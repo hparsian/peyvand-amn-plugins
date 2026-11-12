@@ -27,9 +27,11 @@ scn('1. intake form (public)', function () use ($mobile) {
     $before = (int) $wpdb->get_var("SELECT COUNT(*) FROM $t");
     $nonce_req = new WP_REST_Request('POST', '/payvand/v1/none');
     // nonce path tested over HTTP; here we assert the channel table + registry source exists
-    if (!$wpdb->get_var("SELECT name FROM sqlite_master WHERE type='table' AND name='$t'")) {
-        return ['FAIL', 'payvand_messages table missing'];
-    }
+    // هم SQLite و هم MySQL/MariaDB: فقط وجود جدول و شمارش
+    $wpdb->suppress_errors(true);
+    $exists = $wpdb->get_var("SELECT COUNT(*) FROM $t") !== null;
+    $wpdb->suppress_errors(false);
+    if (!$exists) { return ['FAIL', 'payvand_messages table missing']; }
     return ['PASS', "table ok, existing rows=$before (HTTP submit verified separately)"];
 });
 

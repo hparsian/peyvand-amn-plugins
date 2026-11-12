@@ -43,4 +43,29 @@ final class Pas_CF_Crypto
 
         return Pas_Core_Crypto::decrypt($encoded);
     }
+
+    /**
+     * رمزگشایی با تحملِ داده‌های قدیمی: ردیف‌هایی که پیش از فعال شدن کلید
+     * (یا با نسخه‌های اولیه) به‌صورت متن ساده ذخیره شده‌اند، به‌جای پیام
+     * «داده خراب» همان‌طور که هستند برگردانده می‌شوند — بدون این، مهاجرت از
+     * نسخه‌های اولیه یادداشت‌های قدیمی را ناخوانا نشان می‌داد (باگ پیدا شده
+     * در آزمون مهاجرت فاز ۱۱).
+     *
+     * تشخیص: ciphertext معتبر همیشه base64 با طول دست‌کم nonce(24)+tag(16)
+     * است؛ هر چیز دیگر متن ساده‌ی قدیمی تلقی می‌شود. داده‌ی دستکاری‌شده‌ی
+     * با base64 معتبر همچنان از مسیر سخت‌گیرانه‌ی decrypt رد می‌شود.
+     */
+    public static function decrypt_or_plain(string $value): string
+    {
+        if ($value === '') {
+            return '';
+        }
+
+        $raw = base64_decode($value, true);
+        if ($raw === false || strlen($raw) < 40) { // 24 (nonce) + 16 (tag)
+            return $value;
+        }
+
+        return self::decrypt($value);
+    }
 }

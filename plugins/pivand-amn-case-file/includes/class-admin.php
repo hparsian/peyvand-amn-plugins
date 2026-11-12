@@ -399,7 +399,7 @@ final class Pas_CF_Admin
         $case    = $case_id ? Pas_CF_Case_File::get($case_id) : null;
 
         if ($case_id && !$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
 
         if ($case) {
@@ -1320,7 +1320,7 @@ final class Pas_CF_Admin
         if ($case_id) {
             $existing = Pas_CF_Case_File::get($case_id);
             if (!$existing) {
-                wp_die('پرونده یافت نشد.');
+                wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
             }
             // نگهبان اصلی همین‌جاست: بدون این چک، یک درمانگر بدون
             // PAS_CF_CAP_ALL می‌توانست با ساختن دستی همین درخواست POST
@@ -1362,7 +1362,7 @@ final class Pas_CF_Admin
         if ($next_raw !== '') {
             $converted = Pas_CF_Jalali::jalali_string_to_gregorian_string($next_raw);
             if ($converted === null) {
-                wp_die('تاریخ جلسه‌ی بعد نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲');
+                wp_die('تاریخ جلسه‌ی بعد نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲', 'ورودی نامعتبر', ['response' => 400]);
             }
             $next_date = $converted;
         }
@@ -1390,7 +1390,7 @@ final class Pas_CF_Admin
 
         $case = $case_id ? Pas_CF_Case_File::get($case_id) : null;
         if (!$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
         // بدون این چک، درمانگری بدون دسترسی به این پرونده می‌توانست فقط با
         // فرستادن case_id درست، یادداشت بالینی به پرونده‌ی کس دیگری اضافه کند.
@@ -1398,7 +1398,7 @@ final class Pas_CF_Admin
 
         $session_date = Pas_CF_Jalali::jalali_string_to_gregorian_string($jalali_input);
         if ($session_date === null) {
-            wp_die('تاریخ جلسه نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲');
+            wp_die('تاریخ جلسه نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲', 'ورودی نامعتبر', ['response' => 400]);
         }
 
         if ($content !== '') {
@@ -1431,7 +1431,7 @@ final class Pas_CF_Admin
 
         $case = $case_id ? Pas_CF_Case_File::get($case_id) : null;
         if (!$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
         // همان نگهبان دسترسی add_note — بدون این، درمانگری بدون دسترسی به
         // این پرونده می‌توانست یادداشت بالینی پرونده‌ی کس دیگری را ویرایش کند.
@@ -1439,7 +1439,7 @@ final class Pas_CF_Admin
 
         $session_date = Pas_CF_Jalali::jalali_string_to_gregorian_string($jalali_input);
         if ($session_date === null) {
-            wp_die('تاریخ جلسه نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲');
+            wp_die('تاریخ جلسه نامعتبر است. فرمت درست: ۱۴۰۳/۰۵/۱۲', 'ورودی نامعتبر', ['response' => 400]);
         }
 
         if ($content !== '') {
@@ -1454,7 +1454,7 @@ final class Pas_CF_Admin
                 $this->session_meta_from_post()
             );
             if (!$ok) {
-                wp_die('این یادداشت به این پرونده تعلق ندارد.');
+                wp_die('این یادداشت به این پرونده تعلق ندارد.', 'دسترسی غیرمجاز', ['response' => 403]);
             }
         }
 
@@ -1472,13 +1472,13 @@ final class Pas_CF_Admin
 
         $case = $case_id ? Pas_CF_Case_File::get($case_id) : null;
         if (!$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
         Pas_CF_Security::require_case_access($case);
 
         $ok = Pas_CF_Case_File::delete_note($note_id, $case_id);
         if (!$ok) {
-            wp_die('این یادداشت به این پرونده تعلق ندارد.');
+            wp_die('این یادداشت به این پرونده تعلق ندارد.', 'دسترسی غیرمجاز', ['response' => 403]);
         }
 
         wp_safe_redirect(admin_url('admin.php?page=pas-case-file-new&case_id=' . $case_id . '&note_deleted=1'));
@@ -1495,13 +1495,13 @@ final class Pas_CF_Admin
 
         $case = $case_id ? Pas_CF_Case_File::get($case_id) : null;
         if (!$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
         Pas_CF_Security::require_case_access($case);
 
         $ok = Pas_CF_Case_File::restore_note_version($history_id, $case_id);
         if (!$ok) {
-            wp_die('این نسخه به این پرونده تعلق ندارد.');
+            wp_die('این نسخه به این پرونده تعلق ندارد.', 'دسترسی غیرمجاز', ['response' => 403]);
         }
 
         wp_safe_redirect(admin_url('admin.php?page=pas-case-file-new&case_id=' . $case_id . '&note_restored=1'));
@@ -1585,7 +1585,7 @@ final class Pas_CF_Admin
         $case_id = (int) ($_GET['case_id'] ?? 0);
         $case    = $case_id ? Pas_CF_Case_File::get($case_id) : null;
         if (!$case) {
-            wp_die('پرونده یافت نشد.');
+            wp_die('پرونده یافت نشد.', 'یافت نشد', ['response' => 404]);
         }
         Pas_CF_Security::require_case_access($case);
 

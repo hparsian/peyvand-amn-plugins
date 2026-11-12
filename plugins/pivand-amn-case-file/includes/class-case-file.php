@@ -195,7 +195,7 @@ final class Pas_CF_Case_File
                 $virtual  = $prefix . $field;
                 $encoded  = $row->$column ?? '';
                 $row->$virtual = ($encoded !== '' && Pas_CF_Crypto::is_configured())
-                    ? Pas_CF_Crypto::decrypt($encoded)
+                    ? Pas_CF_Crypto::decrypt_or_plain($encoded)
                     : '';
             }
         }
@@ -204,7 +204,7 @@ final class Pas_CF_Case_File
             $column  = $field . '_encrypted';
             $encoded = $row->$column ?? '';
             $row->$field = ($encoded !== '' && Pas_CF_Crypto::is_configured())
-                ? Pas_CF_Crypto::decrypt($encoded)
+                ? Pas_CF_Crypto::decrypt_or_plain($encoded)
                 : '';
         }
 
@@ -576,11 +576,19 @@ final class Pas_CF_Case_File
 
         $wpdb->insert(Pas_CF_Installer::table('notes'), $row, $formats);
 
+        // شناسهٔ یادداشت باید همین‌جا برداشته شود. قبلاً مقدار برگشتی
+        // `$wpdb->insert_id` بعد از `Pas_CF_Audit_Log::record()` خوانده می‌شد و
+        // آن متد خودش یک INSERT در جدول لاگ انجام می‌دهد؛ بنابراین تابع id
+        // **ردیف لاگ** را برمی‌گرداند، نه id یادداشت. هر مصرف‌کننده‌ای که از
+        // مقدار برگشتی برای لینک/ویرایش استفاده کند روی رکورد اشتباه کار
+        // می‌کرد (باگ واقعی، پیدا شده در آزمون فاز ۱۱).
+        $note_id = (int) $wpdb->insert_id;
+
         $wpdb->update(Pas_CF_Installer::table('cases'), ['updated_at' => current_time('mysql', true)], ['id' => $case_id], ['%s'], ['%d']);
 
         Pas_CF_Audit_Log::record($case_id, 'add_note');
 
-        return (int) $wpdb->insert_id;
+        return $note_id;
     }
 
     /**
@@ -696,7 +704,7 @@ final class Pas_CF_Case_File
         ));
 
         foreach ($rows as $row) {
-            $row->content = Pas_CF_Crypto::decrypt($row->content_encrypted);
+            $row->content = Pas_CF_Crypto::decrypt_or_plain($row->content_encrypted);
         }
 
         return $rows;
@@ -788,7 +796,7 @@ final class Pas_CF_Case_File
         ));
 
         foreach ($rows as $row) {
-            $row->content = Pas_CF_Crypto::decrypt($row->content_encrypted);
+            $row->content = Pas_CF_Crypto::decrypt_or_plain($row->content_encrypted);
         }
 
         return $rows;
@@ -835,7 +843,7 @@ final class Pas_CF_Case_File
         ));
 
         foreach ($rows as $row) {
-            $row->content = Pas_CF_Crypto::decrypt($row->content_encrypted);
+            $row->content = Pas_CF_Crypto::decrypt_or_plain($row->content_encrypted);
         }
 
         return $rows;
