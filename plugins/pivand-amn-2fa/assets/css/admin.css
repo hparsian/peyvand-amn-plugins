@@ -1,0 +1,30 @@
+/**
+ * پیوند امن — احراز دومرحله‌ای
+ * استایل بخش ۲FA در صفحه‌ی پروفایل کاربر (profile.php / user-edit.php).
+ * قبلاً <style> اینلاین بود، حالا با wp_enqueue_style لود می‌شود.
+ */
+
+.pas-2fa-section { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+.pas-2fa-section h2 { font-weight: 700; }
+.pas-2fa-section table.form-table td code {
+    background: var(--pivand-primary-bg, #f0fdfa);
+    border: 1px solid #ccfbf1;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+.pas-2fa-section .button-primary,
+.pas-2fa-section input[type="submit"].button-primary {
+    background: linear-gradient(135deg, var(--pivand-primary-light, #14b8a6), var(--pivand-primary, #0f766e)) !important;
+    border-color: var(--pivand-primary, #0f766e) !important;
+    border-radius: 8px !important;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.pas-2fa-section .button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15,118,110,.28);
+}
+.pas-2fa-section .button.delete { border-radius: 8px !important; }
+
+/* کد راز و لینک otpauth حین فعال‌سازی */
+.pas-2fa-section .pas-2fa-secret { font-size: 16px; user-select: all; }
+.pas-2fa-section .pas-2fa-otpauth-uri { font-size: 11px; }

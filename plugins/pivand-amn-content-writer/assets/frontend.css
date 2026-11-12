@@ -1,0 +1,142 @@
+/**
+ * پیوند امن — استایل عناصر بصری داخل محتوای مقالات تولیدشده با AI.
+ * فقط شامل کلاس‌هایی می‌شود که خودِ افزونه در متن مقاله تزریق می‌کند:
+ * جدول (aco-table-wrap)، باکس نکته (aco-infobox)، باکس هشدار (aco-callout)،
+ * کارت آماری (aco-stat-card) و جداکننده‌ی تزئینی (aco-divider / aco-divider-animated).
+ * عمداً بدون هیچ وابستگی خارجی (فونت/آیکون/جاوااسکریپت) — سبک و ایمن.
+ */
+
+/* ── جدول‌های داخل محتوا ───────────────────────────────────────── */
+.aco-table-wrap {
+    overflow-x: auto;
+    margin: 1.75em 0;
+    border-radius: 10px;
+    border: 1px solid #e5e0da;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.aco-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 460px;
+    font-size: 0.95em;
+}
+
+.aco-table-wrap caption {
+    padding: 0.6em 1em;
+    font-weight: 600;
+    text-align: right;
+}
+
+.aco-table-wrap th,
+.aco-table-wrap td {
+    padding: 0.75em 1em;
+    text-align: right;
+    border-bottom: 1px solid #ece7e0;
+}
+
+.aco-table-wrap thead th {
+    background: #f4efe8;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.aco-table-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aco-table-wrap tbody tr:nth-child(even) {
+    background: #fbfaf8;
+}
+
+/* ── باکس نکته‌ی کلیدی ─────────────────────────────────────────── */
+.aco-infobox {
+    position: relative;
+    margin: 1.75em 0;
+    padding: 1.1em 1.4em 1.1em 1.4em;
+    border-right: 4px solid #4b8f8c;
+    background: #eef6f5;
+    border-radius: 8px;
+}
+
+.aco-infobox::before {
+    content: '💡';
+    margin-left: 0.5em;
+}
+
+.aco-infobox p {
+    margin: 0.3em 0 0;
+    display: inline;
+}
+
+/* ── باکس هشدار/احتیاط ────────────────────────────────────────── */
+.aco-callout {
+    position: relative;
+    margin: 1.75em 0;
+    padding: 1.1em 1.4em;
+    border-right: 4px solid #c0654a;
+    background: #fbf0ec;
+    border-radius: 8px;
+}
+
+.aco-callout::before {
+    content: '⚠';
+    margin-left: 0.5em;
+}
+
+.aco-callout p {
+    margin: 0.3em 0 0;
+    display: inline;
+}
+
+/* ── کارت آماری ────────────────────────────────────────────────── */
+.aco-stat-card {
+    margin: 1.75em 0;
+    padding: 1.2em 1.5em;
+    background: linear-gradient(135deg, #f4efe8, #eef6f5);
+    border: 1px solid #e5e0da;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.05em;
+}
+
+.aco-stat-card p {
+    margin: 0;
+}
+
+/* ── جداکننده‌ی تزئینی بین بخش‌ها ──────────────────────────────── */
+.aco-divider {
+    border: none;
+    height: 3px;
+    margin: 2.5em auto;
+    width: 90px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #4b8f8c, #c0654a);
+}
+
+/* نسخه‌ی متحرک — یک «موشن‌گرافیک» بسیار سبک با CSS خالص، بدون جاوااسکریپت/ویدیو */
+.aco-divider-animated {
+    border: none;
+    height: 4px;
+    margin: 2.5em auto;
+    width: 120px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4b8f8c, #c0654a, #4b8f8c);
+    background-size: 200% 100%;
+    animation: aco-divider-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes aco-divider-shimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* برای کاربرانی که حرکت را کاهش‌داده‌اند (تنظیمات سیستم‌عامل) — انیمیشن غیرفعال شود */
+@media (prefers-reduced-motion: reduce) {
+    .aco-divider-animated {
+        animation: none;
+        background: linear-gradient(90deg, #4b8f8c, #c0654a);
+    }
+}

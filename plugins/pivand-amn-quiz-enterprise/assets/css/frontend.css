@@ -1,0 +1,656 @@
+/* ── Psy Quiz Frontend Styles — v3.3.15 ──────────────────────────────── */
+
+/* ── Tokens ──────────────────────────────────────────────────────────── */
+/* از این نسخه: رنگ‌ها از توکن‌های مشترک اکوسیستم (--pivand-*، تعریف‌شده
+   در پیوند امن — هسته مشترک) می‌خوانند تا ظاهر آزمون‌ها با پنل مراجعان و
+   فرم تماس یکپارچه باشد. مقدار بعد از کاما همان fallback قبلی‌ست. */
+:root {
+    --psy-blue:       var(--pivand-accent, #2b6cb0);
+    --psy-blue-light: #3182ce;
+    --psy-blue-bg:    var(--pivand-accent-bg, #ebf8ff);
+    --psy-purple:     #553c9a;
+    --psy-green:      var(--pivand-success, #38a169);
+    --psy-green-dark: #276749;
+    --psy-green-bg:   var(--pivand-success-bg, #f0fff4);
+    --psy-text:       var(--pivand-ink, #1a202c);
+    --psy-text-mid:   var(--pivand-ink-mid, #4a5568);
+    --psy-text-soft:  var(--pivand-ink-soft, #718096);
+    --psy-border:     var(--pivand-border, #e2e8f0);
+    --psy-surface:    var(--pivand-surface, #f7fafc);
+    --psy-white:      var(--pivand-white, #ffffff);
+    --psy-radius:     var(--pivand-radius, 14px);
+    --psy-radius-sm:  var(--pivand-radius-sm, 8px);
+    --psy-shadow:     var(--pivand-shadow, 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04));
+    --psy-font:       var(--pivand-font-fa, 'Vazirmatn', Tahoma, Arial, sans-serif);
+    --psy-transition: var(--pivand-transition, 0.2s ease);
+}
+
+/* ── Wrap ────────────────────────────────────────────────────────────── */
+#psy-exam-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    font-family: var(--psy-font);
+    direction: rtl;
+    color: var(--psy-text);
+}
+
+/* ── Header / Progress ───────────────────────────────────────────────── */
+#psy-exam-header {
+    background: linear-gradient(135deg, var(--psy-blue) 0%, var(--psy-purple) 100%);
+    padding: 20px 28px 18px;
+    border-radius: var(--psy-radius) var(--psy-radius) 0 0;
+}
+
+#psy-progress-wrap {
+    background: rgba(255,255,255,0.22);
+    border-radius: 20px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+#psy-progress-bar {
+    background: #68d391;
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+}
+#psy-progress-text {
+    font-size: 12px;
+    /* بهبود کنتراست: مقدار قبلی rgba(255,255,255,0.65) روی گرادیان آبی/
+       بنفش هدر، نسبت کنتراست کمتر از حداقل WCAG AA (4.5:1) برای متن کوچک
+       داشت. مقدار جدید با یک سایه‌ی ملایم، خوانایی را در نور محیط روشن
+       هم تضمین می‌کند. */
+    color: rgba(255,255,255,0.92);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    text-align: left;
+    letter-spacing: 0.02em;
+    /* این فیلد معمولاً شامل ارقام (مثل «3 / 10») است؛ فونت لاتین اکوسیستم
+       را برای ارقام واضح‌تر به‌عنوان اولویت اول قرار می‌دهیم، با بازگشت
+       به فونت فارسی برای بقیه‌ی متن. */
+    font-family: var(--pivand-font-latin, 'Inter'), var(--psy-font);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Screens ─────────────────────────────────────────────────────────── */
+/* color-scheme: light + !important روی این کارت: چون کارت آزمون همیشه یک
+   کارت روشن است (مستقل از دارک‌مود سایت/OS)، اگر تم/افزونه‌ی دیگری در سایت
+   یک دارک‌مود مستقل (سوییچ دستی، نه prefers-color-scheme) روی تگ‌های عمومی
+   p/label رنگ متن را عوض کند، پس‌زمینه‌ی سفید این کارت نباید ثابت بماند در
+   حالی که فقط متنش تغییر رنگ می‌دهد — نتیجه‌اش متن کم‌کنتراست/نامرئی است.
+   با قفل‌کردن هر دو با هم، کارت مستقل از دارک‌مود بیرونی همیشه خوانا می‌ماند. */
+#psy-exam-wrap {
+    color-scheme: light;
+}
+.psy-screen {
+    display: none;
+    padding: 36px 32px;
+    background: var(--psy-white) !important;
+    color: var(--psy-text) !important;
+    border: 1px solid var(--psy-border);
+    border-top: none;
+    border-radius: 0 0 var(--psy-radius) var(--psy-radius);
+    box-shadow: var(--psy-shadow);
+}
+.psy-screen.active { display: block; }
+
+/* ── Welcome ─────────────────────────────────────────────────────────── */
+.psy-welcome-box {
+    text-align: center;
+    padding: 8px 0 4px;
+}
+.psy-welcome-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    animation: psy-drop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes psy-drop {
+    from { opacity: 0; transform: translateY(-18px) scale(.85); }
+    to   { opacity: 1; transform: none; }
+}
+.psy-welcome-box h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--psy-text);
+}
+.psy-welcome-box > p {
+    font-size: 14px;
+    color: var(--psy-text-mid);
+    margin: 4px 0;
+    line-height: 1.7;
+}
+
+.psy-note {
+    background: var(--psy-blue-bg);
+    border-right: 3px solid var(--psy-blue-light);
+    border-radius: var(--psy-radius-sm);
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--psy-blue);
+    margin: 20px auto 0;
+    max-width: 480px;
+    text-align: right;
+    line-height: 1.8;
+}
+
+/* Scale guide */
+.psy-scale-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--psy-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 28px 0 12px;
+}
+.psy-scale-preview {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+.psy-scale-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--psy-surface);
+    border: 1.5px solid var(--psy-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 58px;
+    transition: border-color 0.15s;
+}
+.psy-scale-item:hover { border-color: #90cdf4; }
+.psy-scale-num {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--psy-blue);
+    line-height: 1;
+}
+.psy-scale-lbl {
+    font-size: 10px;
+    color: var(--psy-text-soft);
+    margin-top: 5px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.psy-btn {
+    padding: 11px 22px;
+    border-radius: var(--psy-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--psy-font);
+    transition: all 0.18s;
+    outline: none;
+}
+.psy-btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(49,130,206,0.35);
+}
+.psy-btn-primary {
+    background: linear-gradient(135deg, var(--psy-blue-light), var(--psy-blue));
+    color: #fff;
+    font-size: 16px;
+    padding: 14px 40px;
+    border-radius: 50px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 16px rgba(49,130,206,0.35);
+    margin-top: 4px;
+}
+.psy-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(49,130,206,0.4);
+}
+.psy-btn-primary:active { transform: none; }
+
+.psy-btn-prev {
+    background: var(--psy-surface);
+    color: var(--psy-text-mid);
+    border: 1.5px solid var(--psy-border);
+}
+.psy-btn-prev:hover { background: var(--psy-border); }
+
+.psy-btn-next, .psy-btn-submit {
+    background: linear-gradient(135deg, #48bb78, var(--psy-green));
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(56,161,105,0.3);
+}
+.psy-btn-next:hover:not(:disabled),
+.psy-btn-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(56,161,105,0.38);
+}
+.psy-btn-submit {
+    padding: 12px 28px;
+    border-radius: 50px;
+}
+.psy-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Question card ───────────────────────────────────────────────────── */
+/* FIX: animation پیش‌فرض حذف شد — کلاس‌های جهت‌دار (psy-enter-*/psy-exit-*) انیمیشن را مدیریت می‌کنند */
+.psy-question-card {
+    /* بدون animation پیش‌فرض */
+}
+/* @keyframes psy-slidein حذف شد — با psy-enter-right/left تداخل داشت */
+
+.psy-question-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--psy-text-soft);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding: 4px 10px;
+    background: var(--psy-surface);
+    border-radius: 20px;
+    border: 1px solid var(--psy-border);
+}
+
+.psy-question-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--psy-text) !important;
+    line-height: 1.75;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1.5px solid var(--psy-border);
+}
+
+/* ── Options ─────────────────────────────────────────────────────────── */
+.psy-options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 32px;
+}
+.psy-option { cursor: pointer; }
+.psy-option input[type=radio] { display: none; }
+
+.psy-option-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border: 2px solid var(--psy-border);
+    border-radius: 10px;
+    background: var(--psy-surface);
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    user-select: none;
+}
+.psy-option:hover .psy-option-box {
+    border-color: #90cdf4;
+    background: var(--psy-blue-bg);
+}
+.psy-option input:checked + .psy-option-box {
+    border-color: var(--psy-blue-light);
+    background: var(--psy-blue-bg);
+    transform: scale(1.005);
+}
+
+.psy-option-val {
+    background: var(--psy-border);
+    color: var(--psy-text-mid);
+    font-weight: 900;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.psy-option input:checked + .psy-option-box .psy-option-val {
+    background: var(--psy-blue-light);
+    color: #fff;
+}
+.psy-option-lbl {
+    font-size: 14px;
+    color: var(--psy-text-mid) !important;
+    line-height: 1.5;
+}
+.psy-option input:checked + .psy-option-box .psy-option-lbl {
+    color: var(--psy-blue) !important;
+    font-weight: 600;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────── */
+.psy-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 4px;
+}
+
+/* ── Loading ─────────────────────────────────────────────────────────── */
+.psy-loading-box {
+    text-align: center;
+    padding: 60px 20px;
+}
+.psy-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--psy-border);
+    border-top-color: var(--psy-blue-light);
+    border-radius: 50%;
+    animation: psy-spin 0.75s linear infinite;
+    margin: 0 auto 20px;
+}
+@keyframes psy-spin { to { transform: rotate(360deg); } }
+.psy-loading-box p {
+    color: var(--psy-text-soft);
+    font-size: 14px;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────── */
+.psy-error-box,
+.psy-error-standalone {
+    text-align: center;
+    padding: 48px 24px;
+}
+.psy-error-icon { font-size: 48px; margin-bottom: 14px; display: block; }
+.psy-error-box p, .psy-error-standalone p {
+    color: var(--psy-text-mid);
+    font-size: 15px;
+    line-height: 1.8;
+    margin: 8px 0 20px;
+}
+.psy-error-standalone h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--psy-text);
+    margin: 0 0 8px;
+}
+
+/* ── Done ────────────────────────────────────────────────────────────── */
+.psy-done-box {
+    text-align: center;
+    padding: 52px 24px;
+}
+.psy-done-icon {
+    font-size: 68px;
+    display: block;
+    margin-bottom: 20px;
+    animation: psy-pop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes psy-pop {
+    from { opacity: 0; transform: scale(.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.psy-done-box h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--psy-green-dark);
+    margin: 0 0 14px;
+}
+.psy-done-box p {
+    font-size: 15px;
+    color: var(--psy-text-mid);
+    line-height: 1.85;
+    margin: 4px 0;
+}
+.psy-done-note {
+    font-size: 13px;
+    color: var(--psy-text-soft);
+    margin-top: 18px !important;
+    padding: 10px 16px;
+    background: var(--psy-surface);
+    border-radius: var(--psy-radius-sm);
+    display: inline-block;
+}
+
+/* ── Resume button ───────────────────────────────────────────────────── */
+.psy-btn-resume {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+    color: #fff;
+    font-size: 14px;
+    padding: 11px 28px;
+    border-radius: 50px;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 14px rgba(221,107,32,0.32);
+    margin-top: 10px;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+.psy-btn-resume:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(221,107,32,0.4);
+}
+#psy-btn-start {
+    margin-top: 10px;
+}
+
+
+@media print {
+    #psy-exam-header, .psy-nav, #psy-btn-start { display: none !important; }
+    .psy-screen { border: none !important; padding: 0 !important; box-shadow: none !important; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    #psy-exam-wrap { margin: 0; }
+    #psy-exam-header {
+        border-radius: 0;
+        padding: 16px 18px 14px;
+    }
+    .psy-screen {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: 24px 16px;
+    }
+    .psy-question-text { font-size: 16px; }
+    .psy-options { gap: 7px; }
+    .psy-option-box { padding: 12px 14px; gap: 10px; }
+    .psy-option-val { width: 30px; height: 30px; font-size: 14px; }
+    .psy-scale-preview { gap: 5px; }
+    .psy-scale-item { min-width: 50px; padding: 8px 8px; }
+    .psy-scale-num { font-size: 17px; }
+    .psy-btn-primary { padding: 13px 28px; font-size: 15px; }
+}
+
+@media (max-width: 360px) {
+    .psy-screen { padding: 20px 13px; }
+    .psy-question-text { font-size: 15px; }
+    .psy-option-box { padding: 11px 12px; gap: 8px; }
+    .psy-welcome-box h2 { font-size: 19px; }
+    .psy-scale-item { min-width: 42px; padding: 7px 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ── Directional slide animations ────────────────────────────────────── */
+.psy-exit-left  { animation: psy-slide-out-left  0.22s ease forwards; }
+.psy-exit-right { animation: psy-slide-out-right 0.22s ease forwards; }
+.psy-enter-right { opacity: 0; transform: translateX(28px); }
+.psy-enter-left  { opacity: 0; transform: translateX(-28px); }
+.psy-enter-active {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+@keyframes psy-slide-out-left  {
+    to { opacity: 0; transform: translateX(-28px); }
+}
+@keyframes psy-slide-out-right {
+    to { opacity: 0; transform: translateX(28px); }
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+#psy-toast {
+    position: fixed;
+    bottom: max(28px, env(safe-area-inset-bottom, 28px)); /* FIX: پشت keyboard مخفی نشود */
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #2d3748;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-family: var(--psy-font);
+    direction: rtl;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+#psy-toast.psy-toast-show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Welcome stagger animations ──────────────────────────────────────── */
+.psy-header-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.psy-header-visible { opacity: 1; pointer-events: auto; }
+
+.psy-anim-1, .psy-anim-2, .psy-anim-3,
+.psy-anim-4, .psy-anim-5, .psy-anim-6 {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: psy-fadeup 0.5s cubic-bezier(.4,0,.2,1) forwards;
+}
+.psy-anim-1 { animation-delay: 0.05s; }
+.psy-anim-2 { animation-delay: 0.18s; }
+.psy-anim-3 { animation-delay: 0.30s; }
+.psy-anim-4 { animation-delay: 0.42s; }
+.psy-anim-5 { animation-delay: 0.54s; }
+.psy-anim-6 { animation-delay: 0.68s; }
+
+@keyframes psy-fadeup {
+    to { opacity: 1; transform: none; }
+}
+
+/* Done screen — stagger هم برای پایان */
+#psy-screen-result.active .psy-done-icon  { animation: psy-pop 0.5s cubic-bezier(.34,1.56,.64,1) 0.05s both; }
+#psy-screen-result.active .psy-done-box h2 { animation: psy-fadeup 0.4s ease 0.3s both; }
+#psy-screen-result.active .psy-done-box p  { animation: psy-fadeup 0.4s ease 0.45s both; opacity: 0; }
+#psy-screen-result.active .psy-done-box p:nth-child(3) { animation-delay: 0.55s; }
+#psy-screen-result.active .psy-done-note   { animation: psy-fadeup 0.4s ease 0.65s both; opacity: 0; }
+
+/* Error standalone — بهتر */
+.psy-error-standalone {
+    text-align: center;
+    padding: 52px 24px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.psy-error-standalone .psy-error-icon {
+    font-size: 54px;
+    display: block;
+    margin-bottom: 16px;
+    animation: psy-drop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.psy-error-standalone h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--psy-text);
+    margin: 0 0 10px;
+    animation: psy-fadeup 0.4s ease 0.2s both;
+    opacity: 0;
+}
+.psy-error-standalone p {
+    font-size: 14px;
+    color: var(--psy-text-mid);
+    line-height: 1.85;
+    animation: psy-fadeup 0.4s ease 0.35s both;
+    opacity: 0;
+}
+
+/* ── هدر/فوترِ مینیمالِ صفحه‌ی مستقل آزمون آنلاین ──────────────────────────
+   جایگزین هدر/فوتر قالب سایت: فقط لوگو + نام درمانگر (بالا) و شماره
+   پشتیبانی + لینک بازگشت به صفحه اصلی (پایین). همان زبان بصری صفحات
+   مستقل پلاگین پنل مراجعین (ورود/نظرسنجی). */
+body.psy-exam-standalone-body {
+    margin: 0;
+    background: var(--psy-surface);
+    min-height: 100vh;
+}
+.psy-exam-page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 8px 16px 40px;
+}
+.psy-exam-chrome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    padding: 32px 16px 8px;
+}
+.psy-exam-logo-link { display: inline-flex; }
+.psy-exam-logo-img {
+    max-height: 56px;
+    width: auto;
+    border-radius: var(--psy-radius-sm);
+}
+.psy-exam-logo-mark {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: inline-block;
+}
+.psy-exam-logo-fallback { display: none; }
+.psy-exam-logo-mark .psy-ring {
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid var(--psy-blue);
+}
+.psy-exam-logo-mark .psy-ring-a { right: 0; }
+.psy-exam-logo-mark .psy-ring-b {
+    left: 0;
+    border-color: var(--psy-purple);
+    opacity: .75;
+}
+.psy-exam-therapist-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--psy-text-mid);
+}
+.psy-exam-chrome-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 24px 16px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    font-size: 13px;
+}
+.psy-exam-support-link,
+.psy-exam-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--psy-text-soft);
+    text-decoration: none;
+    transition: color var(--psy-transition);
+}
+.psy-exam-support-link:hover,
+.psy-exam-back-link:hover { color: var(--psy-blue); }
+.psy-exam-back-link svg { width: 16px; height: 16px; }

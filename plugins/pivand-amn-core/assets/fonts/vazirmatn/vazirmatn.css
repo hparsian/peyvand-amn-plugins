@@ -1,0 +1,42 @@
+/**
+ * @font-face های فونت Vazirmatn، سلف‌هاست‌شده در خود افزونه‌ی core.
+ * دیگر به fonts.googleapis.com/fonts.gstatic.com وابسته نیستیم — هم برای
+ * سرعت (بدون DNS/اتصال اضافه به گوگل که از ایران گاهی کند/ناپایدار است)
+ * هم برای اطمینان از این‌که فونت برند همیشه لود می‌شود، حتی اگر هیچ
+ * پلاگین دیگری آن را لود نکرده باشد.
+ *
+ * فایل‌های .woff2 باید دستی در همین پوشه (کنار این فایل) قرار بگیرند؛
+ * توضیح کامل در README-FONT.md همین پوشه آمده.
+ */
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('Vazirmatn-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('Vazirmatn-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('Vazirmatn-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
