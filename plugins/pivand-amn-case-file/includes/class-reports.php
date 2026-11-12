@@ -50,10 +50,13 @@ final class Pas_CF_Reports
         $since = date('Y-m-d', strtotime($today . ' -' . $days . ' days'));
 
         // ۱) پرونده‌ها به تفکیک وضعیت.
-        $case_rows = (array) $wpdb->get_results($wpdb->prepare(
-            "SELECT c.status AS status, COUNT(*) AS total FROM $cases_table c WHERE $where GROUP BY c.status",
-            ...$scope_params
-        ));
+        // برای سرپرست/ادمین، scope برابر 1=1 است و هیچ placeholder‌ای در کوئری
+        // نیست؛ wpdb::prepare() با کوئری بدون placeholder نوتیس PHP می‌دهد،
+        // پس فقط وقتی پارامتر داریم prepare می‌زنیم.
+        $case_sql  = "SELECT c.status AS status, COUNT(*) AS total FROM $cases_table c WHERE $where GROUP BY c.status";
+        $case_rows = (array) ($scope_params
+            ? $wpdb->get_results($wpdb->prepare($case_sql, ...$scope_params))
+            : $wpdb->get_results($case_sql));
 
         $cases_by_status = [];
         $cases_total     = 0;

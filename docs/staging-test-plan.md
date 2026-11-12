@@ -36,7 +36,7 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | # | بسته | نسخه |
 |---|---|---|
 | ۱ | `pivand-amn-core-1.7.0.zip` | 1.7.0 |
-| ۲ | `pivand-amn-case-file-1.15.1.zip` | 1.15.1 |
+| ۲ | `pivand-amn-case-file-1.15.2.zip` | 1.15.2 |
 | ۳ | `pivand-amn-quiz-enterprise-3.6.7.zip` | 3.6.7 |
 | ۴ | `pivand-amn-sms-bridge-1.1.6.zip` | 1.1.6 |
 | ۵ | `pivand-amn-2fa-1.3.4.zip` | 1.3.4 |
@@ -46,7 +46,7 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | بسته | SHA-256 |
 |---|---|
 | `pivand-amn-core-1.7.0.zip` | `b28e0f443b8bebadf92c6eb67513139399e7503c042ebea07f3196d8c9d0cd84` |
-| `pivand-amn-case-file-1.15.1.zip` | `dbd0c83f083650e50d755909a636db015b3be0eebd13ca87a629dbd1dbdfabee` |
+| `pivand-amn-case-file-1.15.2.zip` | `3fb99eb1a93a4ec31ca68b01e55d8d2724e85e43f050f9f8b65c28c1aaa7b956` |
 | `pivand-amn-quiz-enterprise-3.6.7.zip` | `addb3c30e162cf6c8da2e85fe3ab72813abda2dd9ecadc5109dbec9e4d0ee36f` |
 | `pivand-amn-sms-bridge-1.1.6.zip` | `2dd5c54d3dbca7f09b284cfb219281f9eee083d1c5ae219d9bc6fd26027c7215` |
 | `pivand-amn-2fa-1.3.4.zip` | `baed8bc334361f869bf54340fb9b4b9f83bde0d433e2896b9898f8580f383a2b` |

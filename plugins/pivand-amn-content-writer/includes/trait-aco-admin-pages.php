@@ -1023,7 +1023,8 @@ trait ACO_Admin_Pages {
                     <label>نویسنده پیش‌فرض پست‌ها</label>
                     <select id="aco-default-author">
                         <?php
-                        $authors    = get_users( [ 'who' => 'authors', 'fields' => [ 'ID', 'display_name' ] ] );
+                        // آرگومان 'who' از وردپرس 5.9 deprecated است؛ جایگزین رسمی آن capability است.
+                        $authors    = get_users( [ 'capability' => 'edit_posts', 'fields' => [ 'ID', 'display_name' ] ] );
                         $current_id = absint( $s['default_author'] ?? 1 );
                         foreach ( $authors as $u ) {
                             printf(

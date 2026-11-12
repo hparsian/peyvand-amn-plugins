@@ -1,5 +1,10 @@
 # Changelog — پیوند امن: پرونده مراجعین
 
+## 1.15.2 — رفع نوتیس wpdb::prepare در گزارش‌ها
+- `Pas_CF_Reports::summary()` در حالت سرپرست/ادمین (scope = `1=1`) کوئری بدون placeholder را به `$wpdb->prepare()` می‌داد و وردپرس نوتیس `_doing_it_wrong` تولید می‌کرد. حالا فقط وقتی پارامتر وجود دارد `prepare` صدا زده می‌شود.
+- رفتار گزارش تغییر نکرده؛ فقط برای سرپرست‌ها بدون نوتیس PHP اجرا می‌شود.
+- `PAS_CF_VERSION` از 1.15.1 به 1.15.2.
+
 ## 1.15.1 — فاز ۹: یکپارچه‌سازی قرارداد دسترسی
 - `Pas_CF_Security::user_can_access_case_row()`: قانون واحد دسترسی به پرونده؛ `current_user_can_access_case()` حالا فقط روی همین متد سوار است.
 - `Pas_CF_Security::case_scope_sql()` و `current_user_case_scope()`: همان قانون به شکل شرط SQL با پشتیبانی از alias.
