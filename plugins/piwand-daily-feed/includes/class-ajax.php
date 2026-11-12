@@ -61,28 +61,28 @@ class PWDF_Ajax {
             return;
         }
 
-        $saved = get_post_meta( $post_id, '_pwdf_saved', true ) ?: [];
-        if ( ! is_array( $saved ) ) $saved = [];
-
-        // BUG-5 + BUG-6: wp_unslash + محدودیت طول 64 کاراکتر
+        // 1.1.5: وضعیت «ذخیره» دیگر در postmeta نوشته نمی‌شود.
+        //
+        // قبلاً این endpoint عمومی (nopriv) اجازه می‌داد هر بازدیدکننده‌ای با
+        // یک nonce عمومی هر تعداد رشته‌ی دلخواه را در متای `_pwdf_saved` همان
+        // کارت بنویسد (سقف ۵۰۰۰ ورودی × ۶۴ کاراکتر ≈ ۳۲۰ کیلوبایت برای هر
+        // کارت). بدتر از آن: **هیچ کدی این متا را نمی‌خواند** — نه شمارنده، نه
+        // فهرست «ذخیره‌شده‌ها»؛ تنها مصرف‌کننده، همان پاسخ AJAX به خود کلیک بود.
+        // یعنی سطح نوشتن عمومی بدون هیچ فایده‌ی کاربردی: امکان رشد دیتابیس و
+        // حذف وضعیت ذخیره‌ی واقعیِ بقیه (به‌خاطر سقف ۵۰۰۰) فراهم بود.
+        //
+        // حالا وضعیت با خودِ کلاینت می‌آید و سرور فقط آن را برمی‌گرداند؛ هیچ
+        // ردیفی نوشته نمی‌شود و رفتار دکمه برای کاربر دقیقاً همان است.
+        // داده‌ی قدیمی حذف نمی‌شود (قاعده‌ی «هیچ داده‌ای پاک نشود»).
         $session_id = substr( sanitize_text_field( wp_unslash( $_POST['session'] ?? '' ) ), 0, 64 );
         if ( empty( $session_id ) ) {
             wp_send_json_error( 'no_session' );
             return;
         }
 
-        if ( in_array( $session_id, $saved, true ) ) {
-            $saved = array_values( array_diff( $saved, [ $session_id ] ) );
-            update_post_meta( $post_id, '_pwdf_saved', $saved );
-            wp_send_json_success( [ 'saved' => false ] );
-        } else {
-            $saved[] = $session_id;
-            if ( count( $saved ) > 5000 ) {
-                $saved = array_slice( $saved, -5000 );
-            }
-            update_post_meta( $post_id, '_pwdf_saved', $saved );
-            wp_send_json_success( [ 'saved' => true ] );
-        }
+        $currently_saved = ! empty( wp_unslash( $_POST['saved'] ?? 0 ) );
+
+        wp_send_json_success( [ 'saved' => ! $currently_saved ] );
     }
 
     public static function share_card() {

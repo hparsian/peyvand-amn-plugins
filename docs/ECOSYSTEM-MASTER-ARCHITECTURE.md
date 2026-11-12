@@ -37,9 +37,9 @@
 | `pivand-amn-quiz-enterprise` | 3.6.7 | `PSY_VERSION` | آزمون‌های روان‌سنجی: دعوت، پاسخ، نتیجه، گزارش |
 | `pivand-amn-sms-bridge` | 1.1.6 | `PAS_BRIDGE_VERSION` | تنها نقطهٔ اتصال به ملی‌پیامک + لاگ پیامک |
 | `pivand-amn-2fa` | 1.3.4 | (ثابت نسخه ندارد) | ورود دومرحله‌ای ادمین (TOTP + کد پشتیبان) |
-| `pivand-amn-smtp-mailer` | 1.5.2 | `ZSM_VERSION` | SMTP و صف ایمیل |
+| `pivand-amn-smtp-mailer` | 1.5.3 | `ZSM_VERSION` | SMTP و صف ایمیل |
 | `pivand-amn-content-writer` | 2.9.18 | `ACO_VERSION` | تولید محتوا/سئو (خارج از دامنهٔ بالینی) |
-| `piwand-daily-feed` | 1.1.4 | `PWDF_VERSION` | فید روزانه (خارج از دامنهٔ بالینی) |
+| `piwand-daily-feed` | 1.1.5 | `PWDF_VERSION` | فید روزانه (خارج از دامنهٔ بالینی) |
 | `payvand-contact` | 1.4.2 | `PAYVAND_VERSION` | فرم تماس (کانال ورودی لید) |
 
 ### ۱.۲. لایه‌بندی

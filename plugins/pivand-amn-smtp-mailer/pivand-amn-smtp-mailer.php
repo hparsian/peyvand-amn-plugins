@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — ارسال ایمیل SMTP
  * Description: تمام ایمیل‌های خروجی وردپرس (wp_mail) را به‌جای mail() پیش‌فرض هاست، از طریق SMTP واقعی یا Brevo API ارسال می‌کند تا در اسپم گیر نکنند.
- * Version: 1.5.2
+ * Version: 1.5.3
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZSM_VERSION', '1.5.2');
+define('ZSM_VERSION', '1.5.3');
 define('ZSM_DIR', plugin_dir_path(__FILE__));
 define('ZSM_URL', plugin_dir_url(__FILE__));
 
@@ -749,6 +749,9 @@ final class ZSM_Mail_Queue
 
     private const MAX_ATTEMPTS = 5;
 
+    /** مدت نگه‌داری ردیف‌های پایان‌یافته در جدول صف/لاگ (روز). */
+    private const RETENTION_DAYS = 30;
+
     private static function table(): string
     {
         global $wpdb;
@@ -855,6 +858,8 @@ final class ZSM_Mail_Queue
     /** توسط wp_cron هر ۵ دقیقه صدا زده می‌شود؛ ردیف‌های سررسیده را دوباره امتحان می‌کند. */
     public static function process_due_queue(): void
     {
+        self::prune_old_rows();
+
         global $wpdb;
         $table = self::table();
 
@@ -866,6 +871,34 @@ final class ZSM_Mail_Queue
         foreach ($rows as $row) {
             self::retry_row($row);
         }
+    }
+
+    /**
+     * پاکسازی دوره‌ای لاگ ارسال (1.5.3).
+     *
+     * جدول `zsm_mail_queue` هم صف retry است و هم لاگ ارسال: هر ایمیل موفق و
+     * هر ایمیل شکست‌خورده یک ردیف با `payload` کامل (شامل متن/HTML ایمیل) در آن
+     * نوشته می‌شود و **هیچ پاکسازی‌ای نداشت** — یعنی رشد بی‌پایان دیتابیس و
+     * نگه‌داری بی‌مدت متن ایمیل‌ها (که می‌تواند داده‌ی شخصی داشته باشد).
+     *
+     * حالا حداکثر یک بار در روز، ردیف‌های **پایان‌یافته** (`sent`/`given_up`)
+     * قدیمی‌تر از ۳۰ روز حذف می‌شوند. ردیف‌های `pending` (در انتظار retry)
+     * هرچقدر قدیمی باشند دست‌نخورده می‌مانند تا ایمیلی گم نشود.
+     */
+    private static function prune_old_rows(): void
+    {
+        if (get_transient('zsm_queue_pruned')) {
+            return;
+        }
+        set_transient('zsm_queue_pruned', 1, DAY_IN_SECONDS);
+
+        global $wpdb;
+        $cutoff = wp_date('Y-m-d H:i:s', time() - (self::RETENTION_DAYS * DAY_IN_SECONDS));
+
+        $wpdb->query($wpdb->prepare(
+            'DELETE FROM ' . self::table() . " WHERE status IN ('sent','given_up') AND created_at < %s",
+            $cutoff
+        ));
     }
 
     private static function retry_row(object $row): void

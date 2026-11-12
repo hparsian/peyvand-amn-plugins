@@ -44,7 +44,10 @@
                 action:   'pwdf_save_card',
                 nonce:    cfg.nonce,
                 post_id:  post_id,
-                session:  session
+                session:  session,
+                // 1.1.5: وضعیت فعلی به سرور می‌رود و سرور فقط برعکسش را برمی‌گرداند؛
+                // هیچ نوشتنی در دیتابیس انجام نمی‌شود (این endpoint عمومی است).
+                saved:    $btn.hasClass('pwdf-saved') ? 1 : 0
             }, function (res) {
                 if (res.success) {
                     if (res.data.saved) {
