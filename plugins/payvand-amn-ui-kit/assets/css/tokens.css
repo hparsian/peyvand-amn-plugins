@@ -1,0 +1,142 @@
+/* ============================================================
+   پیوند امن — کیت رابط کاربری · توکن‌های طراحی (tokens.css)
+   نسخه 1.0.0
+
+   تنها منبع رنگ/فاصله/شعاع/سایه/تایپ در اکوسیستم. هیچ کامپوننتی رنگ
+   هاردکد ندارد. همهٔ نام‌ها با پیشوند --pui- هستند و در :root تعریف
+   می‌شوند تا با افزونه‌های قدیمی (--pivand-*) تداخل نکنند.
+
+   کنتراست‌های اندازه‌گیری‌شده (WCAG 2.1):
+     #51483F روی #F4F0E8 = 7.87 (AAA)
+     #F4F0E8 روی #51483F = 7.87 (AAA)
+     #6B5F52 روی #F4F0E8 = 5.46 (AA)
+     #C8B48A روی #51483F = 4.41 (فقط متن بزرگ/آیکون/مرز)
+     #FFFFFF روی #C8B48A = 2.03 (هرگز)
+     #B8ADA0 روی #F4F0E8 = 1.94 (فقط مرز/تزئین)
+   ============================================================ */
+
+:root {
+    /* ── برند ───────────────────────────────────────────── */
+    --pui-sand:        #B8ADA0;
+    --pui-cream:       #F4F0E8;
+    --pui-brown:       #51483F;
+    --pui-gold:        #C8B48A;
+
+    /* ── نقش‌ها (Light) ─────────────────────────────────── */
+    --pui-bg:          #F4F0E8;
+    --pui-surface:     #FFFFFF;
+    --pui-surface-2:   #FAF7F1;
+    --pui-surface-3:   #F1ECE2;
+    --pui-border:      #B8ADA0;
+    --pui-border-soft: #DDD5C8;
+    --pui-text:        #51483F;
+    --pui-text-muted:  #6B5F52;
+    --pui-text-soft:   #857A6C;
+    --pui-primary:     #51483F;
+    --pui-primary-hover: #3F3830;
+    --pui-on-primary:  #F4F0E8;
+    --pui-accent:      #C8B48A;
+    --pui-accent-soft: #EFE6D3;
+    --pui-accent-line: #B39B6D;
+
+    /* ── وضعیت ──────────────────────────────────────────── */
+    --pui-success:     #3F6B4F;
+    --pui-success-bg:  #E8F1EB;
+    --pui-warning:     #8A5A18;
+    --pui-warning-bg:  #F8EEDC;
+    --pui-danger:      #9B3A2E;
+    --pui-danger-bg:   #F7E7E3;
+    --pui-info:        #3E5A75;
+    --pui-info-bg:     #E7EEF5;
+
+    /* ── سایه ───────────────────────────────────────────── */
+    --pui-shadow-sm: 0 1px 2px rgba(81, 72, 63, .08);
+    --pui-shadow:    0 6px 20px rgba(81, 72, 63, .10), 0 1px 3px rgba(81, 72, 63, .06);
+    --pui-shadow-lg: 0 18px 44px rgba(81, 72, 63, .16), 0 4px 10px rgba(81, 72, 63, .07);
+
+    /* ── فاصله (مقیاس ۴px) ─────────────────────────────── */
+    --pui-s1: 4px;
+    --pui-s2: 8px;
+    --pui-s3: 12px;
+    --pui-s4: 16px;
+    --pui-s5: 20px;
+    --pui-s6: 24px;
+    --pui-s7: 32px;
+    --pui-s8: 40px;
+    --pui-s9: 56px;
+
+    /* ── شعاع ───────────────────────────────────────────── */
+    --pui-r-sm: 8px;
+    --pui-r-md: 12px;
+    --pui-r-lg: 16px;
+    --pui-r-xl: 22px;
+    --pui-r-full: 999px;
+
+    /* ── تایپوگرافی ─────────────────────────────────────── */
+    --pui-font: 'Vazirmatn', Tahoma, Arial, sans-serif;
+    --pui-fs-xs:   .75rem;
+    --pui-fs-sm:   .8125rem;
+    --pui-fs-base: .9375rem;
+    --pui-fs-md:   1.0625rem;
+    --pui-fs-lg:   1.25rem;
+    --pui-fs-xl:   1.5rem;
+    --pui-fs-2xl:  1.875rem;
+    --pui-fs-3xl:  2.25rem;
+    --pui-lh: 1.75;
+
+    /* ── حرکت ───────────────────────────────────────────── */
+    --pui-ease: cubic-bezier(.2, .7, .3, 1);
+    --pui-dur: 160ms;
+    --pui-dur-slow: 240ms;
+
+    /* ── لایه‌ها ────────────────────────────────────────── */
+    --pui-z-nav: 20;
+    --pui-z-modal: 1000;
+    --pui-z-toast: 1100;
+
+    color-scheme: light;
+}
+
+/* ── حالت تاریک ──────────────────────────────────────────
+   با data-pui-theme="dark" روی <html> فعال می‌شود (انتخاب کاربر یا
+   مقدار پیش‌فرض ادمین). رنگ‌های وضعیت روشن‌تر می‌شوند تا کنتراست AA
+   روی سطح تیره حفظ شود. */
+[data-pui-theme="dark"] {
+    --pui-bg:          #2A2521;
+    --pui-surface:     #332D28;
+    --pui-surface-2:   #3A332C;
+    --pui-surface-3:   #443C34;
+    --pui-border:      #4A423A;
+    --pui-border-soft: #3F3830;
+    --pui-text:        #F4F0E8;
+    --pui-text-muted:  #C9BFB2;
+    --pui-text-soft:   #B3A899;
+    --pui-primary:     #C8B48A;
+    --pui-primary-hover: #D8C49A;
+    --pui-on-primary:  #2A2521;
+    --pui-accent:      #D8C49A;
+    --pui-accent-soft: #3C342A;
+    --pui-accent-line: #8E7A55;
+
+    --pui-success:     #86C6A2;
+    --pui-success-bg:  #2E3B33;
+    --pui-warning:     #E2B36B;
+    --pui-warning-bg:  #3E3427;
+    --pui-danger:      #E79A8C;
+    --pui-danger-bg:   #3E2C29;
+    --pui-info:        #9DBDD9;
+    --pui-info-bg:     #2C3743;
+
+    --pui-shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+    --pui-shadow:    0 8px 24px rgba(0, 0, 0, .42), 0 1px 3px rgba(0, 0, 0, .3);
+    --pui-shadow-lg: 0 20px 48px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .35);
+
+    color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --pui-dur: 0ms;
+        --pui-dur-slow: 0ms;
+    }
+}
