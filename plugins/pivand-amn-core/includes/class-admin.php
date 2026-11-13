@@ -9,6 +9,7 @@ final class Pas_Core_Admin
     private string $page_hook = '';
 
     private string $health_page_hook = '';
+    private string $center_page_hook = '';
 
     /**
      * نام اکشن nonce که هر افزونه‌ی مصرف‌کننده (quiz-enterprise، case-file)
@@ -145,6 +146,34 @@ final class Pas_Core_Admin
             ]);
         }
 
+        if ($hook === $this->center_page_hook) {
+            wp_enqueue_style(
+                'pas-core-admin',
+                PAS_CORE_URL . 'assets/css/admin.css',
+                [ \Pas_Core_Tokens::handle() ],
+                PAS_CORE_VERSION
+            );
+            wp_enqueue_style('pas-core-center', PAS_CORE_URL . 'assets/css/center.css', ['pas-core-admin'], PAS_CORE_VERSION);
+
+            // ApexCharts سلف‌هاست — فقط در همین صفحه، بدون هیچ CDN.
+            wp_enqueue_script(
+                'pas-core-apexcharts',
+                PAS_CORE_URL . 'assets/vendor/apexcharts/apexcharts.min.js',
+                [],
+                '3.54.1',
+                true
+            );
+            wp_enqueue_script(
+                'pas-core-center-chart',
+                PAS_CORE_URL . 'assets/js/center.js',
+                ['pas-core-apexcharts'],
+                PAS_CORE_VERSION,
+                true
+            );
+
+            return;
+        }
+
         if ($hook !== $this->page_hook && $hook !== $this->health_page_hook) {
             return;
         }
@@ -198,6 +227,16 @@ final class Pas_Core_Admin
             [$this, 'render_page'],
             'dashicons-networking',
             2
+        );
+
+        // فاز ۱۲ / گام ۵: مرکز مدیریت — صفحهٔ اول این منو.
+        $this->center_page_hook = add_submenu_page(
+            'pas-core-overview',
+            'مرکز مدیریت',
+            'مرکز مدیریت',
+            'manage_options',
+            'pas-core-center',
+            ['Pas_Core_Center', 'render']
         );
 
         // فاز ۱۰: نمای واحد سلامت اکوسیستم (فقط‌خواندنی).

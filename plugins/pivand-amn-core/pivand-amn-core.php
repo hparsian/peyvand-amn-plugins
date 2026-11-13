@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — هسته مشترک
  * Description: زیرساخت مشترک اکوسیستم پیوند امن — توابع تکراری (نرمال‌سازی موبایل، تاریخ شمسی، IP)، بررسی وابستگی بین افزونه‌ها با هشدار واضح در پیشخوان، و رجیستری مستندشده‌ی همه‌ی قراردادهای فیلتری بین‌افزونه‌ای. این افزونه باید همیشه فعال باشد و باید قبل از بقیه‌ی افزونه‌های خانواده لود شود.
- * Version: 1.7.0
+ * Version: 1.8.0
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_CORE_VERSION', '1.7.0');
+define('PAS_CORE_VERSION', '1.8.0');
 define('PAS_CORE_DIR', plugin_dir_path(__FILE__));
 define('PAS_CORE_URL', plugin_dir_url(__FILE__));
 
@@ -57,6 +57,7 @@ require_once PAS_CORE_DIR . 'includes/class-table-registry.php';
 require_once PAS_CORE_DIR . 'includes/class-capability-registry.php';
 require_once PAS_CORE_DIR . 'includes/class-prefix-map.php';
 require_once PAS_CORE_DIR . 'includes/class-admin.php';
+require_once PAS_CORE_DIR . 'includes/class-center.php';
 
 /**
  * موقع فعال‌سازی، اگر کلید رمزنگاری از قبل جایی (wp-config.php یا فایل
