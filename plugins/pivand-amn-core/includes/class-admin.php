@@ -126,6 +126,23 @@ final class Pas_Core_Admin
         wp_send_json_success();
     }
 
+    /**
+     * وابستگی فونت برند: کیت رابط کاربری اگر فعال باشد، وگرنه فونت سلف‌هاست
+     * خود هسته. هیچ درخواست خارجی (Google Fonts) در کار نیست.
+     */
+    private function font_deps(): array
+    {
+        if (class_exists('PUI')) {
+            return [PUI::handle('fonts')];
+        }
+
+        if (class_exists('Pas_Core_Fonts')) {
+            return [\Pas_Core_Fonts::handle()];
+        }
+
+        return [];
+    }
+
     public function enqueue_assets(string $hook): void
     {
         // نوتیس هشدار کلید در admin_notices عمومی است و در همه‌ی صفحات
@@ -150,7 +167,7 @@ final class Pas_Core_Admin
             wp_enqueue_style(
                 'pas-core-admin',
                 PAS_CORE_URL . 'assets/css/admin.css',
-                [ \Pas_Core_Tokens::handle() ],
+                array_merge([ \Pas_Core_Tokens::handle() ], $this->font_deps()),
                 PAS_CORE_VERSION
             );
             wp_enqueue_style('pas-core-center', PAS_CORE_URL . 'assets/css/center.css', ['pas-core-admin'], PAS_CORE_VERSION);
@@ -181,7 +198,7 @@ final class Pas_Core_Admin
         wp_enqueue_style(
             'pas-core-admin',
             PAS_CORE_URL . 'assets/css/admin.css',
-            [ \Pas_Core_Tokens::handle() ],
+            array_merge([ \Pas_Core_Tokens::handle() ], $this->font_deps()),
             PAS_CORE_VERSION
         );
     }

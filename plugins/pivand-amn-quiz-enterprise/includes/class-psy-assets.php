@@ -18,7 +18,6 @@ if (!defined('ABSPATH')) {
 final class Psy_Quiz_Assets
 {
     private const HANDLE      = 'psy-chart-js';
-    private const CDN_URL     = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
     private const LOCAL_RELPATH = 'assets/js/vendor/chart.umd.min.js';
 
     public static function register_chart_js(): void
@@ -29,11 +28,14 @@ final class Psy_Quiz_Assets
 
         $local_path = PSY_DIR . self::LOCAL_RELPATH;
 
-        $src = file_exists($local_path)
-            ? PSY_URL . self::LOCAL_RELPATH
-            : self::CDN_URL;
+        // فاز ۱۲ / گام ۶: فقط نسخه‌ی سلف‌هاست. اگر فایل نبود، اسکریپت ثبت
+        // نمی‌شود (نمودارها بی‌صدا نمایش داده نمی‌شوند) تا هرگز درخواستی به
+        // CDN خارجی زده نشود.
+        if (!file_exists($local_path)) {
+            return;
+        }
 
-        wp_register_script(self::HANDLE, $src, [], '4.4.1', true);
+        wp_register_script(self::HANDLE, PSY_URL . self::LOCAL_RELPATH, [], '4.4.1', true);
     }
 
     public static function enqueue_chart_js(): void

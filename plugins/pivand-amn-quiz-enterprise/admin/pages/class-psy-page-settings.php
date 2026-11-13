@@ -217,8 +217,15 @@ class Psy_Page_Settings {
             </form>
         </div>
 
-        <!-- SortableJS از CDN -->
-        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+        <?php
+        // فاز ۱۲ / گام ۶: SortableJS سلف‌هاست (assets/js/vendor) — بدون CDN.
+        $psy_sortable = PSY_DIR . 'assets/js/vendor/Sortable.min.js';
+        if (file_exists($psy_sortable)) :
+            ?>
+            <script src="<?php echo esc_url(PSY_URL . 'assets/js/vendor/Sortable.min.js?ver=1.15.6'); ?>"></script>
+            <?php
+        endif;
+        ?>
         <script>
         (function(){
             var selected = document.getElementById('psy-popular-selected');

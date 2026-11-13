@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — فرم ارتباط سریع (Pivand Contact)
  * Description: فرم ارتباط سریع تخصصی زوج‌درمانی با ذخیره در پنل و ارسال ایمیل
- * Version: 1.4.2
+ * Version: 1.4.3
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 7.4
@@ -15,7 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'PAYVAND_VERSION', '1.4.2' );
+define( 'PAYVAND_VERSION', '1.4.3' );
 
 // ── Theme Color Detection ────────────────────────────────────────────────────
 function payvand_get_theme_colors() {
@@ -226,26 +226,26 @@ function payvand_enqueue() {
         return;
     }
     // فونت برند: اگر پیوند امن — هسته مشترک فعال باشد، از نسخه‌ی سلف‌هاست‌
-    // شده‌ی آن استفاده می‌شود (بدون درخواست به fonts.googleapis.com). اگر
     // core فعال نباشد، به همان روش قبلی (Google Fonts) برمی‌گردیم تا ظاهر
     // فرم خراب نشود.
-    if ( class_exists( 'Pas_Core_Fonts' ) ) {
+    // فاز ۱۲ / گام ۶: هیچ درخواستی به Google Fonts زده نمی‌شود. اولویت با
+    // فونت سلف‌هاست کیت رابط کاربری است، بعد فونت سلف‌هاست هسته؛ اگر هیچ‌کدام
+    // نبود، فونت از استک سیستمی همان CSS استفاده می‌کند.
+    if ( class_exists( 'PUI' ) ) {
+        $vazirmatn_handle = PUI::handle( 'fonts' );
+    } elseif ( class_exists( 'Pas_Core_Fonts' ) ) {
         $vazirmatn_handle = Pas_Core_Fonts::handle();
     } else {
-        wp_register_style(
-            'payvand-vazirmatn',
-            'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap',
-            [],
-            null
-        );
-        $vazirmatn_handle = 'payvand-vazirmatn';
+        $vazirmatn_handle = '';
     }
-    wp_enqueue_style( $vazirmatn_handle );
+    if ( $vazirmatn_handle !== '' ) {
+        wp_enqueue_style( $vazirmatn_handle );
+    }
 
     // توکن‌های طراحی مشترک اکوسیستم (رنگ/شعاع/سایه): اگر core فعال باشد،
     // form.css به‌جای پالت مستقل خودش از متغیرهای --pivand-* یکپارچه
     // استفاده می‌کند (نگاه کنید به var(--pivand-*, fallback) در form.css).
-    $css_deps = [ $vazirmatn_handle ];
+    $css_deps = $vazirmatn_handle !== '' ? [ $vazirmatn_handle ] : [];
     if ( class_exists( 'Pas_Core_Tokens' ) ) {
         $css_deps[] = Pas_Core_Tokens::handle();
     }

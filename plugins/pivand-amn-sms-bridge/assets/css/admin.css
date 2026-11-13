@@ -75,3 +75,97 @@
         white-space: nowrap;
     }
 }
+
+/* ── فاز ۱۲ / گام ۶: پالت برند پیوند امن ──────────────────────
+   توکن‌های مشترک اکوسیستم فقط در محدودهٔ همین صفحه بازتعریف می‌شوند تا
+   رنگ‌ها، فوکوس و دکمه‌ها با بقیهٔ پیشخوان‌های پیوند امن یکی باشد. */
+.pas-sms-admin {
+    --pivand-primary:       #51483F;
+    --pivand-primary-dark:  #3F3830;
+    --pivand-primary-light: #C8B48A;
+    --pivand-primary-bg:    #EFE6D3;
+    --pivand-primary-mid:   #D9C9A9;
+    --pivand-ink:           #51483F;
+    --pivand-ink-mid:       #6B5F52;
+    --pivand-ink-soft:      #857A6C;
+    --pivand-border:        #DDD5C8;
+    --pivand-border-soft:   #EFE9DE;
+    --pivand-surface:       #FAF7F1;
+    --pivand-white:         #FFFFFF;
+    --pivand-danger:        #9B3A2E;
+    --pivand-danger-bg:     #F7E7E3;
+    --pivand-success:       #3F6B4F;
+    --pivand-success-bg:    #E8F1EB;
+    --pivand-warning:       #8A5A18;
+    --pivand-warning-bg:    #F8EEDC;
+    color: var(--pivand-ink);
+}
+
+.pas-sms-admin h1,
+.pas-sms-admin h2 { color: var(--pivand-ink); }
+
+.pas-sms-admin input[type="text"],
+.pas-sms-admin input[type="tel"],
+.pas-sms-admin input[type="email"],
+.pas-sms-admin input[type="password"],
+.pas-sms-admin input[type="number"],
+.pas-sms-admin input[type="search"],
+.pas-sms-admin input[type="url"],
+.pas-sms-admin select,
+.pas-sms-admin textarea {
+    border: 1px solid var(--pivand-border);
+    border-radius: 9px;
+    background: var(--pivand-white);
+    color: var(--pivand-ink);
+    box-shadow: none;
+}
+
+.pas-sms-admin input[type="text"]:focus,
+.pas-sms-admin input[type="tel"]:focus,
+.pas-sms-admin input[type="email"]:focus,
+.pas-sms-admin input[type="password"]:focus,
+.pas-sms-admin input[type="number"]:focus,
+.pas-sms-admin input[type="search"]:focus,
+.pas-sms-admin select:focus,
+.pas-sms-admin textarea:focus {
+    border-color: var(--pivand-primary);
+    box-shadow: 0 0 0 1px var(--pivand-primary);
+    outline: none;
+}
+
+.pas-sms-admin .button.button-primary,
+.pas-sms-admin input[type="submit"].button-primary {
+    background: var(--pivand-primary) !important;
+    border-color: var(--pivand-primary) !important;
+    color: #F4F0E8 !important;
+    border-radius: 9px !important;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.pas-sms-admin .button.button-primary:hover,
+.pas-sms-admin input[type="submit"].button-primary:hover {
+    background: var(--pivand-primary-dark) !important;
+    border-color: var(--pivand-primary-dark) !important;
+}
+
+.pas-sms-admin .button:not(.button-primary) {
+    border-radius: 9px;
+    color: var(--pivand-primary);
+    border-color: var(--pivand-border);
+    background: var(--pivand-white);
+}
+
+.pas-sms-admin .button:not(.button-primary):hover {
+    background: var(--pivand-primary-bg);
+    border-color: var(--pivand-primary-light);
+    color: var(--pivand-primary-dark);
+}
+
+.pas-sms-admin table.form-table th {
+    color: var(--pivand-ink-mid);
+}
+
+.pas-sms-admin .notice {
+    border-radius: 10px;
+}

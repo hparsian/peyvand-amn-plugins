@@ -53,10 +53,18 @@ final class Pas_Admin
             return;
         }
 
+        // فاز ۱۲ / گام ۶: فونت سلف‌هاست (کیت، سپس هسته) — بدون درخواست خارجی.
+        $deps = class_exists('Pas_Core_Tokens') ? [\Pas_Core_Tokens::handle()] : [];
+        if (class_exists('PUI')) {
+            $deps[] = PUI::handle('fonts');
+        } elseif (class_exists('Pas_Core_Fonts')) {
+            $deps[] = \Pas_Core_Fonts::handle();
+        }
+
         wp_enqueue_style(
             'pas-sms-bridge-admin',
             PAS_BRIDGE_URL . 'assets/css/admin.css',
-            class_exists('Pas_Core_Tokens') ? [\Pas_Core_Tokens::handle()] : [],
+            $deps,
             PAS_BRIDGE_VERSION
         );
     }

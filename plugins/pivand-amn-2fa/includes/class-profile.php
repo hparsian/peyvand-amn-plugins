@@ -34,7 +34,15 @@ final class Pas_2FA_Profile
             return;
         }
 
-        wp_enqueue_style('pas-2fa-admin', PAS_2FA_URL . 'assets/css/admin.css', class_exists('Pas_Core_Tokens') ? [\Pas_Core_Tokens::handle()] : [], PAS_2FA_VERSION);
+        // فاز ۱۲ / گام ۶: فونت سلف‌هاست (کیت، سپس هسته) به‌عنوان dependency تا
+        // بخش ۲FA هم با همان فونت برند نمایش داده شود — بدون هیچ درخواست خارجی.
+        $deps = class_exists('Pas_Core_Tokens') ? [\Pas_Core_Tokens::handle()] : [];
+        if (class_exists('PUI')) {
+            $deps[] = PUI::handle('fonts');
+        } elseif (class_exists('Pas_Core_Fonts')) {
+            $deps[] = \Pas_Core_Fonts::handle();
+        }
+        wp_enqueue_style('pas-2fa-admin', PAS_2FA_URL . 'assets/css/admin.css', $deps, PAS_2FA_VERSION);
     }
 
     /**

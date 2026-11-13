@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — احراز دومرحله‌ای ادمین
  * Description: احراز هویت دومرحله‌ای (TOTP، سازگار با Google Authenticator/Authy) برای ورود به پیشخوان — مخصوص ادمین‌هایی که به داده‌های حساس (پرونده مراجعین، تنظیمات پرداخت/پیامک) دسترسی دارند.
- * Version: 1.3.4
+ * Version: 1.3.5
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_2FA_VERSION', '1.3.4');
+define('PAS_2FA_VERSION', '1.3.5');
 define('PAS_2FA_DIR', plugin_dir_path(__FILE__));
 define('PAS_2FA_URL', plugin_dir_url(__FILE__));
 

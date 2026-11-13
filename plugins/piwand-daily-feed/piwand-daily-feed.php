@@ -3,7 +3,7 @@
  * Plugin Name: پیوند امن — فید محتوای روزانه (Pivand Daily Feed)
  * Plugin URI:  https://piwandsafe.com
  * Description: فید روزانه محتوای روانشناسی برای سایت پیوند امن
- * Version:     1.1.5
+ * Version:     1.1.6
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 7.4
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PWDF_VERSION',  '1.1.5' );
+define( 'PWDF_VERSION',  '1.1.6' );
 define( 'PWDF_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'PWDF_URL',      plugin_dir_url( __FILE__ ) );
 define( 'PWDF_BASENAME', plugin_basename( __FILE__ ) );

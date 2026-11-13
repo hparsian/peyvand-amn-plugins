@@ -75,22 +75,19 @@ class PWDF_Shortcode {
         }
         if ( ! $load ) return;
 
-        if ( class_exists( 'Pas_Core_Fonts' ) ) {
+        // فاز ۱۲ / گام ۶: بدون هیچ درخواست به Google Fonts.
+        if ( class_exists( 'PUI' ) ) {
+            $font_handle = PUI::handle( 'fonts' );
+        } elseif ( class_exists( 'Pas_Core_Fonts' ) ) {
             $font_handle = Pas_Core_Fonts::handle();
         } else {
-            wp_register_style(
-                'pwdf-vazirmatn-fallback',
-                'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap',
-                [],
-                null
-            );
-            $font_handle = 'pwdf-vazirmatn-fallback';
+            $font_handle = '';
         }
 
         wp_enqueue_style(
             'pwdf-feed',
             PWDF_URL . 'assets/css/feed-display.css',
-            array_merge( [ $font_handle ], class_exists( 'Pas_Core_Tokens' ) ? [ Pas_Core_Tokens::handle() ] : [] ),
+            array_merge( $font_handle !== '' ? [ $font_handle ] : [], class_exists( 'Pas_Core_Tokens' ) ? [ Pas_Core_Tokens::handle() ] : [] ),
             PWDF_VERSION
         );
         wp_enqueue_script(
