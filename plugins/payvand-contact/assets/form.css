@@ -314,6 +314,32 @@
     letter-spacing: 0.01em;
 }
 
+/* ── آیکون‌های SVG درون‌خطی (جانشین ایموجی) ── */
+.payvand-wrap .payvand-icon,
+.payvand-admin .payvand-icon {
+    width: 1.05em;
+    height: 1.05em;
+    vertical-align: -0.16em;
+    margin-inline-end: 6px;
+    flex-shrink: 0;
+}
+
+.payvand-wrap .payvand-secure .payvand-icon {
+    width: 13px;
+    height: 13px;
+    vertical-align: -0.2em;
+    color: inherit;
+}
+
+.payvand-wrap .radio-card .payvand-icon {
+    color: var(--pv-primary);
+    margin-inline-end: 6px;
+}
+
+.payvand-wrap .radio-card:has(input:checked) .payvand-icon {
+    color: inherit;
+}
+
 /* ── Responsive ── */
 @media (max-width: 520px) {
     .payvand-wrap .payvand-header   { padding: 24px 20px 20px; }

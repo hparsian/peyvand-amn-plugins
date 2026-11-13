@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — فرم ارتباط سریع (Pivand Contact)
  * Description: فرم ارتباط سریع تخصصی زوج‌درمانی با ذخیره در پنل و ارسال ایمیل
- * Version: 1.4.3
+ * Version: 1.4.4
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 7.4
@@ -106,6 +106,43 @@ function payvand_digits_to_en( $str ) {
         '۰'=>'0','۱'=>'1','۲'=>'2','۳'=>'3','۴'=>'4','۵'=>'5','۶'=>'6','۷'=>'7','۸'=>'8','۹'=>'9',
         '٠'=>'0','١'=>'1','٢'=>'2','٣'=>'3','٤'=>'4','٥'=>'5','٦'=>'6','٧'=>'7','٨'=>'8','٩'=>'9',
     ] );
+}
+
+if ( ! function_exists( 'payvand_icon' ) ) {
+    /**
+     * آیکون SVG درون‌خطی برای فرم/صفحه‌های عمومی پیوند امن.
+     *
+     * هم‌خانواده با آیکون‌های کیت (شبکهٔ ۲۴×۲۴، stroke=currentColor)، بدون فونت
+     * آیکون و بدون درخواست خارجی؛ جای ایموجی می‌نشیند تا ظاهر فرم روی همهٔ
+     * سیستم‌عامل‌ها یکسان بماند. این افزونه مستقل است و به کیت وابسته نمی‌شود.
+     */
+    function payvand_icon( $name, $size = 16 ) {
+        $paths = [
+            'building' => '<path d="M4.5 20.5V5.2a1.2 1.2 0 0 1 1.2-1.2h7.6a1.2 1.2 0 0 1 1.2 1.2v15.3"/><path d="M14.5 9.5h4.3a1.2 1.2 0 0 1 1.2 1.2v9.8M3 20.5h18"/><path d="M7.5 7.5h3M7.5 11h3M7.5 14.5h3M16.8 13h1M16.8 16.5h1"/>',
+            'monitor'  => '<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20.5h6M12 16.5v4"/>',
+            'phone'    => '<path d="M7 3.8 9.6 4l1.2 4-2 1.4a11.5 11.5 0 0 0 5.8 5.8l1.4-2 4 1.2.2 2.6c0 1.3-1 2.3-2.3 2.4C11.4 20 4 12.6 4.6 6.1 4.7 4.8 5.7 3.8 7 3.8z"/>',
+            'lock'     => '<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+            'message'  => '<path d="M20 15.5a2 2 0 0 1-2 2H9l-4.5 3v-3H6a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+            'inbox'    => '<path d="M4 13.5 6.4 5.4A1.5 1.5 0 0 1 7.8 4.3h8.4a1.5 1.5 0 0 1 1.4 1.1L20 13.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 13.5h4l1 2.5h6l1-2.5h4"/>',
+            'settings' => '<circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l1.8-1.2-1.8-3.1-2.1.8a7.6 7.6 0 0 0-2.6-1.5L14.4 3h-4.8l-.3 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.1-.8-1.8 3.1L4.6 10.5a7.6 7.6 0 0 0 0 3l-1.8 1.2 1.8 3.1 2.1-.8a7.6 7.6 0 0 0 2.6 1.5l.3 2.5h4.8l.3-2.5a7.6 7.6 0 0 0 2.6-1.5l2.1.8 1.8-3.1z"/>',
+            'mail'     => '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 6 7.5-6"/>',
+            'check'    => '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+            'alert'    => '<path d="M12 4.5 21 20H3z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+            'x'        => '<path d="m6 6 12 12M18 6 6 18"/>',
+        ];
+
+        if ( ! isset( $paths[ $name ] ) ) {
+            return '';
+        }
+
+        return sprintf(
+            '<svg class="payvand-icon payvand-icon-%s" width="%d" height="%d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%s</svg>',
+            esc_attr( $name ),
+            (int) $size,
+            (int) $size,
+            $paths[ $name ]
+        );
+    }
 }
 
 /** ساخت/به‌روزرسانی جدول پیام‌ها (idempotent؛ از dbDelta استفاده می‌کند). */
@@ -408,15 +445,15 @@ function payvand_render_form() {
                     <div class="payvand-radio-group" role="radiogroup" aria-labelledby="pv-consult-label">
                         <label class="radio-card">
                             <input type="radio" name="consult_type" value="in-person"> 
-                            <span>🏢 حضوری</span>
+                            <span><?php echo payvand_icon('building'); ?> حضوری</span>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="consult_type" value="online"> 
-                            <span>💻 آنلاین</span>
+                            <span><?php echo payvand_icon('monitor'); ?> آنلاین</span>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="consult_type" value="phone"> 
-                            <span>📞 تلفنی</span>
+                            <span><?php echo payvand_icon('phone'); ?> تلفنی</span>
                         </label>
                     </div>
                 </div>
@@ -443,7 +480,7 @@ function payvand_render_form() {
                     <span class="btn-text">ارسال پیام</span>
                     <span class="btn-loader" style="display:none;">در حال ارسال…</span>
                 </button>
-                <p class="payvand-secure">🔒 اطلاعات شما کاملاً محرمانه است</p>
+                <p class="payvand-secure"><?php echo payvand_icon('lock'); ?> اطلاعات شما کاملاً محرمانه است</p>
             </div>
         </form>
     </div>
@@ -591,7 +628,7 @@ function payvand_send_email( $name, $phone, $email, $visit, $consult, $message )
 </head>
 <body>
 <div class="card">
-  <h2>💬 پیام جدید – پیوند امن</h2>
+  <h2>پیام جدید – پیوند امن</h2>
   <div class="row"><span class="label">نام:</span><span class="value">' . esc_html($name) . '</span></div>
   <div class="row"><span class="label">موبایل:</span><span class="value">' . esc_html($phone) . '</span></div>
   <div class="row"><span class="label">ایمیل:</span><span class="value">' . ( $email ? esc_html($email) : '—' ) . '</span></div>
@@ -740,7 +777,7 @@ function payvand_messages_page() {
     ?>
     <div class="wrap payvand-admin" dir="rtl">
         <h1>
-            📩 پیام‌های دریافتی – پیوند امن
+            <?php echo payvand_icon('inbox', 22); ?> پیام‌های دریافتی – پیوند امن
             <span class="payvand-badge-new"><?php echo (int)($cnt['new']??0); ?> جدید</span>
         </h1>
 
@@ -757,7 +794,7 @@ function payvand_messages_page() {
             );
             $cancel_url  = esc_url( admin_url('admin.php?page=payvand-messages') );
             echo '<div class="notice notice-warning" style="padding:14px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
-                . '<span>⚠️ آیا از حذف پیام شماره <strong>' . $confirm_id . '</strong> مطمئن هستید؟ این عمل غیرقابل بازگشت است.</span>'
+                . '<span>' . payvand_icon('alert', 18) . ' آیا از حذف پیام شماره <strong>' . $confirm_id . '</strong> مطمئن هستید؟ این عمل غیرقابل بازگشت است.</span>'
                 . '<a href="' . esc_url( $confirm_url ) . '" class="button button-primary" style="background:#d63638;border-color:#d63638">بله، حذف کن</a>'
                 . '<a href="' . $cancel_url . '" class="button">انصراف</a>'
                 . '</div>';
@@ -894,7 +931,7 @@ function payvand_settings_page() {
     $override = get_option('payvand_color_override', '');
     ?>
     <div class="wrap payvand-admin" dir="rtl">
-        <h1>⚙️ تنظیمات پیوند امن</h1>
+        <h1><?php echo payvand_icon('settings', 22); ?> تنظیمات پیوند امن</h1>
         <?php if ( isset( $_GET['updated'] ) ) echo '<div class="notice notice-success is-dismissible"><p>عملیات با موفقیت انجام شد.</p></div>'; ?>
         <form method="post">
             <?php wp_nonce_field('payvand_settings'); ?>
@@ -974,17 +1011,17 @@ function payvand_settings_page() {
 
         <hr style="margin:32px 0">
 
-        <h2>📧 تست ارسال ایمیل</h2>
+        <h2><?php echo payvand_icon('mail', 20); ?> تست ارسال ایمیل</h2>
         <p>با این دکمه یک ایمیل آزمایشی به آدرس تنظیم‌شده ارسال می‌شود تا مطمئن شوید ارسال ایمیل کار می‌کند.</p>
 
         <?php if ( $mail_test_result !== null ): ?>
             <?php if ( $mail_test_result['success'] ): ?>
                 <div class="notice notice-success inline" style="margin:12px 0">
-                    <p>✅ ایمیل تست با موفقیت به <strong><?php echo esc_html($mail_test_result['to']); ?></strong> ارسال شد. صندوق ورودی را بررسی کنید.</p>
+                    <p><?php echo payvand_icon('check', 16); ?> ایمیل تست با موفقیت به <strong><?php echo esc_html($mail_test_result['to']); ?></strong> ارسال شد. صندوق ورودی را بررسی کنید.</p>
                 </div>
             <?php else: ?>
                 <div class="notice notice-error inline" style="margin:12px 0">
-                    <p>❌ ارسال ایمیل ناموفق بود.</p>
+                    <p><?php echo payvand_icon('x', 16); ?> ارسال ایمیل ناموفق بود.</p>
                     <?php if ( ! empty($mail_test_result['error']) ): ?>
                         <p><strong>جزئیات خطا:</strong><br>
                         <code style="display:block;background:#f8f8f8;padding:8px;border-radius:4px;direction:ltr;text-align:left;margin-top:6px"><?php echo esc_html($mail_test_result['error']); ?></code></p>

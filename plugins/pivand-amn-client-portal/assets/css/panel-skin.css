@@ -466,7 +466,37 @@ body.zdp-panel-blank {
     padding: var(--pui-s6) var(--pui-s4);
 }
 
-.zdp-panel-shell .zdp-empty-state-icon { color: var(--pui-text-muted); }
+.zdp-panel-shell .zdp-empty-state-icon {
+    color: var(--pui-text-muted);
+    display: flex;
+    justify-content: center;
+    margin-block-end: var(--pui-s2);
+}
+
+.zdp-panel-shell .zdp-empty-state-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+/* آیکون‌های SVG درون‌خطی، جانشین ایموجی در عنوان و متن */
+.zdp-panel-shell .zdp-icon-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.18em;
+    margin-inline-end: 6px;
+    color: var(--pui-accent-line);
+}
+
+.zdp-panel-shell .zdp-icon-inline svg {
+    width: 17px;
+    height: 17px;
+}
+
+.zdp-panel-shell .zdp-bw-notice li .zdp-icon-inline {
+    color: var(--pui-text-muted);
+    margin-inline-end: 8px;
+}
 
 /* ── پاورقی ──────────────────────────────────────────────── */
 .zdp-panel-shell .zdp-panel-footer {

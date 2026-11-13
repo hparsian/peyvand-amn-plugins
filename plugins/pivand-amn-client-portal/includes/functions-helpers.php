@@ -405,3 +405,50 @@ function zdp_current_user_id(): int
 {
     return get_current_user_id();
 }
+
+if (!function_exists('zdp_icon')) {
+    /**
+     * آیکون SVG درون‌خطی برای سطوحی که مراجع می‌بیند (پنل، فرم ارزیابی، قیف آزمون).
+     *
+     * هم‌خانواده با آیکون‌های کیت رابط کاربری: شبکهٔ ۲۴×۲۴، stroke=currentColor،
+     * بدون فونت آیکون و بدون درخواست خارجی. جای ایموجی می‌نشیند تا ظاهر رابط در
+     * همهٔ سیستم‌عامل‌ها یکسان و حرفه‌ای بماند. آیکون تزئینی است و aria-hidden
+     * می‌گیرد؛ متن همراه آن، معنای کنترل را می‌رساند.
+     */
+    function zdp_icon(string $name, int $size = 18, array $args = []): string
+    {
+        $paths = [
+            'check'     => '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+            'clock'     => '<circle cx="12" cy="12" r="8.25"/><path d="M12 7.5V12l3 2"/>',
+            'lock'      => '<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+            'clipboard' => '<rect x="6" y="4.5" width="12" height="16" rx="2"/><path d="M9.5 4.5V3.2h5v1.3M9.5 10h5M9.5 13.5h5M9.5 17h3"/>',
+            'message'   => '<path d="M20 15.5a2 2 0 0 1-2 2H9l-4.5 3v-3H6a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+            'calendar'  => '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3.5v3M16 3.5v3M3.5 10.5h17"/>',
+            'phone'     => '<path d="M7 3.8 9.6 4l1.2 4-2 1.4a11.5 11.5 0 0 0 5.8 5.8l1.4-2 4 1.2.2 2.6c0 1.3-1 2.3-2.3 2.4C11.4 20 4 12.6 4.6 6.1 4.7 4.8 5.7 3.8 7 3.8z"/>',
+            'refresh'   => '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5V9h-4.5"/>',
+            'shield'    => '<path d="M12 3.5 19 6v5.5c0 4.2-2.8 7.6-7 9-4.2-1.4-7-4.8-7-9V6z"/><path d="m9 12 2 2 4-4"/>',
+            'mail'      => '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 6 7.5-6"/>',
+        ];
+
+        // اگر کیت رابط کاربری فعال باشد، همان آیکون‌های کیت استفاده می‌شوند تا
+        // در کل اکوسیستم یک خانوادهٔ آیکون واحد داشته باشیم؛ نقشهٔ بالا فقط
+        // fallback برای وقتی است که کیت خاموش است.
+        if (function_exists('pui_icon') && class_exists('PUI_Icons') && in_array($name, \PUI_Icons::names(), true)) {
+            return \pui_icon($name, ['size' => max(12, $size)]);
+        }
+
+        if (!isset($paths[$name])) {
+            return '';
+        }
+
+        $class = 'zdp-icon' . (!empty($args['class']) ? ' ' . preg_replace('/[^A-Za-z0-9 _-]/', '', (string) $args['class']) : '');
+
+        return sprintf(
+            '<svg class="%s" width="%d" height="%d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%s</svg>',
+            $class,
+            max(12, $size),
+            max(12, $size),
+            $paths[$name]
+        );
+    }
+}

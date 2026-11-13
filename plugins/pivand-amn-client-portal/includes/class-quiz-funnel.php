@@ -416,8 +416,8 @@ final class Quiz_Funnel
         $quiz     = $registry[$topic];
         $quiz_url = $this->quiz_url($topic);
 
-        $mid_cta = '<p class="zdp-quiz-cta-mid">💬 <a href="' . esc_url($quiz_url) . '"><strong>' . esc_html($quiz['title']) . '</strong></a> — فقط ۲ دقیقه وقت می‌گیره.</p>';
-        $end_cta = '<p class="zdp-quiz-cta-end">📝 می‌خواید بدونید الان رابطه‌تون در چه وضعیتیه؟ <a href="' . esc_url($quiz_url) . '"><strong>' . esc_html($quiz['title']) . '</strong></a> را رایگان انجام بدید.</p>';
+        $mid_cta = '<p class="zdp-quiz-cta-mid"><span class="zdp-icon-inline">' . zdp_icon('message', 18) . '</span> <a href="' . esc_url($quiz_url) . '"><strong>' . esc_html($quiz['title']) . '</strong></a> — فقط ۲ دقیقه وقت می‌گیره.</p>';
+        $end_cta = '<p class="zdp-quiz-cta-end"><span class="zdp-icon-inline">' . zdp_icon('clipboard', 18) . '</span> می‌خواید بدونید الان رابطه‌تون در چه وضعیتیه؟ <a href="' . esc_url($quiz_url) . '"><strong>' . esc_html($quiz['title']) . '</strong></a> را رایگان انجام بدید.</p>';
 
         $content = $this->insert_html_at_middle_paragraph($post->post_content, $mid_cta) . $end_cta;
 

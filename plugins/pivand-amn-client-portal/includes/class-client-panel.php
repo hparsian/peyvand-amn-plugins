@@ -366,6 +366,7 @@ final class Client_Panel
             'shield'       => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L19 6V11.5C19 15.6 16.1 19 12 20.5C7.9 19 5 15.6 5 11.5V6L12 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11.2 14.2L15.2 10.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             'user'         => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 20C5.5 16.6 8.4 14.5 12 14.5C15.6 14.5 18.5 16.6 18.5 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
             'clock'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.25" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12L15 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'check'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5L9.5 17L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         ];
 
         return $icons[$name] ?? '';
@@ -611,13 +612,13 @@ final class Client_Panel
         ?>
         <?php if ($pending_payment) : ?>
             <div class="zdp-card zdp-pending-payment-box">
-                <h3>✅ نوبت شما با موفقیت ثبت شد</h3>
+                <h3><span class="zdp-icon-inline"><?php echo $this->icon('check'); ?></span> نوبت شما با موفقیت ثبت شد</h3>
                 <p>جزئیات پرداخت و وضعیت تایید را در کادر زیر ببینید.</p>
             </div>
         <?php endif; ?>
         <div class="zdp-card zdp-card-form">
             <?php if ($pending_manual) : ?>
-                <h3>⏳ در انتظار تایید واریز</h3>
+                <h3><span class="zdp-icon-inline"><?php echo $this->icon('clock'); ?></span> در انتظار تایید واریز</h3>
                 <p>
                     <?php echo esc_html($pending_manual->service_name); ?> —
                     مبلغ قابل‌پرداخت: <strong><?php echo esc_html(number_format((float) $pending_manual->price)); ?> تومان</strong>
@@ -648,7 +649,7 @@ final class Client_Panel
                     </form>
                 <?php else : ?>
                     <div class="zdp-receipt-uploaded-box">
-                        <p>✅ رسید شما آپلود شد و در انتظار بررسی ادمین است.</p>
+                        <p><span class="zdp-icon-inline"><?php echo $this->icon('check'); ?></span> رسید شما آپلود شد و در انتظار بررسی ادمین است.</p>
                         <p>
                             <a href="<?php echo esc_url(Booking::receipt_url($pending_manual)); ?>" target="_blank" rel="noopener noreferrer">مشاهده‌ی رسید ارسالی</a>
                         </p>
@@ -690,7 +691,7 @@ final class Client_Panel
         <h3 class="zdp-section-title">نوبت‌های من</h3>
         <?php if (empty($bookings)) : ?>
             <div class="zdp-empty-state">
-                <span class="zdp-empty-state-icon" aria-hidden="true">📅</span>
+                <span class="zdp-empty-state-icon" aria-hidden="true"><?php echo $this->icon('appointments'); ?></span>
                 <p>هنوز نوبتی ثبت نکرده‌اید. از فرم بالا یک نوبت جدید رزرو کنید.</p>
             </div>
         <?php else : ?>
@@ -717,7 +718,7 @@ final class Client_Panel
     private function render_quizzes_tab(array $quizzes): string
     {
         if (empty($quizzes)) {
-            return '<div class="zdp-empty-state"><span class="zdp-empty-state-icon" aria-hidden="true">📝</span><p>در حال حاضر آزمونی برای شما تعریف نشده است.</p></div>';
+            return '<div class="zdp-empty-state"><span class="zdp-empty-state-icon" aria-hidden="true">' . $this->icon('quizzes') . '</span><p>در حال حاضر آزمونی برای شما تعریف نشده است.</p></div>';
         }
 
         ob_start();
@@ -806,7 +807,7 @@ final class Client_Panel
             </ul>
         <?php else : ?>
             <div class="zdp-empty-state">
-                <span class="zdp-empty-state-icon" aria-hidden="true">💬</span>
+                <span class="zdp-empty-state-icon" aria-hidden="true"><?php echo $this->icon('messages'); ?></span>
                 <p>هنوز پیامی رد و بدل نشده. اولین پیام را از فرم بالا برای درمانگر خود بفرستید.</p>
             </div>
         <?php endif; ?>

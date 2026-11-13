@@ -376,7 +376,7 @@ final class Intake
         }
 
         return '<div class="zdp-intake-banner" role="status">'
-            . '<span class="zdp-intake-banner-text">📝 لطفاً پیش از جلسه، فرم ارزیابی مراجع را تکمیل کنید.</span>'
+            . '<span class="zdp-intake-banner-text"><span class="zdp-icon-inline">' . zdp_icon('clipboard', 16) . '</span> لطفاً پیش از جلسه، فرم ارزیابی مراجع را تکمیل کنید.</span>'
             . '<button type="button" class="zdp-btn-primary zdp-intake-banner-btn" data-goto-tab="intake">تکمیل فرم</button>'
             . '</div>';
     }
@@ -399,7 +399,7 @@ final class Intake
         <div class="zdp-card zdp-card-form">
             <h3>فرم ارزیابی مراجع</h3>
             <?php if ($row) : ?>
-                <p class="zdp-intake-done">✅ فرم شما در تاریخ <?php echo esc_html(Jalali::gregorian_to_jalali_string(substr((string) $row->submitted_at, 0, 10))); ?> ثبت شده است. در صورت نیاز می‌توانید اطلاعات را اصلاح کنید.</p>
+                <p class="zdp-intake-done"><span class="zdp-icon-inline"><?php echo zdp_icon('check', 16); ?></span> فرم شما در تاریخ <?php echo esc_html(Jalali::gregorian_to_jalali_string(substr((string) $row->submitted_at, 0, 10))); ?> ثبت شده است. در صورت نیاز می‌توانید اطلاعات را اصلاح کنید.</p>
             <?php else : ?>
                 <p class="zdp-intake-lead">لطفاً پیش از اولین جلسه این فرم را کامل کنید. اطلاعات شما محرمانه است و فقط برای درمانگر نمایش داده می‌شود.</p>
             <?php endif; ?>
@@ -476,7 +476,7 @@ final class Intake
                 </p>
 
                 <h4 class="zdp-intake-section-title"><span class="zdp-intake-step">۲</span> سوابق سلامت و درمان</h4>
-                <p class="zdp-intake-privacy">🔒 این بخش کاملاً محرمانه است و فقط درمانگر شما آن را می‌بیند. پاسخ به این بخش اختیاری است، اما به شناخت بهتر شرایط شما کمک می‌کند.</p>
+                <p class="zdp-intake-privacy"><span class="zdp-icon-inline"><?php echo zdp_icon('lock', 16); ?></span> این بخش کاملاً محرمانه است و فقط درمانگر شما آن را می‌بیند. پاسخ به این بخش اختیاری است، اما به شناخت بهتر شرایط شما کمک می‌کند.</p>
                 <?php foreach (self::HEALTH_FIELDS as $hkey => $cfg) :
                     $hid  = 'zdp-in-' . str_replace('_', '-', $cfg['details']);
                     $hval = $v($hkey);
