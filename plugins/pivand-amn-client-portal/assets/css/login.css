@@ -1,0 +1,659 @@
+/* ============================================================
+   پیوند امن — پنل مراجع · صفحهٔ ورود (login.css)
+   نسخه 1.0.0 — گام ۲ فاز ۱۲
+
+   قواعد سخت:
+     • همهٔ انتخابگرها زیر .zdp-login-stage محدود شده‌اند تا هیچ استایلی
+       به بقیهٔ صفحه‌های سایت یا پنلِ پس از ورود نشت نکند.
+     • همهٔ رنگ‌ها/شعاع/سایه از توکن‌های --pui-* می‌آیند (کیت رابط کاربری).
+       اگر کیت غیرفعال باشد، همان متغیرها با مقدار پشتیبان (fallback) در
+       همین فایل تعریف می‌شوند تا صفحه هرگز بی‌رنگ نشود.
+     • هیچ منطق/شناسه‌ای از OTP تغییر نمی‌کند؛ این فایل فقط ظاهر است.
+   ============================================================ */
+
+.zdp-login-stage {
+    /* پشتیبان، اگر payvand-amn-ui-kit فعال نباشد */
+    --pui-bg: #F4F0E8;
+    --pui-surface: #FFFFFF;
+    --pui-surface-2: #FAF7F1;
+    --pui-surface-3: #F1ECE2;
+    --pui-text: #51483F;
+    --pui-text-soft: #6B5F52;
+    --pui-text-muted: #8A7F72;
+    --pui-border: #D9D1C4;
+    --pui-border-soft: #E8E1D6;
+    --pui-primary: #51483F;
+    --pui-on-primary: #F4F0E8;
+    --pui-accent: #C8B48A;
+    --pui-accent-soft: #F3EAD8;
+    --pui-danger: #9B3A32;
+    --pui-danger-soft: #FBEDEB;
+    --pui-success: #3D6B4F;
+    --pui-success-soft: #ECF4EE;
+    --pui-fs-xs: .78rem;
+    --pui-fs-sm: .875rem;
+    --pui-fs-md: 1rem;
+    --pui-fs-lg: 1.15rem;
+    --pui-fs-xl: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+    --pui-s1: 4px;
+    --pui-s2: 8px;
+    --pui-s3: 12px;
+    --pui-s4: 16px;
+    --pui-s5: 24px;
+    --pui-s6: 32px;
+    --pui-s7: 40px;
+    --pui-r-sm: 8px;
+    --pui-r-md: 12px;
+    --pui-r-lg: 16px;
+    --pui-r-xl: 22px;
+    --pui-shadow-sm: 0 1px 2px rgba(81, 72, 63, .08);
+    --pui-shadow-lg: 0 24px 60px -28px rgba(81, 72, 63, .45);
+    --pui-font: Vazirmatn, Tahoma, Arial, sans-serif;
+
+    min-block-size: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 4vw, 48px);
+    background:
+        radial-gradient(900px 420px at 85% -10%, rgba(200, 180, 138, .30), transparent 62%),
+        radial-gradient(700px 380px at 5% 105%, rgba(184, 173, 160, .28), transparent 60%),
+        var(--pui-bg);
+    color: var(--pui-text);
+    font-family: var(--pui-font);
+    -webkit-font-smoothing: antialiased;
+}
+
+.zdp-login-stage *,
+.zdp-login-stage *::before,
+.zdp-login-stage *::after { box-sizing: border-box; }
+
+/* پوستهٔ دوستونی: برند + کارت فرم */
+.zdp-login-shell {
+    inline-size: min(100%, 1040px);
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    border-radius: var(--pui-r-xl);
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border-soft);
+    box-shadow: var(--pui-shadow-lg);
+}
+
+/* ── ستون برند ───────────────────────────────────────────── */
+.zdp-login-brand {
+    display: none;
+    position: relative;
+    padding: clamp(24px, 4vw, 44px);
+    background:
+        radial-gradient(480px 260px at 110% 110%, rgba(200, 180, 138, .38), transparent 65%),
+        linear-gradient(160deg, #5A5147 0%, #51483F 55%, #443C34 100%);
+    color: var(--pui-bg);
+    align-content: center;
+    gap: var(--pui-s4);
+}
+
+.zdp-login-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--pui-s3);
+    font-weight: 700;
+    font-size: var(--pui-fs-lg);
+}
+
+.zdp-login-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(244, 240, 232, .28);
+    background: rgba(244, 240, 232, .10);
+    color: var(--pui-accent);
+}
+
+.zdp-login-brand-mark svg { inline-size: 22px; block-size: 22px; }
+
+.zdp-login-brand-img {
+    max-block-size: 56px;
+    inline-size: auto;
+    display: block;
+}
+
+.zdp-login-brand-title {
+    margin: var(--pui-s5) 0 0;
+    font-size: var(--pui-fs-xl);
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.zdp-login-brand-lead {
+    margin: var(--pui-s2) 0 0;
+    font-size: var(--pui-fs-sm);
+    line-height: 1.9;
+    color: rgba(244, 240, 232, .78);
+    max-inline-size: 34ch;
+}
+
+.zdp-login-points {
+    list-style: none;
+    margin: var(--pui-s5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--pui-s3);
+}
+
+.zdp-login-point {
+    display: flex;
+    align-items: center;
+    gap: var(--pui-s3);
+    font-size: var(--pui-fs-sm);
+    color: rgba(244, 240, 232, .9);
+}
+
+.zdp-login-point svg {
+    inline-size: 18px;
+    block-size: 18px;
+    flex: 0 0 auto;
+    color: var(--pui-accent);
+}
+
+/* ── ستون فرم ────────────────────────────────────────────── */
+.zdp-login-main {
+    display: grid;
+    place-items: center;
+    padding: clamp(20px, 4vw, 44px);
+    background: var(--pui-surface);
+}
+
+/* کارت قدیمی (panel.css) در این طراحی فقط ظرف محتواست */
+.zdp-login-stage .zdp-login {
+    inline-size: min(100%, 420px);
+    margin: 0;
+    padding: 0;
+    text-align: start;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+}
+
+.zdp-login-stage .zdp-login::before { content: none; animation: none; display: none; }
+
+.zdp-login-stage .zdp-login-head { margin-block-end: var(--pui-s5); }
+
+.zdp-login-stage .zdp-login-title {
+    margin: 0;
+    font-size: var(--pui-fs-xl);
+    line-height: 1.45;
+    font-weight: 700;
+    color: var(--pui-text);
+    text-align: start;
+}
+
+.zdp-login-stage .zdp-login-sub {
+    margin: var(--pui-s2) 0 0;
+    font-size: var(--pui-fs-sm);
+    line-height: 1.9;
+    color: var(--pui-text-soft);
+}
+
+/* لوگو فقط در موبایل، چون ستون برند پنهان است */
+.zdp-login-stage .zdp-login-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--pui-s2);
+    margin-block-end: var(--pui-s4);
+    font-weight: 700;
+    color: var(--pui-text);
+}
+
+.zdp-login-stage .zdp-login-mobile-brand .zdp-login-brand-mark {
+    inline-size: 38px;
+    block-size: 38px;
+    border-radius: 12px;
+    background: var(--pui-accent-soft);
+    border-color: rgba(200, 180, 138, .5);
+    color: var(--pui-text);
+}
+
+/* ── تب‌های کانال ورود ───────────────────────────────────── */
+.zdp-login-stage .zdp-login-channel-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: var(--pui-s1);
+    margin: 0 0 var(--pui-s4);
+    padding: var(--pui-s1);
+    background: var(--pui-surface-3);
+    border-radius: var(--pui-r-md);
+}
+
+.zdp-login-stage .zdp-login-channel-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pui-s1);
+    min-block-size: 40px;
+    padding: var(--pui-s2) var(--pui-s3);
+    border: 0;
+    border-radius: calc(var(--pui-r-md) - 3px);
+    background: transparent;
+    color: var(--pui-text-soft);
+    font-family: inherit;
+    font-size: var(--pui-fs-sm);
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+.zdp-login-stage .zdp-login-channel-tab.active {
+    background: var(--pui-surface);
+    color: var(--pui-text);
+    font-weight: 600;
+    box-shadow: var(--pui-shadow-sm);
+}
+
+.zdp-login-stage .zdp-login-channel-tab:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+}
+
+/* ── مراحل ───────────────────────────────────────────────── */
+.zdp-login-stage .zdp-login-steps {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--pui-s2);
+    margin: 0 0 var(--pui-s5);
+    padding: 0;
+}
+
+.zdp-login-stage .zdp-step-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pui-s2);
+    inline-size: auto;
+    block-size: auto;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    font-size: var(--pui-fs-xs);
+    color: var(--pui-text-muted);
+    transition: color .2s ease;
+}
+
+.zdp-login-stage .zdp-step-dot__n {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 22px;
+    block-size: 22px;
+    border-radius: 999px;
+    border: 1px solid var(--pui-border);
+    background: var(--pui-surface);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--pui-text-muted);
+}
+
+.zdp-login-stage .zdp-step-dot__t { white-space: nowrap; }
+
+.zdp-login-stage .zdp-login-steps[data-step="mobile"] .zdp-step-dot-1,
+.zdp-login-stage .zdp-login-steps[data-step="email"] .zdp-step-dot-1,
+.zdp-login-stage .zdp-login-steps[data-step="otp"] .zdp-step-dot-1,
+.zdp-login-stage .zdp-login-steps[data-step="otp"] .zdp-step-dot-2 {
+    inline-size: auto;
+    background: none;
+    color: var(--pui-text);
+    font-weight: 600;
+}
+
+.zdp-login-stage .zdp-login-steps[data-step="mobile"] .zdp-step-dot-1 .zdp-step-dot__n,
+.zdp-login-stage .zdp-login-steps[data-step="email"] .zdp-step-dot-1 .zdp-step-dot__n,
+.zdp-login-stage .zdp-login-steps[data-step="otp"] .zdp-step-dot-1 .zdp-step-dot__n,
+.zdp-login-stage .zdp-login-steps[data-step="otp"] .zdp-step-dot-2 .zdp-step-dot__n {
+    background: var(--pui-primary);
+    border-color: var(--pui-primary);
+    color: var(--pui-on-primary);
+}
+
+/* خط اتصال بین مراحل */
+.zdp-login-stage .zdp-step-dot + .zdp-step-dot::before {
+    content: "";
+    display: inline-block;
+    inline-size: clamp(18px, 6vw, 40px);
+    block-size: 1px;
+    margin-inline-end: var(--pui-s2);
+    background: var(--pui-border-soft);
+}
+
+/* ── فیلدها ──────────────────────────────────────────────── */
+.zdp-login-stage .zdp-login label {
+    display: block;
+    margin: 0 0 var(--pui-s2);
+    font-size: var(--pui-fs-sm);
+    font-weight: 600;
+    color: var(--pui-text);
+    text-align: start;
+}
+
+.zdp-login-stage .zdp-input-affix {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--pui-s2);
+    min-block-size: 48px;
+    padding: 0 var(--pui-s3);
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border);
+    border-radius: var(--pui-r-md);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.zdp-login-stage .zdp-input-affix:focus-within {
+    border-color: var(--pui-text);
+    box-shadow: 0 0 0 3px rgba(81, 72, 63, .12);
+}
+
+.zdp-login-stage .zdp-input-affix-icon {
+    display: inline-flex;
+    color: var(--pui-text-muted);
+}
+
+.zdp-login-stage .zdp-input-affix-icon svg { inline-size: 18px; block-size: 18px; }
+
+.zdp-login-stage .zdp-input-affix input {
+    flex: 1;
+    min-inline-size: 0;
+    min-block-size: 46px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--pui-text);
+    font-family: inherit;
+    font-size: var(--pui-fs-md);
+    text-align: start;
+}
+
+.zdp-login-stage .zdp-input-affix input:focus { outline: none !important; }
+
+.zdp-login-stage #zdp-mobile,
+.zdp-login-stage #zdp-email { direction: ltr; text-align: start; }
+
+.zdp-login-stage .zdp-field-hint,
+.zdp-login-stage .zdp-otp-support,
+.zdp-login-stage .zdp-otp-timer {
+    margin: var(--pui-s2) 0 0;
+    font-size: var(--pui-fs-xs);
+    line-height: 1.8;
+    color: var(--pui-text-muted);
+    text-align: start;
+}
+
+/* ── جعبه‌های کد یکبارمصرف ──────────────────────────────── */
+.zdp-login-stage .zdp-otp-boxes {
+    display: flex;
+    gap: var(--pui-s2);
+    justify-content: space-between;
+    direction: ltr;
+}
+
+.zdp-login-stage .zdp-otp-box {
+    inline-size: 100%;
+    block-size: 56px;
+    padding: 0;
+    border: 1px solid var(--pui-border);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-surface);
+    color: var(--pui-text);
+    font-family: inherit;
+    font-size: var(--pui-fs-lg);
+    font-weight: 600;
+    text-align: center;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+
+.zdp-login-stage .zdp-otp-box:focus {
+    outline: none !important;
+    border-color: var(--pui-text);
+    box-shadow: 0 0 0 3px rgba(81, 72, 63, .12);
+}
+
+.zdp-login-stage .zdp-otp-box.zdp-filled {
+    border-color: var(--pui-accent);
+    background: var(--pui-surface-2);
+}
+
+/* ── دکمهٔ اصلی ──────────────────────────────────────────── */
+.zdp-login-stage .zdp-btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pui-s2);
+    inline-size: 100%;
+    min-block-size: 48px;
+    margin-block-start: var(--pui-s4);
+    padding: 0 var(--pui-s5);
+    border: 1px solid var(--pui-primary);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-primary);
+    color: var(--pui-on-primary);
+    font-family: inherit;
+    font-size: var(--pui-fs-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .18s ease, transform .12s ease, box-shadow .18s ease;
+}
+
+.zdp-login-stage .zdp-btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--pui-primary) 88%, #000);
+}
+
+.zdp-login-stage .zdp-btn-primary:active:not(:disabled) { transform: translateY(1px); }
+
+.zdp-login-stage .zdp-btn-primary:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 3px;
+}
+
+.zdp-login-stage .zdp-btn-primary:disabled {
+    cursor: progress;
+    opacity: .92;
+}
+
+.zdp-login-stage .zdp-btn-spinner { display: none; }
+.zdp-login-stage .zdp-btn-primary:disabled .zdp-btn-spinner { display: inline-block; }
+.zdp-login-stage .zdp-btn-primary:disabled .zdp-btn-label { opacity: .9; }
+
+/* ── ارسال مجدد / تغییر شماره ───────────────────────────── */
+.zdp-login-stage .zdp-otp-resend-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pui-s2);
+    margin-block-start: var(--pui-s3);
+}
+
+.zdp-login-stage .zdp-otp-resend-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pui-s2);
+    margin: 0;
+}
+
+.zdp-login-stage .zdp-otp-timer { margin: 0; }
+
+.zdp-login-stage .zdp-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pui-s1);
+    padding: var(--pui-s1) var(--pui-s2);
+    border: 0;
+    border-radius: var(--pui-r-sm);
+    background: transparent;
+    color: var(--pui-text-soft);
+    font-family: inherit;
+    font-size: var(--pui-fs-sm);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.zdp-login-stage .zdp-link-btn:hover { color: var(--pui-text); }
+
+.zdp-login-stage .zdp-link-btn:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+}
+
+.zdp-login-stage .zdp-link-btn svg { inline-size: 16px; block-size: 16px; }
+
+/* ── پیام‌ها ─────────────────────────────────────────────── */
+.zdp-login-stage #zdp-login-message {
+    margin: var(--pui-s3) 0 0;
+    padding: 0;
+    min-block-size: 0;
+    font-size: var(--pui-fs-sm);
+    line-height: 1.8;
+    color: var(--pui-text-soft);
+    text-align: start;
+}
+
+.zdp-login-stage #zdp-login-message:not(:empty) {
+    padding: var(--pui-s3);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+}
+
+.zdp-login-stage #zdp-login-message.zdp-error {
+    background: var(--pui-danger-soft);
+    border-color: color-mix(in srgb, var(--pui-danger) 35%, transparent);
+    color: var(--pui-danger);
+}
+
+.zdp-login-stage .zdp-login-bridge-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pui-s2);
+    margin: 0 0 var(--pui-s4);
+    padding: var(--pui-s3);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-danger-soft);
+    border: 1px solid color-mix(in srgb, var(--pui-danger) 35%, transparent);
+    color: var(--pui-danger);
+    font-size: var(--pui-fs-sm);
+    line-height: 1.8;
+    text-align: start;
+}
+
+.zdp-login-stage .zdp-login-bridge-error svg { inline-size: 18px; block-size: 18px; flex: 0 0 auto; }
+
+.zdp-login-stage .zdp-login-pending-booking-note {
+    margin: 0 0 var(--pui-s4);
+    padding: var(--pui-s3);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-accent-soft);
+    border: 1px solid rgba(200, 180, 138, .55);
+    color: var(--pui-text);
+    font-size: var(--pui-fs-sm);
+    line-height: 1.8;
+    text-align: start;
+}
+
+/* ── پاورقی کارت ─────────────────────────────────────────── */
+.zdp-login-stage .zdp-login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pui-s2);
+    margin-block-start: var(--pui-s5);
+    padding-block-start: var(--pui-s4);
+    border-block-start: 1px solid var(--pui-border-soft);
+    background: none;
+}
+
+.zdp-login-stage .zdp-panel-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pui-s1);
+    color: var(--pui-text-soft);
+    font-size: var(--pui-fs-sm);
+    text-decoration: none;
+}
+
+.zdp-login-stage .zdp-panel-back-link:hover { color: var(--pui-text); }
+
+.zdp-login-stage .zdp-panel-back-link svg { inline-size: 16px; block-size: 16px; }
+
+.zdp-login-stage .zdp-login-support {
+    font-size: var(--pui-fs-xs);
+    color: var(--pui-text-muted);
+}
+
+.zdp-login-stage .zdp-login-support a { color: var(--pui-text-soft); }
+
+/* ── دسکتاپ ──────────────────────────────────────────────── */
+@media (min-width: 900px) {
+    .zdp-login-shell { grid-template-columns: 1fr .92fr; }
+    .zdp-login-brand { display: grid; }
+    .zdp-login-stage .zdp-login-mobile-brand { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zdp-login-stage *,
+    .zdp-login-stage *::before,
+    .zdp-login-stage *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+    }
+}
+
+/* ── خنثی‌کردن !importantهای قدیمی panel.css ─────────────────
+   panel.css برای محافظت از دکمه‌ها در قالب‌های مختلف از !important
+   استفاده می‌کند. این فایل بعد از panel.css بارگذاری می‌شود، پس با همان
+   سطح انتخابگر و !important رنگ برند جدید را اعمال می‌کند. */
+.zdp-login-stage .zdp-login .zdp-btn-primary,
+.zdp-login-stage .zdp-login .zdp-btn-primary:hover,
+.zdp-login-stage .zdp-login .zdp-btn-primary:focus,
+.zdp-login-stage .zdp-login .zdp-btn-primary:active {
+    background-color: var(--pui-primary) !important;
+    background-image: none !important;
+    color: var(--pui-on-primary) !important;
+    border: 1px solid var(--pui-primary) !important;
+    box-shadow: none !important;
+}
+
+.zdp-login-stage .zdp-login .zdp-btn-primary:hover .zdp-btn-label,
+.zdp-login-stage .zdp-login .zdp-btn-primary:focus .zdp-btn-label {
+    color: var(--pui-on-primary) !important;
+}
+
+.zdp-login-stage .zdp-login .zdp-login-channel-tab:not(.active),
+.zdp-login-stage .zdp-login .zdp-login-channel-tab:not(.active):hover,
+.zdp-login-stage .zdp-login .zdp-login-channel-tab:not(.active):focus {
+    background-color: transparent !important;
+    background-image: none !important;
+    color: var(--pui-text-soft) !important;
+}
+
+.zdp-login-stage .zdp-login .zdp-login-channel-tab.active,
+.zdp-login-stage .zdp-login .zdp-login-channel-tab.active:hover,
+.zdp-login-stage .zdp-login .zdp-login-channel-tab.active:focus {
+    background-color: var(--pui-surface) !important;
+    background-image: none !important;
+    color: var(--pui-text) !important;
+    box-shadow: var(--pui-shadow-sm) !important;
+}
+
+.zdp-login-stage .zdp-login button.zdp-link-btn,
+.zdp-login-stage .zdp-login button.zdp-link-btn:hover,
+.zdp-login-stage .zdp-login button.zdp-link-btn:focus,
+.zdp-login-stage .zdp-login button.zdp-link-btn:active {
+    background: none !important;
+    background-color: transparent !important;
+    color: var(--pui-text-soft) !important;
+    box-shadow: none !important;
+}

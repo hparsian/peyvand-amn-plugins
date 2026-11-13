@@ -224,32 +224,50 @@ final class Client_Panel
 
         ob_start();
         ?>
-        <div class="zdp-login-stage">
-        <div class="zdp-panel zdp-login" dir="rtl">
-            <div class="zdp-welcome">
-                <?php if ($logo_html) : ?>
-                    <div class="zdp-welcome-logo"><?php echo $logo_html; ?></div>
-                <?php else : ?>
-                    <div class="zdp-welcome-mark" aria-hidden="true">
-                        <span class="zdp-ring zdp-ring-a"></span>
-                        <span class="zdp-ring zdp-ring-b"></span>
-                    </div>
-                <?php endif; ?>
-                <h2 class="zdp-welcome-title">به پیوند امن خوش آمدید</h2>
-                <p class="zdp-welcome-sub">برای ورود، شماره موبایل یا ایمیل خود را وارد کنید؛ کد تأیید برایتان ارسال می‌شود.</p>
+        <div class="zdp-login-stage" dir="rtl" lang="fa-IR">
+        <div class="zdp-login-shell">
+            <aside class="zdp-login-brand">
+                <div class="zdp-login-brand-logo">
+                    <?php if ($logo_html) : ?>
+                        <?php echo $logo_html; ?>
+                    <?php else : ?>
+                        <span class="zdp-login-brand-mark" aria-hidden="true"><?php echo $this->icon('link'); ?></span>
+                        <span>پیوند امن</span>
+                    <?php endif; ?>
+                </div>
+                <h2 class="zdp-login-brand-title">به پیوند امن خوش آمدید</h2>
+                <p class="zdp-login-brand-lead">نوبت‌ها، آزمون‌ها و پیام‌های شما در یک جای امن و خصوصی؛ ورود با یک کد یک‌بارمصرف.</p>
+                <ul class="zdp-login-points">
+                    <li class="zdp-login-point"><?php echo $this->icon('shield'); ?><span>دادهٔ بالینی رمزنگاری‌شده</span></li>
+                    <li class="zdp-login-point"><?php echo $this->icon('user'); ?><span>دسترسی فقط برای خود شما</span></li>
+                    <li class="zdp-login-point"><?php echo $this->icon('phone'); ?><span>ورود سریع با کد پیامکی</span></li>
+                </ul>
+            </aside>
+
+            <div class="zdp-login-main">
+            <div class="zdp-panel zdp-login" dir="rtl">
+            <div class="zdp-login-mobile-brand">
+                <span class="zdp-login-brand-mark" aria-hidden="true"><?php echo $this->icon('link'); ?></span>
+                <span>پیوند امن</span>
             </div>
+
+            <div class="zdp-login-head">
+                <h2 class="zdp-login-title">ورود به پنل مراجع</h2>
+                <p class="zdp-login-sub">برای ورود، شماره موبایل یا ایمیل خود را وارد کنید؛ کد تأیید برایتان ارسال می‌شود.</p>
+            </div>
+
             <?php if ($bridge_error) : ?>
                 <p class="zdp-login-bridge-error" role="alert"><?php echo $this->icon('alert'); ?><?php echo esc_html($bridge_error); ?></p>
             <?php endif; ?>
 
-            <div class="zdp-login-channel-tabs" role="tablist">
-                <button type="button" id="zdp-channel-mobile-btn" class="zdp-login-channel-tab active" role="tab" aria-selected="true">📱 ورود با موبایل</button>
-                <button type="button" id="zdp-channel-email-btn" class="zdp-login-channel-tab" role="tab" aria-selected="false">✉️ ورود با ایمیل</button>
+            <div class="zdp-login-channel-tabs" role="tablist" aria-label="روش ورود">
+                <button type="button" id="zdp-channel-mobile-btn" class="zdp-login-channel-tab active" role="tab" aria-selected="true">ورود با موبایل</button>
+                <button type="button" id="zdp-channel-email-btn" class="zdp-login-channel-tab" role="tab" aria-selected="false">ورود با ایمیل</button>
             </div>
 
-            <div class="zdp-login-steps" data-step="mobile">
-                <div class="zdp-step-dot zdp-step-dot-1" aria-hidden="true"></div>
-                <div class="zdp-step-dot zdp-step-dot-2" aria-hidden="true"></div>
+            <div class="zdp-login-steps" data-step="mobile" aria-hidden="true">
+                <span class="zdp-step-dot zdp-step-dot-1"><span class="zdp-step-dot__n">۱</span><span class="zdp-step-dot__t">شماره</span></span>
+                <span class="zdp-step-dot zdp-step-dot-2"><span class="zdp-step-dot__n">۲</span><span class="zdp-step-dot__t">کد تایید</span></span>
             </div>
 
             <div id="zdp-mobile-step">
@@ -303,13 +321,20 @@ final class Client_Panel
                     </p>
                 <?php endif; ?>
             </div>
+
             <p id="zdp-login-message" role="status" aria-live="polite"></p>
+
             <footer class="zdp-panel-footer zdp-login-footer">
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="zdp-panel-back-link">
                     <?php echo $this->icon('arrow-end'); ?>
                     <span>بازگشت به سایت</span>
                 </a>
+                <?php if ($support_phone !== '') : ?>
+                    <span class="zdp-login-support">پشتیبانی: <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $support_phone)); ?>"><?php echo esc_html($support_phone); ?></a></span>
+                <?php endif; ?>
             </footer>
+            </div>
+            </div>
         </div>
         </div>
         <?php
@@ -337,6 +362,9 @@ final class Client_Panel
             'edit'         => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20L4.7 16.9L15.6 6C16.2 5.4 17.2 5.4 17.8 6L18.9 7.1C19.5 7.7 19.5 8.7 18.9 9.3L8 20.2L4 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
             'alert'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L21.5 20H2.5L12 3.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9.5V13.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16.3" r="0.9" fill="currentColor"/></svg>',
             'arrow-end'    => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'link'         => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 14.5L14.5 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 12L6.2 13.8C4.9 15.1 4.9 17.2 6.2 18.5C7.5 19.8 9.6 19.8 10.9 18.5L12.7 16.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 12L17.8 10.2C19.1 8.9 19.1 6.8 17.8 5.5C16.5 4.2 14.4 4.2 13.1 5.5L11.3 7.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+            'shield'       => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L19 6V11.5C19 15.6 16.1 19 12 20.5C7.9 19 5 15.6 5 11.5V6L12 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11.2 14.2L15.2 10.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'user'         => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 20C5.5 16.6 8.4 14.5 12 14.5C15.6 14.5 18.5 16.6 18.5 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
             'clock'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.25" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12L15 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         ];
 

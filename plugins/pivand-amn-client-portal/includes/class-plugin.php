@@ -325,6 +325,17 @@ final class Plugin
         }
 
         wp_register_style('zdp-panel', ZDP_PLUGIN_URL . 'assets/css/panel.css', $font_deps, ZDP_VERSION);
+
+        // گام ۲ فاز ۱۲ — صفحهٔ ورود روی کیت رابط کاربری.
+        // login.css عمداً جدا از panel.css است تا استایل پنلِ پس از ورود دست‌نخورده
+        // بماند؛ اگر کیت پیوند امن نصب/فعال نباشد، همین فایل با fallback خودش کار می‌کند.
+        $login_deps = ['zdp-panel'];
+        if (class_exists('PUI')) {
+            $login_deps[] = \PUI::handle('fonts');
+            $login_deps[] = \PUI::handle('tokens');
+            $login_deps[] = \PUI::handle('components');
+        }
+        wp_register_style('zdp-login', ZDP_PLUGIN_URL . 'assets/css/login.css', $login_deps, ZDP_VERSION);
         wp_register_script('zdp-panel', ZDP_PLUGIN_URL . 'assets/js/panel.js', [], ZDP_VERSION, true);
 
         // رفع باگ کشف‌شده (ناسازگاری تقویم نوبت‌دهی بین دستگاه‌ها): تقویم
@@ -427,6 +438,22 @@ final class Plugin
         if ($needs_panel_assets) {
             wp_enqueue_style('zdp-panel');
             wp_enqueue_script('zdp-panel');
+        }
+
+        // استایل صفحهٔ ورود (و کیت رابط کاربری) فقط جایی بارگذاری می‌شود که
+        // واقعاً پنل مراجع رندر می‌شود — نه روی صفحه‌های آزمون/نوبت‌دهی/نظرسنجی.
+        // این‌طور هیچ CSS اضافه‌ای به بقیهٔ سایت تحمیل نمی‌شود.
+        $needs_login_assets = $needs_panel_assets && (
+            ((int) get_option('zdp_panel_page_id') > 0 && is_page((int) get_option('zdp_panel_page_id')))
+            || ($post && $this->post_has_shortcode($post, ['zdp_client_panel']))
+        );
+
+        if ($needs_login_assets) {
+            wp_enqueue_style('zdp-login');
+
+            if (class_exists('PUI')) {
+                \PUI::enqueue('auth');
+            }
         }
 
         // یادداشت: enqueue داخل خودِ render()/render_shortcode() هر ماژول
