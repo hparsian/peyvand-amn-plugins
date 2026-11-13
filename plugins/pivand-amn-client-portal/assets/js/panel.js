@@ -49,9 +49,29 @@
     // نکته: فقط OTP (send/verify) از این تابع استفاده می‌کند؛ بقیه‌ی فرم‌ها
     // (رزرو، پیام، نظرسنجی، کوییز) همچنان از post() روی admin-ajax.php
     // استفاده می‌کنند — چیزی در آن‌ها تغییر نکرده است.
-    function postRest(endpoint, data) {
+    // ساخت آدرس REST مستقل از ساختار پیوند یکتا.
+    // روی سایت‌هایی که «پیوند یکتای ساده» دارند، rest_url() خروجی
+    // «https://site/?rest_route=/zdp/v1/» می‌دهد؛ چسباندن مستقیم endpoint
+    // یک علامت «?» دوم می‌سازد، وردپرس مسیر را نمی‌شناسد و خطای
+    // «No route was found matching the URL and request method» برمی‌گردد.
+    // اینجا مسیر و پارامترهای query جدا و درست ترکیب می‌شوند.
+    function restUrl(endpoint) {
         var base = (window.ZDP && window.ZDP.rest_url) || '/wp-json/zdp/v1/';
-        var url = base + endpoint;
+
+        if (base.indexOf('rest_route=') !== -1) {
+            var sep = base.charAt(base.length - 1) === '/' ? '' : '/';
+            var qsAt = endpoint.indexOf('?');
+            var path = qsAt === -1 ? endpoint : endpoint.slice(0, qsAt);
+            var extra = qsAt === -1 ? '' : endpoint.slice(qsAt + 1);
+
+            return base + sep + path + (extra ? '&' + extra : '');
+        }
+
+        return base + endpoint;
+    }
+
+    function postRest(endpoint, data) {
+        var url = restUrl(endpoint);
 
         return fetch(url, {
             method: 'POST',
@@ -131,8 +151,7 @@
     // abort می‌شود و به‌جای اسکلتونِ ابدی، همان جعبه‌ی خطا + دکمه‌ی «تلاش
     // مجدد» نمایش داده می‌شود.
     function getRest(endpoint) {
-        var base = (window.ZDP && window.ZDP.rest_url) || '/wp-json/zdp/v1/';
-        var url = base + endpoint;
+        var url = restUrl(endpoint);
 
         var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
         var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 12000) : null;

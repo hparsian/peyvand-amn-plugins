@@ -313,7 +313,11 @@ final class Plugin
         // یک پلاگین دیگر آن را جایی لود کرده باشد). اگر core فعال نباشد،
         // panel.css همچنان با fallback خودش (Tahoma/Arial) درست کار می‌کند.
         $font_deps = [];
-        if (class_exists('Pas_Core_Fonts')) {
+        // اگر کیت رابط کاربری فعال است، فونت وزیرمتن را همان کیت (با فایل‌های
+        // واقعی woff2) تأمین می‌کند؛ در این حالت هندل فونت هسته اضافه نمی‌شود
+        // تا درخواست‌های ۴۰۴ فایل فونت تکرار نشوند. اگر کیت نباشد، رفتار
+        // قبلی (فونت هسته) دست‌نخورده باقی می‌ماند.
+        if (class_exists('Pas_Core_Fonts') && !class_exists('PUI')) {
             $font_deps[] = \Pas_Core_Fonts::handle();
         }
         // توکن‌های طراحی مشترک اکوسیستم (رنگ/شعاع/سایه): اگر پیوند امن —
@@ -336,6 +340,16 @@ final class Plugin
             $login_deps[] = \PUI::handle('components');
         }
         wp_register_style('zdp-login', ZDP_PLUGIN_URL . 'assets/css/login.css', $login_deps, ZDP_VERSION);
+
+        // پوستهٔ برند پنل (گام ۳): فقط ساختار موجود را روی توکن‌های کیت نگاشت
+        // می‌کند؛ بعد از panel.css بارگذاری می‌شود و به .zdp-panel-shell محدود است.
+        $skin_deps = ['zdp-panel'];
+        if (class_exists('PUI')) {
+            $skin_deps[] = \PUI::handle('fonts');
+            $skin_deps[] = \PUI::handle('tokens');
+            $skin_deps[] = \PUI::handle('components');
+        }
+        wp_register_style('zdp-panel-skin', ZDP_PLUGIN_URL . 'assets/css/panel-skin.css', $skin_deps, ZDP_VERSION);
         wp_register_script('zdp-panel', ZDP_PLUGIN_URL . 'assets/js/panel.js', [], ZDP_VERSION, true);
 
         // رفع باگ کشف‌شده (ناسازگاری تقویم نوبت‌دهی بین دستگاه‌ها): تقویم
@@ -450,6 +464,7 @@ final class Plugin
 
         if ($needs_login_assets) {
             wp_enqueue_style('zdp-login');
+            wp_enqueue_style('zdp-panel-skin');
 
             if (class_exists('PUI')) {
                 \PUI::enqueue('auth');
