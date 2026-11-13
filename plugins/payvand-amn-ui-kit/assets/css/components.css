@@ -593,6 +593,9 @@
     .pui-grid--stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
     .pui-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .pui-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    /* عنصری که باید تمام عرض شبکهٔ کارت‌ها را بگیرد (نمونه‌های عریض). */
+    .pui-grid__wide { grid-column: 1 / -1; }
     .pui-stack { display: grid; gap: var(--pui-s4); }
     .pui-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pui-s2); }
     .pui-row--between { justify-content: space-between; }
@@ -624,4 +627,212 @@
             font-weight: 500;
         }
     }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   کامپوننت‌های پایه — فاز ۱۴ گام ۳
+   ══════════════════════════════════════════════════════════════════════ */
+@layer pui.components {
+    /* ── کلید روشن/خاموش ────────────────────────────────── */
+    .pui-switch-field { display: grid; gap: var(--pui-s1); }
+
+    .pui-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--pui-s3);
+        cursor: pointer;
+        font-size: var(--pui-fs-base);
+        color: var(--pui-text);
+    }
+
+    .pui-switch input {
+        position: absolute;
+        opacity: 0;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: 0;
+    }
+
+    .pui-switch__track {
+        position: relative;
+        flex: none;
+        inline-size: 44px;
+        block-size: 26px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-disabled);
+        border: 1px solid var(--pui-border);
+        transition: background var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-switch__thumb {
+        position: absolute;
+        inset-block-start: 2px;
+        inset-inline-start: 2px;
+        inline-size: 20px;
+        block-size: 20px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-surface);
+        box-shadow: var(--pui-shadow-sm);
+        transition: transform var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-switch input:checked + .pui-switch__track {
+        background: var(--pui-primary);
+        border-color: var(--pui-primary);
+    }
+
+    .pui-switch input:checked + .pui-switch__track .pui-switch__thumb {
+        transform: translateX(-18px);
+    }
+
+    [dir="ltr"] .pui-switch input:checked + .pui-switch__track .pui-switch__thumb {
+        transform: translateX(18px);
+    }
+
+    .pui-switch input:focus-visible + .pui-switch__track {
+        outline: 2px solid var(--pui-focus);
+        outline-offset: 2px;
+    }
+
+    .pui-switch input:disabled + .pui-switch__track {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    /* ── انتخاب کارتی (رادیو/گزینه) ─────────────────────── */
+    .pui-radio-cards {
+        display: grid;
+        gap: var(--pui-s2);
+        border: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    @media (min-width: 640px) {
+        .pui-radio-cards { grid-auto-flow: column; grid-auto-columns: 1fr; }
+    }
+
+    .pui-radio-card {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) var(--pui-s4);
+        border: 1px solid var(--pui-border);
+        border-radius: var(--pui-r-md);
+        background: var(--pui-surface);
+        cursor: pointer;
+        transition: border-color var(--pui-dur) var(--pui-ease), background var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-radio-card input {
+        position: absolute;
+        opacity: 0;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: 0;
+    }
+
+    .pui-radio-card__body {
+        display: grid;
+        gap: 2px;
+    }
+
+    .pui-radio-card__icon { color: var(--pui-text-muted); }
+
+    .pui-radio-card__label { font-size: var(--pui-fs-sm); font-weight: 500; }
+
+    .pui-radio-card__desc { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+
+    .pui-radio-card:hover { border-color: var(--pui-accent-line); }
+
+    .pui-radio-card:has(input:checked) {
+        border-color: var(--pui-primary);
+        background: var(--pui-accent-soft);
+    }
+
+    .pui-radio-card:has(input:checked) .pui-radio-card__icon { color: var(--pui-text); }
+
+    .pui-radio-card:has(input:focus-visible) {
+        outline: 2px solid var(--pui-focus);
+        outline-offset: 2px;
+    }
+
+    /* ── نوار ابزار جدول ────────────────────────────────── */
+    .pui-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) 0;
+    }
+
+    .pui-toolbar__search {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        flex: 1 1 320px;
+        margin: 0;
+    }
+
+    .pui-toolbar__icon {
+        display: inline-flex;
+        align-items: center;
+        color: var(--pui-text-muted);
+        margin-inline-end: calc(var(--pui-s2) * -1);
+        margin-inline-start: var(--pui-s3);
+        pointer-events: none;
+    }
+
+    /* استایل‌های عمومی وردپرس/قالب‌ها با padding فیزیکی (padding-right) روی
+       کنترل‌های فرم، بر لایه‌ها غالب می‌شوند؛ این یک قاعدهٔ آگاهانه
+       با !important است تا آیکون جست‌وجو روی متن نیفتد. */
+    .pui-input.pui-toolbar__input {
+        padding-inline-start: 36px !important;
+        min-inline-size: 0;
+    }
+
+    .pui-toolbar__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        flex-wrap: wrap;
+    }
+
+    /* ── اسکلتون (اندازه با کلاس) ───────────────────────── */
+    .pui-skeleton-stack { display: grid; gap: var(--pui-s2); }
+    .pui-skeleton-stack .pui-skeleton { display: block; }
+
+    .pui-skeleton { min-block-size: 14px; }
+    .pui-skeleton--sm { block-size: 8px; min-block-size: 8px; }
+    .pui-skeleton--lg { block-size: 22px; min-block-size: 22px; }
+    .pui-skeleton--title { block-size: 28px; min-block-size: 28px; }
+    .pui-skeleton--w60 { inline-size: 60%; }
+    .pui-skeleton--w70 { inline-size: 70%; }
+    .pui-skeleton--w85 { inline-size: 85%; }
+    .pui-skeleton--whalf { inline-size: 50%; }
+
+    /* ── پیشرفت با برچسب ────────────────────────────────── */
+    .pui-progress-field { display: grid; gap: var(--pui-s1); }
+
+    .pui-progress-field__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--pui-s2);
+        font-size: var(--pui-fs-sm);
+    }
+
+    .pui-progress-field__label { color: var(--pui-text); }
+    .pui-progress-field__value { color: var(--pui-text-muted); font-size: var(--pui-fs-xs); }
+
+    .pui-progress__bar { transition: inline-size var(--pui-dur-slow) var(--pui-ease); }
+    .pui-progress--success .pui-progress__bar { background: var(--pui-success); }
+    .pui-progress--warning .pui-progress__bar { background: var(--pui-warning); }
+    .pui-progress--danger .pui-progress__bar { background: var(--pui-danger); }
+
+    /* ── مدال: اندازه‌ها و عنوان ────────────────────────── */
+    .pui-modal--sm { max-inline-size: 380px; }
+    .pui-modal--lg { max-inline-size: 720px; }
+    .pui-modal__title { font-size: var(--pui-fs-md); }
 }

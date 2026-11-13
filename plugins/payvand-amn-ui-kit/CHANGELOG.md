@@ -1,5 +1,19 @@
 # Changelog — پیوند امن: کیت رابط کاربری
 
+## 1.2.0 — گام ۱۴.۳ فاز ۱۴ (کامپوننت‌های پایه)
+- هلپرهای تازه در `includes/components.php` (همه با پیشوند `pui_` و آرگومان‌های اختیاری،
+  سازگار با API قبلی): `pui_select`, `pui_textarea`, `pui_switch`, `pui_checkbox`,
+  `pui_radio_cards`, `pui_tabs`, `pui_modal`, `pui_skeleton`, `pui_progress`,
+  `pui_table_toolbar`, `pui_toast_trigger`.
+- CSS: سوییچ، کارت رادیویی، نوار ابزار جدول، اندازه‌های اسکلتون (`pui-skeleton--sm/lg/
+  title/w60`)، پیشرفت با `data-pui-progress`، اندازه‌های مدال (`pui-modal--sm/lg`) —
+  بدون نیاز به استایل درون‌خطی در مصرف‌کننده.
+- `assets/js/ui.js`: هندلر عمومی `[data-pui-toast]` برای نمایش اعلان، و
+  `PUI.initProgress()` برای مقداردهی نوارهای پیشرفت از `data-pui-progress`.
+- صفحهٔ پیش‌نمایش (`tools.php?page=pui-kit`): کارت تازهٔ «کامپوننت‌های پایه (فاز ۱۴)»؛
+  تب‌ها، مدال، اسکلتون و پیشرفت نمایشی هم با هلپرها بازنویسی شدند تا استایل
+  درون‌خطی از خود کیت هم حذف شود.
+
 ## 1.0.0 — گام ۱ فاز ۱۲
 - افزونهٔ جدید `payvand-amn-ui-kit`: سیستم طراحی مشترک اکوسیستم.
 - `assets/css/tokens.css`: پالت برند (`#B8ADA0`, `#F4F0E8`, `#51483F`, `#C8B48A`)،

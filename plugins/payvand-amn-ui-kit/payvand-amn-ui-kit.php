@@ -3,7 +3,7 @@
  * Plugin Name: پیوند امن — کیت رابط کاربری
  * Plugin URI:  https://example.com/payvand-amn
  * Description: سیستم طراحی مشترک اکوسیستم پیوند امن: توکن‌های برند (شنی/کرم/قهوه‌ای/طلایی)، فونت وزیرمتن سلف‌هاست، کامپوننت‌های RTL و حالت تاریک اختیاری. هیچ استایلی به‌صورت سراسری بارگذاری نمی‌شود.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Payvand Amn
  * Text Domain: payvand-amn-ui-kit
  * Requires PHP: 7.4
@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PUI_VERSION', '1.0.0');
+define('PUI_VERSION', '1.2.0');
 define('PUI_FILE', __FILE__);
 define('PUI_DIR', plugin_dir_path(__FILE__));
 define('PUI_URL', plugin_dir_url(__FILE__));

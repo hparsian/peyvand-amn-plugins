@@ -197,6 +197,50 @@ final class PUI_Preview_Page
         echo '</div>';
         echo pui_card_close();
 
+        echo '<div class="pui-grid__wide">';
+        echo pui_card_open([
+            'title'    => 'کامپوننت‌های پایه (فاز ۱۴)',
+            'subtitle' => 'select، textarea، کلید، انتخاب کارتی، نوار ابزار جدول، تب، مدال، اسکلتون و پیشرفت — همه بدون استایل درون‌خطی',
+            'icon'     => 'layers',
+        ]);
+        echo '<div class="pui-stack">';
+        echo pui_select([
+            'id'      => 'pui-demo-service',
+            'label'   => 'نوع خدمت',
+            'value'   => 'individual',
+            'hint'    => 'در فرم واقعی، قیمت با انتخاب خدمت به‌روز می‌شود.',
+            'options' => ['individual' => 'مشاورهٔ فردی', 'couple' => 'زوج‌درمانی', 'family' => 'خانواده'],
+        ]);
+        echo pui_textarea([
+            'id'    => 'pui-demo-note',
+            'label' => 'یادداشت جلسه',
+            'rows'  => 3,
+            'hint'  => 'متن یادداشت در پایگاه داده رمزنگاری می‌شود.',
+            'value' => '',
+        ]);
+        echo pui_switch(['id' => 'pui-demo-reminder', 'label' => 'یادآوری پیامکی نوبت', 'description' => '۲۴ ساعت قبل از جلسه یک پیامک ارسال می‌شود.', 'checked' => true]);
+        echo pui_checkbox(['id' => 'pui-demo-consent', 'label' => 'رضایت مراجع برای ارسال یادآور ثبت شد.', 'checked' => true]);
+        echo pui_radio_cards([
+            'name'    => 'pui-demo-mode',
+            'legend'  => 'روش برگزاری جلسه',
+            'value'   => 'online',
+            'options' => [
+                'in-person' => ['label' => 'حضوری', 'icon' => 'building', 'desc' => 'در مطب'],
+                'online'    => ['label' => 'آنلاین', 'icon' => 'monitor', 'desc' => 'تماس تصویری'],
+                'phone'     => ['label' => 'تلفنی', 'icon' => 'phone', 'desc' => 'تماس صوتی'],
+            ],
+        ]);
+        echo '</div>';
+        echo '<hr class="pui-divider">';
+        echo pui_table_toolbar([
+            'search_name'        => 's',
+            'search_placeholder' => 'جست‌وجو با نام یا موبایل…',
+            'hidden'             => ['page' => 'pas-case-files'],
+            'actions'            => '<button type="button" class="pui-btn pui-btn--primary pui-btn--sm">پروندهٔ جدید</button>',
+        ]);
+        echo pui_card_close();
+        echo '</div>';
+
         echo pui_card_open(['title' => 'کارت‌های آماری', 'icon' => 'chart']);
         echo '<div class="pui-grid pui-grid--stats">';
         echo pui_stat(['label' => 'نوبت بعدی', 'value' => 'مشاورهٔ فردی', 'meta' => '۱۴۰۵/۰۸/۲۱ — ۱۶:۳۰', 'icon' => 'calendar', 'tone' => 'accent']);
@@ -227,20 +271,13 @@ final class PUI_Preview_Page
 
         echo pui_card_open(['title' => 'تب‌ها، مراحل و تایم‌لاین', 'icon' => 'layers']);
         ?>
-        <div class="pui-tabs">
-            <button type="button" class="pui-tab" role="tab" id="pui-demo-tab1" aria-controls="pui-demo-panel1" aria-selected="true">نوبت‌ها <span class="pui-tab__badge">۳</span></button>
-            <button type="button" class="pui-tab" role="tab" id="pui-demo-tab2" aria-controls="pui-demo-panel2" aria-selected="false">آزمون‌ها</button>
-            <button type="button" class="pui-tab" role="tab" id="pui-demo-tab3" aria-controls="pui-demo-panel3" aria-selected="false">پیام‌ها</button>
-        </div>
-        <div class="pui-tabpanel" id="pui-demo-panel1" role="tabpanel" aria-labelledby="pui-demo-tab1">
-            <p class="pui-muted">محتوای تب نوبت‌ها (نمایشی).</p>
-        </div>
-        <div class="pui-tabpanel" id="pui-demo-panel2" role="tabpanel" aria-labelledby="pui-demo-tab2" hidden>
-            <p class="pui-muted">محتوای تب آزمون‌ها (نمایشی).</p>
-        </div>
-        <div class="pui-tabpanel" id="pui-demo-panel3" role="tabpanel" aria-labelledby="pui-demo-tab3" hidden>
-            <p class="pui-muted">محتوای تب پیام‌ها (نمایشی).</p>
-        </div>
+        <?php
+        echo pui_tabs([
+            ['label' => 'نوبت‌ها', 'badge' => '۳', 'content' => '<p class="pui-muted">محتوای تب نوبت‌ها (نمایشی).</p>'],
+            ['label' => 'آزمون‌ها', 'content' => '<p class="pui-muted">محتوای تب آزمون‌ها (نمایشی).</p>'],
+            ['label' => 'پیام‌ها', 'content' => '<p class="pui-muted">محتوای تب پیام‌ها (نمایشی).</p>'],
+        ]);
+        ?>
         <hr class="pui-divider">
         <?php
         echo pui_steps(['شماره موبایل', 'کد تایید', 'ورود به پنل'], 1);
@@ -253,24 +290,25 @@ final class PUI_Preview_Page
 
         echo pui_card_open(['title' => 'حالت‌های خالی، بارگذاری و پیشرفت', 'icon' => 'activity']);
         echo pui_empty('هنوز پیامی ثبت نشده', 'اولین پیام را از دکمهٔ بالا بفرستید.', ['icon' => 'message']);
-        echo '<div style="block-size:12px"></div>';
-        echo '<div class="pui-skeleton" style="block-size:14px;margin-block-end:8px"></div>';
-        echo '<div class="pui-skeleton" style="block-size:14px;inline-size:70%"></div>';
+        echo pui_skeleton(['lines' => 3, 'width' => '70']);
         echo '<hr class="pui-divider">';
-        echo '<p class="pui-muted" style="margin-block-end:6px">تکمیل پرونده</p>';
-        echo '<div class="pui-progress" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"><div class="pui-progress__bar" style="inline-size:65%"></div></div>';
+        echo pui_progress(65, ['label' => 'تکمیل پرونده']);
+        echo '<hr class="pui-divider">';
+        echo pui_progress(100, ['label' => 'پروندهٔ بسته‌شده', 'tone' => 'success']);
         echo pui_card_close();
 
         echo pui_card_open(['title' => 'مدال و اعلان', 'icon' => 'message']);
         echo '<div class="pui-row">';
         echo '<button type="button" class="pui-btn pui-btn--ghost" data-pui-open="pui-demo-modal">باز کردن مدال</button>';
-        echo '<button type="button" class="pui-btn pui-btn--primary" onclick="window.PUI&&window.PUI.toast(\'یک اعلان نمونه\')">نمایش اعلان</button>';
+        echo pui_toast_trigger('یک اعلان نمونه', 'نمایش اعلان', ['variant' => 'primary']);
         echo '</div>';
-        echo '<dialog class="pui-modal" id="pui-demo-modal" aria-labelledby="pui-demo-modal-title">';
-        echo '<div class="pui-modal__head"><h2 id="pui-demo-modal-title" style="font-size:var(--pui-fs-md)">تایید عملیات</h2><button type="button" class="pui-btn pui-btn--quiet pui-btn--icon" data-pui-close aria-label="بستن">' . pui_icon('x', ['size' => 18]) . '</button></div>';
-        echo '<div class="pui-modal__body"><p class="pui-muted">این یک مدال نمایشی است؛ هیچ عملیاتی انجام نمی‌شود. Esc هم آن را می‌بندد.</p></div>';
-        echo '<div class="pui-modal__foot"><button type="button" class="pui-btn pui-btn--ghost" data-pui-close>انصراف</button><button type="button" class="pui-btn pui-btn--primary" data-pui-close>تایید</button></div>';
-        echo '</dialog>';
+        echo pui_modal([
+            'id'      => 'pui-demo-modal',
+            'title'   => 'تایید عملیات',
+            'body'    => '<p class="pui-muted">این یک مدال نمایشی است؛ هیچ عملیاتی انجام نمی‌شود. Esc هم آن را می‌بندد.</p>',
+            'actions' => '<button type="button" class="pui-btn pui-btn--ghost" data-pui-close>انصراف</button>'
+                       . '<button type="button" class="pui-btn pui-btn--primary" data-pui-close>تایید</button>',
+        ]);
         echo pui_card_close();
 
         echo '</div>';

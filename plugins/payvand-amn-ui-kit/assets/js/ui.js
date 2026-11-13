@@ -179,8 +179,28 @@
         window.setTimeout(function () { btn.removeAttribute('aria-busy'); }, 8000);
     });
 
+    /* ── نوار پیشرفت: مقدار از data-pui-progress ──────── */
+    function initProgress(scope) {
+        (scope || document).querySelectorAll('[data-pui-progress]').forEach(function (bar) {
+            var value = parseInt(bar.getAttribute('data-pui-progress'), 10);
+            if (isNaN(value)) { return; }
+            value = Math.max(0, Math.min(100, value));
+            bar.style.inlineSize = value + '%';
+        });
+    }
+
+    initProgress(document);
+
+    /* ── دکمه‌های data-pui-toast ──────────────────────── */
+    document.addEventListener('click', function (event) {
+        var trigger = event.target.closest('[data-pui-toast]');
+        if (!trigger) { return; }
+        toast(trigger.getAttribute('data-pui-toast') || '');
+    });
+
     window.PUI = window.PUI || {};
     window.PUI.setTheme = setTheme;
+    window.PUI.initProgress = initProgress;
     window.PUI.theme = function () { return root.getAttribute('data-pui-theme'); };
     window.PUI.toast = toast;
 })();

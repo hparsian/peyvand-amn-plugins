@@ -241,3 +241,354 @@ if (!function_exists('pui_steps')) {
         return (string) ob_get_clean();
     }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   کامپوننت‌های پایه — فاز ۱۴ گام ۳
+   select · textarea · switch · checkbox · radio-card · tabs · modal
+   skeleton · progress · table-toolbar · toast-trigger
+   همه با همان قواعد: escape کامل، شناسهٔ یکتا، بدون استایل درون‌خطی.
+   ══════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('pui_select')) {
+    /** @param array{id?:string,name?:string,label?:string,options?:array<string,string>,value?:string,hint?:string,error?:string,required?:bool,placeholder?:string} $args */
+    function pui_select(array $args): string
+    {
+        $id       = (string) ($args['id'] ?? '');
+        $label    = (string) ($args['label'] ?? '');
+        $value    = (string) ($args['value'] ?? '');
+        $hint     = (string) ($args['hint'] ?? '');
+        $error    = (string) ($args['error'] ?? '');
+        $required = !empty($args['required']);
+        $name     = (string) ($args['name'] ?? $id);
+        $opts     = (array) ($args['options'] ?? []);
+        $placeholder = (string) ($args['placeholder'] ?? '');
+
+        if ($id === '') {
+            $id = 'pui-' . wp_unique_id();
+        }
+
+        ob_start();
+        ?>
+        <div class="pui-field<?php echo $error !== '' ? ' pui-field--invalid' : ''; ?>">
+            <?php if ($label !== '') : ?>
+                <label class="pui-field__label" for="<?php echo esc_attr($id); ?>"><?php echo esc_html($label); ?><?php if ($required) : ?><span class="pui-field__req" aria-hidden="true">*</span><?php endif; ?></label>
+            <?php endif; ?>
+            <select class="pui-select" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($name); ?>" <?php echo $required ? 'required' : ''; ?><?php echo $error !== '' ? ' aria-invalid="true"' : ''; ?>>
+                <?php if ($placeholder !== '') : ?><option value=""><?php echo esc_html($placeholder); ?></option><?php endif; ?>
+                <?php foreach ($opts as $opt_value => $opt_label) : ?>
+                    <option value="<?php echo esc_attr((string) $opt_value); ?>" <?php echo selected($value, (string) $opt_value, false); ?>><?php echo esc_html((string) $opt_label); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php if ($hint !== '') : ?><p class="pui-field__hint"><?php echo esc_html($hint); ?></p><?php endif; ?>
+            <?php if ($error !== '') : ?><p class="pui-field__error" role="alert"><?php echo esc_html($error); ?></p><?php endif; ?>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_textarea')) {
+    /** @param array{id?:string,name?:string,label?:string,value?:string,rows?:int,hint?:string,error?:string,required?:bool} $args */
+    function pui_textarea(array $args): string
+    {
+        $id    = (string) ($args['id'] ?? '');
+        $label = (string) ($args['label'] ?? '');
+        $value = (string) ($args['value'] ?? '');
+        $hint  = (string) ($args['hint'] ?? '');
+        $error = (string) ($args['error'] ?? '');
+        $rows  = (int) ($args['rows'] ?? 4);
+        $name  = (string) ($args['name'] ?? $id);
+        $required = !empty($args['required']);
+
+        if ($id === '') {
+            $id = 'pui-' . wp_unique_id();
+        }
+
+        ob_start();
+        ?>
+        <div class="pui-field<?php echo $error !== '' ? ' pui-field--invalid' : ''; ?>">
+            <?php if ($label !== '') : ?>
+                <label class="pui-field__label" for="<?php echo esc_attr($id); ?>"><?php echo esc_html($label); ?><?php if ($required) : ?><span class="pui-field__req" aria-hidden="true">*</span><?php endif; ?></label>
+            <?php endif; ?>
+            <textarea class="pui-textarea" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($name); ?>" rows="<?php echo esc_attr((string) max(2, $rows)); ?>" <?php echo $required ? 'required' : ''; ?><?php echo $error !== '' ? ' aria-invalid="true"' : ''; ?>><?php echo esc_textarea($value); ?></textarea>
+            <?php if ($hint !== '') : ?><p class="pui-field__hint"><?php echo esc_html($hint); ?></p><?php endif; ?>
+            <?php if ($error !== '') : ?><p class="pui-field__error" role="alert"><?php echo esc_html($error); ?></p><?php endif; ?>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_switch')) {
+    /** @param array{id?:string,name?:string,label?:string,description?:string,checked?:bool,value?:string} $args */
+    function pui_switch(array $args): string
+    {
+        $id      = (string) ($args['id'] ?? '');
+        $name    = (string) ($args['name'] ?? $id);
+        $label   = (string) ($args['label'] ?? '');
+        $desc    = (string) ($args['description'] ?? '');
+        $value   = (string) ($args['value'] ?? '1');
+        $checked = !empty($args['checked']);
+
+        if ($id === '') {
+            $id = 'pui-' . wp_unique_id();
+        }
+
+        ob_start();
+        ?>
+        <div class="pui-switch-field">
+            <label class="pui-switch" for="<?php echo esc_attr($id); ?>">
+                <input type="checkbox" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" <?php checked($checked); ?>>
+                <span class="pui-switch__track" aria-hidden="true"><span class="pui-switch__thumb"></span></span>
+                <span class="pui-switch__label"><?php echo esc_html($label); ?></span>
+            </label>
+            <?php if ($desc !== '') : ?><p class="pui-field__hint"><?php echo esc_html($desc); ?></p><?php endif; ?>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_checkbox')) {
+    /** @param array{id?:string,name?:string,label?:string,checked?:bool,value?:string} $args */
+    function pui_checkbox(array $args): string
+    {
+        $id      = (string) ($args['id'] ?? '');
+        $name    = (string) ($args['name'] ?? $id);
+        $label   = (string) ($args['label'] ?? '');
+        $value   = (string) ($args['value'] ?? '1');
+        $checked = !empty($args['checked']);
+
+        if ($id === '') {
+            $id = 'pui-' . wp_unique_id();
+        }
+
+        return sprintf(
+            '<label class="pui-check" for="%1$s"><input type="checkbox" id="%1$s" name="%2$s" value="%3$s"%4$s><span>%5$s</span></label>',
+            esc_attr($id),
+            esc_attr($name),
+            esc_attr($value),
+            $checked ? ' checked' : '',
+            esc_html($label)
+        );
+    }
+}
+
+if (!function_exists('pui_radio_cards')) {
+    /**
+     * گروه انتخاب کارتی (جایگزین رادیوهای ساده در فرم‌های عمومی).
+     *
+     * @param array{name:string,options:array<string,array{label:string,icon?:string,desc?:string}>,value?:string,legend?:string,required?:bool} $args
+     */
+    function pui_radio_cards(array $args): string
+    {
+        $name    = (string) ($args['name'] ?? 'pui-choice');
+        $value   = (string) ($args['value'] ?? '');
+        $legend  = (string) ($args['legend'] ?? '');
+        $options = (array) ($args['options'] ?? []);
+        $req     = !empty($args['required']) ? ' required' : '';
+        $group   = 'pui-rc-' . wp_unique_id();
+
+        ob_start();
+        ?>
+        <fieldset class="pui-radio-cards" <?php echo $legend !== '' ? 'aria-label="' . esc_attr($legend) . '"' : ''; ?>>
+            <?php if ($legend !== '') : ?><legend class="pui-field__label"><?php echo esc_html($legend); ?></legend><?php endif; ?>
+            <?php foreach ($options as $opt_value => $opt) :
+                $oid  = $group . '-' . sanitize_key((string) $opt_value);
+                $icon = (string) ($opt['icon'] ?? '');
+                $desc = (string) ($opt['desc'] ?? ''); ?>
+                <label class="pui-radio-card" for="<?php echo esc_attr($oid); ?>">
+                    <input type="radio" id="<?php echo esc_attr($oid); ?>" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr((string) $opt_value); ?>" <?php echo checked($value, (string) $opt_value, false); ?><?php echo $req; ?>>
+                    <span class="pui-radio-card__body">
+                        <?php if ($icon !== '') : ?><span class="pui-radio-card__icon"><?php echo pui_icon($icon, ['size' => 18]); ?></span><?php endif; ?>
+                        <span class="pui-radio-card__label"><?php echo esc_html((string) ($opt['label'] ?? $opt_value)); ?></span>
+                        <?php if ($desc !== '') : ?><span class="pui-radio-card__desc"><?php echo esc_html($desc); ?></span><?php endif; ?>
+                    </span>
+                </label>
+            <?php endforeach; ?>
+        </fieldset>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_tabs')) {
+    /**
+     * تب‌های ARIA با پنل‌های آماده. رفتار (کلیک/کیبورد) را ui.js انجام می‌دهد.
+     *
+     * @param array<int,array{label:string,badge?:string,content?:string,id?:string}> $tabs
+     * @param array{label?:string,class?:string,active?:int} $args
+     */
+    function pui_tabs(array $tabs, array $args = []): string
+    {
+        if (empty($tabs)) {
+            return '';
+        }
+
+        $active = (int) ($args['active'] ?? 0);
+        $active = ($active >= 0 && $active < count($tabs)) ? $active : 0;
+        $label  = (string) ($args['label'] ?? 'تب‌ها');
+        $class  = (string) ($args['class'] ?? '');
+        $base   = 'pui-tab-' . wp_unique_id();
+
+        ob_start();
+        ?>
+        <div class="pui-tabs-wrap <?php echo esc_attr($class); ?>">
+            <div class="pui-tabs" role="tablist" aria-label="<?php echo esc_attr($label); ?>">
+                <?php foreach ($tabs as $i => $tab) :
+                    $tid = $base . '-tab-' . $i;
+                    $pid = $base . '-panel-' . $i;
+                    $selected = $i === $active; ?>
+                    <button type="button" class="pui-tab" role="tab" id="<?php echo esc_attr($tid); ?>"
+                        aria-controls="<?php echo esc_attr($pid); ?>" aria-selected="<?php echo $selected ? 'true' : 'false'; ?>"
+                        tabindex="<?php echo $selected ? '0' : '-1'; ?>">
+                        <?php echo esc_html((string) ($tab['label'] ?? '')); ?>
+                        <?php if (!empty($tab['badge'])) : ?><span class="pui-tab__badge"><?php echo esc_html((string) $tab['badge']); ?></span><?php endif; ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            <?php foreach ($tabs as $i => $tab) : ?>
+                <div class="pui-tabpanel" role="tabpanel" id="<?php echo esc_attr($base . '-panel-' . $i); ?>"
+                    aria-labelledby="<?php echo esc_attr($base . '-tab-' . $i); ?>" <?php echo $i === $active ? '' : 'hidden'; ?>>
+                    <?php echo isset($tab['content']) ? $tab['content'] : ''; // markup ساخته‌شده توسط فراخوان ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_modal')) {
+    /**
+     * مدال native <dialog> با فوکوس طبیعی مرورگر و بسته‌شدن با Esc.
+     *
+     * @param array{id?:string,title?:string,body?:string,actions?:string,size?:string} $args
+     */
+    function pui_modal(array $args): string
+    {
+        $id      = (string) ($args['id'] ?? 'pui-modal-' . wp_unique_id());
+        $title   = (string) ($args['title'] ?? '');
+        $body    = (string) ($args['body'] ?? '');
+        $actions = (string) ($args['actions'] ?? '');
+        $size    = in_array(($args['size'] ?? ''), ['sm', 'lg'], true) ? ' pui-modal--' . $args['size'] : '';
+        $title_id = $id . '-title';
+
+        ob_start();
+        ?>
+        <dialog class="pui-modal<?php echo esc_attr($size); ?>" id="<?php echo esc_attr($id); ?>" <?php echo $title !== '' ? 'aria-labelledby="' . esc_attr($title_id) . '"' : ''; ?>>
+            <?php if ($title !== '') : ?>
+                <div class="pui-modal__head">
+                    <h2 class="pui-modal__title" id="<?php echo esc_attr($title_id); ?>"><?php echo esc_html($title); ?></h2>
+                    <button type="button" class="pui-btn pui-btn--quiet pui-btn--icon" data-pui-close aria-label="بستن"><?php echo pui_icon('x', ['size' => 18]); ?></button>
+                </div>
+            <?php endif; ?>
+            <div class="pui-modal__body"><?php echo $body; ?></div>
+            <?php if ($actions !== '') : ?><div class="pui-modal__foot"><?php echo $actions; ?></div><?php endif; ?>
+        </dialog>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_skeleton')) {
+    /**
+     * اسکلتون بارگذاری. اندازه با کلاس انجام می‌شود (بدون استایل درون‌خطی).
+     *
+     * @param array{lines?:int,size?:string,width?:string,class?:string} $args
+     */
+    function pui_skeleton(array $args = []): string
+    {
+        $lines = max(1, (int) ($args['lines'] ?? 1));
+        $size  = in_array(($args['size'] ?? ''), ['sm', 'lg', 'title'], true) ? ' pui-skeleton--' . $args['size'] : '';
+        $width = in_array(($args['width'] ?? ''), ['60', '70', '85', 'half'], true) ? ' pui-skeleton--w' . $args['width'] : '';
+        $class = (string) ($args['class'] ?? '');
+        $out   = '';
+
+        for ($i = 0; $i < $lines; $i++) {
+            $mod = ($i === $lines - 1 && $lines > 1) ? ' ' . trim($width) : '';
+            $out .= '<span class="pui-skeleton' . $size . $mod . ($class !== '' ? ' ' . esc_attr($class) : '') . '" aria-hidden="true"></span>';
+        }
+
+        return '<span class="pui-skeleton-stack" role="status" aria-live="polite"><span class="pui-sr-only">در حال بارگذاری…</span>' . $out . '</span>';
+    }
+}
+
+if (!function_exists('pui_progress')) {
+    /** @param array{label?:string,show_value?:bool,tone?:string} $args */
+    function pui_progress(int $value, array $args = []): string
+    {
+        $value = max(0, min(100, $value));
+        $label = (string) ($args['label'] ?? '');
+        $show  = !array_key_exists('show_value', $args) || !empty($args['show_value']);
+        $tone  = in_array(($args['tone'] ?? ''), ['success', 'warning', 'danger'], true) ? ' pui-progress--' . $args['tone'] : '';
+
+        ob_start();
+        ?>
+        <div class="pui-progress-field">
+            <?php if ($label !== '' || $show) : ?>
+                <div class="pui-progress-field__head">
+                    <?php if ($label !== '') : ?><span class="pui-progress-field__label"><?php echo esc_html($label); ?></span><?php endif; ?>
+                    <?php if ($show) : ?><span class="pui-progress-field__value"><?php echo esc_html((string) $value); ?>٪</span><?php endif; ?>
+                </div>
+            <?php endif; ?>
+            <div class="pui-progress<?php echo esc_attr($tone); ?>" role="progressbar" aria-valuenow="<?php echo esc_attr((string) $value); ?>" aria-valuemin="0" aria-valuemax="100" <?php echo $label !== '' ? 'aria-label="' . esc_attr($label) . '"' : ''; ?>>
+                <div class="pui-progress__bar" data-pui-progress="<?php echo esc_attr((string) $value); ?>"></div>
+            </div>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_table_toolbar')) {
+    /**
+     * نوار ابزار جدول: جست‌وجو + فیلترها + اکشن‌ها.
+     *
+     * @param array{search_name?:string,search_value?:string,search_placeholder?:string,action?:string,hidden?:array<string,string>,filters?:string,actions?:string,label?:string} $args
+     */
+    function pui_table_toolbar(array $args = []): string
+    {
+        $name        = (string) ($args['search_name'] ?? 's');
+        $value       = (string) ($args['search_value'] ?? '');
+        $placeholder = (string) ($args['search_placeholder'] ?? 'جست‌وجو…');
+        $action      = (string) ($args['action'] ?? '');
+        $hidden      = (array) ($args['hidden'] ?? []);
+        $filters     = (string) ($args['filters'] ?? '');
+        $actions     = (string) ($args['actions'] ?? '');
+        $label       = (string) ($args['label'] ?? 'جست‌وجو در جدول');
+
+        ob_start();
+        ?>
+        <div class="pui-toolbar">
+            <form class="pui-toolbar__search" method="get" role="search" <?php echo $action !== '' ? 'action="' . esc_url($action) . '"' : ''; ?>>
+                <?php foreach ($hidden as $hk => $hv) : ?>
+                    <input type="hidden" name="<?php echo esc_attr((string) $hk); ?>" value="<?php echo esc_attr((string) $hv); ?>">
+                <?php endforeach; ?>
+                <label class="pui-sr-only" for="<?php echo esc_attr('pui-search-' . wp_unique_id()); ?>"><?php echo esc_html($label); ?></label>
+                <span class="pui-toolbar__icon" aria-hidden="true"><?php echo pui_icon('search', ['size' => 16]); ?></span>
+                <input class="pui-input pui-toolbar__input" type="search" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" aria-label="<?php echo esc_attr($label); ?>">
+                <?php echo $filters; // markup فیلترهای ساخته‌شده توسط فراخوان ?>
+                <button type="submit" class="pui-btn pui-btn--ghost pui-btn--sm">جست‌وجو</button>
+            </form>
+            <?php if ($actions !== '') : ?><div class="pui-toolbar__actions"><?php echo $actions; ?></div><?php endif; ?>
+        </div>
+        <?php
+        return (string) ob_get_clean();
+    }
+}
+
+if (!function_exists('pui_toast_trigger')) {
+    /** دکمه‌ای که یک اعلان نمونه نشان می‌دهد (برای پیش‌نمایش و آزمون). */
+    function pui_toast_trigger(string $message, string $label = 'نمایش اعلان', array $args = []): string
+    {
+        $variant = in_array(($args['variant'] ?? ''), ['primary', 'ghost', 'quiet'], true) ? ' pui-btn--' . $args['variant'] : ' pui-btn--ghost';
+
+        return sprintf(
+            '<button type="button" class="pui-btn%s" data-pui-toast="%s">%s</button>',
+            $variant,
+            esc_attr($message),
+            esc_html($label)
+        );
+    }
+}
