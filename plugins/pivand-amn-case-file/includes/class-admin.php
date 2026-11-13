@@ -348,6 +348,8 @@ final class Pas_CF_Admin
         }
 
         $last_session_map = Pas_CF_Case_File::get_last_session_map(wp_list_pluck($cases, 'id'));
+        // یک کوئری برای همه‌ی حساب‌های OTP این صفحه — به‌جای یک کوئری در هر ردیف
+        Pas_CF_Case_File::preload_linked_wp_users(wp_list_pluck($cases, 'phone'));
         $today_ts = strtotime(current_time('Y-m-d'));
         ?>
         <div class="wrap pas-cf-wrap">
@@ -1555,6 +1557,7 @@ final class Pas_CF_Admin
         }
 
         $last_session_map = Pas_CF_Case_File::get_last_session_map(wp_list_pluck($cases, 'id'));
+        Pas_CF_Case_File::preload_linked_wp_users(wp_list_pluck($cases, 'phone'));
 
         nocache_headers();
         header('Content-Type: text/csv; charset=utf-8');

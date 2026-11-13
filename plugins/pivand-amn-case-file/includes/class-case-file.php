@@ -992,9 +992,58 @@ final class Pas_CF_Case_File
     public static function find_linked_wp_user(string $phone): ?\WP_User
     {
         $login = 'zdp_' . self::normalize_phone($phone);
-        $user  = get_user_by('login', $login);
+
+        if (array_key_exists($login, self::$linked_user_cache)) {
+            return self::$linked_user_cache[$login];
+        }
+
+        $user = get_user_by('login', $login);
+
+        self::$linked_user_cache[$login] = $user ?: null;
 
         return $user ?: null;
+    }
+
+    /** @var array<string,\WP_User|null> کش lookup حساب‌های OTP (جلوگیری از N+1 در لیست‌ها) */
+    private static array $linked_user_cache = [];
+
+    /**
+     * پیش‌بارگذاری حساب‌های OTP با یک کوئری برای همه‌ی شماره‌های یک صفحه.
+     * بدون این، هر ردیف لیست پرونده‌ها یک کوئری جدا می‌زد (N+1).
+     *
+     * @param array<int,string> $phones
+     */
+    public static function preload_linked_wp_users(array $phones): void
+    {
+        $logins = [];
+
+        foreach ($phones as $phone) {
+            $login = 'zdp_' . self::normalize_phone((string) $phone);
+
+            if ($login !== 'zdp_' && !array_key_exists($login, self::$linked_user_cache)) {
+                $logins[$login] = true;
+            }
+        }
+
+        if (!$logins) {
+            return;
+        }
+
+        $users = get_users([
+            'login__in' => array_keys($logins),
+            'number'    => count($logins),
+            'fields'    => 'all_with_meta',
+        ]);
+
+        $found = [];
+
+        foreach ($users as $user) {
+            $found[$user->user_login] = $user;
+        }
+
+        foreach (array_keys($logins) as $login) {
+            self::$linked_user_cache[$login] = $found[$login] ?? null;
+        }
     }
 
     /**
