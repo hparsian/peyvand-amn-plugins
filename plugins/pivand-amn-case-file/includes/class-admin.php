@@ -37,6 +37,11 @@ final class Pas_CF_Admin
         // برچسب زیرمنو عمداً خنثی است («لیست پرونده‌ها») نه «همه‌ی پرونده‌ها»:
         // برای کاربری که PAS_CF_CAP_ALL ندارد، این صفحه فقط پرونده‌های خودش
         // را نشان می‌دهد و عنوانِ گمراه‌کننده نباید در منو ثابت بماند.
+        // داشبورد درمانگر — صفحه‌ی اول منو (فاز ۱۲ / گام ۴). همه‌ی اعداد از
+        // همان کوئری‌های محدوده‌ی دید PAS_CF_Reports می‌آید و لینک‌هایش فقط
+        // به صفحات موجود با همین کپابیلیتی می‌رود.
+        add_submenu_page('pas-case-files', 'داشبورد درمانگر', 'داشبورد', PAS_CF_CAP, 'pas-case-dashboard', ['Pas_CF_Dashboard', 'render']);
+
         add_submenu_page('pas-case-files', 'لیست پرونده‌ها', 'لیست پرونده‌ها', PAS_CF_CAP, 'pas-case-files', [$this, 'render_list_page']);
         add_submenu_page('pas-case-files', 'پرونده‌ی جدید', 'پرونده‌ی جدید', PAS_CF_CAP, 'pas-case-file-new', [$this, 'render_edit_page']);
         add_submenu_page('pas-case-files', 'گزارش‌های بالینی', 'گزارش‌ها', PAS_CF_CAP, 'pas-case-reports', [$this, 'render_reports_page']);
@@ -45,10 +50,26 @@ final class Pas_CF_Admin
 
     public function enqueue_assets(string $hook): void
     {
-        if (strpos($hook, 'pas-case-file') === false) {
+        // صفحه‌های این منو هم با هوک `toplevel_page_...` و هم با
+        // `pas-case-files_page_...` صدا زده می‌شوند؛ چک روی پارامتر page
+        // هر دو حالت را می‌گیرد (و هوک هم برای سازگاری نگه داشته شده است).
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        $is_our_page = $page !== '' && strpos($page, 'pas-case-') === 0;
+
+        if (!$is_our_page && strpos($hook, 'pas-case-file') === false) {
             return;
         }
         wp_enqueue_style('pas-cf-admin', PAS_CF_URL . 'assets/css/admin.css', class_exists('Pas_Core_Tokens') ? [\Pas_Core_Tokens::handle()] : [], PAS_CF_VERSION);
+
+        // پوسته‌ی برند (فاز ۱۲): فقط در همین صفحات. اگر کیت رابط کاربری فعال
+        // باشد، فونت و توکن‌های آن هم بارگذاری می‌شوند؛ در غیر این صورت
+        // admin-skin.css با رنگ‌های برند خودش کار می‌کند.
+        $skin_deps = ['pas-cf-admin'];
+        if (class_exists('PUI')) {
+            PUI::enqueue('admin');
+            $skin_deps[] = PUI::handle('tokens');
+        }
+        wp_enqueue_style('pas-cf-admin-skin', PAS_CF_URL . 'assets/css/admin-skin.css', $skin_deps, PAS_CF_VERSION);
 
         // فقط برای فرم «پرونده‌ی جدید» — جست‌وجوی خودکار نام مراجع بر اساس
         // شماره موبایل از طریق نقطه‌ی AJAX مشترک هسته (core).

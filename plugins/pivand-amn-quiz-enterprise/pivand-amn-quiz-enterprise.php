@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — آزمون‌های روان‌سنجی
  * Description: پلتفرم جامع آزمون‌های روان‌سنجی با سیستم توکن مراجع، گزارش تخصصی و ارسال واتساپ.
- * Version: 3.6.7
+ * Version: 3.7.0
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 8.1
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'PSY_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'PSY_URL',        plugin_dir_url( __FILE__ ) );
-define( 'PSY_VERSION',    '3.6.7' );
+define( 'PSY_VERSION',    '3.7.0' );
 define( 'PSY_DB_VERSION', '3.10' );  // 3.8: BUG-22 — نرمال‌سازی client_phone موقع ثبت + migration یک‌بار برای رکوردهای قدیمی
                                      // 3.9: اضافه‌شدن ستون client_email — ورود جایگزین با ایمیل برای مراجعینی که شماره ایرانی ندارند
 
@@ -304,8 +304,19 @@ add_shortcode( 'psy_exam', [ 'Psy_Quiz_Frontend', 'render' ] );
 // (enqueue در آنجا انجام می‌شود — اینجا فقط admin assets لود می‌شوند)
 
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
-    if ( ! str_contains( $hook, 'psy-quiz' ) ) return;
+    // صفحه‌های این منو هم با هوک `toplevel_page_...` و هم با
+    // `psy-quiz_page_...` صدا زده می‌شوند؛ چک پارامتر page هر دو را می‌گیرد.
+    $psy_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+    if ( strpos( $psy_page, 'psy-quiz' ) !== 0 && ! str_contains( $hook, 'psy-quiz' ) ) return;
     wp_enqueue_style( 'psy-quiz-admin', PSY_URL . 'assets/css/admin.css', class_exists( 'Pas_Core_Tokens' ) ? [ Pas_Core_Tokens::handle() ] : [], PSY_VERSION );
+
+    // پوسته‌ی برند (فاز ۱۲ / گام ۴): فقط در صفحات همین افزونه.
+    $psy_skin_deps = [ 'psy-quiz-admin' ];
+    if ( class_exists( 'PUI' ) ) {
+        PUI::enqueue( 'admin' );
+        $psy_skin_deps[] = PUI::handle( 'tokens' );
+    }
+    wp_enqueue_style( 'psy-quiz-admin-skin', PSY_URL . 'assets/css/admin-skin.css', $psy_skin_deps, PSY_VERSION );
     wp_enqueue_script( 'psy-quiz-admin', PSY_URL . 'assets/js/admin.js', [ 'jquery' ], PSY_VERSION, true );
     // نانس مشترک برای jax lookup نام مراجع بر اساس شماره موبایل (core:
     // wp_ajax_pas_core_lookup_client_name). فقط در صفحه‌ی «مراجع جدید»

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — پرونده مراجعین
  * Description: پرونده بالینی متمرکز برای هر مراجع (مشخصات + یادداشت جلسات، رمزنگاری‌شده) با ورود فقط از طریق حساب ادمین وردپرس (بدون OTP)، و اتصال فیلتر-محور به شماره موبایلی که افزونه‌ی ورود مراجعین (پنل مراجعان) با آن حساب می‌سازد.
- * Version: 1.15.3
+ * Version: 1.16.0
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -93,7 +93,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_CF_VERSION', '1.15.3');
+define('PAS_CF_VERSION', '1.16.0');
 define('PAS_CF_DIR', plugin_dir_path(__FILE__));
 define('PAS_CF_URL', plugin_dir_url(__FILE__));
 define('PAS_CF_CAP', 'pas_manage_case_files'); // ورود به پنل پرونده‌ها (حداقلی)
@@ -107,6 +107,7 @@ require_once PAS_CF_DIR . 'includes/class-case-file.php';
 require_once PAS_CF_DIR . 'includes/class-audit-log.php';
 require_once PAS_CF_DIR . 'includes/class-timeline.php';
 require_once PAS_CF_DIR . 'includes/class-reports.php';
+require_once PAS_CF_DIR . 'includes/class-dashboard.php';
 require_once PAS_CF_DIR . 'includes/class-admin.php';
 
 register_activation_hook(__FILE__, function (): void {
