@@ -114,44 +114,48 @@ class AUDIT extends \PsychAssessments\Core\BaseTest {
         $sev       = $this->severity( $scores['total'] );
 
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل',$completed],
                 [$sev['bg'],$sev['color'],'🍺','نمره کل AUDIT',$scores['total'].' از ۴۰'],
-                [$sev['bg'],$sev['color'],'🏷','سطح خطر',$sev['label']],
+                [$sev['bg'],$sev['color'],'🏷','سطح خطر',$sev['label'],$sev['label_en']],
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sev['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;">نمره کل: <?php echo esc_html((int)$scores['total']); ?> از ۴۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title">نمره کل: <?php echo esc_html((int)$scores['total']); ?> از ۴۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$scores['total'], $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($scores['total'],0,40); ?>%;border-radius:6px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                <span>۰</span><span style="color:#2f855a;">۷ کم‌خطر</span><span style="color:#d69e2e;">۱۵ مشکل‌ساز</span><span style="color:#c05621;">۱۹ مضر</span><span style="color:#9b2c2c;">۲۰+ وابستگی</span>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($scores['total'],0,40), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
+                <span>۰</span>
+                <span class="psy-tone--success"><span class="psy-report-scale__mark psy-text">۷ کم‌خطر</span></span>
+                <span class="psy-tone--warning"><span class="psy-report-scale__mark psy-text">۱۵ مشکل‌ساز</span></span>
+                <span class="psy-tone--accent"><span class="psy-report-scale__mark psy-text">۱۹ مضر</span></span>
+                <span class="psy-tone--danger"><span class="psy-report-scale__mark psy-text">۲۰+ وابستگی</span></span>
             </div>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('سه حوزه ارزیابی'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-audit-bar" style="max-height:200px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-audit-bar" class="psy-report-chart psy-report-chart--xs"></canvas>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
-            <h3 style="margin-top:0;font-size:15px;">📋 راهنمای تفسیر (WHO)</h3>
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">نمره</th>
-                    <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">سطح خطر</th>
-                    <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">اقدام پیشنهادی</th>
-                </tr></thead>
+        <div class="psy-report-panel">
+            <h3 class="psy-report-panel__title">📋 راهنمای تفسیر (WHO)</h3>
+            <table class="psy-report-table">
+                <thead>
+                    <tr>
+                        <th class="psy-report-table__cell--start">نمره</th>
+                        <th class="psy-report-table__cell--start">سطح خطر</th>
+                        <th class="psy-report-table__cell--start">اقدام پیشنهادی</th>
+                    </tr>
+                </thead>
                 <tbody>
                 <?php foreach ([
                     ['۰–۷',  'کم‌خطر',          '#2f855a', 'آموزش بهداشت'],
@@ -160,18 +164,18 @@ class AUDIT extends \PsychAssessments\Core\BaseTest {
                     ['۲۰+',  'وابستگی احتمالی', '#9b2c2c', 'ارجاع به متخصص اعتیاد'],
                 ] as $r): ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell--bold <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $r[2] ) ); ?> psy-text"><?php echo esc_html($r[0]); ?></td>
+                    <td class="<?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $r[2] ) ); ?> psy-text"><?php echo esc_html($r[1]); ?></td>
+                    <td><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منبع:</b> Babor et al. (2001). AUDIT: The Alcohol Use Disorders Identification Test (2nd ed.). WHO.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار غربالگری — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Babor et al. (2001). AUDIT: The Alcohol Use Disorders Identification Test (2nd ed.). WHO.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار غربالگری — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

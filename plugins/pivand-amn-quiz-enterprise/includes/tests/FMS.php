@@ -232,7 +232,7 @@ class FMS extends \PsychAssessments\Core\BaseTest {
         ?>
 
         <!-- ===== خلاصه سربرگ ===== -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','👤','نام',         esc_html($session->client_name ?? $session->patient_name ?? '')],
@@ -249,26 +249,26 @@ class FMS extends \PsychAssessments\Core\BaseTest {
 
         <!-- ===== نمره کل + تفسیر ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمره کل ترس از ازدواج'); ?>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
-            <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $total_sev); ?>
-            <div style="flex:1;min-width:200px;">
-                <?php $pct = \PsychAssessments\Core\Scoring::percent($total, 35, 175); ?>
-                <div style="background:#e2e8f0;border-radius:6px;height:14px;overflow:hidden;margin-bottom:6px;">
-                    <div style="width:<?php echo $pct; ?>%;height:100%;background:<?php echo esc_attr($total_sev['color']); ?>;transition:width .4s;"></div>
-                </div>
-                <div style="font-size:12px;color:#718096;">
-                    محدوده: &lt;۷۰ ترس ضعیف | ۷۰–۱۰۴ ترس متوسط | ≥۱۰۵ ترس شدید
+        <div class="psy-report-card psy-report-card--stack <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $total_sev['color'] ) ); ?>">
+            <div class="psy-report-row psy-report-row--center">
+                <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $total_sev); ?>
+                <div class="psy-report-col">
+                    <?php $pct = \PsychAssessments\Core\Scoring::percent($total, 35, 175); ?>
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $total_sev['color'], true ); ?>
+                    <div class="psy-report-en-like">
+                        محدوده: &lt;۷۰ ترس ضعیف | ۷۰–۱۰۴ ترس متوسط | ≥۱۰۵ ترس شدید
+                    </div>
                 </div>
             </div>
         </div>
-        <div style="background:<?php echo esc_attr($total_sev['bg']); ?>;border-right:4px solid <?php echo esc_attr($total_sev['color']); ?>;border-radius:6px;padding:12px 16px;font-size:13px;color:<?php echo esc_attr($total_sev['color']); ?>;margin-bottom:20px;">
+        <div class="psy-report-chip psy-report-chip--block <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $total_sev['color'] ) ); ?>">
             💡 <?php echo esc_html($total_sev['clinical']); ?>
         </div>
 
         <!-- ===== نمودار زیرمقیاس‌ها ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمودار زیرمقیاس‌های ترس'); ?>
-        <div style="max-width:560px;margin:0 auto 28px;">
-            <canvas id="<?php echo esc_attr($chart_id); ?>" height="220"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-panel--center psy-report-chart-wrap">
+            <canvas id="<?php echo esc_attr($chart_id); ?>" class="psy-report-chart psy-report-chart--gauge" height="220"></canvas>
         </div>
         <script>
         (function(){
@@ -319,21 +319,17 @@ class FMS extends \PsychAssessments\Core\BaseTest {
             $sev   = $this->subscale_severity($score);
             $pct   = \PsychAssessments\Core\Scoring::percent($score, 7, 35);
         ?>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;border-right:4px solid <?php echo esc_attr($def['color']); ?>;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $def['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <span style="font-size:15px;font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;">
-                        <?php echo esc_html($def['label']); ?>
-                    </span>
-                    <span style="font-size:11px;color:#a0aec0;margin-right:6px;"><?php echo esc_html($def['label_en']); ?></span>
+                    <span class="psy-report-name-lg"><?php echo esc_html($def['label']); ?></span>
+                    <span class="psy-report-en psy-report-en--inline"><?php echo esc_html($def['label_en']); ?></span>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$score, $sev); ?>
             </div>
-            <div style="background:#e2e8f0;border-radius:4px;height:10px;overflow:hidden;margin-bottom:10px;">
-                <div style="width:<?php echo $pct; ?>%;height:100%;background:<?php echo esc_attr($def['color']); ?>;"></div>
-            </div>
-            <p style="margin:0 0 8px;font-size:13px;color:#4a5568;line-height:1.7;"><?php echo esc_html($def['desc']); ?></p>
-            <div style="background:<?php echo esc_attr($sev['bg']); ?>;border-radius:5px;padding:6px 10px;font-size:12px;color:<?php echo esc_attr($sev['color']); ?>;">
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $def['color'] ); ?>
+            <p class="psy-report-desc psy-report-desc--flush"><?php echo esc_html($def['desc']); ?></p>
+            <div class="psy-report-chip psy-report-chip--block <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sev['color'] ) ); ?>">
                 سطح ترس: <strong><?php echo esc_html($sev['label']); ?></strong>
                 &nbsp;|&nbsp; نمره: <strong><?php echo esc_html((int)$score); ?> از ۳۵</strong>
             </div>
@@ -393,37 +389,37 @@ class FMS extends \PsychAssessments\Core\BaseTest {
                     ? ! \PsychAssessments\Core\Scoring::is_above_level( (float) $pam_total, $pam_test->total_severity_levels(), 0 )
                     : $pam_total < 110; // fallback ایمن اگر متد در دسترس نبود
                 if ( $is_high_fear && $is_low_pam ) {
-                    $combo_color = '#c53030'; $combo_bg = '#fff5f5';
+                    $combo_color = '#c53030';
                     $combo_text  = 'ترکیب ترس از ازدواج بالا و آمادگی ازدواج پایین — اولویت اول مداخله بالینی است. توصیه می‌شود جلسات روان‌درمانی فردی قبل از هر اقدام انجام شود.';
                 } elseif ( $is_high_fear && !$is_low_pam ) {
-                    $combo_color = '#c05621'; $combo_bg = '#fffaf0';
+                    $combo_color = '#c05621';
                     $combo_text  = 'آمادگی ازدواج نسبتاً مناسب است اما ترس بالا می‌تواند مانع تصمیم‌گیری سالم شود. تمرکز بر کاهش ترس و باورهای محدودکننده توصیه می‌شود.';
                 } elseif ( !$is_high_fear && $is_low_pam ) {
-                    $combo_color = '#c05621'; $combo_bg = '#fffaf0';
+                    $combo_color = '#c05621';
                     $combo_text  = 'ترس پایین است اما آمادگی ازدواج نیاز به تقویت دارد. آموزش مهارت‌های ارتباطی و آمادگی عاطفی توصیه می‌شود.';
                 } else {
-                    $combo_color = '#276749'; $combo_bg = '#f0fff4';
+                    $combo_color = '#276749';
                     $combo_text  = 'پروفایل مناسبی از نظر ترکیب سطح ترس و آمادگی ازدواج مشاهده می‌شود.';
                 }
         ?>
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('تفسیر ترکیبی FMS + PAM'); ?>
-        <div style="background:<?php echo esc_attr($combo_bg); ?>;border-right:4px solid <?php echo esc_attr($combo_color); ?>;border-radius:6px;padding:14px 16px;font-size:13px;color:<?php echo esc_attr($combo_color); ?>;margin-bottom:20px;line-height:1.8;">
-            <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px;">
-                <div style="text-align:center;">
-                    <div style="font-size:22px;font-weight:bold;color:<?php echo esc_attr($total_sev['color']); ?>;"><?php echo esc_html($total); ?></div>
-                    <div style="font-size:11px;color:#718096;">FMS نمره ترس (از ۱۷۵)</div>
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $combo_color ) ); ?>">
+            <div class="psy-report-trio">
+                <div class="psy-report-trio__cell">
+                    <div class="psy-report-trio__value <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $total_sev['color'] ) ); ?>"><?php echo esc_html($total); ?></div>
+                    <div class="psy-report-trio__label">FMS نمره ترس (از ۱۷۵)</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-size:22px;font-weight:bold;color:#553c9a;"><?php echo esc_html((int)$pam_total); ?></div>
-                    <div style="font-size:11px;color:#718096;">PAM نمره آمادگی (از ۲۰۰)</div>
+                <div class="psy-report-trio__cell">
+                    <div class="psy-report-trio__value psy-tone--purple"><?php echo esc_html((int)$pam_total); ?></div>
+                    <div class="psy-report-trio__label">PAM نمره آمادگی (از ۲۰۰)</div>
                 </div>
             </div>
-            <strong>تفسیر بالینی:</strong> <?php echo esc_html($combo_text); ?>
+            <p class="psy-report-text psy-report-text--spaced"><strong>تفسیر بالینی:</strong> <?php echo esc_html($combo_text); ?></p>
         </div>
         <?php endif; endif; ?>
 
         <!-- ===== منابع علمی ===== -->
-        <div style="margin-top:28px;padding:12px 16px;background:#f7fafc;border-radius:6px;font-size:11px;color:#718096;line-height:1.9;">
+        <div class="psy-report-refs psy-report-refs--soft">
             <strong>منابع:</strong><br>
             فرامرزی، م.، عطاری، ع.، و صادقی، م. (۱۳۹۰). ساخت و اعتباریابی پرسشنامه ترس از ازدواج در جمعیت ایرانی.
             <em>فصلنامه روان‌شناسی کاربردی</em>، ۵(۴)، ۱۰۳–۱۲۰.
