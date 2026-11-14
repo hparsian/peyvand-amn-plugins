@@ -362,7 +362,7 @@ class PAM extends \PsychAssessments\Core\BaseTest {
         <!-- ===== نمودار رادار / بار ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمودار زیرمقیاس‌ها' . ($partner_session ? ' — مقایسه زوجین' : '')); ?>
         <div class="psy-report-chart-wrap">
-            <canvas id="<?php echo esc_attr($chart_id); ?>" height="<?php echo $partner_session ? 260 : 220; ?>"></canvas>
+            <canvas id="<?php echo esc_attr($chart_id); ?>" class="psy-report-chart" height="<?php echo $partner_session ? 260 : 220; ?>"></canvas>
         </div>
         <script>
         (function(){

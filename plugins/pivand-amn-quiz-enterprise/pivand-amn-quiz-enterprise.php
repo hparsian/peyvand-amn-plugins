@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — آزمون‌های روان‌سنجی
  * Description: پلتفرم جامع آزمون‌های روان‌سنجی با سیستم توکن مراجع، گزارش تخصصی و ارسال واتساپ.
- * Version: 3.8.16
+ * Version: 3.8.17
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 8.1
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'PSY_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'PSY_URL',        plugin_dir_url( __FILE__ ) );
-define( 'PSY_VERSION',    '3.8.16' );
+define( 'PSY_VERSION',    '3.8.17' );
 define( 'PSY_DB_VERSION', '3.10' );  // 3.8: BUG-22 — نرمال‌سازی client_phone موقع ثبت + migration یک‌بار برای رکوردهای قدیمی
                                      // 3.9: اضافه‌شدن ستون client_email — ورود جایگزین با ایمیل برای مراجعینی که شماره ایرانی ندارند
 

@@ -268,7 +268,7 @@ class FMS extends \PsychAssessments\Core\BaseTest {
         <!-- ===== نمودار زیرمقیاس‌ها ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمودار زیرمقیاس‌های ترس'); ?>
         <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-panel--center psy-report-chart-wrap">
-            <canvas id="<?php echo esc_attr($chart_id); ?>" class="psy-report-chart psy-report-chart--gauge" height="220"></canvas>
+            <canvas id="<?php echo esc_attr($chart_id); ?>" class="psy-report-chart psy-report-chart--bar" height="260"></canvas>
         </div>
         <script>
         (function(){
