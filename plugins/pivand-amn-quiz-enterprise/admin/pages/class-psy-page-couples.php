@@ -506,9 +506,18 @@ class Psy_Page_Couples {
         <?php // ── Chart.js bar chart ── ?>
         <script>
         (function() {
-            var ctx = document.getElementById('psy-couple-chart');
-            if (!ctx || !window.Chart) return;
-            new Chart(ctx, {
+            // Chart.js در فوتر enqueue می‌شود و ممکن است بعد از این اسکریپت
+            // پارس شود؛ مثل نمودارهای گزارش‌ها تا آماده شدن Chart صبر می‌کنیم
+            // (قبلاً همین‌جا بی‌صدا return می‌شد و پنل نمودار خالی می‌ماند).
+            var tries = 0;
+            function init() {
+                var ctx = document.getElementById('psy-couple-chart');
+                if (!ctx) return;
+                if (typeof Chart === 'undefined') {
+                    if (tries++ < 100) setTimeout(init, 100);
+                    return;
+                }
+                new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: <?php echo json_encode($chart_labels, JSON_UNESCAPED_UNICODE); ?>,
@@ -556,7 +565,13 @@ class Psy_Page_Couples {
                         }
                     }
                 }
-            });
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
         })();
         </script>
         <?php
