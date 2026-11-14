@@ -20,6 +20,7 @@ class ReportHTML {
         '#fffff0' => 'warning',
         // نارنجی / توجه
         '#c05621' => 'accent',  '#dd6b20' => 'accent',  '#b7791f' => 'accent',
+        '#92400e' => 'accent',  '#fef3c7' => 'accent',  '#fff5f0' => 'accent',
         '#ed8936' => 'accent',  '#fffaf0' => 'accent',
         // خطر
         '#c53030' => 'danger',  '#9b2c2c' => 'danger',  '#742a2a' => 'danger',

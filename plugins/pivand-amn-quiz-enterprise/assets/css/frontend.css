@@ -1176,3 +1176,67 @@ body.psy-exam-standalone-body {
 .psy-report-card--tint.psy-report-card--tight { margin-block-end: 20px; }
 .psy-report-panel--tight { margin-block-end: 20px; }
 .psy-report-item__score--lg { font-size: 14px; }
+/* دستهٔ چهارم: گزارش‌های چندزیرمقیاسی (SCL-90-R / YSQ / NEO) */
+.psy-report-block { margin-block-end: 30px; }
+.psy-report-title-rule {
+    font-size: 15px;
+    border-block-end: 2px solid #e2e8f0;
+    padding-block-end: 8px;
+    margin: 0 0 12px;
+}
+.psy-report-title-rule__sub {
+    display: block;
+    font-size: 11px;
+    color: #a0aec0;
+    font-weight: 400;
+}
+.psy-report-chart--xl { max-height: 320px; }
+.psy-report-chart--domains { max-height: 280px; }
+.psy-report-col--sm { flex: 1 1 300px; min-width: 300px; max-width: 500px; }
+
+/* جدول رتبه‌بندی طرحواره‌ها */
+.psy-report-table--brand thead th { background: #2b6cb0; color: #fff; }
+.psy-report-table--rank td { padding: 7px 8px; }
+.psy-report-table--rank tbody tr { border-block-end: 1px solid #edf2f7; }
+.psy-report-row--tint { background: var(--psy-bg, transparent); }
+.psy-report-table__cell--rank { color: #718096; font-weight: 700; }
+.psy-report-table__cell--score-lg {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-table__cell--tone { color: var(--psy-c, var(--psy-text)); font-weight: 700; font-size: 11px; }
+.psy-report-table__cell--bold { font-weight: 700; }
+.psy-report-dot { font-size: 10px; }
+
+/* نوار حوزه‌های YSQ */
+.psy-report-domain { margin-block-end: 12px; }
+.psy-report-domain__head { display: flex; justify-content: space-between; margin-block-end: 4px; }
+.psy-report-domain__name { font-size: 12px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-domain__value { font-size: 13px; font-weight: 700; }
+.psy-report-domain__en { font-size: 10px; color: #a0aec0; margin-block-start: 2px; }
+
+/* چیپ‌های «نمره پایین/بالا» در NEO */
+.psy-report-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.psy-report-chip {
+    flex: 1;
+    min-width: 200px;
+    background: var(--psy-bg, var(--psy-surface));
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-chip--muted {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-block-start: 8px;
+    background: #f7fafc;
+    color: #718096;
+    padding: 7px 10px;
+}
+.psy-col--8 { width: 8%; }
+.psy-col--16 { width: 16%; }
+.psy-col--28 { width: 28%; }
+.psy-report-name-lg { font-size: 16px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }

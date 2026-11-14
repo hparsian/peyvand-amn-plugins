@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.8.4 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۵): آزمون‌های چندزیرمقیاسی — SCL-90-R، YSQ و NEO-FFI
+- `tests/SCL90R.php`, `tests/YSQ.php` و `tests/NEO.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر سه گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۹/۵۱/۴۲ در فایل، و در خروجی رندر ۹/۲۰۳/۱۳۰).
+- کلاس‌های تازه در `frontend.css`: `psy-report-block`، `psy-report-title-rule` (+`__sub`)، `psy-report-chart--xl|--domains`، `psy-report-col--sm`، `psy-report-table--brand` (سرستون آبی)، `psy-report-table--rank`، `psy-report-row--tint`، `psy-report-table__cell--rank|--score-lg|--tone|--bold`، `psy-report-dot`، `psy-report-domain*` (نوار ۵ حوزهٔ یانگ)، `psy-report-chips`/`psy-report-chip`/`--muted`، `psy-report-name-lg`، `psy-col--8|16|28`.
+- YSQ: جدول رتبه‌بندی ۱۵ طرحواره (ردیف‌های بالینی با تُن شدت + نشانگر ●)، دو نمودار (میله‌ای افقی با خط cut-off و رادار ۵ حوزه)، ۵ نوار حوزه و کارت‌های `clinical_card` بدون تغییر منطق. NEO: پنج عامل با نوار، چیپ‌های «نمره پایین/بالا» و جدول تفسیر. SCL-90-R: کارت‌های GSI/PST/PSDI، بنر GSI و ۹ کارت بعد بالینی.
+- `ReportHTML::TONE_BY_HEX` سه نگاشت تازه گرفت: `#92400e`, `#fef3c7`, `#fff5f0` → `accent`.
+- هیچ تغییری در نمره‌گذاری، cut-off، ترتیب رتبه‌بندی، دادهٔ نمودارها یا اسکریپت Chart.js انجام نشد؛ متن‌ها و منابع دست‌نخورده‌اند.
+- شمارش استایل درون‌خطی افزونه: ۶۰۰ → ۴۸۸ (۳۲ فایل آزمون باقی است؛ سنگین‌ترین‌ها OCIRPCL5BPAQ و MDQEPDSDERS).
+- `PSY_VERSION` از 3.8.3 به 3.8.4.
+
 ## 3.8.3 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۴): BAI، STAI، RSES و GHQ-28
 - `tests/BAI.php`, `tests/STAI.php`, `tests/RSES.php`, `tests/GHQ28.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر چهار گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۳۶/۲۲/۳۸/۷۰ در خروجی رندر).
 - واریانت‌های تازه در `frontend.css`: `psy-report-alert__title--sm`، `psy-report-alert__text--plum` (هشدار افسردگی GHQ با تُن بنفش)، `psy-report-infobox` (کادر راهنمای STAI)، `psy-report-hero__note--sm`، `psy-report-card--tint.psy-report-card--tight` و `psy-report-panel--tight` (فاصلهٔ ۲۰px)، `psy-report-item__score--lg`.

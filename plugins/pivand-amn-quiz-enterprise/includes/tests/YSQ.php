@@ -260,11 +260,12 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         $domain_labels = array_column( $domains, 'label' );
         $domain_values = array_values( array_map( fn($dk) => $domain_scores[$dk], array_keys($domains) ) );
         $domain_colors = array_column( $domains, 'color' );
+        $avg_tone      = \PsychAssessments\Core\ReportHTML::tone( $avg_sev['color'] );
 
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',           $session->client_phone ?? $session->patient_phone ?? '---'],
@@ -281,35 +282,36 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمودار + جدول -->
-        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-bottom:30px;">
-            <div style="flex:1.2;min-width:340px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
-                <h3 style="margin-top:0;text-align:center;color:#2d3748;font-size:15px;">
+        <div class="psy-report-row psy-report-row--loose">
+            <div class="psy-report-card psy-report-card--panel psy-report-col psy-report-col--sm">
+                <h3 class="psy-report-title-rule psy-report-center">
                     نمودار شدت ۱۵ طرحواره
-                    <span style="display:block;font-size:11px;color:#a0aec0;font-weight:normal;">خط قرمز: نقطه برش بالینی (≥ ۳.۰)</span>
+                    <span class="psy-report-title-rule__sub">خط قرمز: نقطه برش بالینی (≥ ۳.۰)</span>
                 </h3>
-                <canvas id="pa-bar-chart" style="max-height:520px;"></canvas>
+                <canvas id="pa-bar-chart" class="psy-report-chart psy-report-chart--domains"></canvas>
             </div>
-            <div style="flex:1;min-width:300px;">
-                <h3 style="margin-top:0;font-size:15px;">رتبه‌بندی طرحواره‌ها</h3>
-                <table class="widefat fixed" style="border-radius:8px;overflow:hidden;font-size:12px;">
-                    <thead><tr style="background:#2b6cb0;color:#fff;">
-                        <th style="text-align:right;padding:8px;width:8%;">#</th>
-                        <th style="text-align:right;padding:8px;">طرحواره</th>
-                        <th style="text-align:center;width:16%;">نمره</th>
-                        <th style="text-align:right;width:28%;">سطح</th>
+            <div class="psy-report-col">
+                <h3 class="psy-report-title-rule">رتبه‌بندی طرحواره‌ها</h3>
+                <table class="widefat fixed psy-report-table psy-report-table--brand psy-report-table--rank">
+                    <thead><tr>
+                        <th class="psy-report-table__cell--start psy-col--8">#</th>
+                        <th class="psy-report-table__cell--start">طرحواره</th>
+                        <th class="psy-report-table__cell--center psy-col--16">نمره</th>
+                        <th class="psy-report-table__cell--start psy-col--28">سطح</th>
                     </tr></thead>
                     <tbody>
-                    <?php foreach ($sorted as $i => $item): $cli = $item['value'] >= 3.0; ?>
-                    <tr style="background:<?php echo $cli ? esc_attr($item['severity']['bg']) : '#fff'; ?>;">
-                        <td style="padding:7px 8px;color:#718096;font-weight:bold;"><?php echo esc_html($i+1); ?></td>
-                        <td style="padding:7px 8px;<?php echo $cli ? 'font-weight:bold;' : ''; ?>">
+                    <?php foreach ($sorted as $i => $item): $cli = $item['value'] >= 3.0;
+                        $row_tone = \PsychAssessments\Core\ReportHTML::tone( $item['severity']['color'] ); ?>
+                    <tr class="<?php echo $cli ? 'psy-report-row--tint ' . esc_attr( $row_tone ) : ''; ?>">
+                        <td class="psy-report-table__cell--rank"><?php echo esc_html($i+1); ?></td>
+                        <td class="<?php echo $cli ? 'psy-report-table__cell--bold' : ''; ?>">
                             <?php echo esc_html($item['label']); ?>
-                            <?php if ($cli): ?><span style="color:<?php echo esc_attr($item['severity']['color']); ?>;font-size:10px;"> ●</span><?php endif; ?>
+                            <?php if ($cli): ?><span class="psy-report-dot psy-text <?php echo esc_attr( $row_tone ); ?>">●</span><?php endif; ?>
                         </td>
-                        <td style="text-align:center;font-size:16px;font-weight:bold;color:<?php echo esc_attr($item['severity']['color']); ?>;"><?php echo esc_html($item['value']); ?></td>
-                        <td style="padding:7px 8px;">
-                            <span style="color:<?php echo esc_attr($item['severity']['color']); ?>;font-weight:bold;font-size:11px;"><?php echo esc_html($item['severity']['label']); ?></span>
-                            <div style="font-size:10px;color:#a0aec0;"><?php echo esc_html($item['severity']['label_en']); ?></div>
+                        <td class="psy-report-table__cell--score-lg <?php echo esc_attr( $row_tone ); ?>"><?php echo esc_html($item['value']); ?></td>
+                        <td>
+                            <span class="psy-report-table__cell--tone psy-text <?php echo esc_attr( $row_tone ); ?>"><?php echo esc_html($item['severity']['label']); ?></span>
+                            <div class="psy-report-en"><?php echo esc_html($item['severity']['label_en']); ?></div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -319,25 +321,25 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- حوزه‌ها -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">نمودار ۵ حوزه اصلی یانگ</h3>
-            <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;">
-                <div style="flex:1;min-width:300px;max-width:500px;"><canvas id="pa-radar-chart" style="max-height:280px;"></canvas></div>
-                <div style="flex:1;min-width:260px;">
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <h3 class="psy-report-panel__title">نمودار ۵ حوزه اصلی یانگ</h3>
+            <div class="psy-report-row psy-report-row--tight psy-report-row--center">
+                <div class="psy-report-col--sm"><canvas id="pa-radar-chart" class="psy-report-chart psy-report-chart--domains"></canvas></div>
+                <div class="psy-report-col">
                     <?php foreach ($domains as $dk => $d):
                         $ds  = $domain_scores[$dk];
                         $dsev = $this->get_severity($ds);
                         $pct  = \PsychAssessments\Core\Scoring::percent($ds, 1, 6);
+                        $d_tone   = \PsychAssessments\Core\ReportHTML::tone( $d['color'] );
+                        $dsev_tone= \PsychAssessments\Core\ReportHTML::tone( $dsev['color'] );
                     ?>
-                    <div style="margin-bottom:12px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                            <span style="font-size:12px;font-weight:bold;color:<?php echo esc_attr($d['color']); ?>;"><?php echo esc_html($d['label']); ?></span>
-                            <span style="font-size:13px;font-weight:bold;color:<?php echo esc_attr($dsev['color']); ?>;"><?php echo esc_html($ds); ?></span>
+                    <div class="psy-report-domain <?php echo esc_attr( $d_tone ); ?>">
+                        <div class="psy-report-domain__head">
+                            <span class="psy-report-domain__name"><?php echo esc_html($d['label']); ?></span>
+                            <span class="psy-report-domain__value psy-text <?php echo esc_attr( $dsev_tone ); ?>"><?php echo esc_html($ds); ?></span>
                         </div>
-                        <div style="background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                            <div style="background:<?php echo esc_attr($d['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:4px;"></div>
-                        </div>
-                        <div style="font-size:10px;color:#a0aec0;margin-top:2px;"><?php echo esc_html($d['label_en']); ?> — <?php echo esc_html($dsev['label']); ?></div>
+                        <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, $d['color'] ); ?>
+                        <div class="psy-report-domain__en"><?php echo esc_html($d['label_en']); ?> — <?php echo esc_html($dsev['label']); ?></div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -347,8 +349,8 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         <!-- طرحواره‌های فعال -->
         <?php $active = array_filter($sorted, fn($s) => $s['value'] >= 3.0);
         if (!empty($active)): ?>
-        <div style="margin-bottom:30px;">
-            <h3 style="font-size:15px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">🔬 تحلیل بالینی طرحواره‌های فعال (نمره ≥ ۳.۰)</h3>
+        <div class="psy-report-block">
+            <h3 class="psy-report-title-rule">🔬 تحلیل بالینی طرحواره‌های فعال (نمره ≥ ۳.۰)</h3>
             <?php foreach ($active as $item):
                 echo \PsychAssessments\Core\ReportHTML::clinical_card(
                     $item['label'], $item['key'], $item['value'], $item['severity'],
@@ -360,14 +362,14 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         <?php endif; ?>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Rijkeboer & van den Bergh (2006) | Sadeghi et al. (2017)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">بازه</th>
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">توصیه</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-caption psy-report-desc">Rijkeboer &amp; van den Bergh (2006) | Sadeghi et al. (2017)</p>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">بازه</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">سطح</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">توصیه</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -376,11 +378,12 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
                     ['3.0–3.9',  'بالینی معنادار',  '#c05621', 'بالاتر از cut-off — پیگیری جدی'],
                     ['2.0–2.9',  'مرزی',             '#d69e2e', 'بالاتر از میانگین'],
                     ['< 2.0',    'غیربالینی',        '#276749', 'محدوده طبیعی'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -388,13 +391,13 @@ class YSQ extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
-            Young, J.E., Klosko, J.S., & Weishaar, M.E. (2003). <i>Schema Therapy: A Practitioner's Guide.</i> Guilford Press.<br>
-            Rijkeboer, M.M., & van den Bergh, H. (2006). <i>Cognitive Therapy and Research, 30</i>(6), 709–723.<br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
+            Young, J.E., Klosko, J.S., &amp; Weishaar, M.E. (2003). <i>Schema Therapy: A Practitioner's Guide.</i> Guilford Press.<br>
+            Rijkeboer, M.M., &amp; van den Bergh, H. (2006). <i>Cognitive Therapy and Research, 30</i>(6), 709–723.<br>
             Sadeghi, K. et al. (2017). <i>Iranian Journal of Psychiatry and Behavioral Sciences.</i><br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

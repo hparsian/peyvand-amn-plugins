@@ -213,8 +213,10 @@ class SCL90R extends \PsychAssessments\Core\BaseTest {
             $bar_values[] = $val;
         }
 
+        $gsi_tone = \PsychAssessments\Core\ReportHTML::tone( $gsi_sev['color'] );
+
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#e9d8fd','#553c9a','👤','نام',$session->client_name ?? $session->patient_name ?? '---'],
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
@@ -225,16 +227,16 @@ class SCL90R extends \PsychAssessments\Core\BaseTest {
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($gsi_sev['bg']); ?>;border:2px solid <?php echo esc_attr($gsi_sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <h3 style="margin:0 0 6px;color:<?php echo esc_attr($gsi_sev['color']); ?>;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $gsi_tone ); ?>">
+            <h3 class="psy-report-hero__title">
                 شاخص کلی شدت (GSI): <?php echo esc_html(number_format($scores['gsi'],2)); ?>
             </h3>
-            <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($gsi_sev['clinical']); ?></p>
+            <p class="psy-report-hero__text"><?php echo esc_html($gsi_sev['clinical']); ?></p>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل ۹ بعد بالینی'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-scl-bar" style="max-height:320px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-scl-bar" class="psy-report-chart psy-report-chart--xl"></canvas>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('جزئیات ابعاد'); ?>
@@ -260,9 +262,9 @@ class SCL90R extends \PsychAssessments\Core\BaseTest {
         ); ?>
         <?php endforeach; ?>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;margin-top:20px;">
-            <b style="color:#4a5568;">منبع:</b> Derogatis, L.R. (1994). SCL-90-R Manual (3rd ed.). | هنجاریابی ایران: میرزایی (۱۳۸۰).<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Derogatis, L.R. (1994). SCL-90-R Manual (3rd ed.). | هنجاریابی ایران: میرزایی (۱۳۸۰).<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

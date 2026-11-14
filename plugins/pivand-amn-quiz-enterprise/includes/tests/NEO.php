@@ -233,7 +233,7 @@ class NEO extends \PsychAssessments\Core\BaseTest {
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',  $session->client_phone ?? $session->patient_phone ?? '---'],
@@ -248,78 +248,71 @@ class NEO extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمودار راداری -->
-        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-bottom:30px;">
-            <div style="flex:1;min-width:300px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
-                <h3 style="margin-top:0;text-align:center;color:#2d3748;font-size:15px;">نمودار پنج عامل شخصیت</h3>
-                <canvas id="pa-radar-chart" style="max-height:320px;"></canvas>
+        <div class="psy-report-row psy-report-row--loose">
+            <div class="psy-report-card psy-report-card--panel psy-report-col">
+                <h3 class="psy-report-panel__title psy-report-center">نمودار پنج عامل شخصیت</h3>
+                <canvas id="pa-radar-chart" class="psy-report-chart psy-report-chart--xl"></canvas>
             </div>
-            <div style="flex:1;min-width:280px;">
-                <h3 style="margin-top:0;font-size:15px;">نمرات خام و سطح</h3>
+            <div class="psy-report-col">
+                <h3 class="psy-report-title-rule">نمرات خام و سطح</h3>
                 <?php foreach ($sorted as $item):
                     $pct = round($item['score']/$chart_max*100);
+                    $item_tone = \PsychAssessments\Core\ReportHTML::tone( $item['color'] );
+                    $sev_tone  = \PsychAssessments\Core\ReportHTML::tone( $item['sev']['color'] );
                 ?>
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:10px;border-right:4px solid <?php echo esc_attr($item['color']); ?>;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                <div class="psy-report-item <?php echo esc_attr( $item_tone ); ?>">
+                    <div class="psy-clinical__head">
                         <div>
-                            <span style="font-weight:bold;color:<?php echo esc_attr($item['color']); ?>;font-size:13px;"><?php echo esc_html($item['label']); ?></span>
-                            <span style="font-size:10px;color:#a0aec0;margin-right:4px;"><?php echo esc_html($item['label_en']); ?></span>
+                            <span class="psy-report-item__name"><?php echo esc_html($item['label']); ?></span>
+                            <span class="psy-report-item__en"><?php echo esc_html($item['label_en']); ?></span>
                         </div>
-                        <span style="font-weight:bold;font-size:14px;color:<?php echo esc_attr($item['sev']['color']); ?>;">
+                        <span class="psy-report-item__score psy-report-item__score--lg psy-text <?php echo esc_attr( $sev_tone ); ?>">
                             <?php echo esc_html((int)$item['score']); ?>/48
-                            <span style="font-size:11px;">(<?php echo esc_html($item['sev']['label']); ?>)</span>
+                            <span class="psy-report-dot">(<?php echo esc_html($item['sev']['label']); ?>)</span>
                         </span>
                     </div>
-                    <div style="margin-top:6px;background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                        <div style="background:<?php echo esc_attr($item['color']); ?>;height:100%;width:<?php echo (int)$pct; ?>%;border-radius:4px;"></div>
-                    </div>
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, $item['color'] ); ?>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
         <!-- تحلیل تفصیلی -->
-        <div style="margin-bottom:30px;">
-            <h3 style="font-size:15px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">🔬 تفسیر بالینی هر عامل</h3>
+        <div class="psy-report-block">
+            <h3 class="psy-report-title-rule">🔬 تفسیر بالینی هر عامل</h3>
             <?php foreach ($sorted as $item):
                 $pct = round($item['score']/$chart_max*100);
-                $is_high = $item['score'] >= 29;
+                $item_tone = \PsychAssessments\Core\ReportHTML::tone( $item['color'] );
+                $sev_tone  = \PsychAssessments\Core\ReportHTML::tone( $item['sev']['color'] );
             ?>
-            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;border-right:4px solid <?php echo esc_attr($item['color']); ?>;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( $item_tone ); ?>">
+                <div class="psy-clinical__head">
                     <div>
-                        <span style="font-size:16px;font-weight:bold;color:<?php echo esc_attr($item['color']); ?>;"><?php echo esc_html($item['label']); ?></span>
-                        <span style="font-size:12px;color:#718096;margin-right:6px;"><?php echo esc_html($item['label_en']); ?></span>
+                        <span class="psy-report-name-lg"><?php echo esc_html($item['label']); ?></span>
+                        <span class="psy-report-item__en"><?php echo esc_html($item['label_en']); ?></span>
                     </div>
                     <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$item['score'], $item['sev']); ?>
                 </div>
-                <div style="margin:10px 0 6px;background:#edf2f7;border-radius:4px;height:10px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($item['color']); ?>;height:100%;width:<?php echo (int)$pct; ?>%;border-radius:4px;"></div>
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, $item['color'], true ); ?>
+                <p class="psy-report-desc"><?php echo esc_html($item['desc']); ?></p>
+                <div class="psy-report-chips">
+                    <div class="psy-report-chip psy-tone--success">⬇ <b>نمره پایین:</b> <?php echo esc_html($item['low']); ?></div>
+                    <div class="psy-report-chip <?php echo esc_attr( $item_tone ); ?>">⬆ <b>نمره بالا:</b> <?php echo esc_html($item['high']); ?></div>
                 </div>
-                <p style="margin:8px 0 6px;font-size:12px;color:#4a5568;line-height:1.7;"><?php echo esc_html($item['desc']); ?></p>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <div style="flex:1;min-width:200px;background:#f0fff4;border-radius:5px;padding:8px 10px;font-size:11px;color:#276749;">
-                        ⬇ <b>نمره پایین:</b> <?php echo esc_html($item['low']); ?>
-                    </div>
-                    <div style="flex:1;min-width:200px;background:<?php echo esc_attr($item['sev']['bg']); ?>;border-radius:5px;padding:8px 10px;font-size:11px;color:<?php echo esc_attr($item['color']); ?>;">
-                        ⬆ <b>نمره بالا:</b> <?php echo esc_html($item['high']); ?>
-                    </div>
-                </div>
-                <div style="margin-top:8px;background:#f7fafc;border-radius:5px;padding:7px 10px;font-size:11px;color:#718096;">
-                    💡 <?php echo esc_html($item['sev']['clinical']); ?>
-                </div>
+                <div class="psy-report-chip psy-report-chip--muted">💡 <?php echo esc_html($item['sev']['clinical']); ?></div>
             </div>
             <?php endforeach; ?>
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Costa & McCrae (1992) | Garousi Farshi et al. (2001)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره خام</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">T-score تقریبی</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر</h3>
+            <p class="psy-report-caption psy-report-desc">Costa &amp; McCrae (1992) | Garousi Farshi et al. (2001)</p>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">نمره خام</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">سطح</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">T-score تقریبی</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -328,11 +321,12 @@ class NEO extends \PsychAssessments\Core\BaseTest {
                     ['20–28', 'متوسط',      '#d69e2e', 'T = 45–54'],
                     ['29–36', 'بالا',       '#c05621', 'T = 55–64'],
                     ['37–48', 'خیلی بالا', '#9b2c2c', 'T ≥ 65'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -340,13 +334,13 @@ class NEO extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
-            Costa, P.T. & McCrae, R.R. (1992). <i>NEO-PI-R and NEO-FFI professional manual.</i> Psychological Assessment Resources.<br>
-            McCrae, R.R. & Costa, P.T. (2004). <i>Personality and Individual Differences, 36,</i> 587–596.<br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
+            Costa, P.T. &amp; McCrae, R.R. (1992). <i>NEO-PI-R and NEO-FFI professional manual.</i> Psychological Assessment Resources.<br>
+            McCrae, R.R. &amp; Costa, P.T. (2004). <i>Personality and Individual Differences, 36,</i> 587–596.<br>
             Garousi Farshi, M. et al. (2001). هنجاریابی NEO-FFI در جمعیت ایرانی.<br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
