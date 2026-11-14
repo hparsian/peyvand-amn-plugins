@@ -298,7 +298,8 @@ class PAM extends \PsychAssessments\Core\BaseTest {
                 "SELECT answers FROM {$wpdb->prefix}psy_attempts WHERE id = %d",
                 $partner_session->id
             ) );
-            $partner_answers = $partner_answers_json ? json_decode( $partner_answers_json, true ) : [];
+            // ستون answers ممکن است رمزنگاری‌شده باشد؛ از helper مشترک استفاده می‌کنیم.
+            $partner_answers = pa_decrypt_json( (string) $partner_answers_json );
             $partner_data   = $this->calculate( $partner_answers );
             $partner_scores = $partner_data['sub_scores'];
             $partner_total  = $partner_data['total'];

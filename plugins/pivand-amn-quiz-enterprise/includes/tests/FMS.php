@@ -376,10 +376,12 @@ class FMS extends \PsychAssessments\Core\BaseTest {
                 "SELECT answers FROM {$wpdb->prefix}psy_attempts WHERE id = %d",
                 $pam_session->id
             ) );
-            $pam_answers = $pam_answers_json ? json_decode( $pam_answers_json, true ) : [];
+            // ستون answers ممکن است رمزنگاری‌شده باشد؛ با helper مشترک رمزگشایی می‌کنیم
+            // (قبلاً json_decode خام روی «enc1:…» نال می‌داد و calculate(null) خطای مهلک می‌شد).
+            $pam_answers = pa_decrypt_json( (string) $pam_answers_json );
             // محاسبه نمره PAM با استفاده از ثبات رجیستری
             $pam_test = \PsychAssessments\Core\Registry::get('pam');
-            $pam_data = $pam_test ? $pam_test->calculate($pam_answers) : null;
+            $pam_data = ( $pam_test && ! empty( $pam_answers ) ) ? $pam_test->calculate($pam_answers) : null;
             if ( $pam_data ):
                 $pam_total = $pam_data['total'];
                 // تفسیر ترکیبی FMS + PAM — هر دو مرز از همان منبع واحد آزمون مربوطه خونده می‌شن
