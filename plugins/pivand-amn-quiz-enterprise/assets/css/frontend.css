@@ -1330,3 +1330,8 @@ body.psy-exam-standalone-body {
 }
 
 .psy-report-table--striped tbody tr:nth-child(even) td { background: #f7fafc; }
+/* دستهٔ هفتم: باورهای غیرمنطقی الیس (IBT) */
+.psy-report-panel__title--center { text-align: center; color: #2d3748; }
+.psy-report-subtle { font-size: 12px; color: #718096; margin: 0 0 10px; }
+.psy-report-chip--block { display: block; margin-block-start: 8px; }
+

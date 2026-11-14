@@ -261,7 +261,7 @@ class IBT extends \PsychAssessments\Core\BaseTest {
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#e9d8fd','#553c9a','👤','نام',               $session->client_name ?? $session->patient_name ?? '---'],
@@ -278,49 +278,46 @@ class IBT extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمره کل -->
-        <div style="background:<?php echo esc_attr($total_sev['bg']); ?>;border:2px solid <?php echo esc_attr($total_sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $total_sev['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($total_sev['color']); ?>;font-size:17px;">
+                    <h3 class="psy-report-hero__title">
                         🧠 نمره کل باورهای غیرمنطقی: <?php echo esc_html($total); ?> از ۲۵۰
                     </h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($total_sev['clinical']); ?></p>
+                    <p class="psy-report-hero__text"><?php echo esc_html($total_sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $total_sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:4px;height:12px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($total_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,50,250); ?>%;border-radius:4px;"></div>
-            </div>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($total,50,250), $total_sev['color'], true ); ?>
         </div>
 
         <!-- نمودار + جزئیات -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <h3 style="margin-top:0;text-align:center;color:#2d3748;font-size:15px;">نمودار ۱۰ زیرمقیاس (ترتیب نزولی)</h3>
-            <canvas id="pa-bar-chart" style="max-height:350px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <h3 class="psy-report-panel__title psy-report-panel__title--center">نمودار ۱۰ زیرمقیاس (ترتیب نزولی)</h3>
+            <canvas id="pa-bar-chart" class="psy-report-chart psy-report-chart--xl"></canvas>
         </div>
 
         <!-- تفصیلی -->
-        <div style="margin-bottom:30px;">
-            <h3 style="font-size:15px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">🔬 تحلیل تفصیلی ۱۰ باور غیرمنطقی</h3>
+        <div class="psy-report-block">
+            <?php echo \PsychAssessments\Core\ReportHTML::section_header('🔬 تحلیل تفصیلی ۱۰ باور غیرمنطقی'); ?>
             <?php foreach ($sorted as $i => $item):
                 $pct = \PsychAssessments\Core\Scoring::percent($item['score'], 5, 25);
+                $item_tone = \PsychAssessments\Core\ReportHTML::tone( (string) $item['color'] );
             ?>
-            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:10px;border-right:4px solid <?php echo esc_attr($item['color']); ?>;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( $item_tone ); ?>">
+                <div class="psy-clinical__head">
                     <div>
-                        <span style="font-size:14px;font-weight:bold;color:<?php echo esc_attr($item['color']); ?>;">
+                        <span class="psy-report-name-lg">
                             <?php echo esc_html(($i+1) . '. ' . $item['label']); ?>
                         </span>
-                        <span style="font-size:10px;color:#a0aec0;margin-right:6px;"><?php echo esc_html($item['label_en']); ?></span>
-                        <?php if ($i === 0): ?><span style="background:<?php echo esc_attr($item['color']); ?>;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;margin-right:4px;">غالب</span><?php endif; ?>
+                        <span class="psy-report-en psy-report-en--inline"><?php echo esc_html($item['label_en']); ?></span>
+                        <?php if ($i === 0): ?><span class="psy-score-badge psy-score-badge--sm">غالب</span><?php endif; ?>
                     </div>
                     <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$item['score'], $item['sev']); ?>
                 </div>
-                <div style="margin:8px 0 4px;background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($item['color']); ?>;height:100%;width:<?php echo esc_attr($pct); ?>%;border-radius:4px;"></div>
-                </div>
-                <p style="margin:8px 0 5px;font-size:12px;color:#4a5568;line-height:1.6;"><?php echo esc_html($item['desc']); ?></p>
-                <div style="background:<?php echo esc_attr($item['sev']['bg']); ?>;border-radius:5px;padding:6px 10px;font-size:11px;color:<?php echo esc_attr($item['color']); ?>;">
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $item['color'] ); ?>
+                <p class="psy-report-desc psy-report-desc--flush"><?php echo esc_html($item['desc']); ?></p>
+                <div class="psy-report-chip psy-report-chip--block">
                     💡 <?php echo esc_html($item['clinical']); ?>
                 </div>
             </div>
@@ -328,15 +325,17 @@ class IBT extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Ellis (1962) | Jones (1968) | Ganji & Molavi (1997)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره زیرمقیاس</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">اولویت درمانی</th>
-                </tr></thead>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-subtle">Ellis (1962) | Jones (1968) | Ganji &amp; Molavi (1997)</p>
+            <table class="psy-report-table">
+                <thead>
+                    <tr>
+                        <th class="psy-report-table__cell--start">نمره زیرمقیاس</th>
+                        <th class="psy-report-table__cell--start">سطح</th>
+                        <th class="psy-report-table__cell--start">اولویت درمانی</th>
+                    </tr>
+                </thead>
                 <tbody>
                 <?php foreach ([
                     ['5–10',  'پایین',       '#276749', 'باور در حد طبیعی — پایش معمول'],
@@ -345,9 +344,9 @@ class IBT extends \PsychAssessments\Core\BaseTest {
                     ['21–25', 'خیلی بالا',  '#9b2c2c', 'اولویت اول در REBT'],
                 ] as $r): ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell--bold <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $r[2] ) ); ?> psy-text"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell--bold <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $r[2] ) ); ?> psy-text"><?php echo esc_html($r[1]); ?></td>
+                    <td><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -355,13 +354,13 @@ class IBT extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منابع:</b><br>
             Ellis, A. (1962). <i>Reason and Emotion in Psychotherapy.</i> Lyle Stuart.<br>
             Jones, R.G. (1968). <i>A factored measure of Ellis' irrational belief system.</i> Wichita State University.<br>
-            Ganji, H. & Molavi, H. (1997). هنجاریابی آزمون باورهای غیرمنطقی برای جمعیت ایرانی.<br>
+            Ganji, H. &amp; Molavi, H. (1997). هنجاریابی آزمون باورهای غیرمنطقی برای جمعیت ایرانی.<br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
