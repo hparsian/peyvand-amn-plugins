@@ -148,7 +148,7 @@ class CSI extends \PsychAssessments\Core\BaseTest {
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#e9d8fd','#553c9a','👤','نام',               $session->client_name ?? $session->patient_name ?? '---'],
@@ -165,74 +165,74 @@ class CSI extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمره کل -->
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:24px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sev['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;font-size:18px;">
+                    <h3 class="psy-report-hero__title psy-report-hero__title--lg">
                         💑 نمره رضایت زناشویی: <?php echo esc_html($total); ?> از <?php echo esc_html($max); ?>
                     </h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-size:36px;font-weight:bold;color:<?php echo esc_attr($sev['color']); ?>;"><?php echo esc_html($pct); ?>%</div>
-                    <div style="font-size:12px;color:#718096;"><?php echo esc_html($sev['label_en']); ?></div>
+                <div class="psy-report-hero__percent-wrap">
+                    <div class="psy-report-hero__percent"><?php echo esc_html($pct); ?>%</div>
+                    <div class="psy-report-hero__percent-label"><?php echo esc_html($sev['label_en']); ?></div>
                 </div>
             </div>
 
             <!-- نوار پیشرفت با cut-off -->
-            <div style="position:relative;margin-top:16px;">
-                <div style="background:#edf2f7;border-radius:6px;height:16px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo esc_attr($pct); ?>%;border-radius:6px;transition:width 0.3s;"></div>
-                </div>
+            <div class="psy-report-track">
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $sev['color'] ); ?>
                 <!-- نشانگر cut-off (بازمقیاس‌شده) — مقدار از همان $levels خوانده می‌شود -->
-                <div style="position:absolute;top:-4px;left:<?php echo round($cutoff_value/70*100, 1); ?>%;width:2px;height:24px;background:#c53030;"></div>
-                <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                    <span>0</span>
-                    <span style="color:#c53030;font-weight:bold;">cut-off: <?php echo esc_html($cutoff_value); ?></span>
-                    <span>70</span>
+                <div class="psy-report-cutoff psy-cutoff--<?php echo esc_attr( (int) ( round( $cutoff_value / 70 * 100 / 5 ) * 5 ) ); ?>"></div>
+                <div class="psy-report-scale">
+                    <span>۰</span>
+                    <span class="psy-tone--danger psy-report-bold"><span class="psy-text">cut-off: <?php echo esc_html($cutoff_value); ?></span></span>
+                    <span>۷۰</span>
                 </div>
             </div>
         </div>
 
         <!-- گیج بصری -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;text-align:center;">
-            <h3 style="margin-top:0;font-size:15px;color:#2d3748;">سطح رضایت زناشویی</h3>
-            <canvas id="pa-gauge-chart" style="max-height:200px;max-width:400px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-panel--center">
+            <h3 class="psy-report-panel__title">سطح رضایت زناشویی</h3>
+            <canvas id="pa-gauge-chart" class="psy-report-chart psy-report-chart--gauge"></canvas>
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Funk & Rogge (2007) — Item Response Theory | دقیق‌ترین ابزار تک‌بُعدی رضایت زناشویی موجود</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">وضعیت</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">توصیه</th>
-                </tr></thead>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-subtle">Funk &amp; Rogge (2007) — Item Response Theory | دقیق‌ترین ابزار تک‌بُعدی رضایت زناشویی موجود</p>
+            <table class="psy-report-table">
+                <thead>
+                    <tr>
+                        <th class="psy-report-table__cell--start">نمره</th>
+                        <th class="psy-report-table__cell--start">وضعیت</th>
+                        <th class="psy-report-table__cell--start">توصیه</th>
+                    </tr>
+                </thead>
                 <tbody>
                 <?php // جدول تفسیر مستقیماً از $levels خونده می‌شه — دیگه اعداد مرز جای سومی هاردکد نمی‌شن ?>
                 <?php foreach ( $levels as $lvl ): ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($lvl['color']); ?>;"><?php echo esc_html($lvl['range']); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($lvl['color']); ?>;font-weight:bold;"><?php echo esc_html($lvl['label']); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($lvl['recommendation']); ?></td>
+                    <td class="psy-report-table__cell--bold <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $lvl['color'] ) ); ?> psy-text"><?php echo esc_html($lvl['range']); ?></td>
+                    <td class="psy-report-table__cell--bold <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $lvl['color'] ) ); ?> psy-text"><?php echo esc_html($lvl['label']); ?></td>
+                    <td><?php echo esc_html($lvl['recommendation']); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <p style="font-size:11px;color:#a0aec0;margin-bottom:0;margin-top:12px;">
+            <p class="psy-report-note--sm">
                 📌 CSI-16 با استفاده از نظریه سوال‌پاسخ (IRT) طراحی شده و دارای دقت اندازه‌گیری بالاتری نسبت به DAS و MSI است.
             </p>
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
-            Funk, J.L. & Rogge, R.D. (2007). <i>Journal of Family Psychology, 21</i>(4), 572–583.<br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منابع:</b><br>
+            Funk, J.L. &amp; Rogge, R.D. (2007). <i>Journal of Family Psychology, 21</i>(4), 572–583.<br>
             Rogge, R.D. et al. (2017). Predicting relationship quality via multiple pathways. <i>Journal of Family Psychology.</i><br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

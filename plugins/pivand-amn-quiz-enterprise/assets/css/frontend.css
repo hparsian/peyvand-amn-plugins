@@ -1334,4 +1334,54 @@ body.psy-exam-standalone-body {
 .psy-report-panel__title--center { text-align: center; color: #2d3748; }
 .psy-report-subtle { font-size: 12px; color: #718096; margin: 0 0 10px; }
 .psy-report-chip--block { display: block; margin-block-start: 8px; }
+/* دستهٔ هشتم: LAS / CSI */
+.psy-report-hero__percent-wrap { text-align: center; }
+.psy-report-hero__percent {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-hero__percent-label { font-size: 12px; color: #718096; }
+.psy-report-track { position: relative; margin-block-start: 16px; }
+.psy-report-track .psy-report-progress {
+    block-size: 16px;
+    margin-block-start: 0;
+    border-radius: 6px;
+}
+.psy-report-track .psy-report-progress__bar { border-radius: 6px; }
+.psy-report-cutoff {
+    position: absolute;
+    inset-block-start: -4px;
+    inline-size: 2px;
+    block-size: 24px;
+    background: #c53030;
+}
+.psy-cutoff--0 { inset-inline-start: 0%; }
+.psy-cutoff--5 { inset-inline-start: 5%; }
+.psy-cutoff--10 { inset-inline-start: 10%; }
+.psy-cutoff--15 { inset-inline-start: 15%; }
+.psy-cutoff--20 { inset-inline-start: 20%; }
+.psy-cutoff--25 { inset-inline-start: 25%; }
+.psy-cutoff--30 { inset-inline-start: 30%; }
+.psy-cutoff--35 { inset-inline-start: 35%; }
+.psy-cutoff--40 { inset-inline-start: 40%; }
+.psy-cutoff--45 { inset-inline-start: 45%; }
+.psy-cutoff--50 { inset-inline-start: 50%; }
+.psy-cutoff--55 { inset-inline-start: 55%; }
+.psy-cutoff--60 { inset-inline-start: 60%; }
+.psy-cutoff--65 { inset-inline-start: 65%; }
+.psy-cutoff--70 { inset-inline-start: 70%; }
+.psy-cutoff--75 { inset-inline-start: 75%; }
+.psy-cutoff--80 { inset-inline-start: 80%; }
+.psy-cutoff--85 { inset-inline-start: 85%; }
+.psy-cutoff--90 { inset-inline-start: 90%; }
+.psy-cutoff--95 { inset-inline-start: 95%; }
+.psy-cutoff--100 { inset-inline-start: 100%; }
+.psy-report-chart--gauge {
+    max-height: 200px;
+    max-width: 400px;
+    margin-inline: auto;
+}
+.psy-report-note--sm { font-size: 11px; color: #a0aec0; margin: 12px 0 0; }
+.psy-report-panel--center { text-align: center; }
 
