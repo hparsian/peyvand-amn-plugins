@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.8.5 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۶): OCI-R، PCL-5 و BPAQ
+- `tests/OCIRPCL5BPAQ.php` (سه آزمون در یک فایل) کامل به کلاس‌های گزارش مهاجرت کرد؛ هر سه گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۵۴/۳۹/…  در خروجی رندر).
+- OCI-R: کارت‌های خلاصه، نوار نمرهٔ کل (۳۶ از ۷۲) با خط‌کش مقیاس و نشانهٔ cut-off = ۲۱، شش ردیف زیرمقیاس با نوار و علامت ⚠️/✅.
+- PCL-5: هشدار قرمز بالاتر از cut-off، همان بلوک نمرهٔ کل (از ۸۰، cut-off ۳۳) و چهار خوشهٔ DSM-5 با نوار.
+- BPAQ: سه کارت خلاصه و چهار زیرمقیاس با درصد و نوار (آستانهٔ ۷۰٪ برای رنگ خطر).
+- همه با کلاس‌های موجودِ دستهٔ چهارم/مراحل قبل (`psy-report-row`, `psy-report-card--tint`, `psy-report-hero__title`, `progress_bar`, `psy-report-scale`, `psy-report-block`, `psy-report-title-rule`, `psy-report-item*`, `psy-clinical__head`, `psy-report-alert*`, `psy-report-refs`) بازنویسی شدند؛ **هیچ CSS تازه‌ای** لازم نشد.
+- شمارش استایل درون‌خطی افزونه: ۴۸۸ → ۴۳۸ (۳۸۱ مورد در ۱۲ فایل آزمون باقی است؛ سنگین‌ترین: MDQEPDSDERS با ۷۱).
+- `PSY_VERSION` از 3.8.4 به 3.8.5.
+
 ## 3.8.4 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۵): آزمون‌های چندزیرمقیاسی — SCL-90-R، YSQ و NEO-FFI
 - `tests/SCL90R.php`, `tests/YSQ.php` و `tests/NEO.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر سه گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۹/۵۱/۴۲ در فایل، و در خروجی رندر ۹/۲۰۳/۱۳۰).
 - کلاس‌های تازه در `frontend.css`: `psy-report-block`، `psy-report-title-rule` (+`__sub`)، `psy-report-chart--xl|--domains`، `psy-report-col--sm`، `psy-report-table--brand` (سرستون آبی)، `psy-report-table--rank`، `psy-report-row--tint`، `psy-report-table__cell--rank|--score-lg|--tone|--bold`، `psy-report-dot`، `psy-report-domain*` (نوار ۵ حوزهٔ یانگ)، `psy-report-chips`/`psy-report-chip`/`--muted`، `psy-report-name-lg`، `psy-col--8|16|28`.
