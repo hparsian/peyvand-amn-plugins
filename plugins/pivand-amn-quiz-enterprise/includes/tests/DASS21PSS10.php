@@ -139,7 +139,7 @@ class DASS21 extends \PsychAssessments\Core\BaseTest {
 
         ob_start();
         ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ',$completed_date],
@@ -150,27 +150,26 @@ class DASS21 extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمودار راداری -->
-        <div style="display:flex;flex-wrap:wrap;gap:20px;margin-bottom:24px;align-items:flex-start;">
-            <div style="flex:1;min-width:260px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);">
-                <h3 style="margin-top:0;text-align:center;font-size:15px;">پروفایل DASS-21</h3>
-                <canvas id="pa-radar-chart" style="max-height:280px;"></canvas>
+        <div class="psy-report-row psy-report-row--tight">
+            <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+                <h3 class="psy-report-panel__title psy-report-panel__title--center">پروفایل DASS-21</h3>
+                <canvas id="pa-radar-chart" class="psy-report-chart psy-report-chart--domains"></canvas>
             </div>
-            <div style="flex:1.2;min-width:280px;">
+            <div class="psy-report-col--wide">
                 <?php foreach ($subs as $key => $def):
                     $s = $scores[$key];
                     $sev = $sevs[$key];
                     $maxs = ['depression'=>42,'anxiety'=>42,'stress'=>42];
                     $pct = \PsychAssessments\Core\Scoring::percent($s, 0, $maxs[$key]);
+                    $sub_tone = \PsychAssessments\Core\ReportHTML::tone( (string) $def['color'] );
                 ?>
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px;border-right:4px solid <?php echo esc_attr($def['color']); ?>;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span style="font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;font-size:14px;"><?php echo esc_html($def['label']); ?> (×2 اعمال شد)</span>
+                <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( $sub_tone ); ?>">
+                    <div class="psy-clinical__head">
+                        <span class="psy-report-name-lg"><?php echo esc_html($def['label']); ?> (×2 اعمال شد)</span>
                         <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$s, $sev); ?>
                     </div>
-                    <div style="margin:10px 0 6px;background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                        <div style="background:<?php echo esc_attr($def['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:4px;"></div>
-                    </div>
-                    <div style="font-size:11px;color:<?php echo esc_attr($sev['color']); ?>;background:<?php echo esc_attr($sev['bg']); ?>;padding:6px 10px;border-radius:5px;">
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $def['color'] ); ?>
+                    <div class="psy-report-chip psy-report-chip--block">
                         💡 <?php echo esc_html($sev['clinical']); ?>
                     </div>
                 </div>
@@ -178,10 +177,10 @@ class DASS21 extends \PsychAssessments\Core\BaseTest {
             </div>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b> Lovibond & Lovibond (1995). <i>Behaviour Research and Therapy, 33</i>(3). | Sahebi et al. (2005) هنجاریابی ایران.<br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منابع:</b> Lovibond &amp; Lovibond (1995). <i>Behaviour Research and Therapy, 33</i>(3). | Sahebi et al. (2005) هنجاریابی ایران.<br>
             📌 نمرات DASS-21 باید ×2 شوند — در این گزارش اعمال شده.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
@@ -296,38 +295,41 @@ class PSS10 extends \PsychAssessments\Core\BaseTest {
 
         ob_start();
         ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ',$completed_date],
                 [$sev['bg'],$sev['color'],'😤','PSS-10',$total.' از ۴۰'],
-                [$sev['bg'],$sev['color'],'🏷','سطح',$sev['label']],
+                [$sev['bg'],$sev['color'],'🏷','سطح',$sev['label'],$sev['label_en']],
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sev['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 5px;color:<?php echo esc_attr($sev['color']); ?>;">استرس ادراک‌شده: <?php echo esc_html((int)$total); ?> از ۴۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title">استرس ادراک‌شده: <?php echo esc_html((int)$total); ?> از ۴۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:12px;background:#edf2f7;border-radius:4px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,0,40); ?>%;border-radius:4px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                <span>0 پایین</span><span style="color:#d69e2e;">14 متوسط</span><span style="color:#9b2c2c;">27 بالا</span><span>40</span>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($total,0,40), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
+                <span class="psy-report-scale__mark">۰ پایین</span>
+                <span class="psy-tone--warning"><span class="psy-report-scale__mark psy-text">۱۴ متوسط</span></span>
+                <span class="psy-tone--danger"><span class="psy-report-scale__mark psy-text">۲۷ بالا</span></span>
+                <span class="psy-report-scale__mark">۴۰</span>
             </div>
         </div>
 
-        <div style="background:#ebf8ff;border:1px solid #90cdf4;border-radius:8px;padding:14px 20px;margin-bottom:20px;font-size:12px;color:#2b6cb0;">
-            📌 <b>نکته:</b> سوالات ۴، ۵، ۷ و ۸ معکوس‌شده هستند و در نمره‌گذاری اعمال شده است. PSS-10 استرس <i>ادراک‌شده</i> را می‌سنجد نه رویدادهای استرس‌زا.
+        <div class="psy-report-alert psy-tone--info">
+            <p class="psy-report-alert__text psy-report-alert__text--sm">
+                📌 <b>نکته:</b> سوالات ۴، ۵، ۷ و ۸ معکوس‌شده هستند و در نمره‌گذاری اعمال شده است. PSS-10 استرس <i>ادراک‌شده</i> را می‌سنجد نه رویدادهای استرس‌زا.
+            </p>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b> Cohen et al. (1983). <i>J. Health and Social Behavior, 24</i>(4). | Maroufizadeh et al. (2014) هنجاریابی ایران.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منابع:</b> Cohen et al. (1983). <i>J. Health and Social Behavior, 24</i>(4). | Maroufizadeh et al. (2014) هنجاریابی ایران.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
         <?php
         return ob_get_clean();

@@ -144,12 +144,16 @@ class PSQI extends \PsychAssessments\Core\BaseTest {
         ob_start();
         // باگ #12: نمایش هشدار ساده‌سازی در ابتدای گزارش
         ?>
-        <div style="background:#fffbeb;border:1px solid #f6ad55;border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#744210;">
-            ⚠️ <strong>توجه بالینی:</strong> اجزای ۳ (مدت خواب) و ۴ (راندمان خواب) در این نسخه با سوال Likert اندازه‌گیری شده‌اند،
-            نه با ساعت واقعی خواب/بیداری. دقت این دو جزء نسبت به نسخه استاندارد Pittsburgh کمتر است.
-            برای تصمیم‌گیری بالینی، ارزیابی کمی مستقیم توصیه می‌شود.
+        <div class="psy-report-alert psy-tone--warning">
+            <h3 class="psy-report-alert__title psy-report-alert__title--sm">⚠️ توجه بالینی:</h3>
+            <p class="psy-report-alert__text psy-report-alert__text--sm">
+                اجزای ۳ (مدت خواب) و ۴ (راندمان خواب) در این نسخه با سوال Likert اندازه‌گیری شده‌اند،
+                نه با ساعت واقعی خواب/بیداری. دقت این دو جزء نسبت به نسخه استاندارد Pittsburgh کمتر است.
+                برای تصمیم‌گیری بالینی، ارزیابی کمی مستقیم توصیه می‌شود.
+            </p>
         </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ',$completed_date],
@@ -158,64 +162,64 @@ class PSQI extends \PsychAssessments\Core\BaseTest {
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sev['color'] ) ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;font-size:18px;">
+                    <h3 class="psy-report-hero__title psy-report-hero__title--lg">
                         😴 کیفیت خواب: <?php echo esc_html((int)$total); ?> از ۲۱
                         — <?php echo $good_sleeper ? esc_html('✅ خواب خوب') : esc_html('⚠️ مشکل خواب'); ?>
                     </h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:12px;overflow:hidden;position:relative;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,0,21); ?>%;border-radius:6px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                <span>0 خوب</span><span style="color:#c53030;">cut-off: <?php echo esc_html(\PsychAssessments\Core\Scoring::level_cutoff($levels, 0)); ?></span><span>21 خیلی بد</span>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($total,0,21), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
+                <span class="psy-report-scale__mark">۰ خوب</span>
+                <span class="psy-tone--danger"><span class="psy-report-scale__mark psy-text">cut-off: <?php echo esc_html(\PsychAssessments\Core\Scoring::level_cutoff($levels, 0)); ?></span></span>
+                <span class="psy-report-scale__mark">۲۱ خیلی بد</span>
             </div>
         </div>
 
         <!-- ۷ جزء -->
-        <div style="margin-bottom:24px;">
-            <h3 style="font-size:15px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">📊 ۷ جزء PSQI</h3>
+        <div class="psy-report-block">
+            <?php echo \PsychAssessments\Core\ReportHTML::section_header('📊 ۷ جزء PSQI'); ?>
             <?php foreach ($comps as $key => $def):
                 $s = $comp_scores[$key];
                 $pct = \PsychAssessments\Core\Scoring::percent($s, 0, 3);
                 $comp_labels = ['خوب','کمی بد','بد','خیلی بد'];
                 $comp_colors = ['#276749','#d69e2e','#c05621','#9b2c2c'];
             ?>
-            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:8px;border-right:4px solid <?php echo esc_attr($def['color']); ?>;">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="psy-report-item <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $def['color'] ) ); ?>">
+                <div class="psy-clinical__head">
                     <div>
-                        <span style="font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;font-size:13px;"><?php echo esc_html($def['label']); ?></span>
-                        <span style="color:#a0aec0;font-size:10px;margin-right:6px;"><?php echo esc_html($def['label_en']); ?></span>
+                        <span class="psy-report-item__name"><?php echo esc_html($def['label']); ?></span>
+                        <span class="psy-report-en psy-report-en--inline"><?php echo esc_html($def['label_en']); ?></span>
                     </div>
-                    <span style="font-weight:bold;font-size:13px;color:<?php echo esc_attr($comp_colors[$s]); ?>;">
+                    <span class="psy-report-tag <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $comp_colors[$s] ) ); ?>">
                         <?php echo $s; ?>/3 — <?php echo esc_html($comp_labels[$s]); ?>
                     </span>
                 </div>
-                <div style="margin-top:6px;background:#edf2f7;border-radius:4px;height:6px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($def['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:4px;"></div>
-                </div>
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, (string) $def['color'] ); ?>
             </div>
             <?php endforeach; ?>
         </div>
 
-        <div style="background:#ebf8ff;border:1px solid #90cdf4;border-radius:8px;padding:14px 20px;margin-bottom:20px;font-size:12px;color:#2b6cb0;">
-            📌 نمره‌گذاری بر اساس الگوریتم استاندارد Buysse et al. (1989): جزء تأخیر خواب با ترکیب q2+q5 محاسبه می‌شود (جمع 0–6 → تبدیل به 0–3). سایر اجزا میانگین مستقیم دارند. cut-off > 5 حساسیت ۸۹.۶% و ویژگی ۸۶.۵% دارد.
+        <div class="psy-report-alert psy-tone--info">
+            <p class="psy-report-alert__text psy-report-alert__text--sm">
+                📌 نمره‌گذاری بر اساس الگوریتم استاندارد Buysse et al. (1989): جزء تأخیر خواب با ترکیب q2+q5 محاسبه می‌شود (جمع 0–6 → تبدیل به 0–3). سایر اجزا میانگین مستقیم دارند. cut-off > 5 حساسیت ۸۹.۶% و ویژگی ۸۶.۵% دارد.
+            </p>
         </div>
 
         <!-- نمودار راداری ۷ جزء -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:20px;text-align:center;">
-            <h3 style="margin-top:0;font-size:14px;">نمودار ۷ جزء PSQI</h3>
-            <canvas id="pa-psqi-chart" style="max-height:280px;max-width:380px;display:inline-block;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-panel--center">
+            <h3 class="psy-report-panel__title">نمودار ۷ جزء PSQI</h3>
+            <canvas id="pa-psqi-chart" class="psy-report-chart psy-report-chart--gauge"></canvas>
         </div>
 
-        <div style="font-size:11px;color:#a0aec0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b> Buysse et al. (1989). <i>Psychiatry Research, 28</i>(2). | Farrahi et al. (2012) هنجاریابی ایران.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منابع:</b> Buysse et al. (1989). <i>Psychiatry Research, 28</i>(2). | Farrahi et al. (2012) هنجاریابی ایران.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
         <script>
         (function(){
