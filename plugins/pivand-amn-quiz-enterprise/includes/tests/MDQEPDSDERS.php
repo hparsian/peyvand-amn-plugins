@@ -143,11 +143,12 @@ class MDQ extends \PsychAssessments\Core\BaseTest {
         $status_bg    = $positive ? '#fff5f5'  : '#f0fff4';
         $status_label = $positive ? 'اسکرینینگ مثبت — ارزیابی بیشتر لازم است' : 'اسکرینینگ منفی';
         $status_icon  = $positive ? '⚠️' : '✅';
+        $status_tone  = \PsychAssessments\Core\ReportHTML::tone( $status_color );
 
         $part_c_labels = [ 0 => 'اصلاً', 1 => 'کم', 2 => 'متوسط', 3 => 'زیاد' ];
 
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس', $session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل', $completed],
@@ -156,38 +157,38 @@ class MDQ extends \PsychAssessments\Core\BaseTest {
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($status_bg); ?>;border:2px solid <?php echo esc_attr($status_color); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <h3 style="margin:0 0 8px;color:<?php echo esc_attr($status_color); ?>;font-size:16px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $status_tone ); ?>">
+            <h3 class="psy-report-hero__title">
                 <?php echo $status_icon; ?> <?php echo esc_html($status_label); ?>
             </h3>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;font-size:13px;">
-                <div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #e2e8f0;">
-                    <div style="font-size:24px;font-weight:bold;color:<?php echo $part_a >= 7 ? '#c05621' : '#276749'; ?>;"><?php echo esc_html((int)$part_a); ?>/۱۳</div>
-                    <div style="color:#718096;margin-top:4px;">بخش A — موارد بله</div>
-                    <div style="font-size:11px;color:<?php echo $part_a >= 7 ? '#c05621' : '#276749'; ?>;margin-top:4px;"><?php echo $part_a >= 7 ? esc_html('آستانه رسیده (≥۷)') : esc_html('زیر آستانه'); ?></div>
+            <div class="psy-report-trio">
+                <div class="psy-report-trio__cell">
+                    <div class="psy-report-trio__value <?php echo $part_a >= 7 ? 'psy-tone--accent' : 'psy-tone--success'; ?>"><?php echo esc_html((int)$part_a); ?>/۱۳</div>
+                    <div class="psy-report-trio__label">بخش A — موارد بله</div>
+                    <div class="psy-report-trio__hint <?php echo $part_a >= 7 ? 'psy-tone--accent' : 'psy-tone--success'; ?>"><?php echo $part_a >= 7 ? esc_html('آستانه رسیده (≥۷)') : esc_html('زیر آستانه'); ?></div>
                 </div>
-                <div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #e2e8f0;">
-                    <div style="font-size:24px;font-weight:bold;color:<?php echo esc_attr($part_b ? '#c05621' : '#276749'); ?>;"><?php echo $part_b ? esc_html('بله') : esc_html('خیر'); ?></div>
-                    <div style="color:#718096;margin-top:4px;">بخش B — همزمانی</div>
-                    <div style="font-size:11px;color:<?php echo $part_b ? '#c05621' : '#718096'; ?>;margin-top:4px;"><?php echo $part_b ? esc_html('شرط برآورده شد') : esc_html('شرط برآورده نشد'); ?></div>
+                <div class="psy-report-trio__cell">
+                    <div class="psy-report-trio__value <?php echo $part_b ? 'psy-tone--accent' : 'psy-tone--success'; ?>"><?php echo $part_b ? esc_html('بله') : esc_html('خیر'); ?></div>
+                    <div class="psy-report-trio__label">بخش B — همزمانی</div>
+                    <div class="psy-report-trio__hint <?php echo $part_b ? 'psy-tone--accent' : 'psy-tone--neutral'; ?>"><?php echo $part_b ? esc_html('شرط برآورده شد') : esc_html('شرط برآورده نشد'); ?></div>
                 </div>
-                <div style="background:#fff;border-radius:8px;padding:12px;text-align:center;border:1px solid #e2e8f0;">
-                    <div style="font-size:24px;font-weight:bold;color:<?php echo $part_c >= 2 ? '#c05621' : '#276749'; ?>"><?php echo esc_html($part_c_labels[$part_c]); ?></div>
-                    <div style="color:#718096;margin-top:4px;">بخش C — اختلال عملکرد</div>
-                    <div style="font-size:11px;color:<?php echo $part_c >= 2 ? '#c05621' : '#718096'; ?>;margin-top:4px;"><?php echo $part_c >= 2 ? esc_html('اختلال معنادار') : esc_html('اختلال کم'); ?></div>
+                <div class="psy-report-trio__cell">
+                    <div class="psy-report-trio__value <?php echo $part_c >= 2 ? 'psy-tone--accent' : 'psy-tone--success'; ?>"><?php echo esc_html($part_c_labels[$part_c]); ?></div>
+                    <div class="psy-report-trio__label">بخش C — اختلال عملکرد</div>
+                    <div class="psy-report-trio__hint <?php echo $part_c >= 2 ? 'psy-tone--accent' : 'psy-tone--neutral'; ?>"><?php echo $part_c >= 2 ? esc_html('اختلال معنادار') : esc_html('اختلال کم'); ?></div>
                 </div>
             </div>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل پاسخ‌های بخش A'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-mdq-bar" style="max-height:180px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-mdq-bar" class="psy-report-chart psy-report-chart--xs"></canvas>
         </div>
 
         <?php if ($positive): ?>
-        <div style="background:#fff5f5;border:1px solid #fc8181;border-radius:8px;padding:16px;margin-bottom:20px;">
-            <strong style="color:#9b2c2c;">⚠️ تذکر بالینی:</strong>
-            <p style="margin:8px 0 0;font-size:13px;color:#4a5568;line-height:1.8;">
+        <div class="psy-report-alert psy-tone--danger">
+            <h3 class="psy-report-alert__title psy-report-alert__title--sm">⚠️ تذکر بالینی:</h3>
+            <p class="psy-report-alert__text">
                 اسکرینینگ MDQ مثبت نشان‌دهنده احتمال وجود اختلال طیف دوقطبی است. ارزیابی روان‌پزشکی کامل
                 شامل مصاحبه بالینی ساختاریافته (SCID-I یا MINI) ضروری است. تشخیص صرفاً بر اساس
                 این پرسشنامه نباید صورت گیرد.
@@ -195,10 +196,10 @@ class MDQ extends \PsychAssessments\Core\BaseTest {
         </div>
         <?php endif; ?>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;margin-top:10px;">
-            <b style="color:#4a5568;">منبع:</b> Hirschfeld et al. (2000). American Journal of Psychiatry, 157(11), 1873–1875.<br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Hirschfeld et al. (2000). American Journal of Psychiatry, 157(11), 1873–1875.<br>
             Sensitivity: 73.0% | Specificity: 90.0% برای تشخیص BD-I<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
@@ -352,64 +353,63 @@ class EPDS extends \PsychAssessments\Core\BaseTest {
                 ? pa_decrypt_json( $session->answers )
                 : (array) $session->answers;
         }
+        $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
 
         ob_start(); ?>
         <?php if ( $self_harm >= 1 ): ?>
-        <div style="background:#fff5f5;border:2px solid #fc8181;border-radius:10px;padding:18px;margin-bottom:20px;">
-            <strong style="color:#9b2c2c;font-size:15px;">🚨 هشدار بالینی — سوال ۱۰ (آسیب به خود)</strong>
-            <p style="margin:10px 0 0;font-size:13px;color:#742a2a;line-height:1.8;">
+        <div class="psy-report-alert psy-tone--danger">
+            <h3 class="psy-report-alert__title psy-report-alert__title--sm">🚨 هشدار بالینی — سوال ۱۰ (آسیب به خود)</h3>
+            <p class="psy-report-alert__text">
                 بیمار به سوال آسیب به خود پاسخ مثبت داده است. ارزیابی ایمنی فوری ضروری است.
                 این موضوع باید در اولین فرصت به صورت حضوری بررسی شود.
             </p>
         </div>
         <?php endif; ?>
 
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس', $session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل', $completed],
                 [$sev['bg'],$sev['color'],'🌸','نمره کل EPDS', $total . ' از ۳۰'],
-                [$sev['bg'],$sev['color'],'🏷','وضعیت', $sev['label'] . ' (' . $sev['label_en'] . ')'],
+                [$sev['bg'],$sev['color'],'🏷','وضعیت', $sev['label'], $sev['label_en']],
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $sev_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;">نمره EPDS: <?php echo esc_html((int)$total); ?> از ۳۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title">نمره EPDS: <?php echo esc_html((int)$total); ?> از ۳۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,0,30); ?>%;border-radius:6px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($total,0,30), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
                 <span>۰</span>
-                <span style="color:#d69e2e;">۱۰ در معرض خطر</span>
-                <span style="color:#9b2c2c;">۱۳ احتمال افسردگی</span>
+                <span class="psy-tone--warning"><span class="psy-report-scale__mark psy-text">۱۰ در معرض خطر</span></span>
+                <span class="psy-tone--danger"><span class="psy-report-scale__mark psy-text">۱۳ احتمال افسردگی</span></span>
                 <span>۳۰</span>
             </div>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل نمرات ۱۰ سوال'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-epds-bar" style="max-height:200px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-epds-bar" class="psy-report-chart psy-report-chart--sm"></canvas>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:20px;font-size:13px;color:#4a5568;line-height:1.8;">
-            <strong style="color:#2d3748;">📌 راهنمای تفسیر (Cox et al., 1987):</strong><br>
-            <span style="color:#276749;">۰–۹:</span> بدون نگرانی قابل توجه &nbsp;|&nbsp;
-            <span style="color:#d69e2e;">۱۰–۱۲:</span> در معرض خطر — پیگیری &nbsp;|&nbsp;
-            <span style="color:#9b2c2c;">≥۱۳:</span> افسردگی احتمالی — مداخله<br>
+        <div class="psy-report-infobox">
+            <strong class="psy-report-bold">📌 راهنمای تفسیر (Cox et al., 1987):</strong><br>
+            <span class="psy-tone--success psy-text">۰–۹:</span> بدون نگرانی قابل توجه &nbsp;|&nbsp;
+            <span class="psy-tone--warning psy-text">۱۰–۱۲:</span> در معرض خطر — پیگیری &nbsp;|&nbsp;
+            <span class="psy-tone--danger psy-text">≥۱۳:</span> افسردگی احتمالی — مداخله<br>
             سوالات معکوس (۱، ۲) قبل از جمع‌بندی وارونه شده‌اند.
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;margin-top:10px;">
-            <b style="color:#4a5568;">منبع:</b> Cox, Holden & Sagovsky (1987). British Journal of Psychiatry, 150, 782–786.<br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Cox, Holden &amp; Sagovsky (1987). British Journal of Psychiatry, 150, 782–786.<br>
             هنجاریابی ایران: Montazeri et al. (2007). BMC Psychiatry, 7:11.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.<br>
-            <b style="color:#c05621;">👩‍⚕️</b> این مقیاس صرفاً برای زنان در دوره بارداری و تا یک سال پس از زایمان اعتبارسنجی شده است.
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.<br>
+            <b class="psy-tone--accent psy-text">👩‍⚕️</b> این مقیاس صرفاً برای زنان در دوره بارداری و تا یک سال پس از زایمان اعتبارسنجی شده است.
         </div>
 
         <script>
@@ -633,71 +633,65 @@ class DERS extends \PsychAssessments\Core\BaseTest {
         $sub_max = [
             'nonacceptance'=>30,'goals'=>25,'impulse'=>30,'awareness'=>30,'strategies'=>40,'clarity'=>25
         ];
+        // باگ O: min هر subscale برابر تعداد سوالاتش است (min per-question=1)
+        $sub_min_map = ['nonacceptance'=>6,'goals'=>5,'impulse'=>6,'awareness'=>6,'strategies'=>8,'clarity'=>5];
+        $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
 
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس', $session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل', $completed],
                 [$sev['bg'],$sev['color'],'🎭','نمره کل DERS', $total . ' از ۱۸۰'],
-                [$sev['bg'],$sev['color'],'🏷','سطح دشواری', $sev['label'] . ' (' . $sev['label_en'] . ')'],
+                [$sev['bg'],$sev['color'],'🏷','سطح دشواری', $sev['label'], $sev['label_en']],
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $sev_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;">نمره کل: <?php echo esc_html((int)$total); ?> از ۱۸۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title">نمره کل: <?php echo esc_html((int)$total); ?> از ۱۸۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,36,180); ?>%;border-radius:6px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent($total,36,180), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
                 <span>۳۶</span>
-                <span style="color:#d69e2e;">۸۱ متوسط</span>
-                <span style="color:#c05621;">۱۱۱ بالا</span>
-                <span style="color:#9b2c2c;">۱۴۱ خیلی بالا</span>
+                <span class="psy-tone--warning"><span class="psy-report-scale__mark psy-text">۸۱ متوسط</span></span>
+                <span class="psy-tone--accent"><span class="psy-report-scale__mark psy-text">۱۱۱ بالا</span></span>
+                <span class="psy-tone--danger"><span class="psy-report-scale__mark psy-text">۱۴۱ خیلی بالا</span></span>
                 <span>۱۸۰</span>
             </div>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل ۶ زیرمقیاس تنظیم هیجان'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-ders-radar" style="max-height:280px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-ders-radar" class="psy-report-chart psy-report-chart--domains"></canvas>
         </div>
 
         <?php foreach ($subs as $key => $val):
             $sub_sev = $this->subscale_severity((int)$val, $key);
-            $mx = $sub_max[$key] ?? 30; ?>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;border-right:4px solid <?php echo esc_attr($sub_sev['color']); ?>;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            $mx = $sub_max[$key] ?? 30;
+            $mn = $sub_min_map[$key] ?? 1;
+            $sub_tone = \PsychAssessments\Core\ReportHTML::tone( $sub_sev['color'] );
+        ?>
+        <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( $sub_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <strong style="font-size:14px;color:<?php echo esc_attr($sub_sev['color']); ?>;"><?php echo esc_html($labels[$key]); ?></strong>
-                    <p style="margin:4px 0 0;font-size:12px;color:#718096;"><?php echo esc_html($sub_descs[$key]); ?></p>
+                    <span class="psy-report-item__name"><?php echo esc_html($labels[$key]); ?></span>
+                    <p class="psy-report-desc psy-report-desc--flush"><?php echo esc_html($sub_descs[$key]); ?></p>
                 </div>
-                <span style="background:<?php echo esc_attr($sub_sev['bg']); ?>;color:<?php echo esc_attr($sub_sev['color']); ?>;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:bold;">
-                    <?php echo (int)$val; ?> از <?php echo $mx; ?> — <?php echo esc_html($sub_sev['label']); ?>
-                </span>
+                <span class="psy-report-tag"><?php echo (int)$val; ?> از <?php echo $mx; ?> — <?php echo esc_html($sub_sev['label']); ?></span>
             </div>
-            <div style="background:#edf2f7;border-radius:6px;height:8px;overflow:hidden;">
-                <?php
-                // باگ O: min هر subscale برابر تعداد سوالاتش است (min per-question=1)
-                // بدون min، نمره حداقل به صورت bar خالی نشان داده می‌شد
-                $sub_min_map = ['nonacceptance'=>6,'goals'=>5,'impulse'=>6,'awareness'=>6,'strategies'=>8,'clarity'=>5];
-                $sub_min = $sub_min_map[$key] ?? 1;
-                ?>
-                <div style="background:<?php echo esc_attr($sub_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent((float)$val, (float)$sub_min, (float)$mx); ?>%;border-radius:6px;"></div>
-            </div>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) \PsychAssessments\Core\Scoring::percent((float)$val, (float)$mn, (float)$mx), $sub_sev['color'] ); ?>
         </div>
         <?php endforeach; ?>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;margin-top:10px;">
-            <b style="color:#4a5568;">منبع:</b> Gratz & Roemer (2004). Journal of Psychopathology and Behavioral Assessment, 26(1), 41–54.<br>
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Gratz &amp; Roemer (2004). Journal of Psychopathology and Behavioral Assessment, 26(1), 41–54.<br>
             هنجاریابی ایران: Khanzadeh et al. (2012). International Journal of Psychological Studies, 4(1).<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

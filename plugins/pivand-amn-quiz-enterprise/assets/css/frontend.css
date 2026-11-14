@@ -1240,3 +1240,36 @@ body.psy-exam-standalone-body {
 .psy-col--16 { width: 16%; }
 .psy-col--28 { width: 28%; }
 .psy-report-name-lg { font-size: 16px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+/* دستهٔ پنجم: MDQ / EPDS / DERS */
+.psy-report-chart--xs { max-height: 180px; }
+.psy-report-trio {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-block-start: 14px;
+    font-size: 13px;
+}
+.psy-report-trio__cell {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.psy-report-trio__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-trio__label { color: #718096; margin-block-start: 4px; }
+.psy-report-trio__hint { font-size: 11px; color: var(--psy-c, #718096); margin-block-start: 4px; }
+.psy-report-tag {
+    display: inline-block;
+    background: var(--psy-bg, var(--psy-surface));
+    color: var(--psy-c, var(--psy-text));
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
