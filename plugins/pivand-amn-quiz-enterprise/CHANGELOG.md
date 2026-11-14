@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.8.0 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۱): حذف استایل درون‌خطی گزارش‌ها
+- `assets/css/frontend.css`: بخش «گزارش آزمون» افزوده شد — `psy-report-card*`, `psy-report-row*`, `psy-score-badge`, `psy-report-progress*`, `psy-report-panel*`, `psy-report-table*`, `psy-clinical*`, `psy-report-note`, `psy-report-refs` و کلاس‌های تُن `psy-tone--success|warning|accent|danger|info|purple|neutral`؛ رنگ‌های بالینی از `--psy-c`/`--psy-bg` خوانده می‌شوند.
+- عرض نوار پیشرفت با کلاس `.psy-w--0 … .psy-w--100` (گام ۵٪) اعمال می‌شود تا مارک‌آپ گزارش هیچ `style="width:…"` نداشته باشد و در PDF (بدون JS) هم درست رندر شود.
+- `ReportHTML`: هلپرهای `summary_card`، `score_badge`، `progress_bar`، `section_header`، `clinical_card`، `clinical_note` دیگر استایل درون‌خطی تولید نمی‌کنند؛ دو متد تازه `ReportHTML::tone( $hex )` و `ReportHTML::pct_class( $pct )` افزوده شد (امضای متدهای قبلی حفظ شد؛ `progress_bar` یک آرگومان اختیاری `$tall` گرفت).
+- `tests/ECR.php`: گزارش «سبک دلبستگی» به‌طور کامل به کلاس‌ها مهاجرت کرد؛ استایل درون‌خطی این گزارش از ۸۴ به ۰ رسید (بدون تغییر در نمره‌گذاری، cut-offها یا متن‌ها).
+- بقیهٔ ۴۳ فایل آزمون هنوز مهاجرت نکرده‌اند (شمارش کل افزونه: ۱۰۴۳ → ۹۵۶)؛ الگوی مهاجرت همان کلاس‌های بالاست.
+- `PSY_VERSION` از 3.7.1 به 3.8.0.
+
 ## 3.7.1 — فاز ۱۲ / گام ۶: حذف کامل CDN
 - `assets/js/vendor/chart.umd.min.js` (Chart.js 4.4.1 + مجوز) به بسته اضافه شد و `Psy_Quiz_Assets` فقط از نسخهٔ محلی استفاده می‌کند؛ هیچ fallback به cdnjs وجود ندارد.
 - `assets/js/vendor/Sortable.min.js` (1.15.6 + مجوز) جای تگ `<script src="https://cdn.jsdelivr.net/...">` در صفحهٔ تنظیمات نشست.

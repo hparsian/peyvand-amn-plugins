@@ -654,3 +654,234 @@ body.psy-exam-standalone-body {
 .psy-exam-support-link:hover,
 .psy-exam-back-link:hover { color: var(--psy-blue); }
 .psy-exam-back-link svg { width: 16px; height: 16px; }
+
+/* ═══ گزارش آزمون (فاز ۱۴.۴) ═══════════════════════════════════════
+   مارک‌آپ گزارش‌ها به‌جای استایل درون‌خطی از این کلاس‌ها استفاده می‌کند.
+   رنگ‌های معنایی هر آزمون با کلاس `psy-tone--*` (نه style="…") اعمال می‌شود.
+   ═════════════════════════════════════════════════════════════════ */
+.psy-tone--success { --psy-c: #276749; --psy-bg: #f0fff4; }
+.psy-tone--warning { --psy-c: #d69e2e; --psy-bg: #fffff0; }
+.psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
+.psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
+.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
+.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
+.psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
+
+.psy-report-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.psy-report-row--center { align-items: center; }
+.psy-report-col { flex: 1 1 280px; min-width: 280px; }
+
+.psy-report-card {
+    flex: 1 1 140px;
+    min-width: 140px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--psy-bg, var(--psy-white));
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-top: 4px solid var(--psy-c, var(--psy-border));
+}
+.psy-report-card--outlined {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    border-inline-start: 4px solid var(--psy-c, var(--psy-border));
+}
+.psy-report-card--tint {
+    background: var(--psy-bg, var(--psy-surface));
+    border: 2px solid var(--psy-c, var(--psy-border));
+    border-radius: 10px;
+    padding: 20px;
+    margin-block-end: 24px;
+}
+.psy-report-card--panel {
+    flex: 1;
+    min-width: 280px;
+    background: var(--psy-white);
+    border: 1px solid var(--psy-border);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+}
+.psy-report-card__label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text-soft));
+    margin-block-end: 4px;
+}
+.psy-report-card__value {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-card__sub {
+    font-size: 11px;
+    color: var(--psy-text-soft);
+    margin-block-start: 4px;
+}
+
+.psy-score-badge {
+    background: var(--psy-c, #718096);
+    color: #fff;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.psy-score-badge--sm {
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+}
+
+.psy-report-progress {
+    background: #edf2f7;
+    border-radius: 4px;
+    block-size: 8px;
+    overflow: hidden;
+    margin-block-start: 8px;
+}
+.psy-report-progress--tall { block-size: 10px; margin-block-start: 12px; }
+.psy-report-progress__bar {
+    background: var(--psy-c, var(--psy-blue));
+    block-size: 100%;
+    border-radius: 4px;
+}
+
+.psy-report-section-title {
+    margin: 24px 0 12px;
+    font-size: 15px;
+    color: #2d3748;
+    border-block-end: 2px solid #e2e8f0;
+    padding-block-end: 8px;
+}
+
+.psy-clinical {
+    background: var(--psy-bg, #fffaf0);
+    border: 1px solid rgba(0, 0, 0, .08);
+    border-inline-start: 4px solid var(--psy-c, #c05621);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-block-end: 10px;
+}
+.psy-clinical__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-block-end: 8px;
+}
+.psy-clinical__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-clinical__desc {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: #4a5568;
+    line-height: 1.7;
+}
+.psy-clinical__note {
+    font-size: 11px;
+    font-style: italic;
+    margin-block-start: 4px;
+    color: var(--psy-c, var(--psy-text-soft));
+}
+
+.psy-report-note {
+    background: var(--psy-bg, #fffaf0);
+    border-inline-start: 4px solid var(--psy-c, #c05621);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 12px;
+    color: #4a5568;
+    line-height: 1.8;
+}
+
+.psy-report-caption { font-size: 11px; color: #a0aec0; }
+.psy-report-muted { color: #4a5568; }
+.psy-report-chart { max-height: 260px; }
+
+.psy-text { color: var(--psy-c, var(--psy-text)); }
+.psy-report-title { margin-top: 0; font-size: 17px; }
+.psy-report-score-name { font-size: 15px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-clinical__hint {
+    background: var(--psy-bg, #fff5f5);
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--psy-c, var(--psy-text-soft));
+}
+.psy-report-panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-block-end: 30px;
+}
+.psy-report-panel--soft { background: #f7fafc; }
+.psy-report-panel__title { margin: 0 0 12px; font-size: 15px; color: #2d3748; }
+.psy-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.psy-report-table--center { text-align: center; }
+.psy-report-table th,
+.psy-report-table td { padding: 8px 10px; border: 1px solid #e2e8f0; }
+.psy-report-table thead th { background: #f7fafc; font-weight: 700; color: #4a5568; }
+.psy-report-table__corner { width: 15%; border: 0; }
+.psy-report-table__cell--current { background: #f0fff4; font-weight: 700; }
+.psy-report-table__cell--current-alt { background: #fff5f5; font-weight: 700; }
+.psy-report-en { color: #a0aec0; font-size: 10px; }
+.psy-report-refs {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 11px;
+    color: #a0aec0;
+    line-height: 1.8;
+}
+.psy-report-refs b { color: #4a5568; }
+
+/* عرض نوار پیشرفت — جایگزین width درون‌خطی (۰ تا ۱۰۰ در گام ۵٪) */
+.psy-w--0 { inline-size: 0%; }
+.psy-w--5 { inline-size: 5%; }
+.psy-w--10 { inline-size: 10%; }
+.psy-w--15 { inline-size: 15%; }
+.psy-w--20 { inline-size: 20%; }
+.psy-w--25 { inline-size: 25%; }
+.psy-w--30 { inline-size: 30%; }
+.psy-w--35 { inline-size: 35%; }
+.psy-w--40 { inline-size: 40%; }
+.psy-w--45 { inline-size: 45%; }
+.psy-w--50 { inline-size: 50%; }
+.psy-w--55 { inline-size: 55%; }
+.psy-w--60 { inline-size: 60%; }
+.psy-w--65 { inline-size: 65%; }
+.psy-w--70 { inline-size: 70%; }
+.psy-w--75 { inline-size: 75%; }
+.psy-w--80 { inline-size: 80%; }
+.psy-w--85 { inline-size: 85%; }
+.psy-w--90 { inline-size: 90%; }
+.psy-w--95 { inline-size: 95%; }
+.psy-w--100 { inline-size: 100%; }
+
+.psy-report-text { font-size: 13px; color: #4a5568; line-height: 1.8; margin: 0; }
+.psy-report-desc { margin: 10px 0 6px; font-size: 12px; color: #4a5568; }
+.psy-report-bold { font-weight: 700; }
+.psy-report-row--loose { gap: 24px; align-items: flex-start; margin-block-end: 30px; }
+.psy-report-col--wide { flex: 1.2 1 300px; min-width: 300px; }
+.psy-report-table__head { background: #f7fafc; font-weight: 700; color: #4a5568; }
+.psy-report-table__cell--start { text-align: start; }
+.psy-report-card--stack { margin-block-end: 16px; }

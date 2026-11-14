@@ -225,10 +225,15 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         $radar_values = [$anxiety, $avoidance];
         $radar_colors = [$anx_sev['color'], $avo_sev['color']];
 
+        // فاز ۱۴.۴: رنگ‌های بالینی با کلاس تُن اعمال می‌شوند، نه style درون‌خطی
+        $anx_tone   = \PsychAssessments\Core\ReportHTML::tone( $anx_sev['color'] );
+        $avo_tone   = \PsychAssessments\Core\ReportHTML::tone( $avo_sev['color'] );
+        $style_tone = \PsychAssessments\Core\ReportHTML::tone( $style['color'] );
+
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#e9d8fd','#553c9a','👤','نام',               $session->client_name ?? $session->patient_name ?? '---'],
@@ -245,61 +250,57 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- سبک دلبستگی -->
-        <div style="background:<?php echo esc_attr($style['bg']); ?>;border:2px solid <?php echo esc_attr($style['color']); ?>;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <h3 style="margin-top:0;color:<?php echo esc_attr($style['color']); ?>;font-size:17px;">
+        <div class="psy-report-card psy-report-card--tint <?php echo esc_attr( $style_tone ); ?>">
+            <h3 class="psy-report-title psy-text">
                 🔷 سبک دلبستگی: <?php echo esc_html($style['label']); ?> (<?php echo esc_html($style['label_en']); ?>)
             </h3>
-            <p style="font-size:13px;color:#4a5568;line-height:1.8;margin-bottom:0;"><?php echo esc_html($style['desc']); ?></p>
+            <p class="psy-report-text"><?php echo esc_html($style['desc']); ?></p>
         </div>
 
         <!-- نمودار + جزئیات -->
-        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-bottom:30px;">
-            <div style="flex:1;min-width:280px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
-                <h3 style="margin-top:0;text-align:center;color:#2d3748;font-size:15px;">نمودار دو بُعد دلبستگی</h3>
-                <canvas id="pa-radar-chart" style="max-height:260px;"></canvas>
+        <div class="psy-report-row psy-report-row--loose">
+            <div class="psy-report-card psy-report-card--panel psy-report-col">
+                <h3 class="psy-report-panel__title psy-report-desc">نمودار دو بُعد دلبستگی</h3>
+                <canvas id="pa-radar-chart" class="psy-report-chart"></canvas>
             </div>
-            <div style="flex:1.2;min-width:300px;">
+            <div class="psy-report-col psy-report-col--wide">
                 <!-- اضطراب -->
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px;border-right:4px solid <?php echo esc_attr($anx_sev['color']); ?>;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div class="psy-report-card psy-report-card--outlined psy-report-card--stack <?php echo esc_attr( $anx_tone ); ?>">
+                    <div class="psy-clinical__head">
                         <div>
-                            <span style="font-size:15px;font-weight:bold;color:<?php echo esc_attr($anx_sev['color']); ?>;">اضطراب دلبستگی</span>
-                            <span style="font-size:11px;color:#a0aec0;margin-right:6px;">Attachment Anxiety</span>
+                            <span class="psy-report-score-name">اضطراب دلبستگی</span>
+                            <span class="psy-report-caption">Attachment Anxiety</span>
                         </div>
                         <?php echo \PsychAssessments\Core\ReportHTML::score_badge($anxiety, $anx_sev); ?>
                     </div>
-                    <div style="margin-top:12px;background:#edf2f7;border-radius:4px;height:10px;overflow:hidden;">
-                        <div style="background:<?php echo esc_attr($anx_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($anxiety,1,7); ?>%;border-radius:4px;"></div>
-                    </div>
-                    <p style="margin:10px 0 6px;font-size:12px;color:#4a5568;">نگرانی از اینکه شریک زندگی در دسترس نباشد یا پاسخ‌گو نباشد؛ ترس از رهاشدگی و عدم تأیید.</p>
-                    <div style="background:<?php echo esc_attr($anx_sev['bg']); ?>;border-radius:5px;padding:7px 10px;font-size:12px;color:<?php echo esc_attr($anx_sev['color']); ?>;">💡 <?php echo esc_html($anx_sev['clinical']); ?></div>
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($anxiety,1,7), $anx_sev['color'], true ); ?>
+                    <p class="psy-report-desc">نگرانی از اینکه شریک زندگی در دسترس نباشد یا پاسخ‌گو نباشد؛ ترس از رهاشدگی و عدم تأیید.</p>
+                    <div class="psy-clinical__hint">💡 <?php echo esc_html($anx_sev['clinical']); ?></div>
                 </div>
                 <!-- اجتناب -->
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;border-right:4px solid <?php echo esc_attr($avo_sev['color']); ?>;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div class="psy-report-card psy-report-card--outlined <?php echo esc_attr( $avo_tone ); ?>">
+                    <div class="psy-clinical__head">
                         <div>
-                            <span style="font-size:15px;font-weight:bold;color:<?php echo esc_attr($avo_sev['color']); ?>;">اجتناب دلبستگی</span>
-                            <span style="font-size:11px;color:#a0aec0;margin-right:6px;">Attachment Avoidance</span>
+                            <span class="psy-report-score-name">اجتناب دلبستگی</span>
+                            <span class="psy-report-caption">Attachment Avoidance</span>
                         </div>
                         <?php echo \PsychAssessments\Core\ReportHTML::score_badge($avoidance, $avo_sev); ?>
                     </div>
-                    <div style="margin-top:12px;background:#edf2f7;border-radius:4px;height:10px;overflow:hidden;">
-                        <div style="background:<?php echo esc_attr($avo_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($avoidance,1,7); ?>%;border-radius:4px;"></div>
-                    </div>
-                    <p style="margin:10px 0 6px;font-size:12px;color:#4a5568;">ناراحتی از نزدیکی و وابستگی عاطفی؛ ترجیح استقلال و اتکا به خود بجای دیگران.</p>
-                    <div style="background:<?php echo esc_attr($avo_sev['bg']); ?>;border-radius:5px;padding:7px 10px;font-size:12px;color:<?php echo esc_attr($avo_sev['color']); ?>;">💡 <?php echo esc_html($avo_sev['clinical']); ?></div>
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($avoidance,1,7), $avo_sev['color'], true ); ?>
+                    <p class="psy-report-desc">ناراحتی از نزدیکی و وابستگی عاطفی؛ ترجیح استقلال و اتکا به خود بجای دیگران.</p>
+                    <div class="psy-clinical__hint">💡 <?php echo esc_html($avo_sev['clinical']); ?></div>
                 </div>
             </div>
         </div>
 
         <!-- ماتریس ۴ سبک -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📊 ماتریس چهار سبک دلبستگی (Bartholomew & Horowitz)</h3>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center;">
+        <div class="psy-report-panel">
+            <h3 class="psy-report-panel__title">📊 ماتریس چهار سبک دلبستگی (Bartholomew &amp; Horowitz)</h3>
+            <table class="psy-report-table psy-report-table--center">
                 <tr>
-                    <td style="width:15%;"></td>
-                    <th style="padding:8px;background:#f7fafc;border:1px solid #e2e8f0;color:#2b6cb0;">اضطراب پایین</th>
-                    <th style="padding:8px;background:#f7fafc;border:1px solid #e2e8f0;color:#c53030;">اضطراب بالا</th>
+                    <td class="psy-report-table__corner"></td>
+                    <th class="psy-report-table__head psy-tone--info psy-text">اضطراب پایین</th>
+                    <th class="psy-report-table__head psy-tone--danger psy-text">اضطراب بالا</th>
                 </tr>
                 <?php
                 $cells = [
@@ -307,14 +308,16 @@ class ECR extends \PsychAssessments\Core\BaseTest {
                     ['اجتناب بالا',  'ترسان/آشفته',    '#553c9a', 'Fearful-Avoidant','اجتناب بالا + اضطراب پایین',   'دلبسته/نگران',   '#c53030', 'Preoccupied',      'اجتناب بالا + اضطراب بالا'],
                 ];
                 foreach ($cells as $row) {
+                    $cur1    = ($style['label_en'] === $row[3]);
+                    $cur2    = ($style['label_en'] === $row[7]);
+                    $tone1   = \PsychAssessments\Core\ReportHTML::tone( $row[2] );
+                    $tone2   = \PsychAssessments\Core\ReportHTML::tone( $row[6] );
                     echo '<tr>';
-                    echo '<th style="padding:8px;background:#f7fafc;border:1px solid #e2e8f0;color:#4a5568;">' . esc_html($row[0]) . '</th>';
-                    $cur1 = ($style['label_en'] === $row[3]);
-                    $cur2 = ($style['label_en'] === $row[7]);
-                    echo '<td style="padding:10px;border:1px solid #e2e8f0;background:' . ($cur1?'#f0fff4':'#fff') . ';font-weight:' . ($cur1?'bold':'normal') . ';color:' . esc_attr($row[2]) . ';">';
-                    echo esc_html($row[1]) . ($cur1?' ◀':'') . '<br><span style="color:#a0aec0;font-size:10px;">' . esc_html($row[3]) . '</span></td>';
-                    echo '<td style="padding:10px;border:1px solid #e2e8f0;background:' . ($cur2?'#fff5f5':'#fff') . ';font-weight:' . ($cur2?'bold':'normal') . ';color:' . esc_attr($row[6]) . ';">';
-                    echo esc_html($row[5]) . ($cur2?' ◀':'') . '<br><span style="color:#a0aec0;font-size:10px;">' . esc_html($row[7]) . '</span></td>';
+                    echo '<th class="psy-report-table__head">' . esc_html($row[0]) . '</th>';
+                    echo '<td class="psy-report-table__cell ' . ( $cur1 ? 'psy-report-table__cell--current ' : '' ) . esc_attr( $tone1 ) . ' psy-text">';
+                    echo esc_html($row[1]) . ($cur1?' ◀':'') . '<br><span class="psy-report-en">' . esc_html($row[3]) . '</span></td>';
+                    echo '<td class="psy-report-table__cell ' . ( $cur2 ? 'psy-report-table__cell--current-alt ' : '' ) . esc_attr( $tone2 ) . ' psy-text">';
+                    echo esc_html($row[5]) . ($cur2?' ◀':'') . '<br><span class="psy-report-en">' . esc_html($row[7]) . '</span></td>';
                     echo '</tr>';
                 }
                 ?>
@@ -322,14 +325,14 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Fraley et al. (2000) | Brennan et al. (1998) | Besharat (2011)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">بازه</th>
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">تفسیر</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-caption psy-report-desc">Fraley et al. (2000) | Brennan et al. (1998) | Besharat (2011)</p>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__cell--start">بازه</th>
+                    <th class="psy-report-table__head psy-report-table__cell--start">سطح</th>
+                    <th class="psy-report-table__head psy-report-table__cell--start">تفسیر</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -337,11 +340,12 @@ class ECR extends \PsychAssessments\Core\BaseTest {
                     ['3.5–4.9',   'بالا',       '#c53030', 'بالاتر از cut-off بالینی — پیگیری جدی'],
                     ['2.5–3.49',  'متوسط',      '#d69e2e', 'بالاتر از میانگین — ارزیابی بیشتر مفید است'],
                     ['< 2.5',     'پایین',      '#276749', 'در محدوده بهنجار'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 10px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -349,13 +353,13 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
-            Fraley, R.C., Waller, N.G., & Brennan, K.A. (2000). <i>Journal of Personality and Social Psychology, 78</i>(2), 350–365.<br>
-            Brennan, K.A., Clark, C.L., & Shaver, P.R. (1998). In Simpson & Rholes (Eds.), <i>Attachment Theory and Close Relationships.</i> Guilford Press.<br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
+            Fraley, R.C., Waller, N.G., &amp; Brennan, K.A. (2000). <i>Journal of Personality and Social Psychology, 78</i>(2), 350–365.<br>
+            Brennan, K.A., Clark, C.L., &amp; Shaver, P.R. (1998). In Simpson &amp; Rholes (Eds.), <i>Attachment Theory and Close Relationships.</i> Guilford Press.<br>
             Besharat, M.A. (2011). Psychometric properties of ECR-R — Iranian sample.<br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
