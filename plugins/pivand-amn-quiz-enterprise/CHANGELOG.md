@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.8.3 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۴): BAI، STAI، RSES و GHQ-28
+- `tests/BAI.php`, `tests/STAI.php`, `tests/RSES.php`, `tests/GHQ28.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر چهار گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۳۶/۲۲/۳۸/۷۰ در خروجی رندر).
+- واریانت‌های تازه در `frontend.css`: `psy-report-alert__title--sm`، `psy-report-alert__text--plum` (هشدار افسردگی GHQ با تُن بنفش)، `psy-report-infobox` (کادر راهنمای STAI)، `psy-report-hero__note--sm`، `psy-report-card--tint.psy-report-card--tight` و `psy-report-panel--tight` (فاصلهٔ ۲۰px)، `psy-report-item__score--lg`.
+- در STAI هر دو بلوک حالت/صفت با بخش‌بندی مشترک `section_header` و تُن جداگانه؛ در GHQ-28 هشدارهای خودکشی/افسردگی، cut-off زیرمقیاس‌ها (⚠️/✅) و نمودار دست‌نخورده ماندند.
+- شمارش استایل درون‌خطی افزونه: ۷۱۵ → ۶۰۰ (۳۵ فایل آزمون باقی است).
+- `PSY_VERSION` از 3.8.2 به 3.8.3.
+
 ## 3.8.2 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۳): RAS، SWLS، GSE و PAM
 - `tests/RAS.php`, `tests/SWLS.php`, `tests/GSE.php`, `tests/PAM.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر چهار گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۱۰۴/۱۷/۳۶/۵۹ در خروجی رندر).
 - کلاس‌های تازه در `frontend.css`: `psy-report-hero--center`/`--sm`، `psy-report-hero__number|unit|row|note`، `psy-report-pill`، `psy-report-gauge*` (نوار با نشانگر cut-off)، `psy-report-table--zebra`، `psy-report-table__cell--num|center|q|score`، `psy-report-note-box*`، `psy-report-center`، و برای PAM: `psy-report-total*`، `psy-report-progress--wide`، `psy-report-progress__bar--partner`، `psy-report-tip*`، `psy-report-chart-wrap`، `psy-report-item--lg`، `psy-report-scoreline`، `psy-report-partner*`، `psy-report-table--compare`، `psy-report-align`، `psy-report-refs--muted`.

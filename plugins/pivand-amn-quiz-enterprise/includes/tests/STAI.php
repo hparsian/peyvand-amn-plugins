@@ -135,8 +135,11 @@ class STAI extends \PsychAssessments\Core\BaseTest {
         $s_sev     = $this->severity( $scores['state'] );
         $t_sev     = $this->severity( $scores['trait'] );
 
+        $s_tone = \PsychAssessments\Core\ReportHTML::tone( $s_sev['color'] );
+        $t_tone = \PsychAssessments\Core\ReportHTML::tone( $t_sev['color'] );
+
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#e9d8fd','#553c9a','👤','نام',$session->client_name ?? $session->patient_name ?? '---'],
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
@@ -147,41 +150,37 @@ class STAI extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('اضطراب حالت (STAI-S) — وضعیت لحظه‌ای'); ?>
-        <div style="background:<?php echo esc_attr($s_sev['bg']); ?>;border:2px solid <?php echo esc_attr($s_sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:20px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint psy-report-card--tight <?php echo esc_attr( $s_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($s_sev['color']); ?>;">نمره: <?php echo esc_html((int)$scores['state']); ?> از ۸۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($s_sev['clinical']); ?></p>
-                    <p style="margin:6px 0 0;font-size:12px;color:#718096;">اضطراب حالت: میزان اضطراب در لحظه انجام آزمون</p>
+                    <h3 class="psy-report-hero__title">نمره: <?php echo esc_html((int)$scores['state']); ?> از ۸۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($s_sev['clinical']); ?></p>
+                    <p class="psy-report-hero__note--sm">اضطراب حالت: میزان اضطراب در لحظه انجام آزمون</p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$scores['state'], $s_sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($s_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($scores['state'],20,80); ?>%;border-radius:6px;"></div>
-            </div>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($scores['state'],20,80), $s_sev['color'], true ); ?>
         </div>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('اضطراب صفت (STAI-T) — ویژگی پایدار شخصیت'); ?>
-        <div style="background:<?php echo esc_attr($t_sev['bg']); ?>;border:2px solid <?php echo esc_attr($t_sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:20px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint psy-report-card--tight <?php echo esc_attr( $t_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($t_sev['color']); ?>;">نمره: <?php echo esc_html((int)$scores['trait']); ?> از ۸۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($t_sev['clinical']); ?></p>
-                    <p style="margin:6px 0 0;font-size:12px;color:#718096;">اضطراب صفت: گرایش پایدار به تجربه اضطراب در طول زمان</p>
+                    <h3 class="psy-report-hero__title">نمره: <?php echo esc_html((int)$scores['trait']); ?> از ۸۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($t_sev['clinical']); ?></p>
+                    <p class="psy-report-hero__note--sm">اضطراب صفت: گرایش پایدار به تجربه اضطراب در طول زمان</p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$scores['trait'], $t_sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:10px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($t_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($scores['trait'],20,80); ?>%;border-radius:6px;"></div>
-            </div>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($scores['trait'],20,80), $t_sev['color'], true ); ?>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:20px;">
-            <h3 style="margin-top:0;font-size:15px;">📊 مقایسه حالت و صفت</h3>
-            <canvas id="pa-stai-bar" style="max-height:200px;"></canvas>
+        <div class="psy-report-panel psy-report-panel--tight">
+            <h3 class="psy-report-panel__title">📊 مقایسه حالت و صفت</h3>
+            <canvas id="pa-stai-bar" class="psy-report-chart psy-report-chart--sm"></canvas>
         </div>
 
-        <div style="background:#edf2f7;border-radius:8px;padding:16px 20px;margin-bottom:20px;font-size:13px;color:#4a5568;">
+        <div class="psy-report-infobox">
             <b>راهنمای تفسیر:</b><br>
             • نمره پایین‌تر از ۳۶: اضطراب پایین<br>
             • ۳۶ تا ۴۴: متوسط<br>
@@ -191,9 +190,9 @@ class STAI extends \PsychAssessments\Core\BaseTest {
             <b>تفاوت حالت و صفت:</b> اگر STAI-S بالاتر از STAI-T باشد، اضطراب موقعیتی است. اگر STAI-T بالاتر باشد، اضطراب ویژگی پایدار شخصیتی است.
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منبع:</b> Spielberger, C.D. (1983). STAI Manual. | هنجاریابی ایران: مهرام و همکاران (۱۳۷۹).<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs">
+            <b>منبع:</b> Spielberger, C.D. (1983). STAI Manual. | هنجاریابی ایران: مهرام و همکاران (۱۳۷۹).<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
