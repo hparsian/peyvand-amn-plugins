@@ -158,48 +158,45 @@ class CTS2 extends \PsychAssessments\Core\BaseTest {
         ];
 
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#e9d8fd','#553c9a','👤','نام',$session->client_name ?? $session->patient_name ?? '---'],
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل',$completed],
-                [$phy_sev['bg'],$phy_sev['color'],'⚠️','خشونت جسمی',$phy_sev['label']],
+                [$phy_sev['bg'],$phy_sev['color'],'⚠️','خشونت جسمی',$phy_sev['label'],$phy_sev['label_en']],
                 ['#faf5ff','#6b46c1','🤝','مذاکره',(int)$scores['schema_scores']['neg'].' امتیاز'],
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
         <?php if ( $scores['schema_scores']['phy'] > 0 || $scores['schema_scores']['sex'] > 0 || $scores['schema_scores']['inj'] > 0 ): ?>
-        <div style="background:#fff5f5;border:2px solid #fc8181;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
-            <strong style="color:#9b2c2c;">🚨 هشدار بالینی:</strong>
-            <p style="margin:8px 0 0;font-size:13px;color:#742a2a;">
+        <div class="psy-report-alert psy-tone--danger">
+            <h3 class="psy-report-alert__title psy-report-alert__title--sm">🚨 هشدار بالینی:</h3>
+            <p class="psy-report-alert__text psy-report-alert__text--sm">
                 گزارش خشونت جسمی، جنسی یا آسیب وجود دارد. ارزیابی ایمنی و مداخله فوری توصیه می‌شود.
             </p>
         </div>
         <?php endif; ?>
 
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل پنج بعد تعارض زوجین'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-cts2-bar" style="max-height:260px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-cts2-bar" class="psy-report-chart psy-report-chart--domains"></canvas>
         </div>
 
         <?php foreach ( $scores['schema_scores'] as $key => $val ):
             $is_danger = in_array($key, ['phy','sex','inj']);
             $color = $val > 0 && $is_danger ? '#9b2c2c' : ($val > 0 ? '#c05621' : '#2f855a');
-            $bg    = $val > 0 && $is_danger ? '#fff5f5' : ($val > 0 ? '#fff5f0' : '#f0fff4');
         ?>
-        <div style="background:<?php echo esc_attr($bg); ?>;border:1px solid <?php echo esc_attr($color); ?>;border-radius:10px;padding:16px;margin-bottom:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <strong style="color:<?php echo esc_attr($color); ?>;"><?php echo esc_html($labels[$key]); ?></strong>
-                <span style="background:<?php echo esc_attr($bg); ?>;color:<?php echo esc_attr($color); ?>;border:1px solid <?php echo esc_attr($color); ?>;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:bold;">
-                    <?php echo esc_html((int)$val); ?> امتیاز
-                </span>
+        <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $color ) ); ?>">
+            <div class="psy-clinical__head">
+                <span class="psy-report-name-lg"><?php echo esc_html($labels[$key]); ?></span>
+                <span class="psy-report-tag"><?php echo esc_html((int)$val); ?> امتیاز</span>
             </div>
         </div>
         <?php endforeach; ?>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;margin-top:10px;">
-            <b style="color:#4a5568;">منبع:</b> Straus et al. (1996). Journal of Family Issues, 17(3), 283–316.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار بالینی حساس — اطلاعات کاملاً محرمانه است.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Straus et al. (1996). Journal of Family Issues, 17(3), 283–316.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار بالینی حساس — اطلاعات کاملاً محرمانه است.
         </div>
 
         <script>
