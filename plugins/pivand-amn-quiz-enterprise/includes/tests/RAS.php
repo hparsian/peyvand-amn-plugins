@@ -110,13 +110,13 @@ class RAS extends \PsychAssessments\Core\BaseTest {
         $completed_date = $session->completed_at ? pa_to_jalali($session->completed_at, 'Y/m/d ساعت H:i') : '---';
         $raw_answers = is_string($session->answers) ? pa_decrypt_json($session->answers) : (array)$session->answers;
 
-        // رنگ گیج
-        $gauge_color = $sev['color'];
+        // فاز ۱۴.۴: رنگ گیج و نوارها با کلاس تُن
+        $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
 
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',       $session->client_phone ?? $session->patient_phone ?? '---'],
@@ -132,45 +132,42 @@ class RAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمره اصلی — طراحی ویژه پایش مکرر -->
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:12px;padding:28px 24px;margin-bottom:24px;text-align:center;">
-            <h3 style="margin:0 0 8px;color:<?php echo esc_attr($sev['color']); ?>;font-size:16px;">📋 نتیجه ارزیابی RAS-7</h3>
+        <div class="psy-report-hero--center <?php echo esc_attr( $sev_tone ); ?>">
+            <h3 class="psy-report-hero__title">📋 نتیجه ارزیابی RAS-7</h3>
 
             <!-- عدد بزرگ -->
-            <div style="margin:16px 0;display:flex;justify-content:center;align-items:baseline;gap:8px;">
-                <span style="font-size:64px;font-weight:900;color:<?php echo esc_attr($sev['color']); ?>;line-height:1;"><?php echo $avg; ?></span>
-                <span style="font-size:20px;color:#718096;">/ ۵</span>
+            <div class="psy-report-hero__row">
+                <span class="psy-report-hero__number"><?php echo $avg; ?></span>
+                <span class="psy-report-hero__unit">/ ۵</span>
             </div>
 
             <!-- نوار با cut-off -->
-            <div style="max-width:400px;margin:0 auto;position:relative;">
-                <div style="background:#edf2f7;border-radius:8px;height:18px;overflow:hidden;">
-                    <div style="background:linear-gradient(90deg,#c53030,#d69e2e,#276749);height:100%;width:100%;opacity:0.25;border-radius:8px;position:absolute;top:0;left:0;"></div>
-                    <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:8px;position:relative;z-index:1;"></div>
+            <div class="psy-report-gauge psy-report-gauge--gradient <?php echo esc_attr( $sev_tone ); ?>">
+                <div class="psy-report-gauge__track">
+                    <div class="psy-report-gauge__fill <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( (float) $pct ) ); ?>"></div>
                 </div>
                 <!-- cut-off نشانگر: 4.0 از 5 = (4-1)/(5-1)*100 = 75% -->
-                <div style="position:absolute;top:-4px;left:75%;width:2px;height:26px;background:#c53030;z-index:2;"></div>
-                <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:6px;">
+                <div class="psy-report-gauge__cutoff"></div>
+                <div class="psy-report-scale">
                     <span>۱ (نارضایتی)</span>
-                    <span style="color:#c53030;font-weight:bold;">cut-off: ۴.۰</span>
+                    <span class="psy-report-scale__mark psy-tone--danger psy-text">cut-off: ۴.۰</span>
                     <span>۵ (رضایت کامل)</span>
                 </div>
             </div>
 
-            <div style="margin-top:16px;display:inline-block;background:<?php echo esc_attr($sev['color']); ?>;color:#fff;padding:8px 24px;border-radius:20px;font-size:14px;font-weight:bold;">
-                <?php echo esc_html($sev['label']); ?> — <?php echo esc_html($sev['label_en']); ?>
-            </div>
-            <p style="margin:14px 0 0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+            <div class="psy-report-pill psy-report-pill--spaced"><?php echo esc_html($sev['label']); ?> — <?php echo esc_html($sev['label_en']); ?></div>
+            <p class="psy-report-hero__note"><?php echo esc_html($sev['clinical']); ?></p>
         </div>
 
         <!-- جدول پاسخ‌های سوالات -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <h3 style="margin-top:0;font-size:15px;">📝 بررسی پاسخ‌های هر سوال</h3>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;width:5%;">#</th>
-                    <th style="text-align:right;padding:8px 10px;border:1px solid #e2e8f0;">سوال</th>
-                    <th style="text-align:center;padding:8px 10px;border:1px solid #e2e8f0;width:12%;">نمره</th>
-                    <th style="text-align:center;padding:8px 10px;border:1px solid #e2e8f0;width:30%;">نوار</th>
+        <div class="psy-report-panel">
+            <h3 class="psy-report-panel__title">📝 بررسی پاسخ‌های هر سوال</h3>
+            <table class="psy-report-table psy-report-table--zebra">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">#</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">سوال</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--center">نمره</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--center">نوار</th>
                 </tr></thead>
                 <tbody>
                 <?php
@@ -182,15 +179,14 @@ class RAS extends \PsychAssessments\Core\BaseTest {
                     $scored = in_array($q, $reversed) ? (6 - $raw) : $raw;
                     $q_pct = ($scored - 1) / 4 * 100;
                     $q_color = $scored >= 4 ? '#276749' : ($scored >= 3 ? '#d69e2e' : '#c53030');
+                    $q_tone  = \PsychAssessments\Core\ReportHTML::tone( $q_color );
                 ?>
-                <tr style="<?php echo ($q % 2 === 0) ? 'background:#f7fafc;' : ''; ?>">
-                    <td style="padding:8px 10px;border:1px solid #e2e8f0;color:#a0aec0;text-align:center;"><?php echo esc_html((int)$q); ?></td>
-                    <td style="padding:8px 10px;border:1px solid #e2e8f0;color:#4a5568;line-height:1.5;"><?php echo esc_html($text); ?></td>
-                    <td style="padding:8px 10px;border:1px solid #e2e8f0;text-align:center;font-weight:bold;font-size:14px;color:<?php echo esc_attr($q_color); ?>;"><?php echo $scored; ?></td>
-                    <td style="padding:8px 10px;border:1px solid #e2e8f0;">
-                        <div style="background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                            <div style="background:<?php echo esc_attr($q_color); ?>;height:100%;width:<?php echo $q_pct; ?>%;border-radius:4px;"></div>
-                        </div>
+                <tr>
+                    <td class="psy-report-table__cell psy-report-table__cell--num"><?php echo esc_html((int)$q); ?></td>
+                    <td class="psy-report-table__cell psy-report-table__cell--q"><?php echo esc_html($text); ?></td>
+                    <td class="psy-report-table__cell psy-report-table__cell--score <?php echo esc_attr( $q_tone ); ?> psy-text"><?php echo $scored; ?></td>
+                    <td class="psy-report-table__cell">
+                        <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $q_pct, $q_color ); ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -199,9 +195,9 @@ class RAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- کاربرد پایش مکرر -->
-        <div style="background:#ebf8ff;border:1px solid #90cdf4;border-radius:10px;padding:18px 20px;margin-bottom:24px;">
-            <h3 style="margin-top:0;font-size:14px;color:#2b6cb0;">🔄 راهنمای استفاده در پایش مکرر</h3>
-            <p style="font-size:12px;color:#4a5568;margin:0;line-height:1.8;">
+        <div class="psy-report-note-box">
+            <h3 class="psy-report-note-box__title">🔄 راهنمای استفاده در پایش مکرر</h3>
+            <p class="psy-report-note-box__text">
                 RAS-7 به‌عنوان ابزار پایش مکرر طراحی شده است. می‌توان آن را هر ۲–۴ هفته یک‌بار تکرار کرد تا پیشرفت درمانی پیگیری شود.<br>
                 <b>تغییر معنادار بالینی (RCI):</b> تفاوت ≥ ۰.۵ در میانگین بین دو اندازه‌گیری معنادار در نظر گرفته می‌شود.<br>
                 <b>cut-off:</b> میانگین ≥ ۴.۰ نشان‌دهنده رضایت مطلوب است (Hendrick, 1988).
@@ -209,14 +205,14 @@ class RAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Hendrick (1988) | Hendrick et al. (1998) | Davoodvandi et al. (2018)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">میانگین</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">وضعیت</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">توصیه</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-caption psy-report-desc">Hendrick (1988) | Hendrick et al. (1998) | Davoodvandi et al. (2018)</p>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">میانگین</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">وضعیت</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">توصیه</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -226,11 +222,12 @@ class RAS extends \PsychAssessments\Core\BaseTest {
                     ['3.5–3.99', 'رضایت متوسط',   '#d69e2e', 'تقویت رابطه مفید است'],
                     ['4.0–4.49', 'راضی',           '#276749', 'وضعیت خوب — پایش ادامه داشته باشد'],
                     ['≥ 4.5',    'رضایت بالا',    '#22543d', 'سطح بالای رضایت زناشویی'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -238,13 +235,13 @@ class RAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
             Hendrick, S.S. (1988). <i>Journal of Marriage and the Family, 50</i>(1), 93–98.<br>
-            Hendrick, S.S., Dicke, A., & Hendrick, C. (1998). <i>Journal of Social and Personal Relationships, 15</i>(1), 137–142.<br>
+            Hendrick, S.S., Dicke, A., &amp; Hendrick, C. (1998). <i>Journal of Social and Personal Relationships, 15</i>(1), 137–142.<br>
             Davoodvandi, M. et al. (2018). Psychometric properties of RAS — Iranian sample.<br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
         <?php
         return ob_get_clean();

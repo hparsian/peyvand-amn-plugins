@@ -83,9 +83,11 @@ class SWLS extends \PsychAssessments\Core\BaseTest {
                 : (array) $session->answers;
         }
 
+        $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
+
         ob_start();
         ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ',$completed_date],
@@ -94,29 +96,32 @@ class SWLS extends \PsychAssessments\Core\BaseTest {
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:12px;padding:28px 24px;margin-bottom:24px;text-align:center;">
-            <h3 style="margin:0 0 8px;color:<?php echo esc_attr($sev['color']); ?>;font-size:16px;">رضایت از زندگی</h3>
-            <div style="font-size:64px;font-weight:900;color:<?php echo esc_attr($sev['color']); ?>;line-height:1;margin:12px 0;"><?php echo esc_html((int)$total); ?><span style="font-size:20px;color:#718096;">/ ۳۵</span></div>
-            <div style="display:inline-block;background:<?php echo esc_attr($sev['color']); ?>;color:#fff;padding:8px 24px;border-radius:20px;font-size:14px;font-weight:bold;"><?php echo esc_html($sev['label']); ?></div>
-            <div style="max-width:400px;margin:16px auto 0;">
-                <div style="background:#edf2f7;border-radius:8px;height:14px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,5,35); ?>%;border-radius:8px;"></div>
+        <div class="psy-report-hero--center <?php echo esc_attr( $sev_tone ); ?>">
+            <h3 class="psy-report-hero__title">رضایت از زندگی</h3>
+            <div class="psy-report-hero__row">
+                <span class="psy-report-hero__number"><?php echo esc_html((int)$total); ?></span>
+                <span class="psy-report-hero__unit">/ ۳۵</span>
+            </div>
+            <div class="psy-report-pill"><?php echo esc_html($sev['label']); ?></div>
+            <div class="psy-report-gauge psy-report-gauge--spaced <?php echo esc_attr( $sev_tone ); ?>">
+                <div class="psy-report-gauge__track psy-report-gauge__track--sm">
+                    <div class="psy-report-gauge__fill <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( (float) \PsychAssessments\Core\Scoring::percent($total,5,35) ) ); ?>"></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                    <span>5</span><span style="color:#718096;">20 خنثی</span><span>35</span>
+                <div class="psy-report-scale">
+                    <span>5</span><span class="psy-report-scale__neutral">20 خنثی</span><span>35</span>
                 </div>
             </div>
         </div>
 
-        <div style="font-size:11px;color:#a0aec0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b> Diener et al. (1985). <i>Journal of Personality Assessment, 49</i>(1). | Bayani et al. (2007) هنجاریابی ایران.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs">
+            <b>منابع:</b> Diener et al. (1985). <i>Journal of Personality Assessment, 49</i>(1). | Bayani et al. (2007) هنجاریابی ایران.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <!-- نمودار سوال‌به‌سوال -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-top:20px;">
-            <h3 style="margin-top:0;text-align:center;font-size:14px;">پروفایل پاسخ‌های ۵ سوال</h3>
-            <canvas id="pa-swls-chart" style="max-height:200px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-chart-panel--top psy-report-chart-panel--center">
+            <h3 class="psy-report-panel__title">پروفایل پاسخ‌های ۵ سوال</h3>
+            <canvas id="pa-swls-chart" class="psy-report-chart psy-report-chart--sm"></canvas>
         </div>
         <script>
         (function(){

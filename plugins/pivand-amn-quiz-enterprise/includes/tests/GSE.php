@@ -75,9 +75,11 @@ class GSE extends \PsychAssessments\Core\BaseTest {
         $sev   = $this->get_severity((float)$total);
         $completed_date = $session->completed_at ? pa_to_jalali($session->completed_at, 'Y/m/d ساعت H:i') : '---';
 
+        $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
+
         ob_start();
         ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ',$completed_date],
@@ -86,29 +88,27 @@ class GSE extends \PsychAssessments\Core\BaseTest {
             ] as $c) echo \PsychAssessments\Core\ReportHTML::summary_card($c[0],$c[1],$c[2],$c[3],$c[4]); ?>
         </div>
 
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $sev_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;font-size:18px;">💪 خودکارآمدی: <?php echo esc_html((int)$total); ?> از ۴۰</h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title psy-report-hero__title--lg">💪 خودکارآمدی: <?php echo esc_html((int)$total); ?> از ۴۰</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:12px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,10,40); ?>%;border-radius:6px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                <span>10 پایین</span><span style="color:#d69e2e;">25 متوسط</span><span style="color:#276749;">33 بالا</span><span>40</span>
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($total,10,40), $sev['color'], true ); ?>
+            <div class="psy-report-scale">
+                <span>10 پایین</span><span class="psy-report-scale__mark psy-tone--warning psy-text">25 متوسط</span><span class="psy-report-scale__mark psy-tone--success psy-text">33 بالا</span><span>40</span>
             </div>
         </div>
 
         <!-- نمودار -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;text-align:center;">
-            <h3 style="margin-top:0;font-size:15px;color:#2d3748;">سطح خودکارآمدی عمومی</h3>
-            <canvas id="pa-gse-chart" style="max-height:200px;max-width:400px;display:inline-block;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel psy-report-chart-panel--center">
+            <h3 class="psy-report-panel__title psy-report-center">سطح خودکارآمدی عمومی</h3>
+            <canvas id="pa-gse-chart" class="psy-report-chart psy-report-chart--sm psy-report-chart--inline"></canvas>
         </div>
 
-        <div style="background:#ebf8ff;border:1px solid #90cdf4;border-radius:8px;padding:14px 20px;margin-bottom:20px;font-size:12px;color:#2b6cb0;">
+        <div class="psy-report-note-box psy-report-note-box--compact">
             📌 <b>خودکارآمدی عمومی</b> باور فرد به توانایی خود در انجام رفتارها و مقابله با چالش‌هاست. نمره بالاتر نشان‌دهنده باور قوی‌تر به توانایی‌های شخصی است.
         </div>
 
@@ -138,13 +138,13 @@ class GSE extends \PsychAssessments\Core\BaseTest {
         })();
         </script>
 
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <h3 style="margin-top:0;font-size:14px;">📚 راهنمای تفسیر (Schwarzer & Jerusalem, 1995)</h3>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">توصیه</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر (Schwarzer &amp; Jerusalem, 1995)</h3>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">نمره</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">سطح</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">توصیه</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -152,20 +152,21 @@ class GSE extends \PsychAssessments\Core\BaseTest {
                     ['20–24','پایین',     '#c53030','تکنیک‌های CBT برای تقویت'],
                     ['25–32','متوسط',     '#d69e2e','تقویت با موفقیت‌های تدریجی'],
                     ['33–40','بالا',      '#276749','حفظ و بهره‌گیری از منبع قوت'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
 
-        <div style="font-size:11px;color:#a0aec0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b> Schwarzer & Jerusalem (1995). In Weinman et al. (Eds.), <i>Measures in Health Psychology.</i> | Rajabi (2006). هنجاریابی ایران.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs">
+            <b>منابع:</b> Schwarzer &amp; Jerusalem (1995). In Weinman et al. (Eds.), <i>Measures in Health Psychology.</i> | Rajabi (2006). هنجاریابی ایران.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
         <?php // باگ Q: script block دوم تکراری حذف شد — Chart.js روی canvas یکسان دوبار اجرا می‌شد ?>
         <?php

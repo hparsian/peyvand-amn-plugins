@@ -317,11 +317,14 @@ class PAM extends \PsychAssessments\Core\BaseTest {
         }
         $chart_id = 'pam_chart_' . $session->id;
 
+        // فاز ۱۴.۴: رنگ وضعیت با کلاس تُن
+        $total_tone = \PsychAssessments\Core\ReportHTML::tone( $total_sev['color'] );
+
         ob_start();
         ?>
 
         <!-- ===== خلاصه سربرگ ===== -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','👤','نام',          esc_html($session->client_name ?? $session->patient_name ?? '')],
@@ -338,26 +341,26 @@ class PAM extends \PsychAssessments\Core\BaseTest {
 
         <!-- ===== نمره کل + تفسیر ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمره کل آمادگی ازدواج'); ?>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
+        <div class="psy-report-total">
             <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $total_sev); ?>
-            <div style="flex:1;min-width:200px;">
+            <div class="psy-report-total__body">
                 <!-- progress bar -->
                 <?php $pct = \PsychAssessments\Core\Scoring::percent($total, 40, 200); ?>
-                <div style="background:#e2e8f0;border-radius:6px;height:14px;overflow:hidden;margin-bottom:6px;">
-                    <div style="width:<?php echo $pct; ?>%;height:100%;background:<?php echo esc_attr($total_sev['color']); ?>;transition:width .4s;"></div>
+                <div class="psy-report-progress psy-report-progress--wide <?php echo esc_attr( $total_tone ); ?>">
+                    <div class="psy-report-progress__bar <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( (float) $pct ) ); ?>"></div>
                 </div>
-                <div style="font-size:12px;color:#718096;">
+                <div class="psy-report-hint">
                     محدوده: ≥۱۴۰ آمادگی مناسب | ۱۱۰–۱۳۹ نیاز به مشاوره | &lt;۱۱۰ آمادگی ضعیف
                 </div>
             </div>
         </div>
-        <div style="background:<?php echo esc_attr($total_sev['bg']); ?>;border-right:4px solid <?php echo esc_attr($total_sev['color']); ?>;border-radius:6px;padding:12px 16px;font-size:13px;color:<?php echo esc_attr($total_sev['color']); ?>;margin-bottom:20px;">
+        <div class="psy-report-tip <?php echo esc_attr( $total_tone ); ?>">
             💡 <?php echo esc_html($total_sev['clinical']); ?>
         </div>
 
         <!-- ===== نمودار رادار / بار ===== -->
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('نمودار زیرمقیاس‌ها' . ($partner_session ? ' — مقایسه زوجین' : '')); ?>
-        <div style="max-width:560px;margin:0 auto 28px;">
+        <div class="psy-report-chart-wrap">
             <canvas id="<?php echo esc_attr($chart_id); ?>" height="<?php echo $partner_session ? 260 : 220; ?>"></canvas>
         </div>
         <script>
@@ -422,39 +425,41 @@ class PAM extends \PsychAssessments\Core\BaseTest {
             $p_score = $partner_scores[$key] ?? null;
             $p_sev   = $p_score !== null ? $this->subscale_severity($p_score) : null;
             $p_pct   = $p_score !== null ? \PsychAssessments\Core\Scoring::percent($p_score, 8, 40) : null;
+            $def_tone = \PsychAssessments\Core\ReportHTML::tone( $def['color'] );
+            $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
         ?>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;border-right:4px solid <?php echo esc_attr($def['color']); ?>;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( $def_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <span style="font-size:15px;font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;">
+                    <span class="psy-report-item__name">
                         <?php echo esc_html($def['label']); ?>
                     </span>
-                    <span style="font-size:11px;color:#a0aec0;margin-right:6px;"><?php echo esc_html($def['label_en']); ?></span>
+                    <span class="psy-report-item__en"><?php echo esc_html($def['label_en']); ?></span>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center;">
+                <div class="psy-report-scoreline">
                     <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$score, $sev); ?>
                     <?php if ($p_score !== null): ?>
-                    <div style="font-size:11px;color:#718096;text-align:center;">
-                        <div style="font-size:16px;font-weight:bold;color:<?php echo esc_attr($p_sev['color']); ?>;"><?php echo $p_score; ?></div>
+                    <div class="psy-report-partner <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $p_sev['color'] ) ); ?>">
+                        <div class="psy-report-partner__value psy-text"><?php echo esc_html($p_score); ?></div>
                         <div>شریک</div>
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
             <!-- progress bar من -->
-            <div style="font-size:11px;color:#718096;margin-bottom:3px;"><?php echo esc_html($session->client_name ?? $session->patient_name ?? ''); ?></div>
-            <div style="background:#e2e8f0;border-radius:4px;height:10px;overflow:hidden;margin-bottom:<?php echo esc_attr($p_score !== null ? '8px' : '10px'); ?>;">
-                <div style="width:<?php echo $pct; ?>%;height:100%;background:<?php echo esc_attr($def['color']); ?>;"></div>
+            <div class="psy-report-hint--sm"><?php echo esc_html($session->client_name ?? $session->patient_name ?? ''); ?></div>
+            <div class="psy-report-progress psy-report-progress--wide <?php echo esc_attr( $def_tone ); ?>">
+                <div class="psy-report-progress__bar <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( (float) $pct ) ); ?>"></div>
             </div>
             <?php if ($p_score !== null && $p_pct !== null): ?>
             <!-- progress bar شریک -->
-            <div style="font-size:11px;color:#718096;margin-bottom:3px;"><?php echo esc_html($partner_session->client_name ?? $partner_session->patient_name ?? ''); ?></div>
-            <div style="background:#e2e8f0;border-radius:4px;height:10px;overflow:hidden;margin-bottom:10px;">
-                <div style="width:<?php echo $p_pct; ?>%;height:100%;background:<?php echo esc_attr($def['color']); ?>;opacity:0.5;"></div>
+            <div class="psy-report-hint--sm"><?php echo esc_html($partner_session->client_name ?? $partner_session->patient_name ?? ''); ?></div>
+            <div class="psy-report-progress psy-report-progress--wide <?php echo esc_attr( $def_tone ); ?>">
+                <div class="psy-report-progress__bar psy-report-progress__bar--partner <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( (float) $p_pct ) ); ?>"></div>
             </div>
             <?php endif; ?>
-            <p style="margin:0 0 8px;font-size:13px;color:#4a5568;line-height:1.7;"><?php echo esc_html($def['desc']); ?></p>
-            <div style="background:<?php echo esc_attr($sev['bg']); ?>;border-radius:5px;padding:6px 10px;font-size:12px;color:<?php echo esc_attr($sev['color']); ?>;">
+            <p class="psy-report-desc--flush psy-report-muted"><?php echo esc_html($def['desc']); ?></p>
+            <div class="psy-clinical__hint <?php echo esc_attr( $sev_tone ); ?>">
                 وضعیت: <strong><?php echo esc_html($sev['label']); ?></strong>
                 <?php if ($p_score !== null && $p_sev !== null): ?>
                 &nbsp;|&nbsp; شریک: <strong><?php echo esc_html($p_sev['label']); ?></strong>
@@ -476,15 +481,15 @@ class PAM extends \PsychAssessments\Core\BaseTest {
         }
         $agreement_pct = round($agreement_score / (count($subscales)*2) * 100);
         ?>
-        <div style="overflow-x:auto;margin-bottom:20px;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <div class="psy-report-scroll">
+            <table class="psy-report-table psy-report-table--compare">
                 <thead>
-                    <tr style="background:#f7fafc;">
-                        <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e2e8f0;color:#4a5568;">زیرمقیاس</th>
-                        <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #e2e8f0;color:#2b6cb0;"><?php echo esc_html($session->client_name ?? $session->patient_name ?? ''); ?></th>
-                        <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #e2e8f0;color:#276749;"><?php echo esc_html($partner_session->client_name ?? $partner_session->patient_name ?? ''); ?></th>
-                        <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #e2e8f0;color:#718096;">اختلاف</th>
-                        <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #e2e8f0;color:#718096;">همسویی</th>
+                    <tr>
+                        <th class="psy-report-table__cell--start">زیرمقیاس</th>
+                        <th class="psy-report-table__cell--center"><?php echo esc_html($session->client_name ?? $session->patient_name ?? ''); ?></th>
+                        <th class="psy-report-table__cell--center"><?php echo esc_html($partner_session->client_name ?? $partner_session->patient_name ?? ''); ?></th>
+                        <th class="psy-report-table__cell--center">اختلاف</th>
+                        <th class="psy-report-table__cell--center">همسویی</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -495,32 +500,33 @@ class PAM extends \PsychAssessments\Core\BaseTest {
                         if ($diff <= 4)      { $align_color='#276749'; $align_label='زیاد'; }
                         elseif ($diff <= 8)  { $align_color='#c05621'; $align_label='متوسط'; }
                         else                 { $align_color='#c53030'; $align_label='کم'; }
+                        $align_tone = \PsychAssessments\Core\ReportHTML::tone( $align_color );
                     ?>
-                    <tr style="border-bottom:1px solid #edf2f7;">
-                        <td style="padding:9px 12px;color:<?php echo esc_attr($def['color']); ?>;font-weight:600;">
+                    <tr>
+                        <td class="psy-report-compare__label <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $def['color'] ) ); ?>">
                             <?php echo esc_html($def['label']); ?>
                         </td>
-                        <td style="padding:9px 12px;text-align:center;font-weight:bold;color:#2b6cb0;"><?php echo esc_html((int)$s1); ?></td>
-                        <td style="padding:9px 12px;text-align:center;font-weight:bold;color:#276749;"><?php echo esc_html((int)$s2); ?></td>
-                        <td style="padding:9px 12px;text-align:center;color:#718096;"><?php echo esc_html((int)$diff); ?></td>
-                        <td style="padding:9px 12px;text-align:center;">
-                            <span style="background:<?php echo $align_color; ?>22;color:<?php echo esc_attr($align_color); ?>;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:bold;">
+                        <td class="psy-report-compare__me"><?php echo esc_html((int)$s1); ?></td>
+                        <td class="psy-report-compare__partner"><?php echo esc_html((int)$s2); ?></td>
+                        <td class="psy-report-compare__diff"><?php echo esc_html((int)$diff); ?></td>
+                        <td class="psy-report-table__cell--center">
+                            <span class="psy-report-align <?php echo esc_attr( $align_tone ); ?>">
                                 <?php echo esc_html($align_label); ?>
                             </span>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                     <!-- ردیف جمع -->
-                    <tr style="background:#f7fafc;font-weight:bold;">
-                        <td style="padding:10px 12px;color:#4a5568;">نمره کل</td>
-                        <td style="padding:10px 12px;text-align:center;color:<?php echo esc_attr($total_sev['color']); ?>;">
+                    <tr>
+                        <td class="psy-report-muted">نمره کل</td>
+                        <td class="psy-report-table__cell--center psy-text <?php echo esc_attr( $total_tone ); ?>">
                             <?php echo esc_html((int)$total); ?> — <?php echo esc_html($total_sev['label']); ?>
                         </td>
-                        <td style="padding:10px 12px;text-align:center;color:<?php echo esc_attr($partner_sev['color']); ?>;">
+                        <td class="psy-report-table__cell--center psy-text <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $partner_sev['color'] ) ); ?>">
                             <?php echo esc_html((int)$partner_total); ?> — <?php echo esc_html($partner_sev['label']); ?>
                         </td>
-                        <td style="padding:10px 12px;text-align:center;color:#718096;"><?php echo esc_html(abs($total - $partner_total)); ?></td>
-                        <td style="padding:10px 12px;text-align:center;color:#553c9a;font-size:13px;"><?php echo esc_html((int)$agreement_pct); ?>٪ همسو</td>
+                        <td class="psy-report-compare__diff"><?php echo esc_html(abs($total - $partner_total)); ?></td>
+                        <td class="psy-report-table__cell--center psy-tone--purple psy-text"><?php echo esc_html((int)$agreement_pct); ?>٪ همسو</td>
                     </tr>
                 </tbody>
             </table>
@@ -539,14 +545,14 @@ class PAM extends \PsychAssessments\Core\BaseTest {
             $ag_text  = 'تفاوت‌های قابل توجهی بین دو نفر وجود دارد. پیش از هر تصمیمی، جلسات مشاوره زوجی با متخصص ضروری است.';
         }
         ?>
-        <div style="background:<?php echo esc_attr($ag_bg); ?>;border-right:4px solid <?php echo esc_attr($ag_color); ?>;border-radius:6px;padding:14px 16px;font-size:13px;color:<?php echo esc_attr($ag_color); ?>;margin-bottom:20px;line-height:1.8;">
+        <div class="psy-report-tip psy-report-tip--lg <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $ag_color ) ); ?>">
             <strong>توصیه بالینی زوجی (همسویی <?php echo esc_html((int)$agreement_pct); ?>٪):</strong><br>
             <?php echo esc_html($ag_text); ?>
         </div>
         <?php endif; ?>
 
         <!-- ===== منابع علمی ===== -->
-        <div style="margin-top:28px;padding:12px 16px;background:#f7fafc;border-radius:6px;font-size:11px;color:#718096;line-height:1.9;">
+        <div class="psy-report-refs psy-report-refs--muted">
             <strong>منابع:</strong><br>
             خجسته‌مهر، ر.، کوچکی، ع.، و عرب، ق. (۱۳۸۸). ساخت و اعتباریابی مقیاس آمادگی برای ازدواج. <em>فصلنامه مشاوره و روان‌درمانی خانواده</em>، ۱(۱)، ۷۲–۹۲.<br>
             ثنایی ذاکر، ب. (۱۳۷۹). <em>مقیاس‌های سنجش خانواده و ازدواج</em>. تهران: انتشارات بعثت.<br>
