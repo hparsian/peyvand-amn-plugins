@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.8.7 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۸): قصه‌های عشق استرنبرگ
+- گزارش LoveStory (۲۵ قصه) از ۴۹ مورد استایل درون‌خطی در سورس به **صفر** رسید؛ خروجی رندر با ۱۰۰ پاسخ از ۲۵۹ مورد به ۰ رسید.
+- پرچم‌های بالینی (قرمز/نارنجی/آبی) با `psy-report-alert psy-report-alert--compact` و تُن‌های danger/warning/info؛ کارت «قصه غالب» با `psy-report-card--tint` و سه پنل قوت/آسیب‌پذیری/راهنمای بالینی روی `psy-report-trio__cell--soft`.
+- سه قصه برتر با مدال رتبه (`psy-report-rank`)، نام بزرگ، پیل نمره (`psy-report-tag`) و نوار پیشرفت مشترک.
+- جدول کامل ۲۵ قصه با `psy-report-table--rank/--striped`، نقطهٔ رنگی قصه (`psy-report-swatch`) و نوار کوچک `psy-report-bar` روی گام‌های ۵٪.
+- رنگ‌های قصه‌ها به تُن نگاشت شدند؛ `TONE_BY_HEX` با `#805ad5`/`#f687b3` (purple)، `#2c7a7b`/`#68b0a9` (info)، `#e9b14c` (warning) و `#a0856c` (neutral) کامل شد.
+- کلاس‌های تازه: `psy-report-chart--lg`، `psy-report-alert--compact`/`__icon`/`__text--sm`، `psy-report-trio__cell--soft`/`__title`/`__text`، `psy-report-rank`، `psy-report-swatch`، `psy-report-en--inline`، `psy-report-bar`/`__fill`، `psy-report-table--striped`.
+- شمارش استایل درون‌خطی افزونه: ۳۶۷ → ۳۱۸ (۲۶۱ مورد در ۱۰ فایل آزمون باقی است).
+- `PSY_VERSION` از 3.8.6 به 3.8.7.
+
 ## 3.8.6 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۷): MDQ، EPDS و DERS
 - `tests/MDQEPDSDERS.php` کامل به کلاس‌های گزارش مهاجرت کرد؛ هر سه گزارش اکنون **صفر** استایل درون‌خطی دارند (قبلاً ۲۴/۲۴/۵۸ در خروجی رندر).
 - MDQ: چهار کارت خلاصه، بلوک وضعیت اسکرینینگ با شبکهٔ سه‌ستونه (`psy-report-trio` برای بخش‌های A/B/C)، پنل نمودار ۱۳ آیتم و کادر «تذکر بالینی» با `psy-report-alert`.

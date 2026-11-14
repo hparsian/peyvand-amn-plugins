@@ -37,7 +37,10 @@ class ReportHTML {
         // خنثی
         '#718096' => 'neutral', '#a0aec0' => 'neutral', '#4a5568' => 'neutral',
         '#2d3748' => 'neutral', '#edf2f7' => 'neutral', '#f7fafc' => 'neutral',
-        '#e2e8f0' => 'neutral',
+        '#e2e8f0' => 'neutral', '#a0856c' => 'neutral',
+        // فیروزه‌ای / سبزآبی
+        '#2c7a7b' => 'info',    '#68b0a9' => 'info',
+        '#e9b14c' => 'warning',
     ];
 
     /** کلاس تُن برای یک رنگ هگز — جایگزین استایل درون‌خطی رنگ */

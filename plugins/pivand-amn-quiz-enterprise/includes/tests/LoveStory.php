@@ -633,7 +633,7 @@ class LoveStory extends \PsychAssessments\Core\BaseTest {
         }
 
         ob_start(); ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php foreach ([
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',$session->client_phone ?? $session->patient_phone ?? '---'],
                 ['#f0fff4','#2f855a','✅','تاریخ تکمیل',$completed],
@@ -644,19 +644,19 @@ class LoveStory extends \PsychAssessments\Core\BaseTest {
 
         <?php // ── پرچم‌های بالینی ──────────────────────────────────────────────── ?>
         <?php if ( ! empty($flags) ): ?>
-        <div style="margin-bottom:24px;">
+        <div class="psy-report-block">
             <?php $flag_styles = [
-                'red'    => ['bg'=>'#fff5f5','border'=>'#fc8181','icon'=>'🔴','title'=>'هشدار بالینی'],
-                'orange' => ['bg'=>'#fffaf0','border'=>'#f6ad55','icon'=>'🟠','title'=>'توجه بالینی'],
-                'blue'   => ['bg'=>'#ebf8ff','border'=>'#63b3ed','icon'=>'🔵','title'=>'نکته بالینی'],
+                'red'    => ['color'=>'#fff5f5','tone'=>'psy-tone--danger','icon'=>'🔴','title'=>'هشدار بالینی'],
+                'orange' => ['color'=>'#fffaf0','tone'=>'psy-tone--warning','icon'=>'🟠','title'=>'توجه بالینی'],
+                'blue'   => ['color'=>'#ebf8ff','tone'=>'psy-tone--info','icon'=>'🔵','title'=>'نکته بالینی'],
             ];
             foreach ( $flags as $flag ):
                 $fs = $flag_styles[$flag['level']] ?? $flag_styles['blue']; ?>
-            <div style="background:<?php echo esc_attr($fs['bg']); ?>;border:1.5px solid <?php echo esc_attr($fs['border']); ?>;border-radius:10px;padding:14px 18px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;">
-                <span style="font-size:18px;margin-top:1px;"><?php echo esc_html($fs['icon']); ?></span>
+            <div class="psy-report-alert psy-report-alert--compact <?php echo esc_attr($fs['tone']); ?>">
+                <span class="psy-report-alert__icon"><?php echo esc_html($fs['icon']); ?></span>
                 <div>
-                    <strong style="font-size:13px;color:#2d3748;"><?php echo esc_html($fs['title']); ?></strong>
-                    <p style="margin:4px 0 0;font-size:12px;color:#4a5568;line-height:1.7;"><?php echo esc_html($flag['message']); ?></p>
+                    <strong class="psy-report-alert__title psy-report-alert__title--sm"><?php echo esc_html($fs['title']); ?></strong>
+                    <p class="psy-report-alert__text psy-report-alert__text--sm"><?php echo esc_html($flag['message']); ?></p>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -665,23 +665,23 @@ class LoveStory extends \PsychAssessments\Core\BaseTest {
 
         <?php // ── قصه غالب ─────────────────────────────────────────────────────── ?>
         <?php if ( $top_data ): ?>
-        <div style="background:#fff8f0;border:2px solid <?php echo esc_attr($top_data['color']); ?>;border-radius:12px;padding:22px;margin-bottom:24px;">
-            <h3 style="margin:0 0 10px;color:<?php echo esc_attr($top_data['color']); ?>;font-size:18px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $top_data['color'] ) ); ?>">
+            <h3 class="psy-report-hero__title psy-report-hero__title--lg">
                 💘 قصه غالب شما: <?php echo esc_html($top_data['label']); ?> (<?php echo esc_html($top_data['label_en']); ?>)
             </h3>
-            <p style="margin:0 0 12px;font-size:14px;color:#4a5568;line-height:1.7;"><?php echo esc_html($top_data['desc']); ?></p>
-            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
-                <div style="flex:1;min-width:160px;background:#f0fff4;border-radius:8px;padding:12px;">
-                    <strong style="color:#276749;font-size:12px;">✅ نقاط قوت</strong>
-                    <p style="margin:6px 0 0;font-size:12px;color:#4a5568;"><?php echo esc_html($top_data['strength']); ?></p>
+            <p class="psy-report-hero__text"><?php echo esc_html($top_data['desc']); ?></p>
+            <div class="psy-report-trio">
+                <div class="psy-report-trio__cell psy-report-trio__cell--soft psy-tone--success">
+                    <div class="psy-report-trio__title">✅ نقاط قوت</div>
+                    <p class="psy-report-trio__text"><?php echo esc_html($top_data['strength']); ?></p>
                 </div>
-                <div style="flex:1;min-width:160px;background:#fff5f0;border-radius:8px;padding:12px;">
-                    <strong style="color:#c05621;font-size:12px;">⚠️ نقاط آسیب‌پذیر</strong>
-                    <p style="margin:6px 0 0;font-size:12px;color:#4a5568;"><?php echo esc_html($top_data['risk']); ?></p>
+                <div class="psy-report-trio__cell psy-report-trio__cell--soft psy-tone--accent">
+                    <div class="psy-report-trio__title">⚠️ نقاط آسیب‌پذیر</div>
+                    <p class="psy-report-trio__text"><?php echo esc_html($top_data['risk']); ?></p>
                 </div>
-                <div style="flex:1;min-width:160px;background:#ebf8ff;border-radius:8px;padding:12px;">
-                    <strong style="color:#2b6cb0;font-size:12px;">🩺 راهنمای بالینی</strong>
-                    <p style="margin:6px 0 0;font-size:12px;color:#4a5568;"><?php echo esc_html($top_data['clinical']); ?></p>
+                <div class="psy-report-trio__cell psy-report-trio__cell--soft psy-tone--info">
+                    <div class="psy-report-trio__title">🩺 راهنمای بالینی</div>
+                    <p class="psy-report-trio__text"><?php echo esc_html($top_data['clinical']); ?></p>
                 </div>
             </div>
         </div>
@@ -689,77 +689,73 @@ class LoveStory extends \PsychAssessments\Core\BaseTest {
 
         <?php // ── سه قصه برتر ──────────────────────────────────────────────────── ?>
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('سه قصه برتر'); ?>
-        <div style="margin-bottom:24px;">
+        <div class="psy-report-block">
             <?php $rank = 1; foreach ( $top3 as $key => $val ):
                 $s = $stories[$key]; ?>
-            <div style="background:#fff;border:1px solid <?php echo esc_attr($s['color']); ?>;border-radius:10px;padding:16px;margin-bottom:10px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div class="psy-report-item psy-report-item--lg <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $s['color'] ) ); ?>">
+                <div class="psy-clinical__head">
                     <div>
-                        <span style="background:<?php echo esc_attr($s['color']); ?>;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;margin-left:8px;"><?php echo (int)$rank; ?></span>
-                        <strong style="color:<?php echo esc_attr($s['color']); ?>;font-size:15px;"><?php echo esc_html($s['label']); ?></strong>
-                        <span style="font-size:12px;color:#718096;margin-right:6px;">(<?php echo esc_html($s['label_en']); ?>)</span>
+                        <span class="psy-report-rank"><?php echo (int)$rank; ?></span>
+                        <span class="psy-report-name-lg"><?php echo esc_html($s['label']); ?></span>
+                        <span class="psy-report-en psy-report-en--inline">(<?php echo esc_html($s['label_en']); ?>)</span>
                     </div>
-                    <span style="background:<?php echo esc_attr($s['color']); ?>;color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:bold;">
-                        <?php echo number_format($val,1); ?> از ۹
-                    </span>
+                    <span class="psy-report-tag"><?php echo number_format($val,1); ?> از ۹</span>
                 </div>
-                <p style="margin:10px 0 0;font-size:12px;color:#718096;"><?php echo esc_html($s['desc']); ?></p>
-                <div style="margin-top:10px;background:#edf2f7;border-radius:6px;height:8px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($s['color']); ?>;height:100%;width:<?php echo round(($val/9)*100); ?>%;border-radius:6px;"></div>
-                </div>
+                <p class="psy-report-desc psy-report-desc--flush"><?php echo esc_html($s['desc']); ?></p>
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( round(($val/9)*100), $s['color'] ); ?>
             </div>
             <?php $rank++; endforeach; ?>
         </div>
 
         <?php // ── نمودار راداری: ۲۵ قصه ────────────────────────────────────────── ?>
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('پروفایل کامل ۲۵ قصه عشق'); ?>
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <canvas id="pa-ls-radar" style="max-height:440px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <canvas id="pa-ls-radar" class="psy-report-chart psy-report-chart--lg"></canvas>
         </div>
 
         <?php // ── جدول کامل نمرات ──────────────────────────────────────────────── ?>
         <?php echo \PsychAssessments\Core\ReportHTML::section_header('جدول کامل نمرات'); ?>
-        <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.07);margin-bottom:24px;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <div class="psy-report-panel">
+            <table class="psy-report-table psy-report-table--rank psy-report-table--striped">
                 <thead>
-                    <tr style="background:#f7fafc;">
-                        <th style="padding:10px 14px;text-align:right;color:#4a5568;font-weight:600;border-bottom:1px solid #e2e8f0;">قصه</th>
-                        <th style="padding:10px 14px;text-align:center;color:#4a5568;font-weight:600;border-bottom:1px solid #e2e8f0;width:80px;">نمره</th>
-                        <th style="padding:10px 14px;text-align:right;color:#4a5568;font-weight:600;border-bottom:1px solid #e2e8f0;">نوار</th>
+                    <tr>
+                        <th class="psy-report-table__cell--start">قصه</th>
+                        <th class="psy-col--16 psy-report-table--center">نمره</th>
+                        <th class="psy-report-table__cell--start">نوار</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $row_i = 0; foreach ( $sorted as $key => $val ):
+                    <?php foreach ( $sorted as $key => $val ):
                         $s = $stories[$key];
-                        $bg = ($row_i % 2 === 0) ? '#fff' : '#f7fafc'; ?>
-                    <tr style="background:<?php echo esc_attr($bg); ?>;">
-                        <td style="padding:9px 14px;color:#2d3748;border-bottom:1px solid #edf2f7;">
-                            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:<?php echo esc_attr($s['color']); ?>;margin-left:6px;vertical-align:middle;"></span>
+                        $story_tone = \PsychAssessments\Core\ReportHTML::tone( (string) $s['color'] ); ?>
+                    <tr>
+                        <td>
+                            <span class="psy-report-swatch <?php echo esc_attr( $story_tone ); ?>"></span>
                             <?php echo esc_html($s['label']); ?>
-                            <span style="font-size:11px;color:#a0aec0;margin-right:4px;"><?php echo esc_html($s['label_en']); ?></span>
+                            <span class="psy-report-en psy-report-en--inline"><?php echo esc_html($s['label_en']); ?></span>
                         </td>
-                        <td style="padding:9px 14px;text-align:center;font-weight:bold;color:<?php echo esc_attr($s['color']); ?>;border-bottom:1px solid #edf2f7;">
+                        <td class="psy-report-table__cell--score-lg <?php echo esc_attr( $story_tone ); ?>">
                             <?php echo number_format($val,1); ?>
                         </td>
-                        <td style="padding:9px 14px;border-bottom:1px solid #edf2f7;">
-                            <div style="background:#edf2f7;border-radius:4px;height:6px;overflow:hidden;">
-                                <div style="background:<?php echo esc_attr($s['color']); ?>;height:100%;width:<?php echo round(($val/9)*100); ?>%;border-radius:4px;"></div>
+                        <td>
+                            <div class="psy-report-bar <?php echo esc_attr( $story_tone ); ?>">
+                                <div class="psy-report-bar__fill <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( round(($val/9)*100) ) ); ?>"></div>
                             </div>
                         </td>
                     </tr>
-                    <?php $row_i++; endforeach; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
 
         <?php // ── پاورقی ────────────────────────────────────────────────────────── ?>
-        <div style="background:#edf2f7;border-radius:10px;padding:16px 20px;margin-bottom:20px;font-size:13px;color:#4a5568;">
-            <strong>📖 درباره آزمون قصه‌های عشق (نسخه کامل ۲۵ قصه):</strong><br>
+        <div class="psy-report-infobox">
+            <strong class="psy-report-bold">📖 درباره آزمون قصه‌های عشق (نسخه کامل ۲۵ قصه):</strong><br>
             استرنبرگ (۱۹۹۸) معتقد است هر کس یک «قصه ذهنی» از رابطه ایده‌آل دارد که از دوران کودکی شکل گرفته. این قصه تعیین می‌کند که چه نوع رابطه‌ای را جذاب یا دلسردکننده می‌یابیم. تطابق قصه‌های دو طرف رابطه، یکی از مهم‌ترین عوامل رضایت زناشویی است.
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منبع:</b> Sternberg, R.J. (1998). Love is a Story. Oxford University Press. | Sternberg (1996). Personal Relationships, 3(1), 59–79.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+        <div class="psy-report-refs psy-report-refs--muted">
+            <b>منبع:</b> Sternberg, R.J. (1998). Love is a Story. Oxford University Press. | Sternberg (1996). Personal Relationships, 3(1), 59–79.<br>
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
