@@ -179,10 +179,13 @@ class DAS extends \PsychAssessments\Core\BaseTest {
             $chart_colors[] = $def['color'];
         }
 
+        // فاز ۱۴.۴: رنگ‌ها با کلاس تُن، نه استایل درون‌خطی
+        $total_tone = \PsychAssessments\Core\ReportHTML::tone( $total_sev['color'] );
+
         ob_start();
         ?>
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',       $session->client_phone ?? $session->patient_phone ?? '---'],
@@ -198,65 +201,63 @@ class DAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمره کل -->
-        <div style="background:<?php echo esc_attr($total_sev['bg']); ?>;border:2px solid <?php echo esc_attr($total_sev['color']); ?>;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $total_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($total_sev['color']); ?>;font-size:17px;">
+                    <h3 class="psy-report-hero__title">
                         📊 نمره کل سازگاری زوجین: <?php echo esc_html($total); ?> از <?php echo esc_html((int)$max_total); ?>
                     </h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($total_sev['clinical']); ?></p>
+                    <p class="psy-report-hero__text"><?php echo esc_html($total_sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $total_sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:4px;height:12px;overflow:hidden;">
-                <div style="background:<?php echo esc_attr($total_sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total, 0, $max_total); ?>%;border-radius:4px;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
+            <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( \PsychAssessments\Core\Scoring::percent($total, 0, $max_total), $total_sev['color'], true ); ?>
+            <div class="psy-report-scale">
                 <span>0 (ناسازگاری شدید)</span>
-                <span style="color:<?php echo esc_attr($total_sev['color']); ?>;font-weight:bold;">cut-off: 100</span>
+                <span class="psy-report-scale__mark psy-text">cut-off: 100</span>
                 <span><?php echo esc_html((int)$max_total); ?> (سازگاری کامل)</span>
             </div>
         </div>
 
         <!-- نمودار + زیرمقیاس‌ها -->
-        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-bottom:30px;">
-            <div style="flex:1;min-width:280px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
-                <h3 style="margin-top:0;text-align:center;color:#2d3748;font-size:15px;">نمودار ۴ زیرمقیاس DAS</h3>
-                <canvas id="pa-bar-chart" style="max-height:280px;"></canvas>
+        <div class="psy-report-row psy-report-row--loose">
+            <div class="psy-report-card psy-report-card--panel psy-report-col">
+                <h3 class="psy-report-panel__title">نمودار ۴ زیرمقیاس DAS</h3>
+                <canvas id="pa-bar-chart" class="psy-report-chart psy-report-chart--bar"></canvas>
             </div>
-            <div style="flex:1.2;min-width:300px;">
-                <h3 style="margin-top:0;font-size:15px;">زیرمقیاس‌ها</h3>
+            <div class="psy-report-col psy-report-col--wide">
+                <h3 class="psy-report-panel__title">زیرمقیاس‌ها</h3>
                 <?php foreach ($subscales as $key => $def):
                     $raw  = $sub_scores[$key];
                     $pct  = round($raw / $def['max_raw'] * 100);
                     $sev  = $this->get_sub_severity($raw, $def['max_raw'], $key);
+                    $def_tone = \PsychAssessments\Core\ReportHTML::tone( $def['color'] );
+                    $sev_tone = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
                 ?>
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:10px;border-right:4px solid <?php echo esc_attr($def['color']); ?>;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div class="psy-report-item <?php echo esc_attr( $def_tone ); ?>">
+                    <div class="psy-clinical__head">
                         <div>
-                            <span style="font-size:14px;font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;"><?php echo esc_html($def['label']); ?></span>
-                            <span style="font-size:10px;color:#a0aec0;margin-right:6px;"><?php echo esc_html($def['label_en']); ?></span>
+                            <span class="psy-report-item__name"><?php echo esc_html($def['label']); ?></span>
+                            <span class="psy-report-item__en"><?php echo esc_html($def['label_en']); ?></span>
                         </div>
-                        <span style="font-size:13px;font-weight:bold;color:<?php echo esc_attr($sev['color']); ?>;"><?php echo $raw . '/' . $def['max_raw']; ?> (<?php echo $pct; ?>%)</span>
+                        <span class="psy-report-item__score psy-text <?php echo esc_attr( $sev_tone ); ?>"><?php echo $raw . '/' . $def['max_raw']; ?> (<?php echo $pct; ?>%)</span>
                     </div>
-                    <div style="margin-top:8px;background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                        <div style="background:<?php echo esc_attr($def['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:4px;"></div>
-                    </div>
-                    <div style="margin-top:6px;font-size:11px;color:<?php echo esc_attr($sev['color']); ?>;">💡 <?php echo esc_html($sev['clinical']); ?></div>
+                    <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, $def['color'] ); ?>
+                    <div class="psy-report-item__note psy-text <?php echo esc_attr( $sev_tone ); ?>">💡 <?php echo esc_html($sev['clinical']); ?></div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:30px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر علمی</h3>
-            <p style="font-size:12px;color:#718096;margin-top:0;">Spanier (1976) | Panaghi et al. (2010)</p>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره کل</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">وضعیت</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">توصیه</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر علمی</h3>
+            <p class="psy-report-caption psy-report-desc">Spanier (1976) | Panaghi et al. (2010)</p>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">نمره کل</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">وضعیت</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">توصیه</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -265,11 +266,12 @@ class DAS extends \PsychAssessments\Core\BaseTest {
                     ['86–99',   'مرزی',            '#c05621', 'ارزیابی دقیق‌تر — پیشگیری'],
                     ['100–114', 'سازگار',          '#276749', 'رابطه نسبتاً سالم'],
                     ['≥ 115',   'سازگاری بالا',   '#22543d', 'سطح بالای سازگاری زناشویی'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:<?php echo esc_attr($r[2]); ?>;font-weight:bold;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -277,13 +279,13 @@ class DAS extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- منابع -->
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
             Spanier, G.B. (1976). <i>Journal of Marriage and the Family, 38</i>(1), 15–28.<br>
-            Sharpley, C.F. & Cross, D.G. (1982). <i>Journal of Marriage and the Family, 44</i>(3), 739–747.<br>
+            Sharpley, C.F. &amp; Cross, D.G. (1982). <i>Journal of Marriage and the Family, 44</i>(3), 739–747.<br>
             Panaghi, L. et al. (2010). Psychometric properties of DAS — Iranian sample.<br>
             <br>
-            <b style="color:#c53030;">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> این گزارش ابزار کمک‌بالینی است و به تنهایی مبنای تشخیص رسمی نیست.
         </div>
 
         <script>

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.8.1 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۲): مهاجرت دستهٔ اول آزمون‌ها
+- `tests/PHQ9GAD7.php` (PHQ-9 و GAD-7)، `tests/BDI.php` و `tests/DAS.php` کامل به کلاس‌های گزارش مهاجرت کردند؛ هر چهار گزارش الان **صفر** استایل درون‌خطی دارند (قبلاً ۴۱/۳۳/۵۵/۷۳ در خروجی رندر).
+- کلاس‌های تازه در `frontend.css`: `psy-report-alert*` (هشدار سوال ۹)، `psy-report-hero__*`، `psy-report-scale*`، `psy-report-progress--gradient`، `psy-report-chart-panel`، `psy-report-subcard*` (زیرمقیاس BDI-II)، `psy-report-item*` (زیرمقیاس DAS)، `psy-report-table__head--strong`، `psy-report-cell--soft`.
+- هشدار خودکشی در BDI-II با تُن `danger`/`warning` (بسته به نمرهٔ سوال ۹) و بدون جابه‌جایی متن‌ها.
+- هیچ تغییر در نمره‌گذاری، cut-off، ماتریس تفسیر، داده‌های نمودار یا اسکریپت Chart.js؛ نسخهٔ آزمون‌ها بامپ نشد.
+- شمارش استایل درون‌خطی افزونه: ۹۵۶ → ۸۵۲ (۴۳ فایل آزمون دیگر باقی است).
+- `PSY_VERSION` از 3.8.0 به 3.8.1.
+
 ## 3.8.0 — فاز ۱۴ / گام ۱۴.۴ (مرحلهٔ ۱): حذف استایل درون‌خطی گزارش‌ها
 - `assets/css/frontend.css`: بخش «گزارش آزمون» افزوده شد — `psy-report-card*`, `psy-report-row*`, `psy-score-badge`, `psy-report-progress*`, `psy-report-panel*`, `psy-report-table*`, `psy-clinical*`, `psy-report-note`, `psy-report-refs` و کلاس‌های تُن `psy-tone--success|warning|accent|danger|info|purple|neutral`؛ رنگ‌های بالینی از `--psy-c`/`--psy-bg` خوانده می‌شوند.
 - عرض نوار پیشرفت با کلاس `.psy-w--0 … .psy-w--100` (گام ۵٪) اعمال می‌شود تا مارک‌آپ گزارش هیچ `style="width:…"` نداشته باشد و در PDF (بدون JS) هم درست رندر شود.

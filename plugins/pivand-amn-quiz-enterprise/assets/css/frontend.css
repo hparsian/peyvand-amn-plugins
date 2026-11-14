@@ -885,3 +885,87 @@ body.psy-exam-standalone-body {
 .psy-report-table__head { background: #f7fafc; font-weight: 700; color: #4a5568; }
 .psy-report-table__cell--start { text-align: start; }
 .psy-report-card--stack { margin-block-end: 16px; }
+
+/* هشدار بالینی (PHQ-9 سوال ۹، BDI-II سوال ۹) */
+.psy-report-alert {
+    background: var(--psy-bg, #fff5f5);
+    border: 2px solid var(--psy-c, #9b2c2c);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-block-end: 20px;
+}
+.psy-report-alert__title { margin: 0 0 6px; font-size: 16px; color: var(--psy-c, #9b2c2c); }
+.psy-report-alert__text { margin: 0; font-size: 13px; color: #742a2a; line-height: 1.8; }
+
+/* بلوک نمرهٔ کل */
+.psy-report-hero__title { margin: 0 0 6px; font-size: 17px; color: var(--psy-c, var(--psy-text)); }
+.psy-report-hero__text { margin: 0; font-size: 13px; color: #4a5568; }
+
+/* خط‌کش مقیاس زیر نوار پیشرفت */
+.psy-report-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #a0aec0;
+    margin-block-start: 4px;
+}
+.psy-report-scale__mark { color: var(--psy-c, #718096); font-weight: 700; }
+
+/* نوار پیشرفت با زمینهٔ گرادیان (BDI-II) */
+.psy-report-progress--gradient {
+    position: relative;
+    block-size: 14px;
+    border-radius: 6px;
+    margin-block-start: 14px;
+}
+.psy-report-progress--gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #276749, #d69e2e, #c05621, #9b2c2c);
+    opacity: .2;
+}
+.psy-report-progress--gradient .psy-report-progress__bar {
+    position: relative;
+    z-index: 1;
+    border-radius: 6px;
+}
+
+/* پنل نمودار */
+.psy-report-chart-panel { margin-block-end: 24px; }
+.psy-report-chart--tall { max-height: 300px; }
+.psy-report-chart--bar { max-height: 280px; }
+
+/* کارت زیرمقیاس (BDI-II) */
+.psy-report-row--tight { gap: 16px; }
+.psy-report-subcard {
+    flex: 1 1 220px;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    border-block-start: 4px solid var(--psy-c, #718096);
+}
+.psy-report-subcard__label { font-size: 13px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-subcard__en { font-size: 11px; color: #a0aec0; margin-block-end: 10px; }
+.psy-report-subcard__value { font-size: 28px; font-weight: 900; color: var(--psy-c, var(--psy-text)); }
+.psy-report-subcard__max { font-size: 14px; color: #718096; }
+
+/* ردیف زیرمقیاس فشرده (DAS) */
+.psy-report-item {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-block-end: 10px;
+    border-inline-start: 4px solid var(--psy-c, #718096);
+}
+.psy-report-item__name { font-size: 14px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-item__en { font-size: 10px; color: #a0aec0; margin-inline-start: 6px; }
+.psy-report-item__score { font-size: 13px; font-weight: 700; }
+.psy-report-item__note { margin-block-start: 6px; font-size: 11px; color: var(--psy-c, var(--psy-text-soft)); }
+
+.psy-report-table__head--strong { background: #edf2f7; }
+.psy-report-cell--soft { color: #718096; font-size: 11px; }

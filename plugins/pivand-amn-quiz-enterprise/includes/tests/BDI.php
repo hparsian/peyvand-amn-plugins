@@ -136,6 +136,10 @@ class BDI extends \PsychAssessments\Core\BaseTest {
                 : (array) $session->answers;
         }
 
+        // فاز ۱۴.۴: تُنِ هشدار و نمره با کلاس، نه استایل درون‌خطی
+        $alert_tone = \PsychAssessments\Core\ReportHTML::tone( $suicide_item >= 2 ? '#9b2c2c' : '#f6ad55' );
+        $sev_tone   = \PsychAssessments\Core\ReportHTML::tone( $sev['color'] );
+
         ob_start();
         ?>
         <!-- هشدار خودکشی -->
@@ -144,9 +148,9 @@ class BDI extends \PsychAssessments\Core\BaseTest {
         // از نظر بالینی حتی نمره ۱ نیاز به پیگیری دارد. threshold از ≥2 به ≥1 تغییر یافت.
         ?>
         <?php if ($suicide_item >= 1): ?>
-        <div style="background:#fff5f5;border:2px solid <?php echo esc_attr($suicide_item >= 2 ? '#9b2c2c' : '#f6ad55'); ?>;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
-            <h3 style="margin:0 0 8px;color:#9b2c2c;font-size:16px;"><?php echo $suicide_item >= 2 ? '🚨' : '⚠️'; ?> هشدار بالینی — افکار خودآسیبی</h3>
-            <p style="margin:0;font-size:13px;color:#742a2a;line-height:1.8;">
+        <div class="psy-report-alert <?php echo esc_attr( $alert_tone ); ?>">
+            <h3 class="psy-report-alert__title"><?php echo $suicide_item >= 2 ? '🚨' : '⚠️'; ?> هشدار بالینی — افکار خودآسیبی</h3>
+            <p class="psy-report-alert__text">
                 مراجع در سوال ۹ (افکار خودکشی) نمره <b><?php echo esc_html((int)$suicide_item); ?> از ۳</b> گزارش داده است.
                 <?php if ($suicide_item === 1): ?>
                 افکار آسیب به خود گزارش شده اما قصد اجرا ذکر نشده — پیگیری و بررسی در اولین جلسه ضروری است.
@@ -158,7 +162,7 @@ class BDI extends \PsychAssessments\Core\BaseTest {
         <?php endif; ?>
 
         <!-- خلاصه -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row">
             <?php
             $cards = [
                 ['#ebf8ff','#2b6cb0','📞','شماره تماس',   $session->client_phone ?? $session->patient_phone ?? '---'],
@@ -171,57 +175,53 @@ class BDI extends \PsychAssessments\Core\BaseTest {
         </div>
 
         <!-- نمره کل -->
-        <div style="background:<?php echo esc_attr($sev['bg']); ?>;border:2px solid <?php echo esc_attr($sev['color']); ?>;border-radius:10px;padding:22px;margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="psy-report-card--tint <?php echo esc_attr( $sev_tone ); ?>">
+            <div class="psy-clinical__head">
                 <div>
-                    <h3 style="margin:0 0 6px;color:<?php echo esc_attr($sev['color']); ?>;font-size:18px;">
-                        📊 نمره کل: <?php echo esc_html((int)$total); ?> از ۶۳
-                    </h3>
-                    <p style="margin:0;font-size:13px;color:#4a5568;"><?php echo esc_html($sev['clinical']); ?></p>
+                    <h3 class="psy-report-hero__title">📊 نمره کل: <?php echo esc_html((int)$total); ?> از ۶۳</h3>
+                    <p class="psy-report-hero__text"><?php echo esc_html($sev['clinical']); ?></p>
                 </div>
                 <?php echo \PsychAssessments\Core\ReportHTML::score_badge((float)$total, $sev); ?>
             </div>
-            <div style="margin-top:14px;background:#edf2f7;border-radius:6px;height:14px;overflow:hidden;position:relative;">
-                <div style="background:linear-gradient(90deg,#276749,#d69e2e,#c05621,#9b2c2c);height:100%;width:100%;opacity:0.2;position:absolute;"></div>
-                <div style="background:<?php echo esc_attr($sev['color']); ?>;height:100%;width:<?php echo \PsychAssessments\Core\Scoring::percent($total,0,63); ?>%;border-radius:6px;position:relative;z-index:1;"></div>
+            <div class="psy-report-progress psy-report-progress--gradient <?php echo esc_attr( $sev_tone ); ?>">
+                <div class="psy-report-progress__bar <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::pct_class( \PsychAssessments\Core\Scoring::percent($total,0,63) ) ); ?>"></div>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#a0aec0;margin-top:4px;">
-                <span>0 حداقل</span><span style="color:#d69e2e;">14 خفیف</span><span style="color:#c05621;">20 متوسط</span><span style="color:#9b2c2c;">29 شدید</span><span>63</span>
+            <div class="psy-report-scale">
+                <span>0 حداقل</span><span class="psy-report-scale__mark psy-tone--warning psy-text">14 خفیف</span><span class="psy-report-scale__mark psy-tone--accent psy-text">20 متوسط</span><span class="psy-report-scale__mark psy-tone--danger psy-text">29 شدید</span><span>63</span>
             </div>
         </div>
 
         <!-- زیرمقیاس‌ها -->
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+        <div class="psy-report-row psy-report-row--tight">
             <?php foreach ($subscales as $key => $def):
                 $s = $sub_scores[$key];
                 $max = count($def['questions']) * 3;
                 $pct = round($s / $max * 100);
+                $def_tone = \PsychAssessments\Core\ReportHTML::tone( $def['color'] );
             ?>
-            <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;border-top:4px solid <?php echo esc_attr($def['color']); ?>;">
-                <div style="font-weight:bold;color:<?php echo esc_attr($def['color']); ?>;font-size:13px;"><?php echo esc_html($def['label']); ?></div>
-                <div style="font-size:11px;color:#a0aec0;margin-bottom:10px;"><?php echo esc_html($def['label_en']); ?></div>
-                <div style="font-size:28px;font-weight:900;color:<?php echo esc_attr($def['color']); ?>;"><?php echo $s; ?><span style="font-size:14px;color:#718096;">/ <?php echo $max; ?></span></div>
-                <div style="margin-top:8px;background:#edf2f7;border-radius:4px;height:8px;overflow:hidden;">
-                    <div style="background:<?php echo esc_attr($def['color']); ?>;height:100%;width:<?php echo $pct; ?>%;border-radius:4px;"></div>
-                </div>
+            <div class="psy-report-subcard <?php echo esc_attr( $def_tone ); ?>">
+                <div class="psy-report-subcard__label"><?php echo esc_html($def['label']); ?></div>
+                <div class="psy-report-subcard__en"><?php echo esc_html($def['label_en']); ?></div>
+                <div class="psy-report-subcard__value"><?php echo $s; ?><span class="psy-report-subcard__max">/ <?php echo $max; ?></span></div>
+                <?php echo \PsychAssessments\Core\ReportHTML::progress_bar( (float) $pct, $def['color'] ); ?>
             </div>
             <?php endforeach; ?>
         </div>
 
         <!-- نمودار -->
-        <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:24px;">
-            <h3 style="margin-top:0;text-align:center;font-size:15px;">نمودار پروفایل BDI-II</h3>
-            <canvas id="pa-bdi-chart" style="max-height:300px;"></canvas>
+        <div class="psy-report-card psy-report-card--panel psy-report-chart-panel">
+            <h3 class="psy-report-panel__title">نمودار پروفایل BDI-II</h3>
+            <canvas id="pa-bdi-chart" class="psy-report-chart psy-report-chart--tall"></canvas>
         </div>
 
         <!-- راهنمای تفسیر -->
-        <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:24px;">
-            <h3 style="margin-top:0;font-size:15px;">📚 راهنمای تفسیر (Beck et al., 1996)</h3>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:#edf2f7;">
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">نمره</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">سطح</th>
-                    <th style="text-align:right;padding:8px;border:1px solid #e2e8f0;">توصیه بالینی</th>
+        <div class="psy-report-panel psy-report-panel--soft">
+            <h3 class="psy-report-panel__title">📚 راهنمای تفسیر (Beck et al., 1996)</h3>
+            <table class="psy-report-table">
+                <thead><tr>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">نمره</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">سطح</th>
+                    <th class="psy-report-table__head psy-report-table__head--strong psy-report-table__cell--start">توصیه بالینی</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ([
@@ -229,22 +229,23 @@ class BDI extends \PsychAssessments\Core\BaseTest {
                     ['14–19', 'خفیف',  '#d69e2e', 'مشاوره روان‌شناختی مفید است'],
                     ['20–28', 'متوسط', '#c05621', 'روان‌درمانی (CBT/دارودرمانی) لازم است'],
                     ['29–63', 'شدید',  '#9b2c2c', 'ارزیابی فوری — روان‌پزشکی ضروری'],
-                ] as $r): ?>
+                ] as $r):
+                    $r_tone = \PsychAssessments\Core\ReportHTML::tone( $r[2] ); ?>
                 <tr>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[0]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;font-weight:bold;color:<?php echo esc_attr($r[2]); ?>;"><?php echo esc_html($r[1]); ?></td>
-                    <td style="padding:7px 8px;border:1px solid #e2e8f0;color:#4a5568;"><?php echo esc_html($r[3]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[0]); ?></td>
+                    <td class="psy-report-table__cell <?php echo esc_attr( $r_tone ); ?> psy-text psy-report-bold"><?php echo esc_html($r[1]); ?></td>
+                    <td class="psy-report-table__cell psy-report-muted"><?php echo esc_html($r[3]); ?></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
 
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;font-size:11px;color:#a0aec0;line-height:1.8;">
-            <b style="color:#4a5568;">منابع:</b><br>
-            Beck, A.T., Steer, R.A., & Brown, G.K. (1996). <i>Manual for the BDI-II.</i> Psychological Corporation.<br>
+        <div class="psy-report-refs">
+            <b>منابع:</b><br>
+            Beck, A.T., Steer, R.A., &amp; Brown, G.K. (1996). <i>Manual for the BDI-II.</i> Psychological Corporation.<br>
             Ghassemzadeh, H. et al. (2005). <i>Psychological Reports, 96</i>(1), 143–150.<br>
-            <b style="color:#c53030;">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
+            <b class="psy-tone--danger psy-text">⚠️</b> ابزار کمک‌بالینی — مبنای تشخیص رسمی نیست.
         </div>
 
         <script>
