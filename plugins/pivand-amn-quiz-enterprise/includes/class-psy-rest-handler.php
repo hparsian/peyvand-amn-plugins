@@ -356,8 +356,8 @@ class Psy_Quiz_Rest_Handler {
             $text  = is_array( $q ) ? ( $q['text'] ?? $q['q'] ?? "سوال $qid" ) : $q;
             $val   = $answers[ $qid ] ?? '—';
             $answers_rows .= sprintf(
-                '<tr><td style="padding:5px 10px;border:1px solid #e2e8f0;color:#4a5568;">%s</td>'
-                . '<td style="padding:5px 10px;border:1px solid #e2e8f0;text-align:center;font-weight:bold;color:#2b6cb0;">%s</td></tr>',
+                '<tr><td class="psy-mail-td">%s</td>'
+                . '<td class="psy-mail-td--score">%s</td></tr>',
                 esc_html( $text ),
                 esc_html( (string) $val )
             );
@@ -372,8 +372,8 @@ class Psy_Quiz_Rest_Handler {
                 $display = (string) $value;
             }
             $result_rows .= sprintf(
-                '<tr><td style="padding:5px 10px;border:1px solid #e2e8f0;color:#4a5568;font-weight:bold;">%s</td>'
-                . '<td style="padding:5px 10px;border:1px solid #e2e8f0;color:#2d3748;">%s</td></tr>',
+                '<tr><td class="psy-mail-td psy-mail-td--bold">%s</td>'
+                . '<td class="psy-mail-td--value">%s</td></tr>',
                 esc_html( $key ),
                 esc_html( $display )
             );
@@ -383,57 +383,83 @@ class Psy_Quiz_Rest_Handler {
         $html = <<<HTML
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
-<head><meta charset="UTF-8"><title>گزارش آزمون</title></head>
-<body style="font-family:Tahoma,Arial,sans-serif;direction:rtl;background:#f7fafc;margin:0;padding:20px;">
-  <div style="max-width:700px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+<head><meta charset="UTF-8"><title>گزارش آزمون</title>
+<style>
+    .psy-mail-body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #f7fafc; margin: 0; padding: 20px; }
+    .psy-mail-wrap { max-width: 700px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .psy-mail-head { background: linear-gradient(135deg, #2b6cb0, #553c9a); padding: 20px 24px; color: #fff; }
+    .psy-mail-title { font-size: 18px; font-weight: bold; }
+    .psy-mail-sub { font-size: 13px; margin-top: 6px; opacity: .85; }
+    .psy-mail-meta { padding: 16px 24px; background: #edf2f7; border-bottom: 1px solid #e2e8f0; }
+    .psy-mail-meta table { width: 100%; border-collapse: collapse; }
+    .psy-mail-label { padding: 4px 8px; font-size: 13px; color: #4a5568; }
+    .psy-mail-value { padding: 4px 8px; font-size: 13px; color: #2d3748; }
+    .psy-mail-value--bold { padding: 4px 8px; font-size: 13px; font-weight: bold; color: #2d3748; }
+    .psy-mail-content { padding: 20px 24px; }
+    .psy-mail-h3 { font-size: 14px; color: #2b6cb0; border-bottom: 2px solid #bee3f8; padding-bottom: 6px; margin-bottom: 12px; }
+    .psy-mail-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 12px; }
+    .psy-mail-table--answers { font-size: 11px; margin-bottom: 0; }
+    .psy-mail-th { padding: 7px 10px; border: 1px solid #e2e8f0; text-align: right; }
+    .psy-mail-th--score { padding: 7px 10px; border: 1px solid #e2e8f0; width: 60px; text-align: center; }
+    .psy-mail-td { padding: 5px 10px; border: 1px solid #e2e8f0; color: #4a5568; }
+    .psy-mail-td--bold { font-weight: bold; }
+    .psy-mail-td--score { padding: 5px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #2b6cb0; }
+    .psy-mail-td--value { padding: 5px 10px; border: 1px solid #e2e8f0; color: #2d3748; }
+    .psy-mail-cta { margin-top: 20px; text-align: center; }
+    .psy-mail-btn { display: inline-block; padding: 10px 24px; background: #2b6cb0; color: #fff; border-radius: 6px; text-decoration: none; font-size: 13px; }
+    .psy-mail-foot { padding: 12px 24px; background: #f7fafc; border-top: 1px solid #e2e8f0; font-size: 10px; color: #a0aec0; text-align: center; }
+</style>
+</head>
+<body class="psy-mail-body">
+  <div class="psy-mail-wrap">
 
     <!-- هدر -->
-    <div style="background:linear-gradient(135deg,#2b6cb0,#553c9a);padding:20px 24px;color:#fff;">
-      <div style="font-size:18px;font-weight:bold;">📊 گزارش آزمون — {$quiz_name}</div>
-      <div style="font-size:13px;margin-top:6px;opacity:.85;">{$site_name}</div>
+    <div class="psy-mail-head">
+      <div class="psy-mail-title">📊 گزارش آزمون — {$quiz_name}</div>
+      <div class="psy-mail-sub">{$site_name}</div>
     </div>
 
     <!-- اطلاعات مراجع -->
-    <div style="padding:16px 24px;background:#edf2f7;border-bottom:1px solid #e2e8f0;">
-      <table style="width:100%;border-collapse:collapse;">
+    <div class="psy-mail-meta">
+      <table>
         <tr>
-          <td style="padding:4px 8px;font-size:13px;color:#4a5568;">👤 نام مراجع:</td>
-          <td style="padding:4px 8px;font-size:13px;font-weight:bold;color:#2d3748;">{$client_name}</td>
-          <td style="padding:4px 8px;font-size:13px;color:#4a5568;">📅 تاریخ تکمیل:</td>
-          <td style="padding:4px 8px;font-size:13px;color:#2d3748;">{$jalali}</td>
+          <td class="psy-mail-label">👤 نام مراجع:</td>
+          <td class="psy-mail-value--bold">{$client_name}</td>
+          <td class="psy-mail-label">📅 تاریخ تکمیل:</td>
+          <td class="psy-mail-value">{$jalali}</td>
         </tr>
       </table>
     </div>
 
-    <div style="padding:20px 24px;">
+    <div class="psy-mail-content">
 
       <!-- نتایج و تحلیل -->
-      <h3 style="font-size:14px;color:#2b6cb0;border-bottom:2px solid #bee3f8;padding-bottom:6px;margin-bottom:12px;">📈 نتایج و تحلیل</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:12px;">
+      <h3 class="psy-mail-h3">📈 نتایج و تحلیل</h3>
+      <table class="psy-mail-table">
         <thead>
-          <tr style="background:#ebf8ff;">
-            <th style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right;">شاخص</th>
-            <th style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right;">مقدار</th>
+          <tr>
+            <th class="psy-mail-th">شاخص</th>
+            <th class="psy-mail-th">مقدار</th>
           </tr>
         </thead>
         <tbody>{$result_rows}</tbody>
       </table>
 
       <!-- جدول پاسخ‌ها -->
-      <h3 style="font-size:14px;color:#2b6cb0;border-bottom:2px solid #bee3f8;padding-bottom:6px;margin-bottom:12px;">📋 پاسخ‌های مراجع</h3>
-      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <h3 class="psy-mail-h3">📋 پاسخ‌های مراجع</h3>
+      <table class="psy-mail-table psy-mail-table--answers">
         <thead>
-          <tr style="background:#ebf8ff;">
-            <th style="padding:7px 10px;border:1px solid #e2e8f0;text-align:right;">سوال</th>
-            <th style="padding:7px 10px;border:1px solid #e2e8f0;width:60px;">پاسخ</th>
+          <tr>
+            <th class="psy-mail-th">سوال</th>
+            <th class="psy-mail-th--score">پاسخ</th>
           </tr>
         </thead>
         <tbody>{$answers_rows}</tbody>
       </table>
 
       <!-- لینک گزارش کامل -->
-      <div style="margin-top:20px;text-align:center;">
-        <a href="{$report_url}" style="display:inline-block;padding:10px 24px;background:#2b6cb0;color:#fff;border-radius:6px;text-decoration:none;font-size:13px;">
+      <div class="psy-mail-cta">
+        <a href="{$report_url}" class="psy-mail-btn">
           مشاهده گزارش کامل در پنل ←
         </a>
       </div>
@@ -441,7 +467,7 @@ class Psy_Quiz_Rest_Handler {
     </div>
 
     <!-- فوتر -->
-    <div style="padding:12px 24px;background:#f7fafc;border-top:1px solid #e2e8f0;font-size:10px;color:#a0aec0;text-align:center;">
+    <div class="psy-mail-foot">
       این ایمیل به صورت خودکار توسط {$site_name} ارسال شده است. این گزارش صرفاً جنبه کمک‌تشخیصی دارد.
     </div>
 

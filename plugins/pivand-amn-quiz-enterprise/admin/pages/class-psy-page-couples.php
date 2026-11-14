@@ -447,7 +447,7 @@ class Psy_Page_Couples {
                         ?>
                         <tr>
                             <td>
-                                <span class="psy-story-dot" style="background:<?php echo esc_attr($sl['color']); ?>;"></span>
+                                <span class="psy-story-dot <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sl['color'] ) ); ?>"></span>
                                 <strong><?php echo esc_html($sl['label']); ?></strong>
                                 <?php if ($is_top1): ?><span class="psy-top-badge psy-person-1-bg">غالب ۱</span><?php endif; ?>
                                 <?php if ($is_top2): ?><span class="psy-top-badge psy-person-2-bg">غالب ۲</span><?php endif; ?>
@@ -458,10 +458,10 @@ class Psy_Page_Couples {
                             <td>
                                 <div class="psy-compare-bar-row">
                                     <div class="psy-compare-bar-track psy-person-1-bg">
-                                        <div class="psy-compare-bar-fill psy-person-1-solid" style="width:<?php echo round(($s1/9)*100); ?>%;"></div>
+                                        <div class="psy-compare-bar-fill psy-person-1-solid psy-w--<?php echo (int) ( round( round(($s1/9)*100) / 5 ) * 5 ); ?>"></div>
                                     </div>
                                     <div class="psy-compare-bar-track psy-person-2-bg">
-                                        <div class="psy-compare-bar-fill psy-person-2-solid" style="width:<?php echo round(($s2/9)*100); ?>%;"></div>
+                                        <div class="psy-compare-bar-fill psy-person-2-solid psy-w--<?php echo (int) ( round( round(($s2/9)*100) / 5 ) * 5 ); ?>"></div>
                                     </div>
                                 </div>
                             </td>

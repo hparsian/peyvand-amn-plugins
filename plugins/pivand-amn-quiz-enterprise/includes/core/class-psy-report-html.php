@@ -6,7 +6,7 @@ class ReportHTML {
 
     /**
      * نقشهٔ رنگ‌های بالینی → تُن.
-     * فاز ۱۴.۴: به‌جای `style="background:#…"` رنگ‌ها با کلاس `psy-tone--*` اعمال می‌شوند
+     * فاز ۱۴.۴: به‌جای استایل درون‌خطیِ رنگ، کلاس `psy-tone--*` اعمال می‌شود
      * (تعریف کلاس‌ها در assets/css/frontend.css). رنگ ناشناخته → neutral.
      */
     private const TONE_BY_HEX = [
@@ -38,6 +38,12 @@ class ReportHTML {
         '#718096' => 'neutral', '#a0aec0' => 'neutral', '#4a5568' => 'neutral',
         '#2d3748' => 'neutral', '#edf2f7' => 'neutral', '#f7fafc' => 'neutral',
         '#e2e8f0' => 'neutral', '#a0856c' => 'neutral',
+        // پالت ادمین (bootstrap-like) → تُن
+        '#28a745' => 'success', '#d4edda' => 'success',
+        '#856404' => 'warning', '#fff3cd' => 'warning',
+        '#721c24' => 'danger',  '#f8d7da' => 'danger',
+        '#0056b3' => 'info',    '#cce5ff' => 'info',
+        '#495057' => 'neutral', '#f8f9fa' => 'neutral',
         // فیروزه‌ای / سبزآبی
         '#2c7a7b' => 'info',    '#68b0a9' => 'info',
         '#e9b14c' => 'warning',
@@ -54,7 +60,7 @@ class ReportHTML {
 
     /**
      * کلاس عرض نوار پیشرفت (۰ تا ۱۰۰ در گام‌های ۵٪).
-     * جایگزین `style="width:X%"` تا مارک‌آپ گزارش هیچ استایل درون‌خطی نداشته باشد.
+     * جایگزین عرض درون‌خطیِ نوار تا مارک‌آپ گزارش هیچ استایل درون‌خطی نداشته باشد.
      */
     public static function pct_class( float $pct ): string {
         $step = (int) ( round( min( 100, max( 0, $pct ) ) / 5 ) * 5 );

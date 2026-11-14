@@ -387,15 +387,15 @@ class Psy_Page_Progress {
             ];
         }
 
-        echo '<details class="psy-panel psy-panel-pad"><summary style="cursor:pointer;font-weight:700;font-size:14px;">';
+        echo '<details class="psy-panel psy-panel-pad"><summary class="psy-details-summary">';
         echo '📋 جزئیات پاسخ به سوالات (' . (int) $changed_count . ' از ' . count( $question_rows ) . ' سوال تغییر کرده)';
         echo '</summary>';
         echo '<table class="psy-compare-table psy-mt-16"><thead><tr>';
         echo '<th class="psy-col-right">سوال</th><th class="psy-col-center psy-col-160 psy-person-1-text">نوبت اول</th><th class="psy-col-center psy-col-160 psy-person-2-text">نوبت دوم</th>';
         echo '</tr></thead><tbody>';
         foreach ( $question_rows as $row ) {
-            $row_style = $row['changed'] ? ' style="background:var(--psy-amber-bg);"' : '';
-            echo '<tr' . $row_style . '>';
+            $row_class = $row['changed'] ? 'psy-row-changed' : '';
+            echo '<tr' . ( $row_class ? ' class="' . esc_attr( $row_class ) . '"' : '' ) . '>';
             echo '<td>' . esc_html( $row['qid'] . '. ' . $row['text'] ) . '</td>';
             echo '<td class="psy-col-center">' . esc_html( $row['l1'] ) . '</td>';
             echo '<td class="psy-col-center">' . esc_html( $row['l2'] ) . '</td>';

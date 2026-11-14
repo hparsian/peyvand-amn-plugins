@@ -227,7 +227,7 @@ class Psy_Debug_Tracker {
                 ];
                 foreach ( $stat_items as [ $icon, $label, $count, $color, $bg ] ):
                 ?>
-                <div class="psy-mini-stat" style="--stat-color:<?php echo esc_attr($color); ?>; --stat-bg:<?php echo esc_attr($bg); ?>;">
+                <div class="psy-mini-stat <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $color ) ); ?>">
                     <div class="psy-mini-stat-val"><?php echo (int)$count; ?></div>
                     <div class="psy-mini-stat-lbl"><?php echo $icon . ' ' . esc_html($label); ?></div>
                 </div>
@@ -238,7 +238,8 @@ class Psy_Debug_Tracker {
                 <div class="psy-progress-panel">
                     <div class="psy-progress-caption">پیشرفت دیباگ</div>
                     <div class="psy-progress-track">
-                        <div class="psy-progress-fill" style="width:<?php echo round($counts[self::STATUS_CLEAN]/$total*100); ?>%;"></div>
+                        <?php $clean_pct = (int) round( $counts[ self::STATUS_CLEAN ] / $total * 100 ); ?>
+                        <div class="psy-progress-fill psy-w--<?php echo (int) ( round( $clean_pct / 5 ) * 5 ); ?>"></div>
                     </div>
                     <div class="psy-progress-lbl">
                         <?php echo round($counts[self::STATUS_CLEAN]/$total*100); ?>% کامل
@@ -256,7 +257,7 @@ class Psy_Debug_Tracker {
                 </button>
             </form>
 
-            <div class="psy-grid-side" style="grid-template-columns:<?php echo $edit_file ? '1fr 380px' : '1fr'; ?>;">
+            <div class="psy-grid-side <?php echo $edit_file ? 'psy-grid-side--edit' : ''; ?>">
 
                 <!-- جدول فایل‌ها -->
                 <div>
@@ -285,7 +286,7 @@ class Psy_Debug_Tracker {
                             $bg     = $status_colors[ $status ] ?? '#fff';
                             $is_editing = ( $edit_file === $f );
                         ?>
-                            <tr style="background:<?php echo esc_attr($bg); ?>;" class="<?php echo $is_editing ? 'psy-editing-outline' : ''; ?>">
+                            <tr class="psy-row-tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $bg ) ); ?> <?php echo $is_editing ? 'psy-editing-outline' : ''; ?>">
                                 <td class="psy-file-cell">
                                     <?php echo esc_html( $f ); ?>
                                     <?php if ( ! empty( $entry['note'] ) ): ?>
@@ -346,7 +347,7 @@ class Psy_Debug_Tracker {
                                 : self::STATUS_PENDING;
                             foreach ( $options as $val => $lbl ):
                             ?>
-                            <label class="psy-radio-option" style="background:<?php echo esc_attr($status_colors[$val]); ?>;">
+                            <label class="psy-radio-option psy-bg-tint <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $status_colors[$val] ) ); ?>">
                                 <input type="radio" name="status" value="<?php echo esc_attr($val); ?>" <?php checked($current_status, $val); ?>>
                                 <?php echo esc_html($lbl); ?>
                             </label>

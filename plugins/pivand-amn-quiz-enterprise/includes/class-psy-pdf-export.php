@@ -206,43 +206,37 @@ class Psy_Quiz_PDF_Export {
         string $site_name
     ): string {
         return <<<HTML
-<div style="
-    background: linear-gradient(135deg, #2b6cb0 0%, #553c9a 100%);
-    color: #fff;
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    font-family: dejavusans, Tahoma, sans-serif;
-">
-    <div>
-        <div style="font-size:16px;font-weight:bold;">{$quiz_name}</div>
-        <div style="font-size:10px;opacity:0.8;margin-top:2px;">{$site_name}</div>
-    </div>
-    <div style="font-size:11px;text-align:left;line-height:1.8;">
+<style>
+    .pdf-head { width: 100%; background: linear-gradient(135deg, #2b6cb0 0%, #553c9a 100%); color: #fff; padding: 14px 20px; font-family: dejavusans, Tahoma, sans-serif; }
+    .pdf-head-title { font-size: 16px; font-weight: bold; }
+    .pdf-head-sub { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+    .pdf-head-meta { font-size: 11px; text-align: left; line-height: 1.8; }
+</style>
+<table class="pdf-head"><tr>
+    <td>
+        <div class="pdf-head-title">{$quiz_name}</div>
+        <div class="pdf-head-sub">{$site_name}</div>
+    </td>
+    <td class="pdf-head-meta">
         <div>نام مراجع: <strong>{$client_name}</strong></div>
         <div>تاریخ تکمیل: {$date}</div>
-    </div>
-</div>
+    </td>
+</tr></table>
 HTML;
     }
 
     // ── HTML فوتر صفحه PDF ───────────────────────────────────────────────────
     private static function build_footer( string $site_name, string $today_date ): string {
         return <<<HTML
-<div style="
-    border-top: 1px solid #e2e8f0;
-    padding: 6px 20px;
-    font-size: 9px;
-    color: #a0aec0;
-    display: flex;
-    justify-content: space-between;
-    font-family: dejavusans, Tahoma, sans-serif;
-">
-    <span>این گزارش صرفاً جنبه کمک‌تشخیصی دارد و جایگزین ارزیابی بالینی نمی‌شود.</span>
-    <span>{$site_name} — {$today_date} — صفحه {PAGENO} از {nbpg}</span>
-</div>
+<style>
+    .pdf-foot { width: 100%; border-top: 1px solid #e2e8f0; padding: 6px 20px; font-size: 9px; color: #a0aec0; font-family: dejavusans, Tahoma, sans-serif; }
+    .pdf-foot-note { text-align: right; }
+    .pdf-foot-meta { text-align: left; }
+</style>
+<table class="pdf-foot"><tr>
+    <td class="pdf-foot-note">این گزارش صرفاً جنبه کمک‌تشخیصی دارد و جایگزین ارزیابی بالینی نمی‌شود.</td>
+    <td class="pdf-foot-meta">{$site_name} — {$today_date} — صفحه {PAGENO} از {nbpg}</td>
+</tr></table>
 HTML;
     }
 
@@ -260,9 +254,25 @@ body {
 .pdf-body {
     padding: 16px 20px 20px;
 }
-/* کارت‌های خلاصه */
-div[style*="display:flex"] {
+/* کارت‌ها و ردیف‌ها در mPDF به‌صورت بلوک چیده می‌شوند (بدون flex) */
+.psy-report-row,
+.psy-report-card,
+.psy-report-card--tint,
+.psy-report-item,
+.psy-clinical__head,
+.psy-report-trio {
     display: block;
+}
+.psy-report-card,
+.psy-report-card--tint,
+.psy-report-item,
+.psy-report-trio__cell {
+    margin-bottom: 8px;
+}
+/* بوم‌های Chart.js در PDF نمایش داده نمی‌شوند */
+.psy-report-chart-panel,
+.psy-chart-panel {
+    display: none !important;
 }
 /* جدول‌ها */
 table {

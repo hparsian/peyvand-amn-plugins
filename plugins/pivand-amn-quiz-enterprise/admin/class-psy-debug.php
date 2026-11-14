@@ -135,7 +135,7 @@ class Psy_Debug {
                 ['🔵', 'اطلاع',  $counts['info'],    '#2b6cb0', '#ebf8ff'],
                 ['📦', 'مجموع',  $counts['total'],   '#4a5568', '#f7fafc'],
             ] as [$icon, $label, $cnt, $color, $bg] ): ?>
-            <div class="psy-mini-stat" style="--stat-color:<?php echo esc_attr($color); ?>;--stat-bg:<?php echo esc_attr($bg); ?>;">
+            <div class="psy-mini-stat <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( $color ) ); ?>">
                 <div class="psy-mini-stat-val"><?php echo (int)$cnt; ?></div>
                 <div class="psy-mini-stat-lbl"><?php echo $icon . ' ' . esc_html($label); ?></div>
             </div>
@@ -200,7 +200,7 @@ class Psy_Debug {
                 ?>
                 <tr>
                     <td class="psy-va-top">
-                        <span class="psy-level-badge" style="--lvl-color:<?php echo esc_attr($lc['badge']); ?>;">
+                        <span class="psy-level-badge <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $lc['badge'] ) ); ?>">
                             <?php echo esc_html($log->level); ?>
                         </span>
                     </td>
@@ -618,7 +618,7 @@ class Psy_Debug {
                     <td class="psy-text-mid psy-mono"><?php echo esc_html($row->client_phone ?: '—'); ?></td>
                     <td><code class="psy-text-xs"><?php echo esc_html($row->quiz_id); ?></code></td>
                     <td class="psy-th-center">
-                        <span class="psy-status-chip" style="background:<?php echo esc_attr($sc); ?>;">
+                        <span class="psy-status-chip psy-chip-tone <?php echo esc_attr( \PsychAssessments\Core\ReportHTML::tone( (string) $sc ) ); ?>">
                             <?php echo esc_html($row->status); ?>
                         </span>
                     </td>

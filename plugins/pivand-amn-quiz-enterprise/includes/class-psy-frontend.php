@@ -126,7 +126,7 @@ class Psy_Quiz_Frontend {
                 <div id="psy-question-area">
                     <?php foreach ( $questions as $qnum => $qdata ): ?>
                     <?php $qtext = is_array( $qdata ) ? ( $qdata['text'] ?? $qdata['q'] ?? "سوال $qnum" ) : $qdata; ?>
-                    <div class="psy-question-card" data-qnum="<?php echo esc_attr((int)$qnum); ?>" style="display:none;">
+                    <div class="psy-question-card psy-is-hidden" data-qnum="<?php echo esc_attr((int)$qnum); ?>">
                         <div class="psy-question-num">سوال <?php echo esc_html((int)$qnum); ?></div>
                         <div class="psy-question-text"><?php echo esc_html( $qtext ); ?></div>
                         <div class="psy-options">

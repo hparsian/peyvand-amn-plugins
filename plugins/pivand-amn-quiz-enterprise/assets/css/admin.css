@@ -528,6 +528,7 @@
 .psy-story-dot {
     display: inline-block; width: 10px; height: 10px; border-radius: 50%;
     margin-left: 6px; vertical-align: middle;
+    background: var(--psy-c, #718096);
 }
 .psy-top-badge {
     font-size: 10px; border-radius: 4px; padding: 1px 5px; margin-right: 4px;
@@ -739,3 +740,55 @@
 .psy-pool-add-btn:hover { background: var(--psy-teal-light) !important; }
 
 .sortable-ghost { opacity: .4; background: var(--psy-teal-bg) !important; }
+
+/* ── تُن‌های کیت برای کامپوننت‌های ادمین (فاز ۱۴) ─────────────────────── */
+.psy-tone--success { --psy-c: #276749; --psy-bg: #f0fff4; }
+.psy-tone--warning { --psy-c: #b7791f; --psy-bg: #fffff0; }
+.psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
+.psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
+.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
+.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
+.psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
+
+/* کامپوننت‌های ادمین از این متغیرها تغذیه می‌شوند */
+.psy-tone--success,
+.psy-tone--warning,
+.psy-tone--accent,
+.psy-tone--danger,
+.psy-tone--info,
+.psy-tone--purple,
+.psy-tone--neutral {
+    --stat-color: var(--psy-c);
+    --stat-bg: var(--psy-bg);
+    --lvl-color: var(--psy-c);
+}
+.psy-row-tint { background: var(--psy-bg, var(--psy-white)); }
+.psy-bg-tint  { background: var(--psy-bg, transparent); }
+.psy-chip-tone { background: var(--psy-c, #718096); color: #fff; }
+.psy-grid-side--edit { grid-template-columns: 1fr 380px; }
+@media (max-width: 900px) { .psy-grid-side--edit { grid-template-columns: 1fr !important; } }
+.psy-details-summary { cursor: pointer; font-weight: 700; font-size: 14px; }
+.psy-row-changed { background: var(--psy-amber-bg); }
+
+/* عرض‌های گام ۵٪ برای نوارهای ادمین */
+.psy-w--0 { inline-size: 0%; }
+.psy-w--5 { inline-size: 5%; }
+.psy-w--10 { inline-size: 10%; }
+.psy-w--15 { inline-size: 15%; }
+.psy-w--20 { inline-size: 20%; }
+.psy-w--25 { inline-size: 25%; }
+.psy-w--30 { inline-size: 30%; }
+.psy-w--35 { inline-size: 35%; }
+.psy-w--40 { inline-size: 40%; }
+.psy-w--45 { inline-size: 45%; }
+.psy-w--50 { inline-size: 50%; }
+.psy-w--55 { inline-size: 55%; }
+.psy-w--60 { inline-size: 60%; }
+.psy-w--65 { inline-size: 65%; }
+.psy-w--70 { inline-size: 70%; }
+.psy-w--75 { inline-size: 75%; }
+.psy-w--80 { inline-size: 80%; }
+.psy-w--85 { inline-size: 85%; }
+.psy-w--90 { inline-size: 90%; }
+.psy-w--95 { inline-size: 95%; }
+.psy-w--100 { inline-size: 100%; }

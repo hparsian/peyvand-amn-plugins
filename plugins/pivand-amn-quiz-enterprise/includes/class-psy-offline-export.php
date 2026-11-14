@@ -68,9 +68,9 @@ class Psy_Quiz_Offline_Export {
                 </label>';
             }
             $questions_html .= '
-            <div class="q-card" id="qcard_' . $qnum . '" data-qnum="' . $qnum . '" style="display:none;">
+            <div class="q-card" id="qcard_' . $qnum . '" data-qnum="' . $qnum . '" hidden>
                 <div class="q-num">سوال ' . $qnum . ' از ' . $q_count . '</div>
-                <div class="progress-bar"><div class="progress-fill" id="prog_' . $qnum . '" style="width:' . round( ($qnum-1) / $q_count * 100 ) . '%"></div></div>
+                <div class="progress-bar"><div class="progress-fill" id="prog_' . $qnum . '"></div></div>
                 <div class="q-text">' . htmlspecialchars( $qtext, ENT_QUOTES ) . '</div>
                 <div class="opts">' . $options . '</div>
                 <div class="q-nav">
@@ -222,6 +222,13 @@ class Psy_Quiz_Offline_Export {
     text-align: right;
   }
 
+  [hidden] { display: none; }
+  .mt-16 { margin-top: 16px; }
+  .mt-20 { margin-top: 20px; }
+  .psy-center { text-align: center; }
+  .btn-block { width: 100%; padding: 14px; font-size: 1rem; }
+  .link-inline { color: #3182ce; font-size: .9rem; text-decoration: underline; }
+
   @media (max-width: 480px) {
     .card { padding: 24px 18px; }
     .scale-items { gap: 6px; }
@@ -251,20 +258,20 @@ class Psy_Quiz_Offline_Export {
   {$questions_html}
 
   <!-- صفحه پایان -->
-  <div id="screen-done" class="card" style="display:none;">
+  <div id="screen-done" class="card" hidden>
     <div class="done-icon">✅</div>
     <h2>پاسخ‌های شما ثبت شد</h2>
     <p>فایل پاسخ‌ها را دانلود کنید و برای درمانگر خود بفرستید (واتساپ، تلگرام، ایمیل یا هر روش دیگر).</p>
-    <p style="margin-top:16px;">
-      <button class="btn btn-submit" style="width:100%;padding:14px;font-size:1rem;" onclick="downloadAnswersFile()">
+    <p class="mt-16">
+      <button class="btn btn-submit btn-block" onclick="downloadAnswersFile()">
         💾 دانلود فایل پاسخ‌ها
       </button>
     </p>
     <div class="done-note">
       یک فایل متنی (.txt) دانلود می‌شود. آن را برای درمانگر خود ارسال کنید؛ او فایل را باز کرده و پاسخ‌ها را در سیستم ثبت می‌کند.
     </div>
-    <p style="margin-top:20px; text-align:center;">
-      <a href="javascript:void(0)" onclick="sendEmail()" style="color:#3182ce; font-size:.9rem; text-decoration:underline;">
+    <p class="mt-20 psy-center">
+      <a href="javascript:void(0)" onclick="sendEmail()" class="link-inline">
         یا ارسال مستقیم با برنامه ایمیل (اگر روی دستگاه شما تنظیم شده)
       </a>
     </p>
