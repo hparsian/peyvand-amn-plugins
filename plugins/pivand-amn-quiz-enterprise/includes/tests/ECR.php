@@ -260,8 +260,8 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         <!-- نمودار + جزئیات -->
         <div class="psy-report-row psy-report-row--loose">
             <div class="psy-report-card psy-report-card--panel psy-report-col">
-                <h3 class="psy-report-panel__title psy-report-desc">نمودار دو بُعد دلبستگی</h3>
-                <canvas id="pa-radar-chart" class="psy-report-chart"></canvas>
+                <h3 class="psy-report-panel__title psy-report-desc">نمودار دو بُعد دلبستگی (۰ تا ۷)</h3>
+                <canvas id="pa-ecr-chart" class="psy-report-chart psy-report-chart--bar"></canvas>
             </div>
             <div class="psy-report-col psy-report-col--wide">
                 <!-- اضطراب -->
@@ -366,26 +366,33 @@ class ECR extends \PsychAssessments\Core\BaseTest {
         (function() {
             function initCharts() {
                 if (typeof Chart === 'undefined') { setTimeout(initCharts, 100); return; }
-                var ctx = document.getElementById('pa-radar-chart');
+                var ctx = document.getElementById('pa-ecr-chart');
                 if (!ctx) return;
+                // دو بُعدی بودن ECR با رادار بی‌معناست (رادار دو محور به یک خط تبدیل
+                // می‌شد و بوم هم مربع/بسیار بلند می‌شد)؛ نمودار میله‌ای افقی می‌خواند.
                 new Chart(ctx.getContext('2d'), {
-                    type: 'radar',
+                    type: 'bar',
                     data: {
                         labels: <?php echo wp_json_encode($radar_labels); ?>,
                         datasets: [{
                             label: 'نمره',
                             data: <?php echo wp_json_encode($radar_values); ?>,
-                            backgroundColor: 'rgba(66,153,225,0.15)',
-                            borderColor: '#3182ce',
-                            borderWidth: 2,
-                            pointBackgroundColor: <?php echo wp_json_encode($radar_colors); ?>,
-                            pointRadius: 7
+                            backgroundColor: <?php echo wp_json_encode($radar_colors); ?>,
+                            borderRadius: 6,
+                            barThickness: 30
                         }]
                     },
                     options: {
+                        indexAxis: 'y',
                         responsive: true,
-                        scales: { r: { min: 1, max: 7, ticks: { stepSize: 1 },
-                            pointLabels: { font: { family: 'Tahoma', size: 12 } } } },
+                        maintainAspectRatio: true,
+                        aspectRatio: 2.2,
+                        scales: {
+                            x: { min: 0, max: 7, ticks: { stepSize: 1, color: '#4a5568' },
+                                 grid: { color: 'rgba(0,0,0,0.06)' } },
+                            y: { ticks: { font: { family: 'Tahoma', size: 12 }, color: '#2d3748' },
+                                 grid: { display: false } }
+                        },
                         plugins: { legend: { display: false } }
                     }
                 });
