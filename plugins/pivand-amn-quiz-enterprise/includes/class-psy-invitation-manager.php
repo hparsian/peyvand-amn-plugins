@@ -39,6 +39,7 @@ class Psy_Quiz_Invitation_Manager {
             'client_name'  => sanitize_text_field( $client_name ),
             'client_phone' => $client_phone !== '' ? self::to_local_format( $client_phone ) : '',
             'client_email' => $client_email !== '' ? sanitize_email( $client_email ) : '',
+            'client_id'    => self::resolve_client_id( $client_phone, $client_name, $client_email ),
             'access_token' => $token,
             'status'       => 'unused',
             'expires_at'   => $expires_at,
@@ -253,6 +254,14 @@ class Psy_Quiz_Invitation_Manager {
 
     /**
      * ثبت نهایی attempt_id پس از درج موفق
+     *
+     * فاز ۳ (هویت + رویداد): همین‌جا هم شناسهٔ مراجع به attempt منتقل می‌شود و
+     * هم رویداد `assessment.completed` منتشر می‌شود. این متد تنها نقطهٔ
+     * "تکمیل آزمون" برای هر دو مسیر است (آزمون آنلاین و ثبت دستی درمانگر)،
+     * پس هیچ مسیری بدون رویداد نمی‌ماند.
+     *
+     * Payload عمداً هیچ پاسخ/نمره/تفسیری ندارد — فقط این‌که «چه آزمونی برای
+     * چه شناسه‌ای چه زمانی تکمیل شد». محتوای بالینی جای دیگری است.
      */
     public static function complete( int $invitation_id, int $attempt_id ): void {
         global $wpdb;
@@ -261,6 +270,76 @@ class Psy_Quiz_Invitation_Manager {
             [ 'status' => 'completed', 'attempt_id' => $attempt_id ],
             [ 'id'     => $invitation_id ]
         );
+
+        $inv = $wpdb->get_row( $wpdb->prepare(
+            "SELECT id, quiz_id, client_name, client_phone, client_email, client_id FROM {$wpdb->prefix}psy_invitations WHERE id = %d",
+            $invitation_id
+        ) );
+        if ( ! $inv ) {
+            return;
+        }
+
+        $client_id = (string) ( $inv->client_id ?? '' );
+        if ( $client_id === '' ) {
+            $client_id = self::resolve_client_id( (string) $inv->client_phone, (string) $inv->client_name, (string) $inv->client_email );
+            if ( $client_id !== '' ) {
+                $wpdb->update( $wpdb->prefix . 'psy_invitations', [ 'client_id' => $client_id ], [ 'id' => $invitation_id ], [ '%s' ], [ '%d' ] );
+            }
+        }
+        if ( $client_id !== '' ) {
+            $wpdb->update( $wpdb->prefix . 'psy_attempts', [ 'client_id' => $client_id ], [ 'id' => $attempt_id ], [ '%s' ], [ '%d' ] );
+        }
+
+        if ( class_exists( 'Pas_Core_Events' ) ) {
+            Pas_Core_Events::dispatch(
+                'assessment.completed',
+                [
+                    'quiz_id'       => (string) $inv->quiz_id,
+                    'attempt_id'    => (int) $attempt_id,
+                    'invitation_id' => (int) $invitation_id,
+                ],
+                [
+                    'source'          => 'quiz-enterprise',
+                    'entity_type'     => 'assessment',
+                    'entity_id'       => (int) $attempt_id,
+                    'client_id'       => $client_id,
+                    'idempotency_key' => 'assessment.completed:' . (int) $attempt_id,
+                ]
+            );
+        }
+    }
+
+    /**
+     * شناسهٔ واحد مراجع برای یک دعوت‌نامه (فاز ۳).
+     *
+     * ترتیب: شناسهٔ ثبت‌شده در خود دعوت‌نامه → قرارداد رسمی هسته
+     * (`pas_get_client_id_for_phone`) → سرویس هویت هسته (که فقط در نبودِ
+     * هیچ ایندکسی، هویت موقت می‌سازد).
+     *
+     * اگر هسته نصب نباشد یا شماره در چند هویت دیده شود (تعارض)، رشتهٔ خالی
+     * برمی‌گردد و افزونه دقیقاً مثل قبل با شمارهٔ تلفن کار می‌کند — نه ادغام،
+     * نه خطا.
+     */
+    public static function resolve_client_id( string $client_phone, string $client_name = '', string $client_email = '' ): string {
+        $phone = $client_phone !== '' ? self::to_local_format( $client_phone ) : '';
+
+        if ( $phone !== '' ) {
+            $id = (string) apply_filters( 'pas_get_client_id_for_phone', '', $phone );
+            if ( $id !== '' ) {
+                return $id;
+            }
+        }
+        if ( $client_email !== '' && is_email( $client_email ) ) {
+            $id = (string) apply_filters( 'pas_get_client_id_for_email', '', $client_email );
+            if ( $id !== '' ) {
+                return $id;
+            }
+        }
+        if ( $phone !== '' && class_exists( 'Pas_Core_Identity' ) ) {
+            return Pas_Core_Identity::ensure_for_phone( $phone, $client_name );
+        }
+
+        return '';
     }
 
     /**

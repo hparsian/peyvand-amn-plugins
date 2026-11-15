@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — هسته مشترک
  * Description: زیرساخت مشترک اکوسیستم پیوند امن — توابع تکراری (نرمال‌سازی موبایل، تاریخ شمسی، IP)، بررسی وابستگی بین افزونه‌ها با هشدار واضح در پیشخوان، و رجیستری مستندشده‌ی همه‌ی قراردادهای فیلتری بین‌افزونه‌ای. این افزونه باید همیشه فعال باشد و باید قبل از بقیه‌ی افزونه‌های خانواده لود شود.
- * Version: 1.8.2
+ * Version: 1.9.0
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_CORE_VERSION', '1.8.2');
+define('PAS_CORE_VERSION', '1.9.0');
 define('PAS_CORE_DIR', plugin_dir_path(__FILE__));
 define('PAS_CORE_URL', plugin_dir_url(__FILE__));
 
@@ -45,6 +45,8 @@ require_once PAS_CORE_DIR . 'includes/class-helpers.php';
 require_once PAS_CORE_DIR . 'includes/class-crypto.php';
 require_once PAS_CORE_DIR . 'includes/class-data-audit.php';
 require_once PAS_CORE_DIR . 'includes/class-client-registry.php';
+require_once PAS_CORE_DIR . 'includes/class-identity.php';
+require_once PAS_CORE_DIR . 'includes/class-events.php';
 require_once PAS_CORE_DIR . 'includes/class-field-mapper.php';
 require_once PAS_CORE_DIR . 'includes/class-compliance.php';
 require_once PAS_CORE_DIR . 'includes/class-health.php';
@@ -70,6 +72,8 @@ register_activation_hook(__FILE__, function (): void {
     Pas_Core_Client_Registry::install();
     // فاز ۲: جداول نگاشت فیلد و ثبت منبع (افزایشی).
     Pas_Core_Field_Mapper::install();
+    // فاز ۳: جدول رویدادها/Outbox (افزایشی).
+    Pas_Core_Events::install();
 });
 
 /**
@@ -89,6 +93,16 @@ add_action('plugins_loaded', function (): void {
     }
 }, 4);
 
+/**
+ * جدول رویدادها هم مثل بقیه جدول‌های هسته، اگر نسخه‌اش عقب باشد یک‌بار
+ * ساخته/به‌روزرسانی می‌شود (dbDelta idempotent و فقط افزایشی).
+ */
+add_action('plugins_loaded', function (): void {
+    if (get_option('pas_events_db_version') !== Pas_Core_Events::DB_VERSION) {
+        Pas_Core_Events::install();
+    }
+}, 4);
+
 add_action('plugins_loaded', function (): void {
     load_plugin_textdomain('pivand-amn-core');
     new Pas_Core_Admin();
@@ -100,6 +114,24 @@ add_action('plugins_loaded', function (): void {
      * واحد مراجع را بگیرند.
      */
     add_filter('pas_get_client', ['Pas_Core_Client_Registry', 'filter_get_client'], 10, 2);
+
+    /**
+     * قرارداد شناسهٔ مراجع (فاز ۳):
+     *   apply_filters('pas_get_client_id_for_phone', '', $mobile)
+     *   apply_filters('pas_get_client_id_for_email', '', $email)
+     * افزونه‌هایی که فقط شناسه لازم دارند (بدون رکورد کامل هویت) از این دو
+     * استفاده می‌کنند تا مجبور نشوند جدول‌های رجیستری را مستقیم بخوانند.
+     */
+    add_filter('pas_get_client_id_for_phone', static function ($default, $phone) {
+        $id = Pas_Core_Identity::client_id_for_phone((string) $phone);
+
+        return $id !== '' ? $id : $default;
+    }, 10, 2);
+    add_filter('pas_get_client_id_for_email', static function ($default, $email) {
+        $id = Pas_Core_Identity::client_id_for_email((string) $email);
+
+        return $id !== '' ? $id : $default;
+    }, 10, 2);
 
     /**
      * ثبت وابستگی‌های شناخته‌شده‌ی اکوسیستم. هر افزونه‌ای که خودش این
@@ -142,6 +174,7 @@ add_action('plugins_loaded', function (): void {
     Pas_Core_Table_Registry::register('تولید محتوا و سئو (content-writer)', 'aco_', ['aco_queue', 'aco_logs', 'aco_keyword_bank']);
     Pas_Core_Table_Registry::register('فرم تماس (payvand-contact)', 'payvand_', ['payvand_messages']);
     Pas_Core_Table_Registry::register('هسته — رجیستری هویت (core 1.4+)', 'pas_', ['pas_clients', 'pas_client_identifiers', 'pas_identity_conflicts']);
+    Pas_Core_Table_Registry::register('هسته — رویدادها (core 1.9+)', 'pas_', ['pas_events']);
     // فاز ۹: جدول‌های فاز ۲ که قبلاً در رجیستری ثبت نشده بودند.
     Pas_Core_Table_Registry::register('هسته — نگاشت فیلد و ثبت منبع (core 1.5+)', 'pas_', ['pas_field_maps', 'pas_field_provenance']);
     // فاز ۹: صف ایمیل افزونه‌ی SMTP (مالک جدول، افزونه‌ی smtp-mailer است؛

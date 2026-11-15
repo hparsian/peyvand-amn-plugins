@@ -190,6 +190,28 @@ class Psy_Quiz_Manual_Entry {
             [ '%d' ]
         );
 
+        // فاز ۳: رویداد تکمیل آزمون برای ثبت دستی هم منتشر می‌شود — این ورودی
+        // هم یک «آزمون تکمیل‌شده» است و نباید از دید پرونده/داشبورد بیفتد.
+        // client_id خالی است چون ثبت دستی شمارهٔ مراجع ندارد (offline).
+        if ( class_exists( 'Pas_Core_Events' ) ) {
+            Pas_Core_Events::dispatch(
+                'assessment.completed',
+                [
+                    'quiz_id'       => (string) sanitize_key( $quiz_id ),
+                    'attempt_id'    => (int) $attempt_id,
+                    'invitation_id' => (int) $inv_id,
+                    'entry_mode'    => 'manual',
+                ],
+                [
+                    'source'          => 'quiz-enterprise',
+                    'entity_type'     => 'assessment',
+                    'entity_id'       => (int) $attempt_id,
+                    'client_id'       => '',
+                    'idempotency_key' => 'assessment.completed:' . (int) $attempt_id,
+                ]
+            );
+        }
+
         return [
             'success'     => true,
             'attempt_id'  => $attempt_id,

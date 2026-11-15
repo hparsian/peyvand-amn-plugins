@@ -94,8 +94,13 @@ final class Pas_CF_Case_File
     {
         global $wpdb;
 
+        $phone = self::normalize_phone($data['phone'] ?? '');
+
         $row = [
-            'phone'                        => self::normalize_phone($data['phone'] ?? ''),
+            'phone'                        => $phone,
+            // فاز ۳ اکوسیستم: شناسهٔ واحد مراجع از هسته (اگر نصب باشد).
+            // رکورد قدیمی بدون شناسه می‌ماند و مسیر فعلی (شمارهٔ تلفن) تغییر نمی‌کند.
+            'client_id'                    => self::resolve_client_id($phone, $data['full_name'] ?? ''),
             'failed_marriage_history'       => sanitize_textarea_field($data['failed_marriage_history'] ?? ''),
             'spouse_phone'                  => self::normalize_phone($data['spouse_phone'] ?? ''),
             'spouse_failed_marriage_history' => sanitize_textarea_field($data['spouse_failed_marriage_history'] ?? ''),
@@ -138,6 +143,32 @@ final class Pas_CF_Case_File
         return $case_id;
     }
 
+    /**
+     * شناسهٔ واحد مراجع برای یک پرونده (فاز ۳).
+     *
+     * اول قرارداد رسمی هسته (`pas_get_client_id_for_phone`) و بعد سرویس
+     * هویت هسته که در نبودِ هیچ ایندکسی هویت موقت می‌سازد. اگر هسته نباشد یا
+     * شماره بین چند هویت مشترک باشد (تعارض)، رشتهٔ خالی برمی‌گردد؛ پرونده
+     * مثل قبل با ستون phone کار می‌کند و هیچ ادغامی انجام نمی‌شود.
+     */
+    public static function resolve_client_id(string $phone, string $full_name = ''): string
+    {
+        if ($phone === '') {
+            return '';
+        }
+
+        $id = (string) apply_filters('pas_get_client_id_for_phone', '', $phone);
+        if ($id !== '') {
+            return $id;
+        }
+
+        if (class_exists('Pas_Core_Identity')) {
+            return Pas_Core_Identity::ensure_for_phone($phone, $full_name);
+        }
+
+        return '';
+    }
+
     public static function update(int $case_id, array $data): void
     {
         global $wpdb;
@@ -161,6 +192,13 @@ final class Pas_CF_Case_File
         $row += self::build_encrypted_columns($data, '');
         $row += self::build_encrypted_columns($data, 'spouse_');
         $row += self::build_encrypted_columns($data, '', self::ENCRYPTED_SOLO_FIELDS);
+
+        // پرونده‌های قدیمی هیچ‌وقت شناسه نگرفته‌اند؛ در ویرایش بعدی اگر شناسه
+        // قابل تشخیص باشد پر می‌شود (بدون دست‌زدن به شناسهٔ موجود).
+        $resolved_client_id = self::resolve_client_id(self::normalize_phone($data['phone'] ?? ''), $data['full_name'] ?? '');
+        if ($resolved_client_id !== '') {
+            $row['client_id'] = $resolved_client_id;
+        }
 
         $formats = array_fill(0, count($row), '%s');
         foreach (['assigned_therapist'] as $int_col) {

@@ -28,6 +28,7 @@ final class Pas_CF_Installer
         dbDelta("CREATE TABLE $cases (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             phone varchar(20) NOT NULL DEFAULT '',
+            client_id char(29) NOT NULL DEFAULT '',
             full_name varchar(190) NOT NULL DEFAULT '',
             age varchar(10) NOT NULL DEFAULT '',
             marital_status varchar(100) NOT NULL DEFAULT '',
@@ -80,6 +81,7 @@ final class Pas_CF_Installer
             updated_at datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
             PRIMARY KEY  (id),
             KEY phone (phone),
+            KEY client_id (client_id),
             KEY assigned_therapist (assigned_therapist),
             KEY partner_case_id (partner_case_id)
         ) $charset_collate;");

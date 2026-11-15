@@ -21,6 +21,7 @@ class Psy_Quiz_Activator {
             client_name  varchar(255) NOT NULL,
             client_phone varchar(30)  NOT NULL DEFAULT '',
             client_email varchar(255) NOT NULL DEFAULT '',
+            client_id    char(29)     NOT NULL DEFAULT '',
             access_token varchar(64)  NOT NULL,
             status       varchar(20)  NOT NULL DEFAULT 'unused',
             attempt_id   bigint(20)   DEFAULT NULL,
@@ -33,19 +34,22 @@ class Psy_Quiz_Activator {
             KEY status (status),
             KEY expires_at (expires_at),
             KEY client_phone (client_phone),
-            KEY client_email (client_email)
+            KEY client_email (client_email),
+            KEY client_id (client_id)
         ) $c;";
 
         $sql2 = "CREATE TABLE {$wpdb->prefix}psy_attempts (
             id            bigint(20)  NOT NULL AUTO_INCREMENT,
             quiz_id       varchar(50) NOT NULL,
             invitation_id bigint(20)  NOT NULL,
+            client_id     char(29)    NOT NULL DEFAULT '',
             answers       longtext    NOT NULL,
             result_data   longtext    NOT NULL,
             completed_at  datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             KEY quiz_id (quiz_id),
-            KEY invitation_id (invitation_id)
+            KEY invitation_id (invitation_id),
+            KEY client_id (client_id)
         ) $c;";
 
         // جدول زوجین — هر رکورد دو attempt از آزمون LoveStory را به هم وصل می‌کند
@@ -98,6 +102,20 @@ class Psy_Quiz_Activator {
         $email_col_exists = $wpdb->get_var( "SHOW COLUMNS FROM {$wpdb->prefix}psy_invitations LIKE 'client_email'" );
         if ( ! $email_col_exists ) {
             $wpdb->query( "ALTER TABLE {$wpdb->prefix}psy_invitations ADD COLUMN client_email varchar(255) NOT NULL DEFAULT '' AFTER client_phone" );
+        }
+
+        // migration (DB 3.11 / فاز ۳ اکوسیستم): ستون client_id — شناسهٔ واحد مراجع
+        // از رجیستری هسته. افزایشی و nullable-ish (پیش‌فرض رشتهٔ خالی): رکوردهای
+        // قدیمی بدون شناسه می‌مانند و مسیر فعلی (تطبیق با شماره) دقیقاً مثل قبل
+        // کار می‌کند؛ رکوردهای جدید هر دو را دارند.
+        $cid_col_exists = $wpdb->get_var( "SHOW COLUMNS FROM {$wpdb->prefix}psy_invitations LIKE 'client_id'" );
+        if ( ! $cid_col_exists ) {
+            $wpdb->query( "ALTER TABLE {$wpdb->prefix}psy_invitations ADD COLUMN client_id char(29) NOT NULL DEFAULT '' AFTER client_email, ADD KEY client_id (client_id)" );
+        }
+
+        $cid_att_exists = $wpdb->get_var( "SHOW COLUMNS FROM {$wpdb->prefix}psy_attempts LIKE 'client_id'" );
+        if ( ! $cid_att_exists ) {
+            $wpdb->query( "ALTER TABLE {$wpdb->prefix}psy_attempts ADD COLUMN client_id char(29) NOT NULL DEFAULT '' AFTER invitation_id, ADD KEY client_id (client_id)" );
         }
 
         // migration (DB 3.10): ایندکس روی client_phone و client_email — پنل مراجع
