@@ -70,6 +70,18 @@ final class Pas_CF_Alerts_Page
     {
         $view = isset($_POST['view']) ? sanitize_key(wp_unslash($_POST['view'])) : 'open';
 
+        // فرم‌هایی که از درون صفحهٔ پرونده ارسال شده‌اند، همان‌جا برمی‌گردند.
+        $return_case = isset($_POST['return_case']) ? (int) $_POST['return_case'] : 0;
+        if ($return_case > 0) {
+            wp_safe_redirect(add_query_arg([
+                'page'    => 'pas-case-file-new',
+                'case_id' => $return_case,
+                'changed' => $what,
+                'result'  => $result,
+            ], admin_url('admin.php')) . '#pas-cf-alerts');
+            exit;
+        }
+
         wp_safe_redirect(add_query_arg([
             'page'    => self::PAGE,
             'view'    => in_array($view, ['open', 'closed', 'all'], true) ? $view : 'open',
@@ -77,6 +89,96 @@ final class Pas_CF_Alerts_Page
             'result'  => $result,
         ], admin_url('admin.php')));
         exit;
+    }
+
+    // ── بخش داخل صفحهٔ پرونده ──────────────────────────────────────────
+
+    /**
+     * کارت «هشدارها و وظایف این پرونده» — همان داده و همان هندلرهای صفحهٔ
+     * مدیریت، فقط محدود به همین پرونده. فرم‌ها با return_case برمی‌گردند به
+     * همین صفحه تا درمانگر وسط کار پرونده جابه‌جا نشود.
+     */
+    public static function render_case_section(int $case_id): void
+    {
+        $case = Pas_CF_Case_File::get($case_id);
+        if (!$case || !Pas_CF_Security::current_user_can_access_case($case)) {
+            return;
+        }
+
+        $alerts = Pas_CF_Alerts::for_case($case_id, 8);
+        $tasks  = Pas_CF_Tasks::for_case($case_id, 8);
+        ?>
+        <div class="pas-cf-box" id="pas-cf-alerts">
+            <h3>هشدارها و وظایف این پرونده</h3>
+
+            <?php if (isset($_GET['changed'])) : ?>
+                <div class="notice <?php echo (($_GET['result'] ?? '') === 'updated') ? 'notice-success' : 'notice-warning'; ?> inline">
+                    <p><?php echo esc_html((($_GET['result'] ?? '') === 'updated') ? 'وضعیت ثبت شد.' : 'تغییر اعمال نشد.'); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (empty($alerts)) : ?>
+                <p class="description">هشدار بالینی برای این پرونده ثبت نشده است. نبود هشدار به معنای نبود خطر نیست.</p>
+            <?php else : ?>
+                <table class="widefat striped">
+                    <thead>
+                        <tr><th>نوع</th><th>اولویت</th><th>وضعیت</th><th>تاریخ</th><th>تغییر وضعیت</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alerts as $alert) : ?>
+                            <tr>
+                                <td><?php echo esc_html(($alert['type'] ?? '') === 'self_harm_risk' ? 'پرچم خودآسیبی' : (string) ($alert['type'] ?? '')); ?></td>
+                                <td><?php echo esc_html(Pas_CF_Alerts::PRIORITIES[(string) ($alert['priority'] ?? 'medium')] ?? ''); ?></td>
+                                <td><?php echo esc_html(Pas_CF_Alerts::STATUSES[(string) ($alert['status'] ?? 'new')] ?? (string) ($alert['status'] ?? '')); ?></td>
+                                <td><?php echo esc_html(Pas_CF_Jalali::to_jalali_string(substr((string) ($alert['created_at'] ?? ''), 0, 10))); ?></td>
+                                <td>
+                                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:flex;gap:.35em;flex-wrap:wrap;align-items:center;">
+                                        <input type="hidden" name="action" value="pas_cf_update_alert" />
+                                        <input type="hidden" name="alert_id" value="<?php echo esc_attr((string) (int) $alert['id']); ?>" />
+                                        <input type="hidden" name="return_case" value="<?php echo esc_attr((string) $case_id); ?>" />
+                                        <?php wp_nonce_field('pas_cf_update_alert'); ?>
+                                        <select name="status">
+                                            <?php foreach (Pas_CF_Alerts::STATUSES as $key => $label) : ?>
+                                                <option value="<?php echo esc_attr($key); ?>" <?php selected((string) ($alert['status'] ?? ''), $key); ?>><?php echo esc_html($label); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <input type="text" name="note" maxlength="190" placeholder="یادداشت" style="max-width:10em;" />
+                                        <button class="button button-small" type="submit">ثبت</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <h4>وظایف باز</h4>
+            <?php if (empty($tasks)) : ?>
+                <p class="description">وظیفهٔ بازی برای این پرونده نیست.</p>
+            <?php else : ?>
+                <ul class="pas-cf-dash-list">
+                    <?php foreach ($tasks as $task) : ?>
+                        <li>
+                            <span class="pas-cf-dash-name"><?php echo esc_html((string) ($task['title'] ?? '')); ?></span>
+                            <span class="pas-cf-dash-meta"><?php echo esc_html(Pas_CF_Tasks::PRIORITIES[(string) ($task['priority'] ?? 'medium')] ?? ''); ?> · <?php echo esc_html(Pas_CF_Tasks::STATUSES[(string) ($task['status'] ?? 'open')] ?? ''); ?></span>
+                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-flex;gap:.35em;align-items:center;">
+                                <input type="hidden" name="action" value="pas_cf_update_task" />
+                                <input type="hidden" name="task_id" value="<?php echo esc_attr((string) (int) $task['id']); ?>" />
+                                <input type="hidden" name="return_case" value="<?php echo esc_attr((string) $case_id); ?>" />
+                                <?php wp_nonce_field('pas_cf_update_task'); ?>
+                                <select name="status">
+                                    <?php foreach (Pas_CF_Tasks::STATUSES as $key => $label) : ?>
+                                        <option value="<?php echo esc_attr($key); ?>" <?php selected((string) ($task['status'] ?? ''), $key); ?>><?php echo esc_html($label); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button class="button button-small" type="submit">ثبت</button>
+                            </form>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+        <?php
     }
 
     // ── نمایش ────────────────────────────────────────────────────────────

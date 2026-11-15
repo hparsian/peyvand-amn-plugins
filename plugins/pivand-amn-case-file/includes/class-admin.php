@@ -1031,6 +1031,8 @@ final class Pas_CF_Admin
                         </div>
                     <?php endif; ?>
 
+                    <?php Pas_CF_Alerts_Page::render_case_section((int) $case->id); ?>
+
                     <div class="pas-cf-box">
                         <h3>نتایج آزمون‌های روان‌سنجی</h3>
                         <?php if (empty($quiz_results)) : ?>
