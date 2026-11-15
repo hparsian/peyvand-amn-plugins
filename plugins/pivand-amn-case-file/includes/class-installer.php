@@ -143,6 +143,14 @@ final class Pas_CF_Installer
             KEY case_id (case_id)
         ) $charset_collate;");
 
+        // فاز ۵: هشدارهای بالینی و وظایف (جداول تازه و مستقل؛ افزایشی).
+        if (class_exists('Pas_CF_Alerts')) {
+            Pas_CF_Alerts::install();
+        }
+        if (class_exists('Pas_CF_Tasks')) {
+            Pas_CF_Tasks::install();
+        }
+
         update_option('pas_cf_db_version', PAS_CF_VERSION);
     }
 }

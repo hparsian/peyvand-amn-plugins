@@ -59,6 +59,13 @@ final class Pas_CF_Dashboard
         $sessions = self::sessions_on($today);
         $new_url  = admin_url('admin.php?page=pas-case-file-new');
 
+        // فاز ۵: هشدارها و وظایف باز — همان محدودهٔ دید پرونده‌ها، بدون
+        // کوئری جداگانه و بدون دادهٔ ساختگی.
+        $open_alerts       = Pas_CF_Alerts::open_visible(6);
+        $open_alerts_count = Pas_CF_Alerts::count_open_visible();
+        $open_tasks        = Pas_CF_Tasks::open_visible(8);
+        $open_tasks_count  = Pas_CF_Tasks::count_open_visible();
+
         $done_today = 0;
         foreach ($sessions as $row) {
             if ((string) $row->status === 'done') {
@@ -98,6 +105,63 @@ final class Pas_CF_Dashboard
                     <span class="pas-cf-dash-sub"><?php echo esc_html($summary['avg_duration'] > 0 ? 'میانگین ' . $summary['avg_duration'] . ' دقیقه' : 'بدون جلسه در بازه'); ?></span>
                 </a>
             </div>
+
+            <div class="pas-cf-dash-stats">
+                <div class="pas-cf-dash-stat pas-cf-dash-alert<?php echo $open_alerts_count > 0 ? ' is-warning' : ''; ?>">
+                    <span class="pas-cf-dash-k">هشدارهای باز</span>
+                    <span class="pas-cf-dash-v"><?php echo esc_html((string) $open_alerts_count); ?></span>
+                    <span class="pas-cf-dash-sub"><?php echo esc_html($open_alerts_count > 0 ? 'نیازمند بررسی انسانی' : 'هشداری در انتظار نیست'); ?></span>
+                </div>
+                <div class="pas-cf-dash-stat">
+                    <span class="pas-cf-dash-k">کارهای باز</span>
+                    <span class="pas-cf-dash-v"><?php echo esc_html((string) $open_tasks_count); ?></span>
+                    <span class="pas-cf-dash-sub"><?php echo esc_html($open_tasks_count > 0 ? 'از رویدادهای اکوسیستم' : 'همه انجام شده'); ?></span>
+                </div>
+            </div>
+
+            <h2>هشدارهای نیازمند بررسی</h2>
+            <p class="description">هر هشدار یک پرچم برای بررسی انسانی است، نه تشخیص؛ نبود هشدار به معنای نبود خطر نیست.</p>
+            <?php if (empty($open_alerts)) : ?>
+                <div class="pas-cf-dash-empty">هشدار بازی ثبت نشده است.</div>
+            <?php else : ?>
+                <table class="widefat striped">
+                    <thead>
+                        <tr><th>مراجع</th><th>نوع</th><th>اولویت</th><th>وضعیت</th><th>زمان</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($open_alerts as $alert) : ?>
+                            <tr>
+                                <td><?php echo esc_html(($alert['full_name'] ?? '') !== '' ? $alert['full_name'] : '—'); ?></td>
+                                <td><?php echo esc_html(($alert['type'] ?? '') === 'self_harm_risk' ? 'پرچم خودآسیبی' : (string) ($alert['type'] ?? '')); ?></td>
+                                <td><span class="pas-cf-dash-status pas-cf-dash-status-<?php echo esc_attr((string) ($alert['priority'] ?? 'medium')); ?>"><?php echo esc_html(Pas_CF_Alerts::PRIORITIES[(string) ($alert['priority'] ?? 'medium')] ?? (string) ($alert['priority'] ?? '')); ?></span></td>
+                                <td><?php echo esc_html(Pas_CF_Alerts::STATUSES[(string) ($alert['status'] ?? 'new')] ?? (string) ($alert['status'] ?? '')); ?></td>
+                                <td><?php echo esc_html(Pas_CF_Jalali::to_jalali_string(substr((string) ($alert['created_at'] ?? ''), 0, 10))); ?></td>
+                                <td><a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=pas-case-file-new&case_id=' . (int) ($alert['case_id'] ?? 0))); ?>">باز کردن پرونده</a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <h2>کارهای نیازمند اقدام</h2>
+            <?php if (empty($open_tasks)) : ?>
+                <div class="pas-cf-dash-empty">کاری در انتظار نیست.</div>
+            <?php else : ?>
+                <ul class="pas-cf-dash-list">
+                    <?php foreach ($open_tasks as $task) : ?>
+                        <li>
+                            <span class="pas-cf-dash-name"><?php echo esc_html((string) ($task['title'] ?? '')); ?></span>
+                            <span class="pas-cf-dash-meta">
+                                <?php echo esc_html(Pas_CF_Tasks::PRIORITIES[(string) ($task['priority'] ?? 'medium')] ?? ''); ?>
+                                <?php if (!empty($task['full_name'])) : ?>· <?php echo esc_html((string) $task['full_name']); ?><?php endif; ?>
+                            </span>
+                            <?php if ((int) ($task['case_id'] ?? 0) > 0) : ?>
+                                <a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=pas-case-file-new&case_id=' . (int) $task['case_id'])); ?>">باز کردن</a>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
 
             <h2>جلسات امروز</h2>
             <?php if (empty($sessions)) : ?>

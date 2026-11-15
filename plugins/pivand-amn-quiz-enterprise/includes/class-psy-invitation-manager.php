@@ -209,6 +209,114 @@ class Psy_Quiz_Invitation_Manager {
     }
 
     /**
+     * پرچم خطر بالینی برای یک تلاش (فاز ۵ اکوسیستم).
+     *
+     * مسئله: آزمون‌هایی مثل BDI و GHQ-28 آیتم خودآسیبی را محاسبه می‌کردند ولی
+     * نتیجه فقط داخل صفحهٔ گزارش می‌ماند؛ پرونده و داشبورد هیچ‌وقت خبردار
+     * نمی‌شدند. این متد همان محاسبه را به یک «پرچم» قابل انتقال تبدیل می‌کند.
+     *
+     * قواعد:
+     *  - آستانه: هر نمرهٔ ≥`threshold` روی آیتم خودآسیبی (پیش‌فرض ۱،
+     *    محافظه‌کارانه) = نیاز به بررسی انسانی. سطح `critical` برای نمرهٔ ۲ و
+     *    بالاتر (BDI) و `high` برای نشانهٔ بولی (GHQ).
+     *  - پاسخ خام هرگز برنمی‌گردد؛ فقط پرچم، سطح، دلیل کوتاه و زمینهٔ اتصال.
+     *  - این یک غربال است، نه تشخیص؛ نبود پرچم هم به معنای نبود خطر نیست.
+     *
+     * @return array{risk_flagged:bool,level:string,reasons:array<int,string>,quiz_id:string,quiz_label:string,attempt_id:int,client_id:string,phone:string,completed_at:string}
+     */
+    public static function get_risk_flags_for_attempt( int $attempt_id, int $threshold = 1 ): array {
+        global $wpdb;
+
+        $out = [
+            'risk_flagged' => false,
+            'level'        => '',
+            'reasons'      => [],
+            'quiz_id'      => '',
+            'quiz_label'   => '',
+            'attempt_id'   => $attempt_id,
+            'client_id'    => '',
+            'phone'        => '',
+            'completed_at' => '',
+        ];
+
+        if ( $attempt_id <= 0 ) {
+            return $out;
+        }
+
+        $row = $wpdb->get_row( $wpdb->prepare(
+            "SELECT a.id, a.quiz_id, a.result_data, a.completed_at, i.client_id, i.client_phone
+             FROM {$wpdb->prefix}psy_attempts a
+             LEFT JOIN {$wpdb->prefix}psy_invitations i ON i.id = a.invitation_id
+             WHERE a.id = %d",
+            $attempt_id
+        ) );
+        if ( ! $row ) {
+            return $out;
+        }
+
+        $out['quiz_id']      = (string) $row->quiz_id;
+        $out['client_id']    = (string) ( $row->client_id ?? '' );
+        $out['phone']        = (string) ( $row->client_phone ?? '' );
+        $out['completed_at'] = (string) ( $row->completed_at ?? '' );
+
+        $test              = \PsychAssessments\Core\Registry::get( (string) $row->quiz_id );
+        $out['quiz_label'] = $test ? $test->get_name() : (string) $row->quiz_id;
+
+        $data = function_exists( 'pa_decrypt_json' )
+            ? pa_decrypt_json( (string) $row->result_data )
+            : json_decode( (string) $row->result_data, true );
+        if ( ! is_array( $data ) ) {
+            return $out;
+        }
+
+        $reasons = [];
+        $level   = '';
+
+        // ۱) BDI: آیتم ۹ (افکار خودکشی) — نمرهٔ ۰..۳
+        if ( isset( $data['suicide_item'] ) && is_numeric( $data['suicide_item'] ) ) {
+            $score = (float) $data['suicide_item'];
+            if ( $score >= $threshold ) {
+                // ارقام فارسی، هم‌خوان با بقیهٔ متن‌های رابط فارسی این اکوسیستم
+                $fa_digits = strtr( (string) (int) $score, [ '0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹' ] );
+                $reasons[] = sprintf( 'آیتم خودآسیبی: %s از ۳', $fa_digits );
+                $level     = $score >= 2 ? 'critical' : 'high';
+            }
+        }
+
+        // ۲) GHQ-28: پرچم بولی پاسخ نگران‌کننده به آیتم‌های خودکشی
+        if ( ! empty( $data['suicide_alert'] ) ) {
+            $reasons[] = 'پاسخ نگران‌کننده به آیتم‌های خودآسیبی (GHQ)';
+            if ( $level !== 'critical' ) {
+                $level = 'high';
+            }
+        }
+
+        // ۳) هر کلید دیگری با همین معنا در آزمون‌های آینده (بدون وابستگی به نام آزمون)
+        foreach ( $data as $key => $value ) {
+            if ( ! is_string( $key ) || ! preg_match( '/suicid|self_?harm/i', $key ) ) {
+                continue;
+            }
+            if ( $key === 'suicide_item' || $key === 'suicide_alert' ) {
+                continue;
+            }
+            $flag = ( is_bool( $value ) && $value )
+                || ( is_numeric( $value ) && (float) $value >= (float) $threshold );
+            if ( $flag ) {
+                $reasons[] = sprintf( 'شاخص خودآسیبی (%s)', sanitize_key( $key ) );
+                if ( $level === '' ) {
+                    $level = 'high';
+                }
+            }
+        }
+
+        $out['reasons']      = array_values( array_unique( $reasons ) );
+        $out['risk_flagged'] = ! empty( $out['reasons'] );
+        $out['level']        = $out['risk_flagged'] ? ( $level !== '' ? $level : 'high' ) : '';
+
+        return $out;
+    }
+
+    /**
      * شماره موبایلِ متصل به یک ایمیل — آخرین دعوت‌نامه‌ای که برای این ایمیل
      * ثبت شده (صرف‌نظر از وضعیت). مصرف‌کننده: فیلتر psy_get_mobile_for_email
      * (نگاه کنید به pivand-amn-quiz-enterprise.php) — پنل مراجع OTP وقتی

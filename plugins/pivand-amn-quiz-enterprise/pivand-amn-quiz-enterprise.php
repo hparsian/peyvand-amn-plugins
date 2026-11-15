@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — آزمون‌های روان‌سنجی
  * Description: پلتفرم جامع آزمون‌های روان‌سنجی با سیستم توکن مراجع، گزارش تخصصی و ارسال واتساپ.
- * Version: 3.9.0
+ * Version: 3.9.1
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 8.1
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'PSY_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'PSY_URL',        plugin_dir_url( __FILE__ ) );
-define( 'PSY_VERSION',    '3.9.0' );
+define( 'PSY_VERSION',    '3.9.1' );
 define( 'PSY_DB_VERSION', '3.10' );  // 3.8: BUG-22 — نرمال‌سازی client_phone موقع ثبت + migration یک‌بار برای رکوردهای قدیمی
                                      // 3.9: اضافه‌شدن ستون client_email — ورود جایگزین با ایمیل برای مراجعینی که شماره ایرانی ندارند
 
@@ -132,6 +132,14 @@ add_filter( 'psy_get_assessment_scores_for_phone', function ( $default_value, $p
     $rows = Psy_Quiz_Invitation_Manager::get_assessment_scores_for_phone( (string) $phone );
 
     return ! empty( $rows ) ? $rows : $default_value;
+}, 10, 2 );
+
+// قرارداد پرچم خطر بالینی (فاز ۵ اکوسیستم): آیا نتیجهٔ این تلاش شامل
+// پاسخ نگران‌کننده به آیتم خودآسیبی/خودکشی است؟ مصرف‌کننده: پروندهٔ مراجعین
+// برای ساخت هشدار. خودِ آزمون مالک داده است و پاسخ خام را برنمی‌گرداند؛
+// فقط پرچم، سطح و دلیل کوتاه.
+add_filter( 'psy_get_assessment_risk_flags', function ( $default_value, $attempt_id ) {
+    return Psy_Quiz_Invitation_Manager::get_risk_flags_for_attempt( (int) $attempt_id );
 }, 10, 2 );
 
 // قرارداد فیلتری مشترک pas_lookup_known_client_name — اولویت ۱۵ (آخرین در
