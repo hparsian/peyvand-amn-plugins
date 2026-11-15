@@ -934,7 +934,8 @@ body.zdp-panel-blank {
 }
 
 /* فقط وقتی فایل انتخاب شده، نام فایل پررنگ می‌شود؛ حالت خالی کم‌رنگ می‌ماند */
-.zdp-panel-shell .zdp-receipt-drop.has-file ~ .zdp-receipt-file-row .zdp-receipt-filename {
+.zdp-panel-shell .zdp-receipt-drop.has-file ~ .zdp-receipt-file-row .zdp-receipt-filename,
+.zdp-panel-shell .zdp-receipt-file-row .zdp-receipt-filename:not(:empty) {
     color: var(--pui-text);
     font-weight: 600;
 }
