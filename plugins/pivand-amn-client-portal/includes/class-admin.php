@@ -36,6 +36,7 @@ final class Admin
         add_action('admin_post_zdp_add_service', [$this, 'handle_add_service']);
         add_action('admin_post_zdp_update_service', [$this, 'handle_update_service']);
         add_action('admin_post_zdp_delete_service', [$this, 'handle_delete_service']);
+        add_action('admin_post_zdp_move_service', [$this, 'handle_move_service']);
         add_action('admin_post_zdp_add_card', [$this, 'handle_add_card']);
         add_action('admin_post_zdp_delete_card', [$this, 'handle_delete_card']);
         add_action('admin_post_zdp_save_survey_questions', [$this, 'handle_save_survey_questions']);
@@ -846,25 +847,40 @@ final class Admin
 
         <hr>
         <h2>خدمات قابل رزرو</h2>
-        <table class="widefat striped" style="max-width:700px;">
-            <thead><tr><th>نام خدمت</th><th>قیمت (تومان)</th><th>نوع</th><th>عملیات</th></tr></thead>
+        <p class="description">ترتیب همین جدول، همان ترتیبی است که مراجع در فرم رزرو نوبت می‌بیند. با دکمه‌های ▲ / ▼ خدمات را بالا و پایین ببرید تا اولویت‌بندی مشخص شود (ردیف بالا، اولین گزینهٔ مراجع است).</p>
+        <table class="widefat striped" style="max-width:760px;">
+            <thead><tr><th style="width:44px;">ردیف</th><th>نام خدمت</th><th>قیمت (تومان)</th><th>نوع</th><th>ترتیب</th><th>عملیات</th></tr></thead>
             <tbody>
-            <?php foreach ($services as $s) : ?>
+            <?php $service_rows = array_values($services); ?>
+            <?php foreach ($service_rows as $i => $s) : ?>
                 <tr>
+                    <td><?php echo (int) ($i + 1); ?></td>
                     <td><?php echo esc_html($s['name']); ?></td>
                     <td><?php echo esc_html(number_format((float) $s['price'])); ?></td>
                     <td><?php
                         $type_labels = ['both' => 'تلفنی و حضوری', 'phone' => 'تلفنی', 'online' => 'آنلاین (تصویری)', 'in_person' => 'حضوری'];
                         echo esc_html($type_labels[$s['type'] ?? 'both'] ?? 'تلفنی و حضوری');
                     ?></td>
+                    <td style="white-space:nowrap;">
+                        <?php if ($i > 0) : ?>
+                            <a class="button button-small" aria-label="انتقال به بالا" title="انتقال به بالا" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_move_service&service_id=' . urlencode($s['id']) . '&dir=up'), 'zdp_move_service_' . $s['id'])); ?>">▲</a>
+                        <?php else : ?>
+                            <span class="button button-small" aria-hidden="true" style="opacity:.35;pointer-events:none;">▲</span>
+                        <?php endif; ?>
+                        <?php if ($i < count($service_rows) - 1) : ?>
+                            <a class="button button-small" aria-label="انتقال به پایین" title="انتقال به پایین" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_move_service&service_id=' . urlencode($s['id']) . '&dir=down'), 'zdp_move_service_' . $s['id'])); ?>">▼</a>
+                        <?php else : ?>
+                            <span class="button button-small" aria-hidden="true" style="opacity:.35;pointer-events:none;">▼</span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=zdp-admin&tab=services&edit_service=' . urlencode($s['id']))); ?>">ویرایش</a>
                         <a class="button button-small" style="color:#b91c1c;" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_delete_service&service_id=' . urlencode($s['id'])), 'zdp_delete_service_' . $s['id'])); ?>" onclick="return confirm('حذف این خدمت؟');">حذف</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
-            <?php if (empty($services)) : ?>
-                <tr><td colspan="4">هنوز هیچ خدمتی تعریف نشده — بدون این لیست، فرم رزرو نوبت در پنل مراجع خالی می‌ماند.</td></tr>
+            <?php if (empty($service_rows)) : ?>
+                <tr><td colspan="6">هنوز هیچ خدمتی تعریف نشده — بدون این لیست، فرم رزرو نوبت در پنل مراجع خالی می‌ماند.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -1007,6 +1023,53 @@ final class Admin
         }
 
         wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=services&zdp_notice=service_invalid'));
+        exit;
+    }
+
+    /**
+     * جابه‌جایی و اولویت‌بندی خدمات (▲/▼).
+     * ترتیب همان آرایهٔ option است و چون لیست خدمات در فرم رزرو مراجع
+     * به همین ترتیب رندر می‌شود، جابه‌جایی اینجا مستقیماً ترتیب نمایش
+     * برای مراجع را عوض می‌کند. هیچ دادهٔ خدمتی حذف نمی‌شود؛ فقط جای
+     * دو عضو آرایه جابه‌جا می‌شود.
+     */
+    public function handle_move_service(): void
+    {
+        $this->assert_can_manage();
+        $service_id = sanitize_text_field(wp_unslash($_GET['service_id'] ?? ''));
+        check_admin_referer('zdp_move_service_' . $service_id);
+
+        $dir = sanitize_text_field(wp_unslash($_GET['dir'] ?? ''));
+        if ($service_id === '' || !in_array($dir, ['up', 'down'], true)) {
+            wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=services'));
+            exit;
+        }
+
+        $services = array_values((array) get_option('zdp_services_list', []));
+        $index    = null;
+        foreach ($services as $i => $s) {
+            if (($s['id'] ?? '') === $service_id) {
+                $index = $i;
+                break;
+            }
+        }
+
+        if ($index !== null) {
+            $target = $dir === 'up' ? $index - 1 : $index + 1;
+            if ($target >= 0 && $target < count($services)) {
+                $swap            = $services[$index];
+                $services[$index]  = $services[$target];
+                $services[$target] = $swap;
+                update_option('zdp_services_list', $services);
+                audit_log('service_reordered', [
+                    'id'        => $service_id,
+                    'direction' => $dir,
+                    'position'  => $target + 1,
+                ]);
+            }
+        }
+
+        wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=services'));
         exit;
     }
 

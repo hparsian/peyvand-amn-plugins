@@ -1103,6 +1103,74 @@
         var resultEl  = document.getElementById('zdp-receipt-result');
         var btn       = form.querySelector('.zdp-receipt-submit');
 
+        // ── نمایش فایل انتخاب‌شده (نام، حجم و پیش‌نمایش تصویر) ──────────
+        // بدون این بخش، input خام هیچ بازخوردی نمی‌داد و مراجع مطمئن نمی‌شد
+        // فایل درستی انتخاب کرده است. حداکثر حجم همان سقف سمت کلاینت است؛
+        // اعتبارسنجی واقعی همچنان در سرور انجام می‌شود.
+        var dropEl   = form.querySelector('[data-receipt-drop]');
+        var nameEl   = form.querySelector('[data-receipt-filename]');
+        var prevEl   = form.querySelector('[data-receipt-preview]');
+        var MAX_SIZE = 2 * 1024 * 1024;
+        var objectUrl = null;
+
+        function renderPickedFile() {
+            var file = fileInput.files && fileInput.files[0];
+
+            if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+            if (prevEl) { prevEl.hidden = true; prevEl.innerHTML = ''; }
+            if (dropEl) { dropEl.classList.remove('has-file'); }
+
+            if (!file) {
+                if (nameEl) { nameEl.textContent = 'فایلی انتخاب نشده'; }
+                return;
+            }
+
+            if (file.size > MAX_SIZE) {
+                if (nameEl) { nameEl.textContent = 'فایلی انتخاب نشده'; }
+                setMessage(resultEl, 'حجم تصویر رسید نباید بیشتر از ۲ مگابایت باشد.', true);
+                fileInput.value = '';
+                return;
+            }
+
+            if (nameEl) {
+                nameEl.textContent = file.name + ' · ' + Math.max(1, Math.round(file.size / 1024)) + ' کیلوبایت';
+            }
+            if (dropEl) { dropEl.classList.add('has-file'); }
+
+            if (prevEl && file.type && file.type.indexOf('image/') === 0) {
+                objectUrl = URL.createObjectURL(file);
+                prevEl.innerHTML = '<img alt="پیش‌نمایش تصویر رسید" src="' + objectUrl + '">';
+                prevEl.hidden = false;
+            }
+            setMessage(resultEl, '', false);
+        }
+
+        fileInput.addEventListener('change', renderPickedFile);
+
+        // ── درگ‌اند‌دراپ روی ناحیهٔ انتخاب ──────────────────────────────
+        if (dropEl) {
+            ['dragenter', 'dragover'].forEach(function (evt) {
+                dropEl.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    dropEl.classList.add('is-dragover');
+                });
+            });
+            ['dragleave', 'dragend'].forEach(function (evt) {
+                dropEl.addEventListener(evt, function () { dropEl.classList.remove('is-dragover'); });
+            });
+            dropEl.addEventListener('drop', function (e) {
+                e.preventDefault();
+                dropEl.classList.remove('is-dragover');
+                if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) { return; }
+                try {
+                    fileInput.files = e.dataTransfer.files;
+                } catch (err) {
+                    return; // مرورگرهای قدیمی: همچنان از دکمهٔ انتخاب فایل استفاده می‌شود
+                }
+                renderPickedFile();
+            });
+        }
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
