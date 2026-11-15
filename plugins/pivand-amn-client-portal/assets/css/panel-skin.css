@@ -824,3 +824,164 @@ body.zdp-panel-blank {
         max-inline-size: 112px;
     }
 }
+
+/* ============================================================
+   آپلود رسید واریز (تب نوبت‌ها) — طراحی تازه
+
+   قبلاً یک input[type=file] خام با برچسب متنی بود: در موبایل ناحیهٔ
+   لمسی کوچک، بدون پیش‌نمایش و بدون بازخورد. اکنون یک ناحیهٔ کشیدن‌و‌رها
+   کردن با آیکون، متن راهنما، نام و حجم فایل و پیش‌نمایش تصویر است.
+   شناسه‌ها و رفتار آپلود تغییر نکرده‌اند؛ فقط ظاهر.
+   ============================================================ */
+
+.zdp-panel-shell .zdp-receipt-upload-form {
+    max-inline-size: 460px;
+    gap: 12px;
+    margin-block-start: 16px;
+}
+
+/* input اصلی پنهان است ولی فوکوس‌پذیر می‌ماند (دسترسی با کیبورد) */
+.zdp-panel-shell .zdp-receipt-upload-form .zdp-receipt-input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.zdp-panel-shell .zdp-receipt-drop {
+    position: relative;
+}
+
+.zdp-panel-shell .zdp-receipt-drop-label {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 22px 18px;
+    text-align: center;
+    cursor: pointer;
+    border: 1.5px dashed var(--pui-border);
+    border-radius: var(--pui-r-lg);
+    background: var(--pui-surface-2);
+    transition: border-color var(--pui-dur) var(--pui-ease),
+                background var(--pui-dur) var(--pui-ease),
+                box-shadow var(--pui-dur) var(--pui-ease);
+}
+
+.zdp-panel-shell .zdp-receipt-drop-label:hover,
+.zdp-panel-shell .zdp-receipt-drop.is-dragover .zdp-receipt-drop-label {
+    border-color: var(--pui-accent-line);
+    background: var(--pui-accent-soft);
+}
+
+.zdp-panel-shell .zdp-receipt-drop.has-file .zdp-receipt-drop-label {
+    border-style: solid;
+    border-color: var(--pui-accent-line);
+    background: var(--pui-surface);
+}
+
+/* حلقهٔ فوکوس روی خودِ ناحیه، چون input پنهان است */
+.zdp-panel-shell .zdp-receipt-input:focus-visible + .zdp-receipt-drop-label {
+    outline: var(--pui-focus) solid 2px;
+    outline-offset: 2px;
+}
+
+.zdp-panel-shell .zdp-receipt-drop-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 46px;
+    block-size: 46px;
+    border-radius: 50%;
+    background: var(--pui-accent-soft);
+    color: var(--pui-primary);
+}
+
+.zdp-panel-shell .zdp-receipt-drop-icon svg {
+    inline-size: 22px;
+    block-size: 22px;
+}
+
+.zdp-panel-shell .zdp-receipt-drop-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-receipt-drop-hint {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--pui-text-soft);
+}
+
+/* ردیف نام فایل + پیش‌نمایش */
+.zdp-panel-shell .zdp-receipt-file-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-block-size: 0;
+}
+
+.zdp-panel-shell .zdp-receipt-filename {
+    font-size: 13px;
+    color: var(--pui-text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* فقط وقتی فایل انتخاب شده، نام فایل پررنگ می‌شود؛ حالت خالی کم‌رنگ می‌ماند */
+.zdp-panel-shell .zdp-receipt-drop.has-file ~ .zdp-receipt-file-row .zdp-receipt-filename {
+    color: var(--pui-text);
+    font-weight: 600;
+}
+
+.zdp-panel-shell .zdp-receipt-preview img {
+    display: block;
+    inline-size: 56px;
+    block-size: 56px;
+    object-fit: cover;
+    border-radius: var(--pui-r-sm);
+    border: 1px solid var(--pui-border-soft);
+    background: var(--pui-surface-3);
+}
+
+.zdp-panel-shell .zdp-receipt-submit {
+    inline-size: 100%;
+    justify-content: center;
+}
+
+.zdp-panel-shell .zdp-receipt-replace summary {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--pui-link);
+    padding: 6px 0;
+}
+
+.zdp-panel-shell .zdp-receipt-replace[open] summary { margin-block-end: 8px; }
+
+/* جعبهٔ «رسید ارسال شد» */
+.zdp-panel-shell .zdp-receipt-uploaded-box {
+    padding: 14px 16px;
+    border-radius: var(--pui-r-md);
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    box-shadow: var(--pui-shadow-sm);
+}
+.zdp-panel-shell .zdp-receipt-uploaded-box p:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-block: 0 8px;
+    font-weight: 700;
+    color: var(--pui-text);
+}
+
+@media (max-width: 640px) {
+    .zdp-panel-shell .zdp-receipt-drop-label { padding: 18px 14px; }
+    .zdp-panel-shell .zdp-receipt-drop-title { font-size: 14px; }
+    .zdp-panel-shell .zdp-receipt-drop-hint { font-size: 12px; }
+}

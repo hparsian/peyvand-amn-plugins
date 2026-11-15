@@ -348,6 +348,47 @@ final class Client_Panel
      * نمی‌کنند؛ اگر آیکن ناشناخته‌ای خواسته شود رشته‌ی خالی برمی‌گردد (هیچ‌وقت
      * خروجی را نمی‌شکند).
      */
+    /**
+     * فرم آپلود رسید واریز — طراحی واحد برای هر دو حالت (آپلود اول و
+     * جایگزینی رسید قبلی). شناسه‌ها همان‌هایی هستند که panel.js به آن‌ها
+     * وصل می‌شود (#zdp-receipt-upload-form/#zdp-receipt-file/...)، پس
+     * رفتار آپلود تغییر نکرده و فقط مارک‌آپ و ظاهر بهتر شده است.
+     *
+     * ناحیهٔ انتخاب فایل عمداً یک <label> برای input است (نه input خام)
+     * تا هم کلیک و هم درگ‌اند‌دراپ کار کند و در موبایل ناحیهٔ لمسی بزرگی
+     * داشته باشد.
+     */
+    private function render_receipt_upload_form(int $booking_id, string $button_label): string
+    {
+        ob_start();
+        ?>
+        <form id="zdp-receipt-upload-form" class="zdp-receipt-upload-form" enctype="multipart/form-data">
+            <input type="hidden" name="booking_id" value="<?php echo (int) $booking_id; ?>">
+
+            <div class="zdp-receipt-drop" data-receipt-drop>
+                <input type="file" id="zdp-receipt-file" name="receipt" accept="image/png,image/jpeg" required class="zdp-receipt-input">
+                <label class="zdp-receipt-drop-label" for="zdp-receipt-file">
+                    <span class="zdp-receipt-drop-icon" aria-hidden="true"><?php echo $this->icon('upload'); ?></span>
+                    <span class="zdp-receipt-drop-title">تصویر رسید واریز را انتخاب کنید</span>
+                    <span class="zdp-receipt-drop-hint">JPG یا PNG · حداکثر ۲ مگابایت · مبلغ و تاریخ واریز در تصویر دیده شود</span>
+                </label>
+            </div>
+
+            <div class="zdp-receipt-file-row">
+                <span class="zdp-receipt-filename" data-receipt-filename>فایلی انتخاب نشده</span>
+                <span class="zdp-receipt-preview" data-receipt-preview hidden></span>
+            </div>
+
+            <button type="submit" id="zdp-receipt-submit-btn" class="zdp-btn-primary zdp-receipt-submit">
+                <span class="zdp-btn-label"><?php echo esc_html($button_label); ?></span>
+                <span class="zdp-btn-spinner" aria-hidden="true"></span>
+            </button>
+            <p id="zdp-receipt-result" role="status"></p>
+        </form>
+        <?php
+        return (string) ob_get_clean();
+    }
+
     private function icon(string $name): string
     {
         $icons = [
@@ -367,6 +408,7 @@ final class Client_Panel
             'user'         => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 20C5.5 16.6 8.4 14.5 12 14.5C15.6 14.5 18.5 16.6 18.5 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
             'clock'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.25" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12L15 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             'check'        => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5L9.5 17L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'upload'       => '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16.5V4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7.5 9L12 4.5L16.5 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15.5V18.5C4.5 19.6 5.4 20.5 6.5 20.5H17.5C18.6 20.5 19.5 19.6 19.5 18.5V15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
         ];
 
         return $icons[$name] ?? '';
@@ -656,33 +698,16 @@ final class Client_Panel
                 <?php endif; ?>
 
                 <?php if (empty($pending_manual->receipt_path)) : ?>
-                    <form id="zdp-receipt-upload-form" class="zdp-receipt-upload-form" enctype="multipart/form-data">
-                        <input type="hidden" name="booking_id" value="<?php echo (int) $pending_manual->id; ?>">
-                        <label for="zdp-receipt-file">تصویر رسید واریز (jpg یا png)</label>
-                        <input type="file" id="zdp-receipt-file" name="receipt" accept="image/png,image/jpeg" required>
-                        <button type="submit" id="zdp-receipt-submit-btn" class="zdp-btn-primary zdp-receipt-submit">
-                            <span class="zdp-btn-label">آپلود رسید</span>
-                            <span class="zdp-btn-spinner" aria-hidden="true"></span>
-                        </button>
-                        <p id="zdp-receipt-result" role="status"></p>
-                    </form>
+                    <?php echo $this->render_receipt_upload_form((int) $pending_manual->id, 'آپلود رسید'); ?>
                 <?php else : ?>
                     <div class="zdp-receipt-uploaded-box">
                         <p><span class="zdp-icon-inline"><?php echo $this->icon('check'); ?></span> رسید شما آپلود شد و در انتظار بررسی ادمین است.</p>
                         <p>
                             <a href="<?php echo esc_url(Booking::receipt_url($pending_manual)); ?>" target="_blank" rel="noopener noreferrer">مشاهده‌ی رسید ارسالی</a>
                         </p>
-                        <details>
-                            <summary style="cursor:pointer;">آپلود رسید جدید (جایگزین رسید قبلی)</summary>
-                            <form id="zdp-receipt-upload-form" class="zdp-receipt-upload-form" enctype="multipart/form-data" style="margin-top:8px;">
-                                <input type="hidden" name="booking_id" value="<?php echo (int) $pending_manual->id; ?>">
-                                <input type="file" id="zdp-receipt-file" name="receipt" accept="image/png,image/jpeg" required>
-                                <button type="submit" id="zdp-receipt-submit-btn" class="zdp-btn-primary zdp-receipt-submit">
-                                    <span class="zdp-btn-label">آپلود رسید جدید</span>
-                                    <span class="zdp-btn-spinner" aria-hidden="true"></span>
-                                </button>
-                                <p id="zdp-receipt-result" role="status"></p>
-                            </form>
+                        <details class="zdp-receipt-replace">
+                            <summary>آپلود رسید جدید (جایگزین رسید قبلی)</summary>
+                            <?php echo $this->render_receipt_upload_form((int) $pending_manual->id, 'آپلود رسید جدید'); ?>
                         </details>
                     </div>
                 <?php endif; ?>
