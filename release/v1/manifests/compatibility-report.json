@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-11-14T09:29:59Z",
+  "verified_on": {
+    "wordpress": "7.1.4",
+    "php": "8.5.8"
+  },
+  "declared_requires": {
+    "wordpress": "6.6",
+    "php": "8.1"
+  },
+  "plugins": [
+    {
+      "slug": "pivand-amn-core",
+      "version": "1.8.1",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-sms-bridge",
+      "version": "1.1.7",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-smtp-mailer",
+      "version": "1.5.4",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-2fa",
+      "version": "1.3.5",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-case-file",
+      "version": "1.16.1",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-quiz-enterprise",
+      "version": "3.8.17",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-client-portal",
+      "version": "1.13.1.0",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "payvand-amn-ui-kit",
+      "version": "1.2.0",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "payvand-contact",
+      "version": "1.4.4",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "pivand-amn-content-writer",
+      "version": "2.9.18",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    },
+    {
+      "slug": "piwand-daily-feed",
+      "version": "1.1.6",
+      "structure": "ok",
+      "zip_valid": true,
+      "notes": []
+    }
+  ]
+}
