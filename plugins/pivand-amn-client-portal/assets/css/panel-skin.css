@@ -806,3 +806,21 @@ body.zdp-panel-blank {
     font-size: 13px;
     line-height: 1.85;
 }
+
+/* لوگوی سایت در نوار بالای پنل (جایگزین نشان گرافیکی قبلی) */
+.zdp-panel-shell .zdp-shell-brand-logo {
+    display: block;
+    block-size: 40px;
+    inline-size: auto;
+    max-inline-size: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+    .zdp-panel-shell .zdp-shell-brand-logo {
+        block-size: 34px;
+        max-inline-size: 112px;
+    }
+}

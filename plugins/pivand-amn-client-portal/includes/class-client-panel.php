@@ -419,16 +419,35 @@ final class Client_Panel
             $avatar_text = '؟';
         }
 
+        /* لوگوی سایت در نوار بالای پنل.
+           طبق درخواست کارفرما نشان گرافیکی قبلی (دو حلقهٔ متصل) کنار
+           «پیوند امن» حذف شد و جای آن لوگوی رسمی سایت می‌نشیند.
+           ترتیب انتخاب منبع: ۱) لوگوی سفارشی‌ساز وردپرس (custom_logo)
+           ۲) آیکون سایت (site_icon). اگر هیچ‌کدام تنظیم نشده باشد، هیچ
+           شکلی نمایش داده نمی‌شود و فقط نام برند می‌ماند — عمداً شکل
+           جایگزین ترسیم نمی‌کنیم تا خواستهٔ «شکل حذف شود» نقض نشود. */
+        $shell_logo_id   = (int) get_theme_mod('custom_logo');
+        $shell_logo_html = '';
+        if ($shell_logo_id) {
+            $shell_logo_html = (string) wp_get_attachment_image($shell_logo_id, 'medium', false, [
+                'class'   => 'zdp-shell-brand-logo',
+                'alt'     => esc_attr(get_bloginfo('name')),
+                'loading' => 'eager',
+            ]);
+        } else {
+            $shell_icon_url = get_site_icon_url(96);
+            if ($shell_icon_url) {
+                $shell_logo_html = '<img class="zdp-shell-brand-logo" src="' . esc_url($shell_icon_url) . '" alt="' . esc_attr(get_bloginfo('name')) . '" loading="eager" decoding="async">';
+            }
+        }
+
         ob_start();
         ?>
         <div class="zdp-panel zdp-panel-shell" dir="rtl" data-user-mobile="<?php echo esc_attr($mobile); ?>">
 
             <header class="zdp-shell-topbar">
                 <div class="zdp-shell-brand">
-                    <span class="zdp-shell-brand-mark" aria-hidden="true">
-                        <span class="zdp-ring zdp-ring-a"></span>
-                        <span class="zdp-ring zdp-ring-b"></span>
-                    </span>
+                    <?php echo $shell_logo_html; // لوگوی سایت (اگر تنظیم شده باشد) ?>
                     <span class="zdp-shell-brand-name">پیوند امن</span>
                 </div>
 
