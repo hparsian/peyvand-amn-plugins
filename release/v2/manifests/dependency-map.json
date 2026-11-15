@@ -1,0 +1,150 @@
+{
+  "generated_at": "2026-11-15T10:20:22Z",
+  "core_min_version": "1.8.1",
+  "install_order": [
+    "pivand-amn-core",
+    "pivand-amn-sms-bridge",
+    "pivand-amn-smtp-mailer",
+    "pivand-amn-2fa",
+    "pivand-amn-case-file",
+    "pivand-amn-quiz-enterprise",
+    "pivand-amn-client-portal",
+    "payvand-amn-ui-kit",
+    "payvand-contact",
+    "pivand-amn-content-writer",
+    "piwand-daily-feed"
+  ],
+  "upgrade_order": [
+    "pivand-amn-core",
+    "pivand-amn-sms-bridge",
+    "pivand-amn-smtp-mailer",
+    "pivand-amn-2fa",
+    "pivand-amn-case-file",
+    "pivand-amn-quiz-enterprise",
+    "pivand-amn-client-portal",
+    "payvand-amn-ui-kit",
+    "payvand-contact",
+    "pivand-amn-content-writer",
+    "piwand-daily-feed"
+  ],
+  "plugins": {
+    "pivand-amn-core": {
+      "requires": [],
+      "optional": [],
+      "contracts_provided": [
+        "pas_get_client",
+        "pas_lookup_known_client_name"
+      ],
+      "notes": "پایهٔ مشترک: رمزنگاری، توکن‌های طراحی، رجیستری قراردادها، هویت مراجع. باید اولین نصب و آخرین حذف شود."
+    },
+    "pivand-amn-sms-bridge": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [
+        "pas_send_sms"
+      ],
+      "notes": "تنها ارائه‌دهندهٔ pas_send_sms. اگر افزونهٔ پیامک دیگری فعال باشد، باید غیرفعال شود."
+    },
+    "pivand-amn-smtp-mailer": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "wp_mail را بازنویسی می‌کند؛ پس از فعال‌سازی باید ایمیل آزمایشی ارسال شود."
+    },
+    "pivand-amn-2fa": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "اختیاری per-user؛ پیش از فعال‌سازی کدهای پشتیبان ادمین باید ذخیره شود."
+    },
+    "pivand-amn-case-file": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [
+        "pivand-amn-quiz-enterprise"
+      ],
+      "contracts_provided": [
+        "pas_get_case_summary_for_phone",
+        "pas_cf_timeline_events"
+      ],
+      "contracts_consumed": [
+        "psy_get_assessment_scores_for_phone",
+        "zdp_get_intake_for_phone",
+        "pas_get_client"
+      ],
+      "notes": "بدون quiz، کارت روند ارزیابی خالی می‌ماند (بدون خطا)."
+    },
+    "pivand-amn-quiz-enterprise": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [
+        "psy_get_pending_quizzes_for_phone",
+        "psy_get_client_name_for_phone",
+        "psy_get_completed_results_for_phone",
+        "psy_get_assessment_scores_for_phone"
+      ],
+      "notes": "باید هم‌زمان با case-file و client-portal به‌روزرسانی شود."
+    },
+    "pivand-amn-client-portal": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [
+        "pivand-amn-sms-bridge",
+        "pivand-amn-quiz-enterprise"
+      ],
+      "contracts_provided": [
+        "zdp_get_intake_for_phone",
+        "zdp_get_client_panel_url"
+      ],
+      "contracts_consumed": [
+        "pas_send_sms",
+        "psy_get_pending_quizzes_for_phone",
+        "pas_get_case_summary_for_phone",
+        "pas_get_client"
+      ],
+      "notes": "بدون sms-bridge ارسال OTP کار نمی‌کند؛ درگاه پرداخت نیاز به کلید دارد."
+    },
+    "payvand-amn-ui-kit": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "فقط CSS/توکن؛ بدون آن ظاهر پنل‌ها ساده اما کارا می‌ماند."
+    },
+    "payvand-contact": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "فرم تماس عمومی؛ صفحهٔ فرم باید وجود داشته باشد."
+    },
+    "pivand-amn-content-writer": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "برای تولید محتوا به کلید API هوش مصنوعی نیاز دارد."
+    },
+    "piwand-daily-feed": {
+      "requires": [
+        "pivand-amn-core"
+      ],
+      "optional": [],
+      "contracts_provided": [],
+      "notes": "وابسته به cron سایت برای تولید روزانه."
+    }
+  }
+}

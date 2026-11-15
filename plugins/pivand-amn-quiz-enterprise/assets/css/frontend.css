@@ -5,10 +5,14 @@
    در پیوند امن — هسته مشترک) می‌خوانند تا ظاهر آزمون‌ها با پنل مراجعان و
    فرم تماس یکپارچه باشد. مقدار بعد از کاما همان fallback قبلی‌ست. */
 :root {
-    --psy-blue:       var(--pivand-accent, #2b6cb0);
-    --psy-blue-light: #3182ce;
-    --psy-blue-bg:    var(--pivand-accent-bg, #ebf8ff);
-    --psy-purple:     #553c9a;
+    /* یکپارچه‌سازی رنگ: آزمون‌ها همان پالت برندِ پنل مراجع و پیشخوان‌ها
+       (شن/کرم/قهوه‌ای/طلایی) را می‌گیرند. قبلاً آبی/بنفش بود و در کنار
+       پنل قهوه‌ای/کرم ناهمگون دیده می‌شد. همه‌ی نام‌های قدیمی (blue/purple)
+       حفظ شده‌اند تا هیچ قاعده‌ای نشکند؛ فقط مقدارشان تغییر کرده. */
+    --psy-blue:       var(--pivand-primary, #51483F);
+    --psy-blue-light: var(--pivand-primary-light, #C8B48A);
+    --psy-blue-bg:    var(--pivand-primary-bg, #EFE6D3);
+    --psy-purple:     var(--pivand-accent, #8A6B3E);
     --psy-green:      var(--pivand-success, #38a169);
     --psy-green-dark: #276749;
     --psy-green-bg:   var(--pivand-success-bg, #f0fff4);
@@ -36,7 +40,7 @@
 
 /* ── Header / Progress ───────────────────────────────────────────────── */
 #psy-exam-header {
-    background: linear-gradient(135deg, var(--psy-blue) 0%, var(--psy-purple) 100%);
+    background: linear-gradient(135deg, var(--pivand-primary-dark, #3F3830) 0%, var(--psy-purple) 100%);
     padding: 20px 28px 18px;
     border-radius: var(--psy-radius) var(--psy-radius) 0 0;
 }
@@ -49,7 +53,7 @@
     margin-bottom: 10px;
 }
 #psy-progress-bar {
-    background: #68d391;
+    background: var(--pivand-primary-light, #C8B48A);
     height: 100%;
     width: 0%;
     border-radius: 20px;
@@ -193,7 +197,7 @@
     box-shadow: 0 0 0 3px rgba(49,130,206,0.35);
 }
 .psy-btn-primary {
-    background: linear-gradient(135deg, var(--psy-blue-light), var(--psy-blue));
+    background: linear-gradient(135deg, var(--psy-purple), var(--psy-blue));
     color: #fff;
     font-size: 16px;
     padding: 14px 40px;
@@ -663,8 +667,8 @@ body.psy-exam-standalone-body {
 .psy-tone--warning { --psy-c: #d69e2e; --psy-bg: #fffff0; }
 .psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
 .psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
-.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
-.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
+.psy-tone--info    { --psy-c: var(--pivand-info, #3E5A75); --psy-bg: var(--pivand-accent-bg, #E7EEF5); }
+.psy-tone--purple  { --psy-c: var(--pivand-accent, #8A6B3E); --psy-bg: var(--pivand-accent-bg, #F3EAD8); }
 .psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
 
 .psy-report-row {
@@ -1053,10 +1057,10 @@ body.psy-exam-standalone-body {
 .psy-report-table__cell--q { color: #4a5568; line-height: 1.5; }
 .psy-report-table__cell--score { text-align: center; font-weight: 700; font-size: 14px; }
 
-/* کادر یادداشت/راهنمای آبی */
+/* کادر یادداشت/راهنمای برند (قبلاً آبی بود) */
 .psy-report-note-box {
-    background: #ebf8ff;
-    border: 1px solid #90cdf4;
+    background: var(--pivand-primary-bg, #EFE6D3);
+    border: 1px solid var(--pivand-primary-light, #C8B48A);
     border-radius: 10px;
     padding: 18px 20px;
     margin-block-end: 24px;
@@ -1066,9 +1070,9 @@ body.psy-exam-standalone-body {
     padding: 14px 20px;
     margin-block-end: 20px;
     font-size: 12px;
-    color: #2b6cb0;
+    color: var(--pivand-accent, #8A6B3E);
 }
-.psy-report-note-box__title { margin: 0 0 8px; font-size: 14px; color: #2b6cb0; }
+.psy-report-note-box__title { margin: 0 0 8px; font-size: 14px; color: var(--pivand-primary, #51483F); }
 .psy-report-note-box__text { margin: 0; font-size: 12px; color: #4a5568; line-height: 1.8; }
 
 /* نمودار وسط‌چین و کوچک */
@@ -1137,7 +1141,7 @@ body.psy-exam-standalone-body {
     border-block-end: 0;
 }
 .psy-report-compare__label { color: var(--psy-c, var(--psy-text)); font-weight: 600; }
-.psy-report-compare__me { text-align: center; font-weight: 700; color: #2b6cb0; }
+.psy-report-compare__me { text-align: center; font-weight: 700; color: var(--pivand-primary, #51483F); }
 .psy-report-compare__partner { text-align: center; font-weight: 700; color: #276749; }
 .psy-report-compare__diff { text-align: center; color: #718096; }
 .psy-report-align {
@@ -1195,7 +1199,7 @@ body.psy-exam-standalone-body {
 .psy-report-col--sm { flex: 1 1 300px; min-width: 300px; max-width: 500px; }
 
 /* جدول رتبه‌بندی طرحواره‌ها */
-.psy-report-table--brand thead th { background: #2b6cb0; color: #fff; }
+.psy-report-table--brand thead th { background: var(--pivand-primary, #51483F); color: #fff; }
 .psy-report-table--rank td { padding: 7px 8px; }
 .psy-report-table--rank tbody tr { border-block-end: 1px solid #edf2f7; }
 .psy-report-row--tint { background: var(--psy-bg, transparent); }

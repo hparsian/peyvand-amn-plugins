@@ -686,3 +686,115 @@ body.zdp-panel-blank {
     color: var(--pui-text-muted);
     box-shadow: inset 0 0 0 1px var(--pui-border-soft);
 }
+
+/* ============================================================
+   فاز ۱۶ — خوانایی متن و نوار بخش‌ها (بازخورد کارفرما)
+
+   ۱) متن‌های پنل (موبایل و دسکتاپ) بزرگ‌تر و بازتر شدند: اندازهٔ پایه از
+      ۱۳px به ۱۵px و ارتفاع خط به ۱٫۹ رسید. قبلاً برچسب‌ها و متن‌های
+      توضیحی روی موبایل ریز و فشرده بودند.
+   ۲) نوار بخش‌ها (نوبت‌ها / آزمون‌ها / پیام‌ها / ...) از این پس در همهٔ
+      اندازه‌های صفحه به پایین صفحه می‌چسبد تا مراجع همیشه همهٔ بخش‌ها را
+      ببیند؛ روی دسکتاپ به‌شکل یک داک شناور وسط‌چین و روی موبایل تمام‌عرض.
+      در نتیجه محتوای پنل هم فضای پایین لازم دارد تا زیر نوار نرود.
+   ============================================================ */
+
+/* ── ۱) تایپوگرافی ─────────────────────────────────────────── */
+.zdp-panel-shell {
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.zdp-panel-shell p,
+.zdp-panel-shell li,
+.zdp-panel-shell label,
+.zdp-panel-shell td,
+.zdp-panel-shell .zdp-field-check-label {
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.zdp-panel-shell h2 { font-size: 21px; line-height: 1.6; }
+.zdp-panel-shell h3 { font-size: 17.5px; line-height: 1.6; }
+.zdp-panel-shell h4 { font-size: 15.5px; line-height: 1.6; }
+
+/* متن‌های کم‌اهمیت‌تر: بزرگ‌تر از قبل، ولی هنوز کوچک‌تر از متن اصلی */
+.zdp-panel-shell small,
+.zdp-panel-shell .zdp-hint,
+.zdp-panel-shell .zdp-field-hint,
+.zdp-panel-shell .zdp-muted {
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.zdp-panel-shell .zdp-shell-user-name { font-size: 14px; }
+
+/* برچسب تب‌ها: در موبایل قبلاً ۱۰٫۵px بود و خواندنش سخت */
+.zdp-panel-shell .zdp-tab { font-size: 14px; }
+.zdp-panel-shell .zdp-tab-label { line-height: 1.4; }
+
+/* ── ۲) نوار بخش‌ها چسبیده به پایین صفحه ────────────────────
+   position: fixed تا در همهٔ مرورگرها/ارتفاع‌ها ثابت بماند؛ عرض با
+   max-inline-size محدود می‌شود تا روی دسکتاپ مثل یک داک وسط بنشیند. */
+.zdp-panel-shell .zdp-tabs {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    margin: 0 auto;
+    inline-size: 100%;
+    max-inline-size: 1080px;
+    justify-content: space-between;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+    border-radius: var(--pui-r-xl) var(--pui-r-xl) 0 0;
+    background: color-mix(in srgb, var(--pui-surface) 96%, #fff);
+    box-shadow: 0 -10px 30px -18px rgba(81, 72, 63, .55);
+    border: 1px solid var(--pui-border-soft);
+    border-bottom: none;
+}
+
+/* فضای لازم پایین محتوا تا آخرین کارت زیر نوار پنهان نشود */
+.zdp-panel-shell .zdp-shell-main {
+    padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 961px) {
+    .zdp-panel-shell .zdp-tabs {
+        bottom: 14px;
+        inset-inline: 0;
+        inline-size: calc(100% - 32px);
+        border-radius: var(--pui-r-xl);
+        border-bottom: 1px solid var(--pui-border-soft);
+        padding: 8px;
+    }
+    .zdp-panel-shell .zdp-shell-main {
+        padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    }
+    .zdp-panel-shell .zdp-tab { font-size: 14.5px; }
+}
+
+@media (max-width: 640px) {
+    .zdp-panel-shell { font-size: 15.5px; }
+    .zdp-panel-shell p,
+    .zdp-panel-shell li,
+    .zdp-panel-shell label,
+    .zdp-panel-shell td { font-size: 15.5px; }
+    .zdp-panel-shell h2 { font-size: 19px; }
+    .zdp-panel-shell h3 { font-size: 16.5px; }
+
+    /* در موبایل تب‌ها آیکون + برچسب می‌مانند (قبلاً زیر ۳۶۰px برچسب حذف
+       می‌شد و مراجع فقط آیکون می‌دید) */
+    .zdp-panel-shell .zdp-tab {
+        flex-direction: column;
+        gap: 4px;
+        padding: 7px 2px;
+        min-height: 52px;
+        font-size: 11.5px;
+    }
+    .zdp-panel-shell .zdp-tab-icon svg { width: 20px; height: 20px; }
+}
+
+@media (max-width: 360px) {
+    .zdp-panel-shell .zdp-tab { font-size: 10.5px; }
+    .zdp-panel-shell .zdp-tab-label { display: block; }
+}

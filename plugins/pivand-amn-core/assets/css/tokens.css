@@ -15,29 +15,37 @@
    ============================================================ */
 
 :root {
-    /* رنگ اصلی برند: آبی روشن (طبق درخواست صریح کارفرما — قبلاً تیل بود) */
-    --pivand-primary:       #2563eb;
-    --pivand-primary-dark:  #1d4ed8;
-    --pivand-primary-light: #60a5fa;
-    --pivand-primary-bg:    #eff6ff;
+    /* رنگ اصلی برند.
+       تصمیم محصولی (یکپارچه‌سازی رنگ اکوسیستم): پالت برند «پیوند امن»
+       همان پالت گرم کیت رابط کاربری است — شن/کرم/قهوه‌ای/طلایی
+       (--pui-* در payvand-amn-ui-kit). پیش از این، رفتارهای متفاوتی
+       وجود داشت: آزمون‌ها آبی/بنفش، پنل مراجع قهوه‌ای/کرم و پیشخوان‌ها
+       هم پالت برند. نتیجه، تجربه‌ی بصری ناهمگون بین آزمون و پنل بود.
+       اکنون همه‌ی افزونه‌هایی که از این توکن‌ها می‌خوانند یک زبان
+       بصری واحد دارند؛ هر افزونه‌ای که بخواهد مستقل بماند، همچنان
+       می‌تواند داخل دامنه‌ی خودش مقداردهی کند (مثل admin-skin.css). */
+    --pivand-primary:       #51483F;
+    --pivand-primary-dark:  #3F3830;
+    --pivand-primary-light: #C8B48A;
+    --pivand-primary-bg:    #EFE6D3;
 
-    /* رنگ ثانویه: آبی/بنفش، برای تاکید در آزمون‌ها و لینک‌ها */
-    --pivand-accent:        #2b6cb0;
-    --pivand-accent-bg:     #ebf8ff;
+    /* رنگ ثانویه: طلایی/قهوه‌ای روشن، برای تاکید در آزمون‌ها و لینک‌ها */
+    --pivand-accent:        #8A6B3E;
+    --pivand-accent-bg:     #F3EAD8;
 
-    /* رنگ‌های وضعیت (مشترک بین همه‌ی افزونه‌ها) */
-    --pivand-success:       #16a34a;
-    --pivand-warning:       #d97706;
-    --pivand-danger:        #dc2626;
-    --pivand-info:          #6366f1;
+    /* رنگ‌های وضعیت (مشترک بین همه‌ی افزونه‌ها — هم‌خانواده با پالت برند) */
+    --pivand-success:       #3F6B4F;
+    --pivand-warning:       #8A5A18;
+    --pivand-danger:        #9B3A2E;
+    --pivand-info:          #3E5A75;
 
     /* متن و سطح */
-    --pivand-ink:           #1e293b;
-    --pivand-ink-mid:       #475569;
-    --pivand-ink-soft:      #64748b;
-    --pivand-border:        #e2e8f0;
-    --pivand-border-soft:   #f1f5f9;
-    --pivand-surface:       #f8fafc;
+    --pivand-ink:           #51483F;
+    --pivand-ink-mid:       #6B5F52;
+    --pivand-ink-soft:      #857A6C;
+    --pivand-border:        #DDD5C8;
+    --pivand-border-soft:   #EFE9DE;
+    --pivand-surface:       #FAF7F1;
     --pivand-white:         #ffffff;
 
     /* هندسه */
@@ -52,12 +60,12 @@
 
     /* نسخه‌ی روشن‌تر آبی، برای لهجه‌های ثانویه/گرادیان (مثل نوار پیشرفت یا
        تگ‌های کوچک) — قبلاً در چند افزونه به‌صورت مستقل هاردکد شده بود */
-    --pivand-primary-mid:   #93c5fd;
+    --pivand-primary-mid:   #B39B6D;
 
     /* پس‌زمینه‌های کم‌رنگِ رنگ‌های وضعیت (برای بج/برچسب‌ها) */
-    --pivand-danger-bg:     #fff1f2;
-    --pivand-warning-bg:    #fffbeb;
-    --pivand-success-bg:    #f0fdf4;
+    --pivand-danger-bg:     #F7E7E3;
+    --pivand-warning-bg:    #F8EEDC;
+    --pivand-success-bg:    #E8F1EB;
 
     /* مقیاس فاصله‌گذاری مشترک (8px baseline) */
     --pivand-space-1:       4px;
@@ -88,7 +96,7 @@
     --pivand-focus-color:   var(--pivand-primary-light, #14b8a6);
     --pivand-focus-outline: 2px solid var(--pivand-focus-color);
     --pivand-focus-offset:  2px;
-    --pivand-focus-shadow:  0 0 0 3px rgba(37, 99, 235, 0.35);
+    --pivand-focus-shadow:  0 0 0 3px rgba(81, 72, 63, 0.35);
 }
 
 /* تصمیم محصولی: کل اکوسیستم «پیوند امن» عمداً دارک‌مود ندارد — همه‌ی
