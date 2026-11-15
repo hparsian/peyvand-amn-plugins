@@ -1,6 +1,6 @@
 {
   "release_label": "v2",
-  "generated_at": "2026-11-15T10:20:22Z",
+  "generated_at": "2026-11-15T10:23:21Z",
   "channel": "production",
   "excluded_patterns": [
     "\\.log$",
@@ -142,12 +142,12 @@
     {
       "order": 7,
       "slug": "pivand-amn-client-portal",
-      "version_source": "1.13.1.1",
-      "version_in_zip": "1.13.1.1",
+      "version_source": "1.13.1.2",
+      "version_in_zip": "1.13.1.2",
       "main_file": "pivand-amn-client-portal.php",
       "file_count": 30,
-      "size_bytes": 271140,
-      "sha256": "1784beb8edf9e7f30a876c7ef7f8d16b1e61e8e27d1ad96d5ca184d59b30af18",
+      "size_bytes": 271488,
+      "sha256": "2df44c268351ae41987c31af3fb4016a7efde75abd7f9476e966e503f314ad24",
       "verified": true,
       "problems": []
     },

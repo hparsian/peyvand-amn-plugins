@@ -723,22 +723,35 @@ final class Client_Panel
 
         ob_start();
         ?>
-        <h3 class="zdp-section-title">آزمون‌های در انتظار شما</h3>
+        <h3 class="zdp-section-title">آزمون‌های شما</h3>
+        <?php
+        /* تصمیم محصولی: نام (عنوان) آزمون به مراجع نشان داده نمی‌شود.
+           مراجع فقط باید بداند «آزمونی در انتظار تکمیل» دارد و بتواند آن را
+           شروع کند؛ عنوان دقیق آزمون (مثل CSI، FMS، PAM) اطلاعات بالینی است
+           و ممکن است انتظارات یا سوگیری مراجع را قبل از پاسخ‌دادن تغییر دهد.
+           دادهٔ ورودی همچنان quiz_name دارد؛ فقط در این نما رندر نمی‌شود.
+           اگر چند آزمون در انتظار باشد، با شماره از هم تفکیک می‌شوند. */
+        $zdp_quiz_total = count($quizzes);
+        $zdp_quiz_index = 0;
+        ?>
+        <p class="zdp-section-hint">عنوان آزمون پیش از شروع نمایش داده نمی‌شود؛ برای دیدن جزئیات، دکمهٔ شروع آزمون را بزنید.</p>
         <ul class="zdp-quiz-list">
             <?php foreach ($quizzes as $q) : ?>
                 <?php
                 // شکل واقعی داده‌ای که psy-quiz-enterprise از طریق فیلتر
                 // psy_get_pending_quizzes_for_phone برمی‌گرداند: آرایه‌ی انجمنی
-                // با کلیدهای quiz_name/link (نه یک object با title/url). قبلاً
-                // این تب اشتباهاً دنبال $q->title و $q->url می‌گشت که همیشه
-                // خالی بود و لیست آزمون‌ها هرگز درست نمایش داده نمی‌شد.
-                $name = is_array($q) ? ($q['quiz_name'] ?? 'آزمون') : ($q->quiz_name ?? $q->title ?? 'آزمون');
-                $url  = is_array($q) ? ($q['link'] ?? '') : ($q->link ?? $q->url ?? '');
+                // با کلیدهای quiz_name/link (نه یک object با title/url).
+                // عمداً quiz_name خوانده نمی‌شود (توضیح بالا).
+                $zdp_quiz_index++;
+                $label = $zdp_quiz_total > 1
+                    ? sprintf('آزمون شماره %d در انتظار تکمیل', $zdp_quiz_index)
+                    : 'آزمون در انتظار تکمیل';
+                $url = is_array($q) ? ($q['link'] ?? '') : ($q->link ?? $q->url ?? '');
                 ?>
                 <li>
                     <div class="zdp-list-item-icon" aria-hidden="true"><?php echo $this->icon('quizzes'); ?></div>
                     <div class="zdp-list-item-body">
-                        <strong><?php echo esc_html($name); ?></strong>
+                        <strong><?php echo esc_html($label); ?></strong>
                     </div>
                     <?php if (!empty($url)) : ?>
                         <a href="<?php echo esc_url($url); ?>" class="zdp-list-item-cta">شروع آزمون</a>

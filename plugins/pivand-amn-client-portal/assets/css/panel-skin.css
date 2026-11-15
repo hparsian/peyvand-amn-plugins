@@ -798,3 +798,11 @@ body.zdp-panel-blank {
     .zdp-panel-shell .zdp-tab { font-size: 10.5px; }
     .zdp-panel-shell .zdp-tab-label { display: block; }
 }
+
+/* راهنمای کوتاه زیر عنوان بخش‌ها (مثل تب آزمون‌ها) */
+.zdp-panel-shell .zdp-section-hint {
+    margin: -4px 0 14px;
+    color: var(--pui-text-soft);
+    font-size: 13px;
+    line-height: 1.85;
+}
