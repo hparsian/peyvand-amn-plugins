@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T10:57:52Z",
+  "generated_at": "2026-11-15T13:10:31Z",
   "verified_on": {
     "wordpress": "7.1.4",
     "php": "8.5.8"
@@ -11,7 +11,7 @@
   "plugins": [
     {
       "slug": "pivand-amn-core",
-      "version": "1.8.2",
+      "version": "1.9.0",
       "structure": "ok",
       "zip_valid": true,
       "notes": []
@@ -39,14 +39,14 @@
     },
     {
       "slug": "pivand-amn-case-file",
-      "version": "1.16.1",
+      "version": "1.20.0",
       "structure": "ok",
       "zip_valid": true,
       "notes": []
     },
     {
       "slug": "pivand-amn-quiz-enterprise",
-      "version": "3.8.18",
+      "version": "3.9.1",
       "structure": "ok",
       "zip_valid": true,
       "notes": []

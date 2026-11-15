@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-15T10:57:52Z",
-  "core_min_version": "1.8.1",
+  "generated_at": "2026-11-15T13:10:31Z",
+  "core_min_version": "1.9.0",
   "install_order": [
     "pivand-amn-core",
     "pivand-amn-sms-bridge",
@@ -33,7 +33,10 @@
       "optional": [],
       "contracts_provided": [
         "pas_get_client",
-        "pas_lookup_known_client_name"
+        "pas_lookup_known_client_name",
+        "pas_get_client_id_for_phone",
+        "pas_get_client_id_for_email",
+        "pas_event"
       ],
       "notes": "پایهٔ مشترک: رمزنگاری، توکن‌های طراحی، رجیستری قراردادها، هویت مراجع. باید اولین نصب و آخرین حذف شود."
     },
@@ -76,10 +79,12 @@
       ],
       "contracts_consumed": [
         "psy_get_assessment_scores_for_phone",
-        "zdp_get_intake_for_phone",
-        "pas_get_client"
+        "psy_get_assessment_risk_flags",
+        "pas_get_client",
+        "pas_get_client_id_for_phone",
+        "pas_event_assessment.completed"
       ],
-      "notes": "بدون quiz، کارت روند ارزیابی خالی می‌ماند (بدون خطا)."
+      "notes": "بدون quiz، کارت روند ارزیابی و شنوندهٔ assessment.completed خالی می‌ماند (بدون خطا)."
     },
     "pivand-amn-quiz-enterprise": {
       "requires": [
@@ -90,9 +95,10 @@
         "psy_get_pending_quizzes_for_phone",
         "psy_get_client_name_for_phone",
         "psy_get_completed_results_for_phone",
-        "psy_get_assessment_scores_for_phone"
+        "psy_get_assessment_scores_for_phone",
+        "psy_get_assessment_risk_flags"
       ],
-      "notes": "باید هم‌زمان با case-file و client-portal به‌روزرسانی شود."
+      "notes": "باید هم‌زمان با case-file و client-portal به‌روزرسانی شود. تکمیل آزمون رویداد assessment.completed را در هسته ثبت می‌کند."
     },
     "pivand-amn-client-portal": {
       "requires": [

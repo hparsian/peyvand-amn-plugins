@@ -47,13 +47,19 @@ PLUGIN_ORDER = [
     "piwand-daily-feed",
 ]
 
-CORE_MIN = "1.8.1"
+CORE_MIN = "1.9.0"
 
 DEPENDENCIES = {
     "pivand-amn-core": {
         "requires": [],
         "optional": [],
-        "contracts_provided": ["pas_get_client", "pas_lookup_known_client_name"],
+        "contracts_provided": [
+            "pas_get_client",
+            "pas_lookup_known_client_name",
+            "pas_get_client_id_for_phone",
+            "pas_get_client_id_for_email",
+            "pas_event",
+        ],
         "notes": "پایهٔ مشترک: رمزنگاری، توکن‌های طراحی، رجیستری قراردادها، هویت مراجع. باید اولین نصب و آخرین حذف شود.",
     },
     "pivand-amn-sms-bridge": {
@@ -78,8 +84,8 @@ DEPENDENCIES = {
         "requires": ["pivand-amn-core"],
         "optional": ["pivand-amn-quiz-enterprise"],
         "contracts_provided": ["pas_get_case_summary_for_phone", "pas_cf_timeline_events"],
-        "contracts_consumed": ["psy_get_assessment_scores_for_phone", "zdp_get_intake_for_phone", "pas_get_client"],
-        "notes": "بدون quiz، کارت روند ارزیابی خالی می‌ماند (بدون خطا).",
+        "contracts_consumed": ["psy_get_assessment_scores_for_phone", "psy_get_assessment_risk_flags", "pas_get_client", "pas_get_client_id_for_phone", "pas_event_assessment.completed"],
+        "notes": "بدون quiz، کارت روند ارزیابی و شنوندهٔ assessment.completed خالی می‌ماند (بدون خطا).",
     },
     "pivand-amn-quiz-enterprise": {
         "requires": ["pivand-amn-core"],
@@ -89,8 +95,9 @@ DEPENDENCIES = {
             "psy_get_client_name_for_phone",
             "psy_get_completed_results_for_phone",
             "psy_get_assessment_scores_for_phone",
+            "psy_get_assessment_risk_flags",
         ],
-        "notes": "باید هم‌زمان با case-file و client-portal به‌روزرسانی شود.",
+        "notes": "باید هم‌زمان با case-file و client-portal به‌روزرسانی شود. تکمیل آزمون رویداد assessment.completed را در هسته ثبت می‌کند.",
     },
     "pivand-amn-client-portal": {
         "requires": ["pivand-amn-core"],

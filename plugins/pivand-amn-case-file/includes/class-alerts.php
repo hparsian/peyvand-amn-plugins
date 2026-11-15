@@ -216,7 +216,7 @@ final class Pas_CF_Alerts
                   LIMIT %d";
 
         $params  = array_merge($params, [$limit]);
-        $results = $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
+        $results = $wpdb->get_results($params ? $wpdb->prepare($sql, ...$params) : $sql, ARRAY_A);
 
         return is_array($results) ? $results : [];
     }
@@ -246,7 +246,7 @@ final class Pas_CF_Alerts
 
         $sql = "SELECT COUNT(*) FROM $alerts a INNER JOIN $cases c ON c.id = a.case_id WHERE a.status <> 'closed' AND $where";
 
-        return (int) $wpdb->get_var($wpdb->prepare($sql, ...$params));
+        return (int) $wpdb->get_var($params ? $wpdb->prepare($sql, ...$params) : $sql);
     }
 
     /**

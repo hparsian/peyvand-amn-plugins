@@ -151,7 +151,7 @@ final class Pas_CF_Tasks
                 LIMIT %d";
 
         $params  = array_merge($params, [$limit]);
-        $results = $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
+        $results = $wpdb->get_results($params ? $wpdb->prepare($sql, ...$params) : $sql, ARRAY_A);
 
         return is_array($results) ? $results : [];
     }
@@ -185,7 +185,7 @@ final class Pas_CF_Tasks
                   LIMIT %d";
 
         $params  = array_merge($params, [$limit]);
-        $results = $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
+        $results = $wpdb->get_results($params ? $wpdb->prepare($sql, ...$params) : $sql, ARRAY_A);
 
         return is_array($results) ? $results : [];
     }
@@ -243,7 +243,7 @@ final class Pas_CF_Tasks
         $sql = "SELECT COUNT(*) FROM $tasks t LEFT JOIN $cases c ON c.id = t.case_id
                 WHERE t.status IN ('open', 'in_progress') AND (t.case_id = 0 OR $where)";
 
-        return (int) $wpdb->get_var($wpdb->prepare($sql, ...$params));
+        return (int) $wpdb->get_var($params ? $wpdb->prepare($sql, ...$params) : $sql);
     }
 
     public static function complete(int $task_id): bool
