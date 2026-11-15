@@ -187,6 +187,55 @@ final class Pas_CF_Alerts
         return is_array($results) ? $results : [];
     }
 
+    /**
+     * فهرست صفحهٔ مدیریت هشدارها.
+     *
+     * @param string $filter open|closed|all
+     * @return array<int,array<string,mixed>>
+     */
+    public static function list_visible(string $filter = 'open', int $limit = 200): array
+    {
+        global $wpdb;
+
+        $alerts = self::table('alerts');
+        $cases  = self::table('cases');
+        [$where, $params] = Pas_CF_Reports::scope();
+
+        $status_sql = match ($filter) {
+            'closed' => "a.status = 'closed'",
+            'all'    => '1=1',
+            default  => "a.status <> 'closed'",
+        };
+
+        $limit = max(1, min(500, $limit));
+        $sql   = "SELECT a.*, c.full_name, c.phone
+                  FROM $alerts a
+                  INNER JOIN $cases c ON c.id = a.case_id
+                  WHERE $status_sql AND $where
+                  ORDER BY FIELD(a.priority, 'critical', 'high', 'medium', 'low'), a.id DESC
+                  LIMIT %d";
+
+        $params  = array_merge($params, [$limit]);
+        $results = $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
+
+        return is_array($results) ? $results : [];
+    }
+
+    /** آیا کاربر جاری به پروندهٔ این هشدار دسترسی دارد؟ */
+    public static function can_access(int $alert_id): bool
+    {
+        global $wpdb;
+
+        $alert = self::get($alert_id);
+        if (!$alert) {
+            return false;
+        }
+
+        $case = Pas_CF_Case_File::get((int) $alert['case_id']);
+
+        return $case ? Pas_CF_Security::current_user_can_access_case($case) : false;
+    }
+
     public static function count_open_visible(): int
     {
         global $wpdb;

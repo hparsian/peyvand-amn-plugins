@@ -42,6 +42,20 @@ final class Pas_CF_Admin
         // به صفحات موجود با همین کپابیلیتی می‌رود.
         add_submenu_page('pas-case-files', 'داشبورد درمانگر', 'داشبورد', PAS_CF_CAP, 'pas-case-dashboard', ['Pas_CF_Dashboard', 'render']);
 
+        // فاز ۵: یک جای مشخص برای اقدام روی هشدارها و وظایف. برچسب منو
+        // تعداد هشدارهای بازِ قابل‌دیدن همین کاربر را نشان می‌دهد تا هشدار
+        // بالینی در میان منوها گم نشود؛ برای کاربر بدون دسترسی، هیچ عددی
+        // محاسبه/نمایش داده نمی‌شود.
+        $open_alerts = 0;
+        if (class_exists('Pas_CF_Alerts') && Pas_CF_Security::current_user_can_access()) {
+            $open_alerts = Pas_CF_Alerts::count_open_visible();
+        }
+        $alerts_label = 'هشدارها و وظایف';
+        if ($open_alerts > 0) {
+            $alerts_label .= sprintf(' <span class="update-plugins count-%1$d"><span class="plugin-count">%1$d</span></span>', $open_alerts);
+        }
+        add_submenu_page('pas-case-files', 'هشدارها و وظایف', $alerts_label, PAS_CF_CAP, Pas_CF_Alerts_Page::PAGE, ['Pas_CF_Alerts_Page', 'render']);
+
         add_submenu_page('pas-case-files', 'لیست پرونده‌ها', 'لیست پرونده‌ها', PAS_CF_CAP, 'pas-case-files', [$this, 'render_list_page']);
         add_submenu_page('pas-case-files', 'پرونده‌ی جدید', 'پرونده‌ی جدید', PAS_CF_CAP, 'pas-case-file-new', [$this, 'render_edit_page']);
         add_submenu_page('pas-case-files', 'گزارش‌های بالینی', 'گزارش‌ها', PAS_CF_CAP, 'pas-case-reports', [$this, 'render_reports_page']);

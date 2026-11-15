@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — پرونده مراجعین
  * Description: پرونده بالینی متمرکز برای هر مراجع (مشخصات + یادداشت جلسات، رمزنگاری‌شده) با ورود فقط از طریق حساب ادمین وردپرس (بدون OTP)، و اتصال فیلتر-محور به شماره موبایلی که افزونه‌ی ورود مراجعین (پنل مراجعان) با آن حساب می‌سازد.
- * Version: 1.18.0
+ * Version: 1.19.0
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -93,7 +93,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_CF_VERSION', '1.18.0');
+define('PAS_CF_VERSION', '1.19.0');
 define('PAS_CF_DIR', plugin_dir_path(__FILE__));
 define('PAS_CF_URL', plugin_dir_url(__FILE__));
 define('PAS_CF_CAP', 'pas_manage_case_files'); // ورود به پنل پرونده‌ها (حداقلی)
@@ -110,6 +110,7 @@ require_once PAS_CF_DIR . 'includes/class-reports.php';
 require_once PAS_CF_DIR . 'includes/class-alerts.php';
 require_once PAS_CF_DIR . 'includes/class-tasks.php';
 require_once PAS_CF_DIR . 'includes/class-clinical-events.php';
+require_once PAS_CF_DIR . 'includes/class-alerts-page.php';
 require_once PAS_CF_DIR . 'includes/class-dashboard.php';
 require_once PAS_CF_DIR . 'includes/class-admin.php';
 
@@ -138,6 +139,7 @@ add_action('plugins_loaded', function (): void {
     load_plugin_textdomain('pivand-amn-case-file');
 
     new Pas_CF_Admin();
+    Pas_CF_Alerts_Page::register();
 
     /**
      * قرارداد فیلتر برای بقیه‌ی اکوسیستم (اختیاری، اگر لازم شد):
