@@ -7,3 +7,7 @@ _analysis/
 # فایل‌های موقت/سیستمی
 .DS_Store
 *.log
+
+# پایتون
+__pycache__/
+*.pyc

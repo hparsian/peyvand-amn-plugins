@@ -15,7 +15,7 @@
   ۷. جدول نتیجه چاپ می‌کند و با کد خروج ۱ تمام می‌شود اگر هر بررسی شکست بخورد.
 
 اجرا (نمونه، همان محیط Staging):
-  python3 scripts/upgrade-test.py \
+  python3 scripts/upgrade_test.py \
     --php ~/phase11/php/php --wp-cli ~/phase11/wp-cli.phar \
     --wp-source ~/phase11/web --workdir ~/phase17-upgrade \
     --db phase17_upgrade --db-host 127.0.0.1:3307 --db-user root --db-pass '' \

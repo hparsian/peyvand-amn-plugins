@@ -1,0 +1,125 @@
+# آزمون‌های اکوسیستم پیوند امن روی هر push / pull request.
+#
+# دو آزمون مستقل، هرکدام یک وردپرس و دیتابیس تازه می‌سازند (هیچ داده‌ای از
+# سایت واقعی لازم نیست و هیچ secret‌ای استفاده نمی‌شود):
+#   ۱. نصب تازه  — ۱۱ بستهٔ release/v2 از صفر نصب و کل زنجیره سنجیده می‌شود.
+#   ۲. ارتقای v1→v2 — بسته‌های v1 نصب، دادهٔ نمونه ساخته، به v2 ارتقا داده می‌شود
+#      و حفظ داده/ساختار/رفتار بررسی می‌شود.
+#
+# هر دو آزمون نتیجه را به‌صورت JSON و لاگ متنی در Artifacts می‌گذارند تا در
+# صورت شکست، دقیقاً همان بررسیِ قرمز و جزئیاتش دیده شود.
+
+name: Ecosystem tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecosystem-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Fresh install + v1→v2 upgrade
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      DB_HOST: 127.0.0.1:3306
+      DB_USER: root
+      DB_PASS: root
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mysqli, mbstring, zip, curl, json, openssl
+          coverage: none
+
+      - name: Prepare wp-cli and a clean WordPress core
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin" "$RUNNER_TEMP/wp" artifacts
+          curl -fsSL -o "$RUNNER_TEMP/bin/wp-cli.phar" \
+            https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          php "$RUNNER_TEMP/bin/wp-cli.phar" core download --path="$RUNNER_TEMP/wp" --quiet
+          printf 'wp-cli: '; php "$RUNNER_TEMP/bin/wp-cli.phar" --info | head -n 1
+          printf 'wordpress: '; php "$RUNNER_TEMP/bin/wp-cli.phar" core version --path="$RUNNER_TEMP/wp"
+
+      - name: Wait for MySQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 40); do
+            if php -r 'exit(@mysqli_connect("127.0.0.1","root","root","",3306) ? 0 : 1);'; then
+              echo "MySQL ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL did not become ready" >&2
+          exit 1
+
+      - name: Fresh install test (release/v2)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/fresh_install_test.py \
+            --php php \
+            --wp-cli "$RUNNER_TEMP/bin/wp-cli.phar" \
+            --wp-source "$RUNNER_TEMP/wp" \
+            --workdir "$RUNNER_TEMP/fresh" \
+            --db ci_fresh --db-host "$DB_HOST" --db-user "$DB_USER" --db-pass "$DB_PASS" \
+            --port 8081 --json-out artifacts/fresh-install.json 2>&1 | tee artifacts/fresh-install.log
+
+      - name: Upgrade test (release/v1 → release/v2)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/upgrade_test.py \
+            --php php \
+            --wp-cli "$RUNNER_TEMP/bin/wp-cli.phar" \
+            --wp-source "$RUNNER_TEMP/wp" \
+            --workdir "$RUNNER_TEMP/upgrade" \
+            --db ci_upgrade --db-host "$DB_HOST" --db-user "$DB_USER" --db-pass "$DB_PASS" \
+            --port 8082 --json-out artifacts/upgrade.json 2>&1 | tee artifacts/upgrade.log
+
+      - name: Collect PHP debug logs
+        if: always()
+        shell: bash
+        run: |
+          for d in fresh upgrade; do
+            src="$RUNNER_TEMP/$d/site/wp-content/debug.log"
+            [ -f "$src" ] && cp "$src" "artifacts/$d-debug.log" || true
+          done
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-test-results
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
