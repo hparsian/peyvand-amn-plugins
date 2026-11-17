@@ -105,9 +105,9 @@ final class PAS_Dashboard_Module_System_Health extends PAS_Dashboard_Module {
 
 		foreach ( $checks as $check ) {
 			$html .= '<tr>';
-			$html .= '<td>' . esc_html( $check['label'] ) . '</td>';
-			$html .= '<td>' . $check['badge'] . '</td>';
-			$html .= '<td><code>' . esc_html( $check['detail'] ) . '</code></td>';
+			$html .= '<td data-label="' . esc_attr__( 'بررسی', 'peyvand-amn-dashboard' ) . '">' . esc_html( $check['label'] ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '">' . $check['badge'] . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'جزئیات', 'peyvand-amn-dashboard' ) . '"><code>' . esc_html( $check['detail'] ) . '</code></td>';
 			$html .= '</tr>';
 		}
 

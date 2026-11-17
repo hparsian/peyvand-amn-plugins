@@ -39,9 +39,9 @@ final class PAS_Dashboard_Module_Assessments extends PAS_Dashboard_Module {
 
 			foreach ( $tests as $test ) {
 				$html .= '<tr>';
-				$html .= '<td><code>' . esc_html( (string) $test['id'] ) . '</code></td>';
-				$html .= '<td>' . esc_html( (string) $test['name'] ) . '</td>';
-				$html .= '<td>' . esc_html( (string) $test['category'] ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'شناسه', 'peyvand-amn-dashboard' ) . '"><code>' . esc_html( (string) $test['id'] ) . '</code></td>';
+				$html .= '<td data-label="' . esc_attr__( 'نام آزمون', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $test['name'] ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'دسته', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $test['category'] ) . '</td>';
 				$html .= '</tr>';
 			}
 

@@ -77,10 +77,10 @@ final class PAS_Dashboard_Module_Appointments extends PAS_Dashboard_Module {
 
 			foreach ( array_slice( $upcoming, 0, 50 ) as $row ) {
 				$html .= '<tr>';
-				$html .= '<td>#' . esc_html( (string) $row['case_id'] ) . '</td>';
-				$html .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::jalali( $row['date'] ) ) . '</td>';
-				$html .= '<td>' . esc_html( (string) $row['number'] ) . '</td>';
-				$html .= '<td><a class="pas-btn" href="' . esc_url( add_query_arg( array( 'page' => PAS_DASHBOARD_SLUG, 'module' => 'case_files', 'case_id' => $row['case_id'] ), admin_url( 'admin.php' ) ) ) . '">' . esc_html__( 'پرونده', 'peyvand-amn-dashboard' ) . '</a></td>';
+				$html .= '<td data-label="' . esc_attr__( 'پرونده', 'peyvand-amn-dashboard' ) . '">#' . esc_html( (string) $row['case_id'] ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'تاریخ (شمسی)', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::jalali( $row['date'] ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'شماره جلسه', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $row['number'] ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '"><a class="pas-btn" href="' . esc_url( add_query_arg( array( 'page' => PAS_DASHBOARD_SLUG, 'module' => 'case_files', 'case_id' => $row['case_id'] ), admin_url( 'admin.php' ) ) ) . '">' . esc_html__( 'پرونده', 'peyvand-amn-dashboard' ) . '</a></td>';
 				$html .= '</tr>';
 			}
 
@@ -110,8 +110,8 @@ final class PAS_Dashboard_Module_Appointments extends PAS_Dashboard_Module {
 				}
 
 				$html .= '<tr>';
-				$html .= '<td>#' . esc_html( (string) $row['case_id'] ) . '</td>';
-				$html .= '<td>' . esc_html( $summary ? implode( ' — ', $summary ) : '—' ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'پرونده', 'peyvand-amn-dashboard' ) . '">#' . esc_html( (string) $row['case_id'] ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'اطلاعات نوبت', 'peyvand-amn-dashboard' ) . '">' . esc_html( $summary ? implode( ' — ', $summary ) : '—' ) . '</td>';
 				$html .= '</tr>';
 			}
 

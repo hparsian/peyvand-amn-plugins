@@ -33,7 +33,7 @@ inspected in a real browser after the UI upgrade.
 | CSV export end-to-end | PASS (SQLite and MariaDB; PHP 8.5: no `fputcsv` deprecation) |
 | `dbDelta` DDL + `SHOW CREATE TABLE` on MariaDB | PASS |
 | `INSERT … ON DUPLICATE KEY UPDATE` notification upsert | PASS on MariaDB |
-| UI upgrade (design tokens, icons, sticky header, a11y) | Rendered in browser; see `FINAL-UI-UPGRADE.md` |
+| UI upgrade (design tokens, icons, sticky header, a11y) | Rendered at 1024/768/360 px; 22 module×width overflow checks, 0 failures |
 | PHP error log | empty |
 
 **205 runtime assertions + 13 database/DDL checks, 0 failures.**
@@ -64,21 +64,21 @@ inspected in a real browser after the UI upgrade.
 
 ## Remaining conditions before production
 
-1. **Mobile browser matrix**: 360 px and 768 px, RTL, note form, CSV download,
-   pagination. A 1024 px desktop view is done; the narrow widths are not.
-2. **PHP 7.4**, only if that minimum is claimed: lint + both PHP suites.
-3. Couple/partner view with a linked partner case.
-4. Multisite, if the deployment is multisite.
-5. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (only
+1. **PHP 7.4**, only if that minimum is claimed: lint + both PHP suites.
+2. Couple/partner view with a linked partner case.
+3. Multisite, if the deployment is multisite.
+4. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (only
    MariaDB 11.8 was exercised).
+5. CSV download and the note-form keyboard flow at 360 px, if those flows are
+   used on phones (layout itself is verified at 360/768 px).
 
 ## Why not unconditional GO
 
 The database engine gate is now closed — `dbDelta`, the MySQL-only upsert, the
 unique `dedupe_key`, and Persian `utf8mb4` round-trips are proven on MariaDB.
-What remains is coverage, not a known defect: the layout is verified at one
-desktop width only, PHP 7.4 is untested, and the partner/couple path and
-multisite are unexercised. These are cheap to close on staging, so a conditional
+What remains is coverage, not a known defect: the layout is now verified at
+1024/768/360 px with zero horizontal overflow, but PHP 7.4 is untested and the
+partner/couple path and multisite are unexercised. These are cheap to close on staging, so a conditional
 approval is both honest and useful.
 
 ## Why not NO-GO
@@ -93,7 +93,7 @@ the package now runs clean on a real MySQL-family server.
 - [x] Backup plan documented (`FINAL-DEPLOYMENT-GUIDE.md`)
 - [x] Staging on MariaDB: activation + `dbDelta` + upsert + reinstall idempotency
 - [x] Desktop browser pass (1024 px, RTL, header/sidebar/KPI/table/empty state)
-- [ ] Mobile/tablet browser pass (360/768 px)
+- [x] Mobile/tablet browser pass (360/768 px, card tables, zero page overflow)
 - [ ] PHP version matches host (7.4 lint if claimed)
 - [ ] Partner view spot-check
 - [ ] Production deploy with rollback plan

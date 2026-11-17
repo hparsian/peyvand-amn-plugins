@@ -66,10 +66,10 @@ final class PAS_Dashboard_Module_Overview extends PAS_Dashboard_Module {
 			foreach ( $recent as $case ) {
 				$case_id = (int) ( $case->id ?? 0 );
 				$html   .= '<tr>';
-				$html   .= '<td>#' . esc_html( (string) $case_id ) . '</td>';
-				$html   .= '<td>' . esc_html( mb_strimwidth( (string) ( $case->full_name ?? '' ), 0, 40, '…' ) ) . '</td>';
-				$html   .= '<td><span class="pas-badge">' . esc_html( (string) ( $case->status ?? '' ) ) . '</span></td>';
-				$html   .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $case->updated_at ?? '' ) ) ) . '</td>';
+				$html   .= '<td data-label="' . esc_attr__( 'شناسه', 'peyvand-amn-dashboard' ) . '">#' . esc_html( (string) $case_id ) . '</td>';
+				$html   .= '<td data-label="' . esc_attr__( 'مراجع', 'peyvand-amn-dashboard' ) . '">' . esc_html( mb_strimwidth( (string) ( $case->full_name ?? '' ), 0, 40, '…' ) ) . '</td>';
+				$html   .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '"><span class="pas-badge">' . esc_html( (string) ( $case->status ?? '' ) ) . '</span></td>';
+				$html   .= '<td data-label="' . esc_attr__( 'آخرین به‌روزرسانی', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $case->updated_at ?? '' ) ) ) . '</td>';
 				$case_url = add_query_arg(
 					array(
 						'page'    => PAS_DASHBOARD_SLUG,
@@ -78,7 +78,7 @@ final class PAS_Dashboard_Module_Overview extends PAS_Dashboard_Module {
 					),
 					admin_url( 'admin.php' )
 				);
-				$html   .= '<td><a class="pas-btn" href="' . esc_url( $case_url ) . '">' . esc_html__( 'پرونده', 'peyvand-amn-dashboard' ) . '</a></td>';
+				$html   .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '"><a class="pas-btn" href="' . esc_url( $case_url ) . '">' . esc_html__( 'پرونده', 'peyvand-amn-dashboard' ) . '</a></td>';
 				$html   .= '</tr>';
 			}
 

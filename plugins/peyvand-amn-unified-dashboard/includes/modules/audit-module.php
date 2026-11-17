@@ -42,11 +42,11 @@ final class PAS_Dashboard_Module_Audit extends PAS_Dashboard_Module {
 				$class  = $result === 'ok' ? 'pas-badge-good' : ( $result === 'denied' ? 'pas-badge-danger' : 'pas-badge-warn' );
 
 				$html .= '<tr>';
-				$html .= '<td>' . esc_html( (string) ( $row->created_at ?? '' ) ) . '</td>';
-				$html .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::therapist_name( (int) ( $row->user_id ?? 0 ) ) ) . '</td>';
-				$html .= '<td><code>' . esc_html( (string) ( $row->action ?? '' ) ) . '</code></td>';
-				$html .= '<td>' . esc_html( (string) ( $row->object_type ?? '' ) . ( ! empty( $row->object_id ) ? ' #' . (int) $row->object_id : '' ) ) . '</td>';
-				$html .= '<td><span class="pas-badge ' . esc_attr( $class ) . '">' . esc_html( $result ) . '</span></td>';
+				$html .= '<td data-label="' . esc_attr__( 'زمان', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) ( $row->created_at ?? '' ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'کاربر', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::therapist_name( (int) ( $row->user_id ?? 0 ) ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'رخداد', 'peyvand-amn-dashboard' ) . '"><code>' . esc_html( (string) ( $row->action ?? '' ) ) . '</code></td>';
+				$html .= '<td data-label="' . esc_attr__( 'شیء', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) ( $row->object_type ?? '' ) . ( ! empty( $row->object_id ) ? ' #' . (int) $row->object_id : '' ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'نتیجه', 'peyvand-amn-dashboard' ) . '"><span class="pas-badge ' . esc_attr( $class ) . '">' . esc_html( $result ) . '</span></td>';
 				$html .= '</tr>';
 			}
 

@@ -74,13 +74,13 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 		foreach ( $slice as $case ) {
 			$id = (int) ( $case->id ?? 0 );
 			$html .= '<tr>';
-			$html .= '<td>#' . esc_html( (string) $id ) . '</td>';
-			$html .= '<td>' . esc_html( mb_strimwidth( (string) ( $case->full_name ?? '' ), 0, 36, '…' ) ) . '</td>';
-			$html .= '<td><span class="pas-badge">' . esc_html( (string) ( $case->status ?? '' ) ) . '</span></td>';
-			$html .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::therapist_name( (int) ( $case->assigned_therapist ?? 0 ) ) ) . '</td>';
-			$html .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $last_map[ $id ] ?? '' ) ) ) . '</td>';
-			$html .= '<td>' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $case->updated_at ?? '' ) ) ) . '</td>';
-			$html .= '<td><a class="pas-btn" href="' . esc_url( $this->url( array( 'case_id' => $id ) ) ) . '">' . esc_html__( 'بازکردن', 'peyvand-amn-dashboard' ) . '</a></td>';
+			$html .= '<td data-label="' . esc_attr__( 'شناسه', 'peyvand-amn-dashboard' ) . '">#' . esc_html( (string) $id ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'مراجع', 'peyvand-amn-dashboard' ) . '">' . esc_html( mb_strimwidth( (string) ( $case->full_name ?? '' ), 0, 36, '…' ) ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '"><span class="pas-badge">' . esc_html( (string) ( $case->status ?? '' ) ) . '</span></td>';
+			$html .= '<td data-label="' . esc_attr__( 'درمانگر', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::therapist_name( (int) ( $case->assigned_therapist ?? 0 ) ) ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'آخرین جلسه', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $last_map[ $id ] ?? '' ) ) ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'به‌روزرسانی', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::jalali( (string) ( $case->updated_at ?? '' ) ) ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '"><a class="pas-btn" href="' . esc_url( $this->url( array( 'case_id' => $id ) ) ) . '">' . esc_html__( 'بازکردن', 'peyvand-amn-dashboard' ) . '</a></td>';
 			$html .= '</tr>';
 		}
 

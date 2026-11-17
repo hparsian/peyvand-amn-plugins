@@ -61,7 +61,7 @@ final class PAS_Dashboard_Module_Reports extends PAS_Dashboard_Module {
 			$html .= '</tr></thead><tbody>';
 
 			foreach ( $by_status as $status => $count ) {
-				$html .= '<tr><td>' . esc_html( $status ) . '</td><td>' . esc_html( (string) $count ) . '</td></tr>';
+				$html .= '<tr><td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '">' . esc_html( $status ) . '</td><td data-label="' . esc_attr__( 'تعداد', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $count ) . '</td></tr>';
 			}
 
 			$html .= '</tbody></table></div>';

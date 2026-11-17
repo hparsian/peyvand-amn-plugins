@@ -130,3 +130,15 @@ The presentation layer was upgraded afterwards (see `FINAL-UI-UPGRADE.md`);
 render 26/26, lint 32/32 and the static suite were re-run green, and the page was
 inspected in a logged-in desktop browser session
 (`artifacts/dashboard-ui-overview.png`). Mobile widths remain unverified.
+
+### Round 3b — responsive pass (360 / 768 px)
+
+Six synthetic cases were created on the MariaDB site and the dashboard was
+driven in a real Chromium session at 360, 768 and 1024 px. Three layout defects
+were found and fixed (D18 off-screen skip link causing a ~10 000 px RTL
+horizontal scroll, D19 clipped tables at 360 px, D20 3 px table overflow at
+768 px). After the fixes, `documentElement.scrollWidth == clientWidth` on all
+eleven modules at both 360 px and 768 px (22 checks, 0 overflow), tables render
+as labelled cards on phones, and the 768 px table shows all seven columns with
+no scrollbar. Screenshots: `artifacts/ui-360-after.png`,
+`artifacts/ui-768-after.png`.

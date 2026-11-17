@@ -44,7 +44,7 @@ final class PAS_Dashboard_Module_Patients extends PAS_Dashboard_Module {
 			'mobile'    => __( 'موبایل', 'peyvand-amn-dashboard' ),
 			'email'     => __( 'ایمیل', 'peyvand-amn-dashboard' ),
 		) as $key => $label ) {
-			$html .= '<option value="' . esc_attr( $key ) . '"' . selected( $type, $key, false ) . '>' . esc_html( $label ) . '</option>';
+			$html .= '<option value="' . esc_attr( $key ) . '">' . selected( $type, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		$html .= '</select></div>';
 		$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'جست‌وجو', 'peyvand-amn-dashboard' ) . '</button>';
@@ -89,11 +89,11 @@ final class PAS_Dashboard_Module_Patients extends PAS_Dashboard_Module {
 
 			foreach ( $clients as $client ) {
 				$html .= '<tr>';
-				$html .= '<td><code>' . esc_html( (string) ( $client['client_id'] ?? '' ) ) . '</code></td>';
-				$html .= '<td>' . esc_html( (string) ( $client['display_name'] ?? '—' ) ) . '</td>';
-				$html .= '<td>' . $this->status_badge( (string) ( $client['status'] ?? '' ) ) . '</td>';
-				$html .= '<td>' . esc_html( (string) ( $client['identifiers_text'] ?? '' ) ) . '</td>';
-				$html .= '<td><a class="pas-btn" href="' . esc_url( $this->url( array( 'client_id' => (string) ( $client['client_id'] ?? '' ) ) ) ) . '">' . esc_html__( 'جزئیات', 'peyvand-amn-dashboard' ) . '</a></td>';
+				$html .= '<td data-label="' . esc_attr__( 'شناسه', 'peyvand-amn-dashboard' ) . '"><code>' . esc_html( (string) ( $client['client_id'] ?? '' ) ) . '</code></td>';
+				$html .= '<td data-label="' . esc_attr__( 'نام نمایشی', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) ( $client['display_name'] ?? '—' ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '">' . $this->status_badge( (string) ( $client['status'] ?? '' ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'شناسه‌ها', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) ( $client['identifiers_text'] ?? '' ) ) . '</td>';
+				$html .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '"><a class="pas-btn" href="' . esc_url( $this->url( array( 'client_id' => (string) ( $client['client_id'] ?? '' ) ) ) ) . '">' . esc_html__( 'جزئیات', 'peyvand-amn-dashboard' ) . '</a></td>';
 				$html .= '</tr>';
 			}
 

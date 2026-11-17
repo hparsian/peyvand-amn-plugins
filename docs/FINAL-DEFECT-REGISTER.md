@@ -28,6 +28,9 @@ before packaging; each fix was followed by the static suite
 | D15 | Opt-in uninstall left `pas_dashboard_version` behind | Low (hygiene) | `uninstall.php` | added `delete_option( 'pas_dashboard_version' )` | uninstall suite +2 checks |
 | D16 | `fputcsv()` was called without the `$escape` argument; PHP 8.4 deprecates that and PHP 9 changes the default, so CSV export would emit notices and could change quoting on newer hosts | Low (forward compatibility) | `class-dashboard-export.php` | explicit `fputcsv( $out, $row, ',', '"', '' )` (RFC 4180 behaviour) for header and rows | export on PHP 8.5: zero `fputcsv` deprecations, 1 neutralised cell, 0 raw |
 | D17 | `tests/wp/smoke.php` and `tests/wp/uninstall.php` read table names from `sqlite_master`, so the dbDelta assertions failed on MariaDB although the tables existed | Low (test portability) | `tests/wp/*` | `SHOW TABLES LIKE` via `$wpdb->prepare()` | smoke 48/48 and uninstall 13/13 on both MariaDB and the SQLite drop-in |
+| D18 | Skip link hidden with `inset-inline-start: -9999px` created a ~10 000 px horizontal page scroll in RTL, shifting the whole admin | Medium (layout) | `assets/css/dashboard-admin.css` | hidden with `transform: translateY(-120%)` + `opacity: 0` + `pointer-events: none`, revealed on `:focus` | `scrollWidth == clientWidth` on all 11 modules at 360/768 px |
+| D19 | Tables were clipped mid-column at 360 px and demanded blind horizontal scrolling | Medium (layout/mobile) | 11 module files + CSS | rows become labelled cards below 600 px: `data-label` on every cell (`esc_attr__()`), `thead` visually hidden, `td::before { content: attr(data-label) }` | 360 px screenshots, zero overflow on 11 modules |
+| D20 | Table overflowed by 3 px at 768 px, producing a scrollbar | Low (layout) | `assets/css/dashboard-admin.css` | cell padding 10×11 px at ≤ 900 px | 768 px: wrapper 659 px, table fits, no scrollbar |
 
 ## Phase Two findings (not changed; documented)
 

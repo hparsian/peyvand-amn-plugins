@@ -42,12 +42,12 @@ final class PAS_Dashboard_Module_Notifications extends PAS_Dashboard_Module {
 			foreach ( $rows as $row ) {
 				$is_read = ! empty( $row->read_at );
 				$html   .= '<tr>';
-				$html   .= '<td>' . esc_html( (string) $row->title ) . '</td>';
-				$html   .= '<td>' . esc_html( (string) $row->created_at ) . '</td>';
-				$html   .= '<td>' . ( $is_read
+				$html   .= '<td data-label="' . esc_attr__( 'عنوان', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $row->title ) . '</td>';
+				$html   .= '<td data-label="' . esc_attr__( 'زمان', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $row->created_at ) . '</td>';
+				$html   .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '">' . ( $is_read
 					? '<span class="pas-badge pas-badge-good">' . esc_html__( 'خوانده‌شده', 'peyvand-amn-dashboard' ) . '</span>'
 					: '<span class="pas-badge pas-badge-warn">' . esc_html__( 'نخوانده', 'peyvand-amn-dashboard' ) . '</span>' ) . '</td>';
-				$html   .= '<td>';
+				$html   .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '">';
 				if ( ! $is_read ) {
 					$html .= '<button type="button" class="pas-btn" data-pas-read-notification="' . esc_attr( (string) (int) $row->id ) . '">' . esc_html__( 'خواندم', 'peyvand-amn-dashboard' ) . '</button>';
 				}
