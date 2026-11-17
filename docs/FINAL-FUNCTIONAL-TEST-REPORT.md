@@ -142,3 +142,41 @@ eleven modules at both 360 px and 768 px (22 checks, 0 overflow), tables render
 as labelled cards on phones, and the 768 px table shows all seven columns with
 no scrollbar. Screenshots: `artifacts/ui-360-after.png`,
 `artifacts/ui-768-after.png`.
+
+## Round 4 — PHP 7.4 (minimum supported version)
+
+PHP **7.4.33** (CLI, mysqli/pdo_mysql/sqlite3/mbstring/json/curl/phar) was
+installed next to the 8.3 and 8.5 runtimes.
+
+| Check | Result |
+|---|---|
+| `php -l` all 32 plugin files | 32/32 |
+| `tests/php/test-validation.php` | 18/18 |
+| `tests/php/test-load.php` | 59/59 |
+| Smoke / activation surface | 48/48 |
+| Module rendering | 24/24 |
+| Uninstall | 13/13 |
+| Plugin error log | empty |
+| Static suite | 100/100 |
+
+The WordPress suites were necessarily run in **standalone mode**: Core 1.8.1 and
+Case File 1.16.1 declare `Requires PHP: 8.1` and use `?->`, so activating them on
+7.4 is a fatal parse error in upstream code (`class-admin.php` line 477) before
+the dashboard loads. Clinical integration (32 checks), AJAX (9) and CSV export
+therefore cannot be executed on 7.4 and remain verified on PHP 8.3/8.5 only.
+
+Two test-harness defects surfaced in this pass and were fixed:
+
+- **D21** `tests/wp/uninstall.php` was not idempotent: scenario B deletes the
+  options and drops the tables, so a second run failed "settings survive" and
+  "tables exist". The test now recreates its prerequisites. Verified by running
+  it twice back to back on 7.4 (13/13 both times) and again on 8.5 with the
+  upstream plugins active (13/13).
+- **D22** `tests/wp/render.php` required `case_files` to be visible for a
+  therapist, which is only true while Case File supplies
+  `pas_manage_case_files`; without it the module is hidden by design. The check
+  now asserts the correct expectation for each case.
+
+After re-activating the four upstream plugins, the full suite was re-run on
+PHP 8.5.8/MariaDB and stayed green: smoke 48, integration 32, AJAX 9, render 26,
+uninstall 13, unit 18+59, static 100.

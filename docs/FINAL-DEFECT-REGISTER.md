@@ -31,6 +31,8 @@ before packaging; each fix was followed by the static suite
 | D18 | Skip link hidden with `inset-inline-start: -9999px` created a ~10 000 px horizontal page scroll in RTL, shifting the whole admin | Medium (layout) | `assets/css/dashboard-admin.css` | hidden with `transform: translateY(-120%)` + `opacity: 0` + `pointer-events: none`, revealed on `:focus` | `scrollWidth == clientWidth` on all 11 modules at 360/768 px |
 | D19 | Tables were clipped mid-column at 360 px and demanded blind horizontal scrolling | Medium (layout/mobile) | 11 module files + CSS | rows become labelled cards below 600 px: `data-label` on every cell (`esc_attr__()`), `thead` visually hidden, `td::before { content: attr(data-label) }` | 360 px screenshots, zero overflow on 11 modules |
 | D20 | Table overflowed by 3 px at 768 px, producing a scrollbar | Low (layout) | `assets/css/dashboard-admin.css` | cell padding 10×11 px at ≤ 900 px | 768 px: wrapper 659 px, table fits, no scrollbar |
+| D21 | `tests/wp/uninstall.php` was not idempotent: scenario B drops the tables and deletes the options, so a second run failed “tables exist” and “settings survive” | Low (test reliability) | `tests/wp/uninstall.php` | the test recreates its prerequisites (options + tables via `PAS_Dashboard_Database::install()`) | two consecutive runs: 13/13 on PHP 7.4 and on 8.5 |
+| D22 | `tests/wp/render.php` required `case_files` for a therapist, which is only true while Case File is active | Low (test assumption) | `tests/wp/render.php` | branch on `PAS_Dashboard_Core_Bridge::has_case_file()` and assert graceful hiding when absent | render 26/26 with deps, 24/24 standalone on PHP 7.4 |
 
 ## Phase Two findings (not changed; documented)
 

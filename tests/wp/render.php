@@ -88,7 +88,12 @@ if ( is_wp_error( $therapist ) ) {
 	rcheck( 'therapist sees fewer modules than admin', count( $visible ) < 11, (string) count( $visible ) );
 	rcheck( 'therapist cannot see settings', ! isset( $visible['settings'] ) );
 	rcheck( 'therapist cannot see audit', ! isset( $visible['audit'] ) );
-	rcheck( 'therapist can see case files', isset( $visible['case_files'] ) );
+	if ( PAS_Dashboard_Core_Bridge::has_case_file() ) {
+		rcheck( 'therapist can see case files', isset( $visible['case_files'] ) );
+	} else {
+		// بدون افزونه‌ی پرونده، ماژول بالینی نباید نمایش داده شود (تنزل امن).
+		rcheck( 'case files hidden without the Case File plugin', ! isset( $visible['case_files'] ) );
+	}
 
 	$matrix             = PAS_Dashboard_Permissions::matrix();
 	$therapist_rendered = 0;

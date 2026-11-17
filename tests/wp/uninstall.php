@@ -43,7 +43,22 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	define( 'WP_UNINSTALL_PLUGIN', 'peyvand-amn-unified-dashboard/peyvand-amn-unified-dashboard.php' );
 }
 
+// پیش‌نیازها را بازسازی می‌کنیم تا تست به اجرای قبلی وابسته نباشد:
+// سناریوی B گزینه‌ها را حذف و جداول را drop می‌کند.
 update_option( 'pas_dashboard_version', '2.0.0' );
+update_option( 'pas_dashboard_db_version', '1.0.0' );
+
+if ( ! is_array( get_option( 'pas_dashboard_settings' ) ) ) {
+	update_option( 'pas_dashboard_settings', array() );
+}
+
+if ( ! table_present( $audit ) || ! table_present( $notif ) ) {
+	require_once WP_PLUGIN_DIR . '/peyvand-amn-unified-dashboard/peyvand-amn-unified-dashboard.php';
+
+	if ( class_exists( 'PAS_Dashboard_Database' ) ) {
+		PAS_Dashboard_Database::install();
+	}
+}
 
 WP_CLI::log( '--- scenario A: default uninstall keeps data ---' );
 

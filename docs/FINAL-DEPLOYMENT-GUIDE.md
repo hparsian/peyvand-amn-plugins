@@ -5,14 +5,18 @@
 | Item | Minimum | Tested |
 |---|---|---|
 | WordPress | 6.x | 7.1.4 |
-| PHP | 7.4 | 8.3.32 |
-| Database | MySQL 5.7 / MariaDB 10.3 | **SQLite drop-in only** |
-| Required plugins | Core, Case File | Core 1.7.0, Case File 1.15.3 |
-| Optional plugins | Quiz Enterprise, SMS Bridge | 3.6.7 / 1.1.6 |
+| PHP (dashboard alone) | 7.4 | 7.4.33, 8.3.32, 8.5.8 |
+| PHP (with Core/Case File) | **8.1** — the upstream plugins declare 8.1 and use `?->` | 8.5.8 |
+| Database | MySQL 5.7 / MariaDB 10.3 | MariaDB 11.8.10 (InnoDB) + SQLite drop-in |
+| Required plugins | Core, Case File (both 8.1+) | Core 1.8.1, Case File 1.16.1 |
+| Optional plugins | Quiz Enterprise, SMS Bridge | 3.8.17 / 1.1.7 |
 | Encryption | `PAS_CORE_ENCRYPTION_KEY` (`base64:` 32 bytes) | configured |
 
 Without Core/Case File the dashboard activates but degrades with notices; it
-never fatals.
+never fatals — verified on PHP 7.4 with all four upstream plugins deactivated
+(smoke 48/48, render 24/24, uninstall 13/13). Note that the clinical plugins
+themselves require PHP 8.1, so a PHP 7.4 host can only run the dashboard's
+degraded, non-clinical surface.
 
 ## 2. Pre-deployment
 
