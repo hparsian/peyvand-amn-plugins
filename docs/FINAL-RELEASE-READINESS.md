@@ -72,16 +72,16 @@ inspected in a real browser after the UI upgrade.
 | D20 | Low layout | 768 px table no longer overflows by 3 px |
 | D21 | Low test reliability | uninstall test recreates its prerequisites, so it is repeatable |
 | D22 | Low test assumption | render test checks graceful hiding when Case File is absent |
+| D23 | Medium defence in depth | partner row withheld by the bridge unless `can_view_partner` is true |
 
 ## Remaining conditions before production
 
-1. Couple/partner view with a linked partner case.
-2. Multisite, if the deployment is multisite.
-3. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (only
+1. Multisite, if the deployment is multisite.
+2. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (only
    MariaDB 11.8 was exercised).
-4. CSV download and the note-form keyboard flow at 360 px, if those flows are
+3. CSV download and the note-form keyboard flow at 360 px, if those flows are
    used on phones (layout itself is verified at 360/768 px).
-5. **Host PHP must be ≥ 8.1** to use the clinical modules at all — Core 1.8.1
+4. **Host PHP must be ≥ 8.1** to use the clinical modules at all — Core 1.8.1
    and Case File 1.16.1 require it. On 7.4 only the dashboard's degraded,
    non-clinical surface exists (that surface is verified).
 
@@ -90,9 +90,10 @@ inspected in a real browser after the UI upgrade.
 The database engine gate is now closed — `dbDelta`, the MySQL-only upsert, the
 unique `dedupe_key`, and Persian `utf8mb4` round-trips are proven on MariaDB.
 What remains is coverage, not a known defect: the layout is verified at
-1024/768/360 px with zero overflow, MySQL/MariaDB DDL is proven, and PHP 7.4 is
-verified for the standalone surface — but the partner/couple path, multisite and
-Oracle MySQL 8.0 are unexercised. These are cheap to close on staging, so a conditional
+1024/768/360 px with zero overflow, MySQL/MariaDB DDL is proven, PHP 7.4 is
+verified for the standalone surface, and the partner/couple path is verified
+end-to-end in both directions with a linked fixture — but multisite and Oracle
+MySQL 8.0 are unexercised. These are cheap to close on staging, so a conditional
 approval is both honest and useful.
 
 ## Why not NO-GO

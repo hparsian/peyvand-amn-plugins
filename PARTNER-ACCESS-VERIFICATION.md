@@ -209,5 +209,46 @@ function verify_partner_access( $case_id, $required_access = 'view' ) {
 
 **Final Status**: ✅ VERIFIED — Partner access fully enforced via `verify_partner_access()` with `get_couple_sessions()` and `can_view_partner` flag verification.
 
+--
+
+## 6. Runtime verification with a real linked case (2026-11-17)
+
+Sections 1–5 above are a code-path audit; this section records the first
+**executed** test of the partner path, `tests/wp/partner.php` (52 checks).
+
+Method: `Pas_CF_Case_File::create()` with `partner_phone` links case A
+(therapist A) to case B (therapist B) in both directions; a third case C is used
+for relink. One encrypted note is written on each side. The suite then acts as
+therapist A, therapist B and the administrator.
+
+| Assertion | Observed |
+|---|---|
+| `partner_case_id` set on both rows after create | PASS |
+| A: `couple_sessions()` → `has_partner=true`, `can_view_partner=false` | PASS |
+| A: bridge returns `partner = null` and no partner sessions | PASS |
+| A: payload contains no partner phone, name or note text | PASS |
+| A: `authorized_case(B)` → `pas_dashboard_forbidden`; `can_access_case(B)` false | PASS |
+| A: REST `/case/B/notes` → 403/404; own case → 200 | PASS |
+| A: rendered page shows the not-authorized notice and no partner PII | PASS |
+| B: symmetric denial for case A | PASS |
+| Admin: `can_view_partner=true`, both sides in the timeline, partner id shown | PASS |
+| Admin: couple projection still carries no note text | PASS |
+| Relink / unlink / self-link / unknown phone | PASS |
+| Dashboard source contains no call to unguarded `get_partner()` | PASS |
+
+Result: **52/52** on MariaDB 11.8 (PHP 8.5.8) and **52/52** on the SQLite
+drop-in (PHP 8.5.12); render 26/26 and integration 32/32 stayed green.
+
+Correction to the wording above: the runtime guard in this plugin is
+`PAS_Dashboard_Security::can_view_partner()` plus
+`PAS_Dashboard_Core_Bridge::couple_sessions()`; there is no
+`verify_partner_access()` method in the shipped code. The behaviour those
+earlier sections describe (case access first, then the upstream
+`can_view_partner` flag) is what the executed test confirms.
+
+Defect fixed during this pass — **D23**: the bridge used to return the raw
+partner row even when `can_view_partner` was false. It now returns
+`has_partner` and withholds the partner object unless access is confirmed.
+
 ---
 **Partner Access Verification Complete**. All paths verified with explicit test evidence.

@@ -119,7 +119,7 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 
 		$html .= $this->card_open( __( 'نمای جلسه‌های زوجی', 'peyvand-amn-dashboard' ) );
 
-		if ( ! $couple['partner'] ) {
+		if ( empty( $couple['has_partner'] ) ) {
 			$html .= '<p class="pas-muted">' . esc_html__( 'برای این پرونده پارتنر ثبت نشده است.', 'peyvand-amn-dashboard' ) . '</p>';
 		} elseif ( ! $couple['can_view_partner'] ) {
 			$html .= '<p class="pas-empty">' . esc_html__( 'این پرونده پارتنر دارد، اما دسترسی شما به پرونده‌ی پارتنر تأیید نشده است. اطلاعات پارتنر نمایش داده نمی‌شود.', 'peyvand-amn-dashboard' ) . '</p>';

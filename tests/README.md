@@ -13,6 +13,7 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | Clinical integration | `wp eval-file tests/wp/integration.php` | 32/32 |
 | Live AJAX authorization | `wp eval-file tests/wp/ajax-permissions.php` | 9/9 |
 | Module rendering | `wp eval-file tests/wp/render.php` | 26/26 |
+| Partner/couple path | `wp eval-file tests/wp/partner.php` | 52/52 |
 | Uninstall | `wp eval-file tests/wp/uninstall.php` | 13/13 |
 | CSV export | `wp eval-file tests/wp/export.php > out.csv` | 5/5 shell assertions |
 | JS syntax | `node --check` | pass |
@@ -34,6 +35,15 @@ pinned `dist/` packages and the newer source.
 - **`integration.php`** creates two therapists and two cases through the real
   API, verifies isolation, encryption at rest, note lifecycle, REST denial and
   administrator scope, then deletes every fixture.
+- **`partner.php`** links two real cases (A→B, bidirectional) through
+  `partner_phone`, puts a note on each side, then checks the boundary from three
+  identities: the owning therapist sees `can_view_partner=false`, no partner
+  sessions, no partner row, no partner note, and the blocked-partner notice in
+  the rendered dashboard; the partner's therapist gets the same denial in the
+  other direction; the administrator sees both sides but never note text in the
+  couple projection. It also exercises relink, self-link, unknown-phone and
+  unlink, REST denial, and a static guard that the dashboard never calls
+  upstream `get_partner()` directly. 52/52 on both MariaDB and SQLite.
 - **`cleanup-fixtures.php`** removes any leftover synthetic cases/users.
 
 ## Environment setup (reproducible)
@@ -53,8 +63,8 @@ wp plugin activate peyvand-amn-unified-dashboard
 
 ## Limits
 
-- SQLite, not MySQL/MariaDB; no `mysqli` in the available PHP build.
-- PHP 8.3 only (declared minimum is 7.4).
-- No browser: RTL/mobile layout unverified.
-- Partner/couple view and note restore are wired but not exercised.
-- Multisite untested.
+Superseded by the later passes documented in `docs/FINAL-FUNCTIONAL-TEST-REPORT.md`:
+MariaDB 11.8 (PHP 8.5), the 360/768 px browser matrix and PHP 7.4 standalone
+runs are all executed; the partner/couple path is covered by `partner.php`.
+What is still untested: note restore (only history creation is exercised),
+multisite, and Oracle MySQL 8.0 (only MariaDB was exercised).

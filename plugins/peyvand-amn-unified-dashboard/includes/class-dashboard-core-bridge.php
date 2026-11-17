@@ -127,11 +127,12 @@ final class PAS_Dashboard_Core_Bridge {
 	}
 
 	/**
-	 * @return array{partner:object|null,can_view_partner:bool,sessions:array}
+	 * @return array{partner:object|null,has_partner:bool,can_view_partner:bool,sessions:array}
 	 */
 	public static function couple_sessions( $case, $limit = 60 ) {
 		$empty = array(
 			'partner'          => null,
+			'has_partner'      => false,
 			'can_view_partner' => false,
 			'sessions'         => array(),
 		);
@@ -146,13 +147,20 @@ final class PAS_Dashboard_Core_Bridge {
 			return $empty;
 		}
 
-		return array_merge(
-			$empty,
-			array(
-				'partner'          => isset( $result['partner'] ) && is_object( $result['partner'] ) ? $result['partner'] : null,
-				'can_view_partner' => ! empty( $result['can_view_partner'] ),
-				'sessions'         => isset( $result['sessions'] ) && is_array( $result['sessions'] ) ? $result['sessions'] : array(),
-			)
+		$partner  = isset( $result['partner'] ) && is_object( $result['partner'] ) ? $result['partner'] : null;
+		$can_view = ! empty( $result['can_view_partner'] );
+
+		/*
+		 * داده‌ی پارتنر (شماره، نام، ستون‌های رمزنگاری‌شده) فقط وقتی از این پل
+		 * بیرون می‌رود که مجوز دیدنش تأیید شده باشد. پیش‌تر شیء پارتنر حتی با
+		 * can_view_partner=false هم برگردانده می‌شد و امنیت فقط به این وابسته
+		 * بود که هیچ فراخوانی آن را چاپ نکند؛ حالا مرز در خود پل اعمال می‌شود.
+		 */
+		return array(
+			'partner'          => $can_view ? $partner : null,
+			'has_partner'      => null !== $partner,
+			'can_view_partner' => $can_view,
+			'sessions'         => isset( $result['sessions'] ) && is_array( $result['sessions'] ) ? $result['sessions'] : array(),
 		);
 	}
 

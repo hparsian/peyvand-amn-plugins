@@ -88,7 +88,7 @@ pagination clicks, filters via UI. These remain **unverified**.
 |---|---|
 | T08 note restore | only history creation exercised |
 | T11 export without nonce (negative) | not invoked live |
-| T13 partner/couple view | no linked partner fixture |
+| ~~T13 partner/couple view~~ | covered in Round 5 (`tests/wp/partner.php`, 52 checks) |
 | T14/T15 handler-level settings/audit denial | module hidden, handler not invoked |
 | T18 mobile/RTL | no browser |
 | MySQL/MariaDB behaviour | no server, no `mysqli` |
@@ -180,3 +180,50 @@ Two test-harness defects surfaced in this pass and were fixed:
 After re-activating the four upstream plugins, the full suite was re-run on
 PHP 8.5.8/MariaDB and stayed green: smoke 48, integration 32, AJAX 9, render 26,
 uninstall 13, unit 18+59, static 100.
+
+## Round 5 — partner / couple path with a linked case
+
+New suite: `tests/wp/partner.php`. It builds a real couple through
+`Pas_CF_Case_File::create( [ 'partner_phone' => … ] )` (three cases: A assigned
+to therapist A, B and C assigned to therapist B), writes one encrypted note per
+side, renders the dashboard case detail for each identity, and deletes every
+fixture at the end.
+
+| Check | Result |
+|---|---|
+| `tests/wp/partner.php` on MariaDB 11.8 / PHP 8.5.8 | **52/52** |
+| `tests/wp/partner.php` on SQLite drop-in / PHP 8.5.12 | **52/52** |
+| Regression: render / integration on MariaDB | 26/26, 32/32 |
+| `php -l` of changed files on PHP 7.4.33 | 3/3 |
+
+What the suite proves:
+
+- **Link is bidirectional** (`partner_case_id` set on both rows), relink moves
+  both sides and clears the old partner, unlink via empty `partner_phone` clears
+  both sides, self-link and unknown phone are ignored.
+- **Therapist A** (owner of case A) gets `can_view_partner=false`, zero partner
+  sessions, no partner object from the bridge, a `pas_dashboard_forbidden` error
+  for case B, and a 403/404 from REST. The rendered page shows the
+  “دسترسی شما به پرونده‌ی پارتنر تأیید نشده است” notice and contains neither the
+  partner's name, phone nor note text; the therapist's own note still renders.
+- **Therapist B** (owner of the partner case) is denied in the other direction,
+  so the rule is “assigned therapist + explicit flag”, not couple membership.
+- **Administrator** sees both sides in the couple timeline and the partner case
+  id, but the couple projection still carries **no note text** — only date,
+  number, status, duration, `is_joint` and author.
+- A static guard asserts the dashboard never calls upstream `get_partner()`
+  (which has no authorization check); all partner reads go through
+  `PAS_Dashboard_Core_Bridge::couple_sessions()`.
+
+Defect found and fixed in this pass:
+
+- **D23** `couple_sessions()` used to return the raw partner row even when
+  `can_view_partner` was false. Nothing printed it, but the unauthorized PII
+  (phone, name, spouse/encrypted columns) still crossed the bridge API. The
+  bridge now returns `has_partner` plus `partner = null` unless access is
+  confirmed, and the module branches on `has_partner` so the user still sees the
+  correct “exists but not authorized” message instead of “no partner recorded”.
+
+With Round 5 the partner/couple condition is **closed**; the remaining
+conditions in `FINAL-RELEASE-READINESS.md` are multisite, Oracle MySQL 8.0 and
+the two 360 px interaction flows (CSV download, note form).
