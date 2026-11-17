@@ -1,0 +1,44 @@
+# Copyright (C) 2026 Peyvand Amn
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Peyvand Amn Unified Therapist Dashboard 2.0.0\n"
+"Report-Msgid-Bugs-To: https://peyvandamn.ir\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: Persian\n"
+"X-Domain: peyvand-amn-dashboard\n"
+
+msgid "نمای کلی"
+msgstr ""
+
+msgid "مراجعان"
+msgstr ""
+
+msgid "پرونده‌ها"
+msgstr ""
+
+msgid "آزمون‌ها"
+msgstr ""
+
+msgid "نوبت‌ها"
+msgstr ""
+
+msgid "گزارش‌ها"
+msgstr ""
+
+msgid "ارتباطات"
+msgstr ""
+
+msgid "اعلان‌ها"
+msgstr ""
+
+msgid "سلامت سیستم"
+msgstr ""
+
+msgid "تنظیمات"
+msgstr ""
+
+msgid "ممیزی"
+msgstr ""

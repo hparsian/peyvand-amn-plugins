@@ -1,0 +1,542 @@
+/**
+ * استایل داشبورد یکپارچه درمانگر — RTL، واکنش‌گرا، بدون وابستگی خارجی.
+ */
+
+.pas-dashboard {
+	--pas-bg: #f6f7fb;
+	--pas-card: #ffffff;
+	--pas-ink: #1d2433;
+	--pas-muted: #6b7488;
+	--pas-line: #e3e7ef;
+	--pas-primary: #2f6fed;
+	--pas-primary-ink: #ffffff;
+	--pas-good: #12805c;
+	--pas-good-bg: #e6f6ef;
+	--pas-warn: #8a5b00;
+	--pas-warn-bg: #fdf3dc;
+	--pas-danger: #a11c1c;
+	--pas-danger-bg: #fdeaea;
+	--pas-radius: 12px;
+
+	margin: 16px 20px 24px 20px;
+	color: var(--pas-ink);
+	font-family: Vazirmatn, Tahoma, "Segoe UI", sans-serif;
+	direction: rtl;
+}
+
+.pas-dashboard *,
+.pas-dashboard *::before,
+.pas-dashboard *::after {
+	box-sizing: border-box;
+}
+
+/* ── سربرگ ─────────────────────────────────────────────────────────── */
+
+.pas-header {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+	background: var(--pas-card);
+	border: 1px solid var(--pas-line);
+	border-radius: var(--pas-radius);
+	padding: 18px 20px;
+	margin-bottom: 16px;
+	flex-wrap: wrap;
+}
+
+.pas-header-main {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.pas-title {
+	margin: 0;
+	font-size: 20px;
+	line-height: 1.5;
+}
+
+.pas-subtitle {
+	margin: 4px 0 0;
+	color: var(--pas-muted);
+	font-size: 13px;
+}
+
+.pas-header-side {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.pas-user {
+	background: var(--pas-bg);
+	border-radius: 999px;
+	padding: 6px 12px;
+	font-size: 13px;
+}
+
+.pas-unread {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+	color: var(--pas-ink);
+	background: var(--pas-bg);
+	border-radius: 999px;
+	padding: 6px 12px;
+	font-size: 13px;
+}
+
+.pas-unread-count {
+	background: var(--pas-primary);
+	color: var(--pas-primary-ink);
+	border-radius: 999px;
+	min-width: 20px;
+	text-align: center;
+	padding: 1px 6px;
+	font-size: 12px;
+}
+
+.pas-nav-toggle {
+	display: none;
+	border: 1px solid var(--pas-line);
+	background: var(--pas-card);
+	border-radius: 8px;
+	padding: 8px 10px;
+	cursor: pointer;
+	font-size: 16px;
+}
+
+/* ── چیدمان ────────────────────────────────────────────────────────── */
+
+.pas-dashboard-body {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr);
+	gap: 16px;
+	align-items: start;
+}
+
+.pas-sidebar {
+	background: var(--pas-card);
+	border: 1px solid var(--pas-line);
+	border-radius: var(--pas-radius);
+	padding: 12px;
+	position: sticky;
+	top: 40px;
+}
+
+.pas-nav-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.pas-nav-item a {
+	display: block;
+	padding: 10px 12px;
+	border-radius: 8px;
+	text-decoration: none;
+	color: var(--pas-ink);
+	font-size: 14px;
+	margin-bottom: 2px;
+}
+
+.pas-nav-item a:hover,
+.pas-nav-item a:focus {
+	background: var(--pas-bg);
+	color: var(--pas-primary);
+}
+
+.pas-nav-item.is-active a {
+	background: var(--pas-primary);
+	color: var(--pas-primary-ink);
+	font-weight: 600;
+}
+
+.pas-sidebar-foot {
+	border-top: 1px solid var(--pas-line);
+	margin-top: 12px;
+	padding-top: 8px;
+}
+
+.pas-muted {
+	color: var(--pas-muted);
+	font-size: 12px;
+	margin: 4px 0;
+}
+
+.pas-main {
+	min-width: 0;
+}
+
+/* ── کارت ───────────────────────────────────────────────────────────── */
+
+.pas-card {
+	background: var(--pas-card);
+	border: 1px solid var(--pas-line);
+	border-radius: var(--pas-radius);
+	padding: 18px 20px;
+	margin-bottom: 16px;
+}
+
+.pas-card-title {
+	margin: 0 0 12px;
+	font-size: 16px;
+}
+
+.pas-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 12px;
+}
+
+.pas-stat {
+	background: var(--pas-bg);
+	border-radius: var(--pas-radius);
+	padding: 14px 16px;
+}
+
+.pas-stat-value {
+	display: block;
+	font-size: 24px;
+	font-weight: 700;
+}
+
+.pas-stat-label {
+	display: block;
+	color: var(--pas-muted);
+	font-size: 12px;
+	margin-top: 4px;
+}
+
+/* ── جدول ───────────────────────────────────────────────────────────── */
+
+.pas-table-wrap {
+	overflow-x: auto;
+}
+
+.pas-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.pas-table th,
+.pas-table td {
+	text-align: right;
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--pas-line);
+	vertical-align: middle;
+}
+
+.pas-table thead th {
+	background: var(--pas-bg);
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.pas-table tbody tr:hover {
+	background: #fafbff;
+}
+
+/* ── دکمه و فرم ─────────────────────────────────────────────────────── */
+
+.pas-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	border: 1px solid var(--pas-line);
+	background: var(--pas-card);
+	color: var(--pas-ink);
+	border-radius: 8px;
+	padding: 7px 14px;
+	font-size: 13px;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.pas-btn:hover {
+	border-color: var(--pas-primary);
+	color: var(--pas-primary);
+}
+
+.pas-btn-primary {
+	background: var(--pas-primary);
+	color: var(--pas-primary-ink);
+	border-color: var(--pas-primary);
+}
+
+.pas-btn-primary:hover {
+	color: var(--pas-primary-ink);
+	opacity: 0.92;
+}
+
+.pas-btn-danger {
+	color: var(--pas-danger);
+	border-color: var(--pas-danger);
+}
+
+.pas-form-row {
+	margin-bottom: 14px;
+}
+
+.pas-form-row label {
+	display: block;
+	font-size: 13px;
+	margin-bottom: 6px;
+	font-weight: 600;
+}
+
+.pas-input,
+.pas-textarea,
+.pas-select {
+	width: 100%;
+	border: 1px solid var(--pas-line);
+	border-radius: 8px;
+	padding: 9px 12px;
+	font-size: 13px;
+	font-family: inherit;
+	background: var(--pas-card);
+}
+
+.pas-textarea {
+	min-height: 120px;
+	resize: vertical;
+}
+
+.pas-input:focus,
+.pas-textarea:focus,
+.pas-select:focus {
+	outline: 2px solid rgba(47, 111, 237, 0.25);
+	border-color: var(--pas-primary);
+}
+
+/* ── نشان و اعلان ───────────────────────────────────────────────────── */
+
+.pas-badge {
+	display: inline-block;
+	border-radius: 999px;
+	padding: 3px 10px;
+	font-size: 12px;
+	background: var(--pas-bg);
+	color: var(--pas-muted);
+}
+
+.pas-badge-good {
+	background: var(--pas-good-bg);
+	color: var(--pas-good);
+}
+
+.pas-badge-warn {
+	background: var(--pas-warn-bg);
+	color: var(--pas-warn);
+}
+
+.pas-badge-danger {
+	background: var(--pas-danger-bg);
+	color: var(--pas-danger);
+}
+
+.pas-notice {
+	border-radius: var(--pas-radius);
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	border: 1px solid var(--pas-line);
+	background: var(--pas-bg);
+	font-size: 13px;
+}
+
+.pas-notice p {
+	margin: 0;
+}
+
+.pas-notice-success {
+	background: var(--pas-good-bg);
+	color: var(--pas-good);
+	border-color: transparent;
+}
+
+.pas-notice-warning {
+	background: var(--pas-warn-bg);
+	color: var(--pas-warn);
+	border-color: transparent;
+}
+
+.pas-notice-error {
+	background: var(--pas-danger-bg);
+	color: var(--pas-danger);
+	border-color: transparent;
+}
+
+.pas-empty {
+	color: var(--pas-muted);
+	background: var(--pas-bg);
+	border-radius: var(--pas-radius);
+	padding: 24px;
+	text-align: center;
+	font-size: 13px;
+}
+
+/* ── صفحه‌بندی ──────────────────────────────────────────────────────── */
+
+.pas-pagination {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	margin-top: 16px;
+	font-size: 13px;
+}
+
+.pas-page {
+	text-decoration: none;
+	border: 1px solid var(--pas-line);
+	border-radius: 8px;
+	padding: 6px 12px;
+	color: var(--pas-ink);
+}
+
+.pas-page-current {
+	color: var(--pas-muted);
+}
+
+/* ── خط زمان جلسات ─────────────────────────────────────────────────── */
+
+.pas-timeline {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-right: 2px solid var(--pas-line);
+}
+
+.pas-timeline li {
+	position: relative;
+	padding: 0 16px 16px 0;
+}
+
+.pas-timeline li::before {
+	content: "";
+	position: absolute;
+	right: -6px;
+	top: 6px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--pas-primary);
+}
+
+.pas-timeline-date {
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.pas-timeline-meta {
+	color: var(--pas-muted);
+	font-size: 12px;
+}
+
+/* ── پایین صفحه ────────────────────────────────────────────────────── */
+
+.pas-footer {
+	margin-top: 8px;
+	color: var(--pas-muted);
+	font-size: 12px;
+	text-align: center;
+}
+
+/* ── یادداشت و فهرست ───────────────────────────────────────────────── */
+
+.pas-note {
+	border: 1px solid var(--pas-line);
+	border-radius: var(--pas-radius);
+	padding: 14px 16px;
+	margin-bottom: 12px;
+	background: var(--pas-card);
+}
+
+.pas-note-title {
+	margin: 0 0 8px;
+	font-size: 14px;
+}
+
+.pas-note-body {
+	font-size: 13px;
+	line-height: 1.9;
+	white-space: normal;
+	word-break: break-word;
+}
+
+.pas-note-history {
+	margin-top: 8px;
+	font-size: 12px;
+	color: var(--pas-muted);
+}
+
+.pas-list {
+	margin: 0;
+	padding-inline-start: 20px;
+	font-size: 13px;
+	line-height: 2;
+}
+
+.pas-filter-form {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+	gap: 12px;
+	align-items: end;
+}
+
+@media (max-width: 700px) {
+	.pas-filter-form {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ── واکنش‌گرا ──────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+	.pas-dashboard-body {
+		grid-template-columns: 1fr;
+	}
+
+	.pas-sidebar {
+		display: none;
+		position: static;
+	}
+
+	.pas-sidebar.is-open {
+		display: block;
+	}
+
+	.pas-nav-toggle {
+		display: inline-block;
+	}
+}
+
+@media (max-width: 600px) {
+	.pas-dashboard {
+		margin: 10px;
+	}
+
+	.pas-header {
+		padding: 14px;
+	}
+
+	.pas-title {
+		font-size: 17px;
+	}
+
+	.pas-table th,
+	.pas-table td {
+		padding: 8px;
+	}
+}
+
+/* احترام به کاهش حرکت */
+@media (prefers-reduced-motion: reduce) {
+	.pas-dashboard * {
+		transition: none !important;
+		animation: none !important;
+	}
+}
