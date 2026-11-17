@@ -66,4 +66,4 @@ then exercised at runtime.
 | Assessment results | upstream exposes no public read API; intentionally catalogue-only |
 | Appointment writes | no verified write API; read-only by design |
 | SMS sending | requires an approved `body_id`; intentionally disabled |
-| Version skew | only tested against the versions in `dist/` (Core 1.7.0, Case File 1.15.3) |
+| Version skew | none observed: the full suite ran twice — on Core 1.7.0 / Case File 1.15.3 and on the current source builds **Core 1.8.1 / Case File 1.16.1 / Quiz 3.8.17 / SMS 1.1.7** — with identical results. All 13 Case File methods above keep the same signatures in 1.16.1. |

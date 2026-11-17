@@ -4,6 +4,12 @@ Environment: PHP **8.3.32**, WordPress **7.1.4**, SQLite drop-in **1.8.0**, plus
 the real **Core 1.7.0**, **Case File 1.15.3**, **Quiz 3.6.7**, **SMS Bridge
 1.1.6**. `PAS_CORE_ENCRYPTION_KEY` configured. No MySQL server, no browser.
 
+**Second full run on the current source builds** (Core **1.8.1**, Case File
+**1.16.1**, Quiz **3.8.17**, SMS Bridge **1.1.7**, all built from `plugins/`)
+produced identical results: smoke 48/48, integration 32/32, AJAX 9/9, render
+26/26, uninstall 13/13, CSV 5/5, lint 32/32, unit 18/18, load 59/59, static
+100/100, empty PHP error log.
+
 ## Executed totals
 
 | Suite | Command | Result |

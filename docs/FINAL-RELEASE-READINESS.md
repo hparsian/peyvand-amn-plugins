@@ -5,8 +5,10 @@
 **Decision:** **CONDITIONAL GO** — staging deployment approved; production
 blocked on MySQL/MariaDB and browser verification.
 
-Tested stack: PHP 8.3.32, WordPress 7.1.4, SQLite drop-in, Core 1.7.0,
-Case File 1.15.3, Quiz 3.6.7, SMS Bridge 1.1.6, encryption key configured.
+Tested stack: PHP 8.3.32, WordPress 7.1.4, SQLite drop-in, encryption key
+configured — run twice, on Core 1.7.0 / Case File 1.15.3 and on the current
+source builds **Core 1.8.1 / Case File 1.16.1 / Quiz 3.8.17 / SMS 1.1.7**, with
+identical results (205 runtime assertions, 0 failures, empty PHP error log).
 
 ## Evidence
 

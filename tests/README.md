@@ -17,6 +17,11 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | CSV export | `wp eval-file tests/wp/export.php > out.csv` | 5/5 shell assertions |
 | JS syntax | `node --check` | pass |
 
+The whole table was executed a second time against builds made from the current
+`plugins/` source — **Core 1.8.1, Case File 1.16.1, Quiz 3.8.17, SMS Bridge
+1.1.7** — with identical results, so the dashboard is compatible with both the
+pinned `dist/` packages and the newer source.
+
 ## Notes on the trickier suites
 
 - **`ajax-permissions.php`** defines `DOING_AJAX` and replaces every `wp_die`
