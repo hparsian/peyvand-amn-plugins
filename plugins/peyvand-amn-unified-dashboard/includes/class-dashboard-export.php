@@ -65,6 +65,8 @@ final class PAS_Dashboard_Export {
 		// BOM برای نمایش درست فارسی در Excel
 		fwrite( $out, "\xEF\xBB\xBF" );
 
+		// پارامتر $escape صریح است: از PHP 8.4 به بعد حذف آن منسوخ است و
+		// پیش‌فرضش هم تغییر می‌کند؛ رشته‌ی خالی رفتار سازگار RFC 4180 می‌دهد.
 		fputcsv(
 			$out,
 			array_map(
@@ -76,7 +78,10 @@ final class PAS_Dashboard_Export {
 					__( 'آخرین جلسه', 'peyvand-amn-dashboard' ),
 					__( 'آخرین به‌روزرسانی', 'peyvand-amn-dashboard' ),
 				)
-			)
+			),
+			',',
+			'"',
+			''
 		);
 
 		// یک کوئری متادیتا برای همه‌ی پرونده‌ها — بدون رمزگشایی و بدون متن یادداشت.
@@ -112,7 +117,10 @@ final class PAS_Dashboard_Export {
 						(string) ( $last_map[ $case_id ] ?? '' ),
 						(string) ( $case->updated_at ?? '' ),
 					)
-				)
+				),
+				',',
+				'"',
+				''
 			);
 		}
 

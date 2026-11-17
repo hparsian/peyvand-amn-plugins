@@ -19,6 +19,30 @@ abstract class PAS_Dashboard_Module {
 	/** هر ماژول محتوای خودش را برمی‌گرداند (escape شده). */
 	abstract public function render();
 
+	/** آیکون داشبورد برای هر ماژول (کلاس dashicons). */
+	public static function icon_for( $id ) {
+		$icons = array(
+			'overview'       => 'dashicons-chart-pie',
+			'patients'       => 'dashicons-groups',
+			'case_files'     => 'dashicons-portfolio',
+			'assessments'    => 'dashicons-clipboard',
+			'appointments'   => 'dashicons-calendar-alt',
+			'reports'        => 'dashicons-chart-line',
+			'communications' => 'dashicons-email-alt',
+			'notifications'  => 'dashicons-bell',
+			'system_health'  => 'dashicons-heart',
+			'settings'       => 'dashicons-admin-generic',
+			'audit'          => 'dashicons-shield-alt',
+		);
+
+		return isset( $icons[ $id ] ) ? $icons[ $id ] : 'dashicons-marker';
+	}
+
+	/** آیکون همین ماژول */
+	public function icon() {
+		return self::icon_for( $this->id );
+	}
+
 	/** آدرس صفحه‌ی همین ماژول */
 	public function url( array $args = array() ) {
 		$args = array_merge(

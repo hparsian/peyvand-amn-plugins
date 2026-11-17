@@ -35,8 +35,8 @@ $plugin_file = WP_PLUGIN_DIR . '/peyvand-amn-unified-dashboard/uninstall.php';
 
 function table_present( $name ) {
 	global $wpdb;
-	$rows = (array) $wpdb->get_col( "SELECT name FROM sqlite_master WHERE type='table'" );
-	return in_array( $name, $rows, true );
+	// دو-موتوره: روی MySQL و SQLite drop-in یکسان کار می‌کند.
+	return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $name ) ) === $name;
 }
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {

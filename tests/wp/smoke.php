@@ -37,10 +37,13 @@ smoke( 'plugin is active', is_plugin_active( 'peyvand-amn-unified-dashboard/peyv
 
 $audit_table = $wpdb->prefix . 'pas_dashboard_audit';
 $notif_table = $wpdb->prefix . 'pas_dashboard_notifications';
-$tables      = (array) $wpdb->get_col( "SELECT name FROM sqlite_master WHERE type='table'" );
+// دو-موتوره: SHOW TABLES LIKE روی MySQL و SQLite drop-in کار می‌کند.
+$table_exists = static function ( $table ) use ( $wpdb ) {
+	return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+};
 
-smoke( 'audit table created by dbDelta', in_array( $audit_table, $tables, true ) );
-smoke( 'notifications table created by dbDelta', in_array( $notif_table, $tables, true ) );
+smoke( 'audit table created by dbDelta', $table_exists( $audit_table ) );
+smoke( 'notifications table created by dbDelta', $table_exists( $notif_table ) );
 smoke( 'db version option stored', '1.0.0' === get_option( 'pas_dashboard_db_version' ), var_export( get_option( 'pas_dashboard_db_version' ), true ) );
 
 WP_CLI::log( '--- capabilities ---' );

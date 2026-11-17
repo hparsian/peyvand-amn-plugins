@@ -12,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
 ?>
 <div class="pas-dashboard" dir="rtl">
 
+	<a class="pas-skip-link" href="#pas-main"><?php esc_html_e( 'پرش به محتوا', 'peyvand-amn-dashboard' ); ?></a>
+
 	<?php include PAS_DASHBOARD_DIR . 'templates/header.php'; ?>
 
 	<div class="pas-dashboard-body">

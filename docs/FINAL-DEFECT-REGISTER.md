@@ -26,6 +26,8 @@ before packaging; each fix was followed by the static suite
 | D13 | `cases()` always used `list_for_therapist()`, so an administrator with `PAS_CF_CAP_ALL` saw **zero** cases in Overview, Reports and CSV | High (functional) | `class-dashboard-core-bridge.php` | branch to `list_all()` only after `current_user_can_view_all()`; added `viewer_can_see_all_cases()` | integration +2 checks; real CSV now returns rows; static checker permits `list_all` only behind the view-all guard |
 | D14 | CSV formula injection: a display name like `=2+2` was written verbatim and would execute in Excel | Medium (security) | `class-dashboard-export.php` | `csv_cell()` prefixes `'` for `= + - @ TAB CR`, applied to header and every row | 6 smoke checks + real exported file (`'=2+2`, zero raw `,=2+2`) |
 | D15 | Opt-in uninstall left `pas_dashboard_version` behind | Low (hygiene) | `uninstall.php` | added `delete_option( 'pas_dashboard_version' )` | uninstall suite +2 checks |
+| D16 | `fputcsv()` was called without the `$escape` argument; PHP 8.4 deprecates that and PHP 9 changes the default, so CSV export would emit notices and could change quoting on newer hosts | Low (forward compatibility) | `class-dashboard-export.php` | explicit `fputcsv( $out, $row, ',', '"', '' )` (RFC 4180 behaviour) for header and rows | export on PHP 8.5: zero `fputcsv` deprecations, 1 neutralised cell, 0 raw |
+| D17 | `tests/wp/smoke.php` and `tests/wp/uninstall.php` read table names from `sqlite_master`, so the dbDelta assertions failed on MariaDB although the tables existed | Low (test portability) | `tests/wp/*` | `SHOW TABLES LIKE` via `$wpdb->prepare()` | smoke 48/48 and uninstall 13/13 on both MariaDB and the SQLite drop-in |
 
 ## Phase Two findings (not changed; documented)
 
@@ -35,7 +37,7 @@ before packaging; each fix was followed by the static suite
 | F2 | REST `/case/{id}/notes` returns decrypted text to any authorized clinical user | same data as the UI, capability- and resource-gated, audited per request |
 | F3 | upstream `get()` decrypts before the access check | upstream behaviour; dashboard never emits data before authorization |
 | F4 | Phase One reports describe the older 10-file v1.0.0 plugin | documentation only; superseded by the Phase Two reports |
-| F5 | MySQL/MariaDB, PHP 7.4, browser, multisite untested | environment limits; listed as release conditions |
+| F5 | PHP 7.4, mobile-width browser matrix, multisite untested | environment limits (only PHP 8.3/8.5 and one desktop viewport available); listed as release conditions. MySQL/MariaDB and a desktop browser pass are now executed — see `FINAL-DATABASE-VERIFICATION.md` §5 and `FINAL-UI-UPGRADE.md` §4 |
 
 ## Open defects
 

@@ -8,6 +8,11 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$pas_display = $user instanceof WP_User ? (string) $user->display_name : '';
+$pas_initial = $pas_display !== ''
+	? ( function_exists( 'mb_substr' ) ? mb_substr( $pas_display, 0, 1 ) : substr( $pas_display, 0, 1 ) )
+	: '?';
 ?>
 <header class="pas-header">
 	<div class="pas-header-main">
@@ -15,6 +20,8 @@ defined( 'ABSPATH' ) || exit;
 			<span class="screen-reader-text"><?php esc_html_e( 'نمایش منو', 'peyvand-amn-dashboard' ); ?></span>
 			<span aria-hidden="true">☰</span>
 		</button>
+
+		<span class="pas-title-icon dashicons <?php echo esc_attr( $module->icon() ); ?>" aria-hidden="true"></span>
 
 		<div>
 			<h1 class="pas-title"><?php echo esc_html( $module->title ); ?></h1>
@@ -34,7 +41,8 @@ defined( 'ABSPATH' ) || exit;
 		<?php endif; ?>
 
 		<span class="pas-user">
-			<?php echo esc_html( $user instanceof WP_User ? $user->display_name : '' ); ?>
+			<span class="pas-avatar" aria-hidden="true"><?php echo esc_html( $pas_initial ); ?></span>
+			<?php echo esc_html( $pas_display ); ?>
 		</span>
 	</div>
 </header>

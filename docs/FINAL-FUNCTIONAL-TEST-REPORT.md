@@ -102,3 +102,31 @@ exercise passed after fixing three real defects (D13–D15). The plugin activate
 degrades safely without dependencies, enforces access control on read and write,
 protects encrypted data, and preserves data on uninstall. Browser, MySQL and
 PHP 7.4 verification remain outstanding and are stated as such.
+
+
+## Round 3 — MariaDB + UI upgrade (2026-11-17)
+
+Executed on **PHP 8.5.8, WordPress 7.1.4, MariaDB 11.8.10** with the upstream
+Core 1.8.1 / Case File 1.16.1 / Quiz 3.8.17 / SMS 1.1.7 activated (`mysqli`,
+real InnoDB tables, encryption key configured):
+
+| Suite | Result |
+|---|---|
+| Smoke / activation surface | 48/48 |
+| Clinical integration | 32/32 |
+| AJAX authorization | 9/9 |
+| Module rendering | 26/26 |
+| Uninstall | 13/13 |
+| CSV export | 4 rows, 1 neutralised cell, 0 raw, no phone column |
+| `php -l` | 32/32 |
+| Static + integration suite | 100/100 |
+
+Two harness defects were found and fixed on this run: D16 (`fputcsv()` without
+an explicit escape argument, deprecated from PHP 8.4) and D17 (smoke/uninstall
+queried `sqlite_master`). After the fixes every suite above passed on MariaDB and
+the same suites re-passed unchanged on the SQLite drop-in (48/32/9/26/13).
+
+The presentation layer was upgraded afterwards (see `FINAL-UI-UPGRADE.md`);
+render 26/26, lint 32/32 and the static suite were re-run green, and the page was
+inspected in a logged-in desktop browser session
+(`artifacts/dashboard-ui-overview.png`). Mobile widths remain unverified.

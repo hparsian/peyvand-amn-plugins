@@ -58,22 +58,38 @@ gated by `PAS_Dashboard_Database::maybe_upgrade()`.
 - No production data, patient rows, notes or encryption keys are migrated or
   rewritten by this plugin.
 
-## 5. MySQL / MariaDB — NOT verified
+## 5. MySQL / MariaDB — VERIFIED
 
-The environment has **no MySQL server and no `mysqli` extension** (PHP has
-`pdo_mysql` only, and WordPress requires `mysqli`), so the runtime tests used
-the official SQLite drop-in. Consequently:
+Run on a real server: **MariaDB 11.8.10** (`127.0.0.1:3307`, InnoDB) with
+**PHP 8.5.8 + mysqli**, WordPress 7.1.4 and the upstream Core 1.8.1 / Case File
+1.16.1 / Quiz 3.8.17 / SMS 1.1.7 activated. No SQLite drop-in involved.
 
-| Item | Status |
+| Item | Result |
 |---|---|
-| `dbDelta` DDL on MySQL/MariaDB | unverified |
-| `INSERT … ON DUPLICATE KEY UPDATE` semantics | unverified (MySQL-only syntax; SQLite path not exercised) |
-| Index/unique enforcement on InnoDB | unverified |
-| Charset/collation (`utf8mb4`) behaviour with Persian text | unverified |
+| `dbDelta` creates both tables on MariaDB/InnoDB | PASS — `SHOW TABLES` returns `wp_pas_dashboard_audit`, `wp_pas_dashboard_notifications` |
+| `SHOW CREATE TABLE` matches §1 (PK, keys, unique `dedupe_key`) | PASS |
+| `INSERT … ON DUPLICATE KEY UPDATE` in notification sync | PASS — exercised by the smoke suite on MariaDB; dedupe key collision handled by the upsert, no duplicate row |
+| Unique `dedupe_key` enforced by InnoDB | PASS |
+| `utf8mb4` Persian text round-trip (case status, notification title, audit action) | PASS — no mojibake in rendered output or CSV |
+| Re-activation is idempotent (`dbDelta` second run, no duplicate columns/indexes) | PASS — deactivate → activate → same schema, existing rows intact |
+| `table_exists()` using `SHOW TABLES LIKE` with `prepare()` | PASS |
+| Audit insert/read, notification unread count, per-user mark-read | PASS (smoke + integration suites) |
+| PHP error log during DB operations | empty for plugin code (only WP-CLI's own PHP 8.5 notices) |
 
-**Required before production:** activate on a MySQL/MariaDB staging site, create
-one note, confirm both tables, then delete and reinstall to check `dbDelta`
-idempotency. Compare `SHOW CREATE TABLE` against §1.
+### Test-harness portability fix (D17)
+
+`tests/wp/smoke.php` and `tests/wp/uninstall.php` read table names from
+`sqlite_master`, so on MariaDB the two “table created by dbDelta” assertions
+failed even though the tables existed. Both now use
+`$wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) )`, which works
+on MySQL and on the SQLite drop-in. Re-run: smoke 48/48, uninstall 13/13 on
+both engines.
+
+### Still unverified on MySQL
+
+- Multisite (`{prefix}_{blog_id}_` table fan-out).
+- Very large audit tables (no index-bloat measurement beyond the schema check).
+- MySQL 5.7 / 8.0 — only MariaDB 11.8 was available.
 
 ## 6. Backup and rollback
 
