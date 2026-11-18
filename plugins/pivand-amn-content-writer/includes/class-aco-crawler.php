@@ -103,9 +103,9 @@ class ACO_Crawler {
 
         $posts_per_night = max( 1, (int) $cfg['posts_per_night'] );
         $interval_days   = max( 1, (int) $cfg['interval_days'] );
-        // BUG-CRAWL-1 FIX: date() از timezone سرور استفاده می‌کند نه WP.
-        // current_time('timestamp') WP local timestamp است — سازگار با created_at که با current_time('mysql') ذخیره شده.
-        $cutoff          = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) - $interval_days * DAY_IN_SECONDS );
+        // wp_date() زمان سایت را می‌دهد (date() از timezone سرور استفاده می‌کرد
+        // و روی سرورهای غیر-UTC ساعت‌ها جابه‌جا می‌شد). ورودی time() خام UTC است.
+        $cutoff          = wp_date( 'Y-m-d H:i:s', time() - $interval_days * DAY_IN_SECONDS );
 
         global $wpdb;
 

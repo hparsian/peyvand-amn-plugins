@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — تولید محتوا با هوش مصنوعی
  * Description: سیستم تولید محتوای هوشمند با هوش مصنوعی — پشتیبانی از OpenRouter و DeepSeek. شامل تحلیل بلادرنگ سئو (ادغام‌شده از Peyvand Amn SEO Assistant Pro)، تولید خودکار تصویر شاخص، بانک کلمات کلیدی روزانه، و اتصال اختیاری به Google Search Console.
- * Version: 2.9.19
+ * Version: 2.9.20
  * Requires at least: 6.6
  * Requires PHP: 7.4
  * Domain Path: /languages
@@ -26,7 +26,7 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 // WP 7.0 COMPAT: جلوگیری از تداخل با WP AI Client داخلی وردپرس
 add_filter( 'wp_ai_client_enabled', '__return_false', 5 );
 
-define( 'ACO_VERSION',    '2.9.19' );
+define( 'ACO_VERSION',    '2.9.20' );
 define( 'ACO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ACO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

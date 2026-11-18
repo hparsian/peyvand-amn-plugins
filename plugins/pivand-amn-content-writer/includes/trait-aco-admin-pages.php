@@ -1577,7 +1577,7 @@ trait ACO_Admin_Pages {
                                 <?php echo esc_html( $pr['title'] ); ?>
                             </a>
                             <p class="aco-soft157">
-                                پیشنهاد شده: <?php echo esc_html( $pr['date'] ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $pr['date'] ) ) ) : '—' ); ?>
+                                پیشنهاد شده: <?php echo esc_html( $pr['date'] ? self::jalali_dt( (string) $pr['date'] ) : '—' ); ?>
                                 · تعداد کلمات: <?php echo esc_html( $pr['word_count'] ); ?>
                                 · سئو:
                                 <strong class="aco-soft116"><?php echo esc_html( $pr['score_before'] ); ?></strong>
@@ -1699,7 +1699,7 @@ trait ACO_Admin_Pages {
                     <?php foreach ( $page_slice as $row ) : ?>
                         <tr>
                             <td class="aco-text177">
-                                <?php echo esc_html( $row['date'] ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $row['date'] ) ) ) : '—' ); ?>
+                                <?php echo esc_html( $row['date'] ? self::jalali_dt( (string) $row['date'] ) : '—' ); ?>
                             </td>
                             <td>
                                 <?php if ( $row['post_id'] ) : ?>
@@ -1775,7 +1775,7 @@ trait ACO_Admin_Pages {
                 <div class="aco-flex187">
                     <h3 class="aco-u188">
                         <?php echo esc_html( $label ); ?> —
-                        <?php echo esc_html( $date ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $date ) ) ) : '—' ); ?>
+                        <?php echo esc_html( $date ? self::jalali_dt( (string) $date ) : '—' ); ?>
                     </h3>
                     <div class="aco-flex189">
                         <span>🔍 <?php echo (int) ( $summary['scanned'] ?? 0 ); ?> بررسی</span>

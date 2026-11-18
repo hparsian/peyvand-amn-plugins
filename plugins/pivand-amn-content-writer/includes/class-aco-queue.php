@@ -162,10 +162,9 @@ class ACO_Queue {
         // آیتم‌های گیرکرده در processing بیش از ۱۰ دقیقه را بازیابی کن
         // BUG-QUEUE-1 FIX: هر دو مقدار باید در timezone یکسان (WP local time) محاسبه شوند.
         // started_at با current_time('mysql') ذخیره می‌شود (WP local time).
-        // stale_before باید هم local-time باشد — از current_time('timestamp') استفاده می‌کنیم
-        // که WP local timestamp است، نه UTC.
+        // stale_before باید هم local-time باشد — wp_date() با time() خام UTC، همان زمان سایت را می‌دهد.
         $stale_threshold = current_time( 'mysql' );
-        $stale_before    = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) - 10 * MINUTE_IN_SECONDS );
+        $stale_before    = wp_date( 'Y-m-d H:i:s', time() - 10 * MINUTE_IN_SECONDS );
         $wpdb->query( $wpdb->prepare( // phpcs:ignore
             "UPDATE {$table} SET status='failed', finished_at=%s, error_message='زمان پردازش تمام شد (بازیابی خودکار)'
              WHERE status='processing' AND started_at <= %s",
@@ -461,7 +460,7 @@ class ACO_Queue {
         global $wpdb;
         $table = $wpdb->prefix . self::TABLE_SUFFIX;
         // ۶۰ ثانیه تأخیر — بیشتر از RETRY_DELAY_429 router
-        $retry_at = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) + 60 );
+        $retry_at = wp_date( 'Y-m-d H:i:s', time() + 60 );
         $wpdb->query( $wpdb->prepare( // phpcs:ignore
             "UPDATE {$table}
              SET status       = 'pending',

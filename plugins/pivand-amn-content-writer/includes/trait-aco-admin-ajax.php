@@ -879,7 +879,7 @@ trait ACO_Admin_Ajax {
         $next = wp_next_scheduled( ACO_Crawler::CRON_HOOK );
         wp_send_json_success( [
             'message'  => 'تنظیمات کرم ذخیره شد.',
-            'next_run' => $next ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) $next ) ) : null,
+            'next_run' => $next ? self::jalali_dt( (string) wp_date( 'Y-m-d H:i:s', (int) $next ) ) : null,
         ] );
     }
 
@@ -997,7 +997,7 @@ trait ACO_Admin_Ajax {
         $next = wp_next_scheduled( ACO_Keyword_Bank::CRON_HOOK );
         wp_send_json_success( [
             'message'  => 'تنظیمات بانک کلمات کلیدی ذخیره شد.',
-            'next_run' => $next ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) $next ) ) : null,
+            'next_run' => $next ? self::jalali_dt( (string) wp_date( 'Y-m-d H:i:s', (int) $next ) ) : null,
         ] );
     }
 

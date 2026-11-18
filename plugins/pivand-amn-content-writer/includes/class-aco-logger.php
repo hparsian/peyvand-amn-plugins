@@ -180,9 +180,9 @@ class ACO_Logger {
         $today     = substr( $now_mysql, 0, 10 ); // YYYY-MM-DD
         $month     = substr( $now_mysql, 0, 7 );  // YYYY-MM
 
-        // BUG-LOG-4 FIX: current_time('timestamp', true) = UTC timestamp بود که بعدش gmt_offset دوباره اضافه می‌شد → double offset.
-        // current_time('timestamp') بدون پارامتر دوم = WP local timestamp — سازگار با created_at که با current_time('mysql') ذخیره شده.
-        $seven_days_ago = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS );
+        // BUG-LOG-4 FIX: wp_date() با time() خام UTC، زمان سایت را می‌دهد.
+        // قبلاً date() با current_time('timestamp') روی سرورهای غیر-UTC ساعت‌ها را جابه‌جا می‌کرد.
+        $seven_days_ago = wp_date( 'Y-m-d H:i:s', time() - 7 * DAY_IN_SECONDS );
 
         $total_all   = (int) $wpdb->get_var( "SELECT SUM(tokens) FROM {$table}" ); // phpcs:ignore
         $total_today = (int) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore
@@ -208,9 +208,9 @@ class ACO_Logger {
             $daily_map[ $row->day ] = (int) $row->tokens;
         }
         $daily = [];
-        $now_ts = current_time( 'timestamp' );
+        $now_ts = time();
         for ( $i = 6; $i >= 0; $i-- ) {
-            $day_str = date( 'Y-m-d', $now_ts - $i * DAY_IN_SECONDS );
+            $day_str = wp_date( 'Y-m-d', $now_ts - $i * DAY_IN_SECONDS );
             $daily[] = (object) [
                 'day'    => $day_str,
                 'tokens' => $daily_map[ $day_str ] ?? 0,
