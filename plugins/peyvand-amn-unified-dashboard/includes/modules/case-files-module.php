@@ -208,7 +208,14 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 					) ) . '</p>';
 
 					if ( $can_write && $note_id > 0 ) {
-						$html .= '<p><button type="button" class="pas-btn pas-btn-danger" data-pas-delete-note="1" data-case-id="' . esc_attr( (string) $case_id ) . '" data-note-id="' . esc_attr( (string) $note_id ) . '">' . esc_html__( 'حذف یادداشت', 'peyvand-amn-dashboard' ) . '</button></p>';
+						$html .= '<div class="pas-note-actions">';
+						$html .= '<button type="button" class="pas-btn" data-pas-edit-note="1"'
+							. ' data-note-id="' . esc_attr( (string) $note_id ) . '"'
+							. ' data-session-date="' . esc_attr( (string) ( $note->session_date ?? '' ) ) . '"'
+							. ' data-session-number="' . esc_attr( (string) (int) ( $note->session_number ?? 0 ) ) . '">'
+							. esc_html__( 'ویرایش', 'peyvand-amn-dashboard' ) . '</button>';
+						$html .= '<button type="button" class="pas-btn pas-btn-danger" data-pas-delete-note="1" data-case-id="' . esc_attr( (string) $case_id ) . '" data-note-id="' . esc_attr( (string) $note_id ) . '">' . esc_html__( 'حذف یادداشت', 'peyvand-amn-dashboard' ) . '</button>';
+						$html .= '</div>';
 					}
 
 					if ( ! empty( $history ) ) {
@@ -236,8 +243,8 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 
 			if ( $can_write ) {
 				$html .= '<hr />';
-				$html .= '<h3>' . esc_html__( 'افزودن یادداشت جدید', 'peyvand-amn-dashboard' ) . '</h3>';
 				$html .= '<form id="pas-note-form" class="pas-note-form">';
+				$html .= '<h3 class="pas-note-form-title">' . esc_html__( 'افزودن یادداشت جدید', 'peyvand-amn-dashboard' ) . '</h3>';
 				$html .= '<input type="hidden" name="case_id" value="' . esc_attr( (string) $case_id ) . '" />';
 				$html .= '<input type="hidden" name="note_id" value="0" />';
 				$html .= '<div class="pas-form-row"><label for="pas-session-date">' . esc_html__( 'تاریخ جلسه (میلادی)', 'peyvand-amn-dashboard' ) . '</label>';
@@ -246,7 +253,10 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 				$html .= '<input class="pas-input" type="number" id="pas-session-number" name="session_number" min="0" max="999" value="0" /></div>';
 				$html .= '<div class="pas-form-row"><label for="pas-note-content">' . esc_html__( 'متن یادداشت', 'peyvand-amn-dashboard' ) . '</label>';
 				$html .= '<textarea class="pas-textarea" id="pas-note-content" name="content" required></textarea></div>';
+				$html .= '<div class="pas-note-form-actions">';
 				$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'ثبت یادداشت', 'peyvand-amn-dashboard' ) . '</button>';
+				$html .= '<button class="pas-btn" type="button" data-pas-cancel-edit hidden>' . esc_html__( 'لغو ویرایش', 'peyvand-amn-dashboard' ) . '</button>';
+				$html .= '</div>';
 				$html .= '</form>';
 			} else {
 				$html .= $this->notice( 'info', __( 'ثبت یادداشت برای نقش شما یا در وضعیت فعلی رمزنگاری مجاز نیست.', 'peyvand-amn-dashboard' ) );

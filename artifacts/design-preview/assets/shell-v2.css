@@ -950,6 +950,30 @@
     display: none;
 }
 
+/* ── ویرایش یادداشت ─────────────────────────────────────── */
+
+.pas-note-actions,
+.pas-note-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pui-s2);
+}
+
+.pas-note-actions {
+    margin-block: var(--pui-s3) 0;
+}
+
+.pas-note-form.is-editing {
+    padding: var(--pui-s4);
+    border: 1px solid var(--pui-primary);
+    border-radius: var(--pui-radius);
+    background: var(--pui-surface-2);
+}
+
+.pas-note-form.is-editing .pas-note-form-title {
+    color: var(--pui-primary);
+}
+
 
 
 /* ── حالت تاریک ───────────────────────────────────────────

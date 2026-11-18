@@ -177,6 +177,55 @@
 		}
 	});
 
+	/* ویرایش یادداشت — فرم پایین فهرست را پر می‌کند و note_id را ست می‌دهد
+	   تا همان هندلر ذخیره، مسیر ویرایش (و ساخت تاریخچه) را اجرا کند. */
+	function resetNoteForm() {
+		var $form = $('#pas-note-form');
+
+		if (!$form.length) {
+			return;
+		}
+
+		$form.find('input[name="note_id"]').val('0');
+		$form.find('#pas-session-date').val('');
+		$form.find('#pas-session-number').val('0');
+		$form.find('#pas-note-content').val('');
+		$form.removeClass('is-editing');
+		$form.find('.pas-note-form-title').text(cfg.i18n.newTitle);
+		$form.find('button[type="submit"]').text(cfg.i18n.addNote);
+		$form.find('[data-pas-cancel-edit]').attr('hidden', 'hidden');
+	}
+
+	$(document).on('click', '[data-pas-edit-note]', function () {
+		var $button = $(this);
+		var $form = $('#pas-note-form');
+
+		if (!$form.length) {
+			return;
+		}
+
+		$form.find('input[name="note_id"]').val($button.attr('data-note-id'));
+		$form.find('#pas-session-date').val($button.attr('data-session-date') || '');
+		$form.find('#pas-session-number').val($button.attr('data-session-number') || '0');
+		$form.find('#pas-note-content').val($button.closest('.pas-note').find('.pas-note-body').text());
+
+		$form.addClass('is-editing');
+		$form.find('.pas-note-form-title').text(cfg.i18n.editTitle);
+		$form.find('button[type="submit"]').text(cfg.i18n.saveChanges);
+		$form.find('[data-pas-cancel-edit]').removeAttr('hidden');
+
+		if ($form[0].scrollIntoView) {
+			$form[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+
+		$form.find('#pas-note-content').trigger('focus');
+	});
+
+	$(document).on('click', '[data-pas-cancel-edit]', function (event) {
+		event.preventDefault();
+		resetNoteForm();
+	});
+
 	/* ثبت/ویرایش یادداشت */
 	$(document).on('submit', '#pas-note-form', function (event) {
 		event.preventDefault();

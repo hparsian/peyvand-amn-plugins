@@ -66,7 +66,7 @@ final class PAS_Dashboard_Ajax {
 		}
 
 		if ( $note_id > 0 ) {
-			$ok = PAS_Dashboard_Core_Bridge::update_note( $note_id, $case_id, $date, $content );
+			$ok = PAS_Dashboard_Core_Bridge::update_note( $note_id, $case_id, $date, $content, $number );
 
 			if ( ! $ok ) {
 				PAS_Dashboard_Security::record_denied( 'note.update', 'note', $note_id );

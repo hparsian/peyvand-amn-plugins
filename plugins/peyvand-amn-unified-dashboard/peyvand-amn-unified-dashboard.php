@@ -3,7 +3,7 @@
  * Plugin Name: Peyvand Amn Unified Therapist Dashboard
  * Plugin URI: https://peyvandamn.ir
  * Description: داشبورد یکپارچه درمانگر برای اکوسیستم پیوند امن. تمام داده‌ها فقط از APIهای تأییدشده‌ی افزونه‌های موجود خوانده می‌شود و هیچ جدول اختصاصی افزونه‌های دیگر مستقیماً پرس‌وجو نمی‌شود.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Peyvand Amn
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PAS_DASHBOARD_VERSION', '2.2.0' );
+define( 'PAS_DASHBOARD_VERSION', '2.3.0' );
 define( 'PAS_DASHBOARD_FILE', __FILE__ );
 define( 'PAS_DASHBOARD_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAS_DASHBOARD_URL', plugin_dir_url( __FILE__ ) );

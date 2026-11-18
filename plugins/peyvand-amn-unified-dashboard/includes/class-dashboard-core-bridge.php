@@ -220,13 +220,21 @@ final class PAS_Dashboard_Core_Bridge {
 		return (int) $note_id > 0 ? (int) $note_id : new WP_Error( 'pas_dashboard_note_failed', __( 'ثبت یادداشت ناموفق بود.', 'peyvand-amn-dashboard' ) );
 	}
 
-	public static function update_note( $note_id, $case_id, $session_date, $content ) {
+	/**
+	 * @param int|null $session_number صفر/تهی یعنی شماره‌ی جلسه دست نخورد.
+	 */
+	public static function update_note( $note_id, $case_id, $session_date, $content, $session_number = null ) {
 		if ( ! method_exists( 'Pas_CF_Case_File', 'update_note' ) || ! self::crypto_ready() ) {
 			return false;
 		}
 
+		$number = null;
+		if ( null !== $session_number && (int) $session_number > 0 ) {
+			$number = (int) $session_number;
+		}
+
 		try {
-			return (bool) Pas_CF_Case_File::update_note( (int) $note_id, (int) $case_id, (string) $session_date, (string) $content );
+			return (bool) Pas_CF_Case_File::update_note( (int) $note_id, (int) $case_id, (string) $session_date, (string) $content, $number );
 		} catch ( Throwable $e ) {
 			return false;
 		}
