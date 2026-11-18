@@ -16,10 +16,28 @@ final class PAS_Dashboard_Assets {
 			return;
 		}
 
+		/*
+		 * کیت رابط کاربری اگر فعال باشد، توکن‌ها/کامپوننت‌ها/فونت Display را
+		 * می‌آورد. اگر غیرفعال باشد، پوسته با توکن‌های fallback خودش کار
+		 * می‌کند و هیچ صفحه‌ای سفید نمی‌شود.
+		 */
+		if ( class_exists( 'PUI' ) ) {
+			PUI::enqueue( 'admin' );
+		}
+
+		$deps = array();
+
 		wp_enqueue_style(
 			'pas-dashboard-admin',
 			PAS_DASHBOARD_URL . 'assets/css/dashboard-admin.css',
-			array(),
+			$deps,
+			PAS_DASHBOARD_VERSION
+		);
+
+		wp_enqueue_style(
+			'pas-dashboard-shell',
+			PAS_DASHBOARD_URL . 'assets/css/shell-v2.css',
+			array( 'pas-dashboard-admin' ),
 			PAS_DASHBOARD_VERSION
 		);
 

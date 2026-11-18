@@ -39,10 +39,32 @@
 	}
 
 	/* منوی موبایل */
+	function closeNav() {
+		$('#pas-sidebar').removeClass('is-open');
+		$('.pas-nav-toggle').attr('aria-expanded', 'false');
+		$('body').removeClass('pvn-nav-open');
+	}
+
 	$(document).on('click', '.pas-nav-toggle', function () {
 		var $sidebar = $('#pas-sidebar');
 		var open = $sidebar.toggleClass('is-open').hasClass('is-open');
 		$(this).attr('aria-expanded', open ? 'true' : 'false');
+		$('body').toggleClass('pvn-nav-open', open);
+	});
+
+	$(document).on('click', '[data-pvn-close-nav]', closeNav);
+
+	$(document).on('keydown', function (event) {
+		if (event.key === 'Escape') {
+			closeNav();
+		}
+	});
+
+	/* فوکوس پس از پرش به محتوا */
+	$(document).on('click', '.pas-skip-link', function () {
+		window.setTimeout(function () {
+			$('#pas-main').trigger('focus');
+		}, 0);
 	});
 
 	/* تأیید عملیات مخرب */

@@ -44,15 +44,27 @@ final class PUI
             PUI_VERSION
         );
         wp_register_style(
+            'pui-plex',
+            PUI_URL . 'assets/fonts/plex-arabic/plex-arabic.css',
+            [],
+            PUI_VERSION
+        );
+        wp_register_style(
             'pui-tokens',
             PUI_URL . 'assets/css/tokens.css',
-            ['pui-fonts'],
+            ['pui-fonts', 'pui-plex'],
             $ver
         );
         wp_register_style(
             'pui-components',
             PUI_URL . 'assets/css/components.css',
             ['pui-tokens'],
+            $ver
+        );
+        wp_register_style(
+            'pui-calm',
+            PUI_URL . 'assets/css/calm.css',
+            ['pui-components'],
             $ver
         );
         wp_register_style(
@@ -85,6 +97,7 @@ final class PUI
 
         wp_enqueue_style('pui-tokens');
         wp_enqueue_style('pui-components');
+        wp_enqueue_style('pui-calm');
         wp_enqueue_script('pui-ui');
 
         /** امکان افزودن پوستهٔ اختصاصی توسط افزونهٔ مصرف‌کننده. */
@@ -104,8 +117,10 @@ final class PUI
 
         $map = [
             'fonts'      => 'pui-fonts',
+            'display'    => 'pui-plex',
             'tokens'     => 'pui-tokens',
             'components' => 'pui-components',
+            'calm'       => 'pui-calm',
             'shell'      => 'pui-shell',
             'script'     => 'pui-ui',
         ];

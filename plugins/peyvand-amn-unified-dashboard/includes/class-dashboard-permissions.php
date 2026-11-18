@@ -54,13 +54,16 @@ final class PAS_Dashboard_Permissions {
 		return array(
 			'overview'      => array(
 				'label'   => __( 'نمای کلی', 'peyvand-amn-dashboard' ),
-				'access'  => self::ACCESS_DASHBOARD,
+				// نمای کلی شمار پرونده و نام مراجع را نشان می‌دهد؛ پس همان
+				// سطح دسترسی داده‌ی بالینی لازم است، نه فقط ورود به داشبورد.
+				'access'  => self::ACCESS_CLINICAL,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Overview',
 			),
 			'patients'      => array(
 				'label'   => __( 'مراجعان', 'peyvand-amn-dashboard' ),
-				'access'  => self::ACCESS_DASHBOARD,
+				// نام و شماره‌ی مراجع داده‌ی حساس است: دسترسی بالینی الزامی است.
+				'access'  => self::ACCESS_CLINICAL,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Patients',
 			),
