@@ -78,6 +78,14 @@ final class Admin
 
         $tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'bookings';
         $notice = isset($_GET['zdp_notice']) ? sanitize_key($_GET['zdp_notice']) : '';
+
+        // دلیل دقیق خطای ثبت/ویرایش نوبت در یک transient کوتاه‌عمر ذخیره می‌شود
+        // (به‌ازای هر کاربر) تا بعد از ریدایرکت هم قابل نمایش باشد؛ بدون آن
+        // فقط یک پیام کلی باقی می‌ماند.
+        $flash = '';
+        if (in_array($notice, ['manual_booking_failed', 'booking_update_invalid'], true)) {
+            $flash = $this->take_flash_notice();
+        }
         ?>
         <div class="wrap zdp-admin">
             <h1>پیوند امن — پنل مدیریت زوج‌درمان</h1>
@@ -88,9 +96,11 @@ final class Admin
             <?php elseif ($notice === 'manual_booking_created') : ?>
                 <div class="notice notice-success is-dismissible"><p>نوبت با موفقیت ثبت شد.</p></div>
             <?php elseif ($notice === 'manual_booking_failed') : ?>
-                <div class="notice notice-error is-dismissible"><p>ثبت نوبت ناموفق بود — لطفاً فیلدها (به‌خصوص شماره موبایل و تاریخ) را بررسی کنید.</p></div>
+                <div class="notice notice-error is-dismissible"><p><?php echo esc_html($flash !== '' ? $flash : 'ثبت نوبت ناموفق بود — لطفاً فیلدها (به‌خصوص شماره موبایل و تاریخ) را بررسی کنید.'); ?></p></div>
             <?php elseif ($notice === 'booking_updated') : ?>
                 <div class="notice notice-success is-dismissible"><p>نوبت به‌روزرسانی شد.</p></div>
+            <?php elseif ($notice === 'booking_update_invalid') : ?>
+                <div class="notice notice-error is-dismissible"><p><?php echo esc_html($flash !== '' ? $flash : 'تاریخ یا ساعت نامعتبر بود؛ تغییری در تاریخ و ساعت اعمال نشد.'); ?></p></div>
             <?php elseif ($notice === 'booking_deleted') : ?>
                 <div class="notice notice-success is-dismissible"><p>نوبت حذف شد.</p></div>
             <?php elseif ($notice === 'booking_delete_failed') : ?>
@@ -426,6 +436,23 @@ final class Admin
         exit;
     }
 
+    /** پیام خطای دقیق را برای نمایش بعد از ریدایرکت نگه می‌دارد (۶۰ ثانیه، به‌ازای هر کاربر). */
+    private function set_flash_notice(string $message): void
+    {
+        set_transient('zdp_admin_flash_' . get_current_user_id(), $message, 60);
+    }
+
+    private function take_flash_notice(): string
+    {
+        $key     = 'zdp_admin_flash_' . get_current_user_id();
+        $message = (string) get_transient($key);
+        if ($message !== '') {
+            delete_transient($key);
+        }
+
+        return $message;
+    }
+
     /** ثبت نوبتی که درمانگر برای رزروی خارج از سایت (تلفنی/واتساپ/اینستاگرام/حضوری) وارد کرده. */
     public function handle_create_manual_booking(): void
     {
@@ -437,17 +464,34 @@ final class Admin
         $jalali_date = normalize_digits(sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? '')));
         $gregorian   = Jalali::jalali_string_to_gregorian_string($jalali_date);
 
+        if ($gregorian === null) {
+            $this->set_flash_notice(sprintf('تاریخ «%s» معتبر نیست (نمونه: 1405/05/01)؛ نوبتی ثبت نشد.', $jalali_date !== '' ? $jalali_date : '—'));
+            wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=bookings&zdp_notice=manual_booking_failed'));
+            exit;
+        }
+
+        $time_in = sanitize_text_field(wp_unslash($_POST['booking_time'] ?? ''));
+        if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time_in)) {
+            $this->set_flash_notice(sprintf('ساعت «%s» معتبر نیست (نمونه: 09:00)؛ نوبتی ثبت نشد.', $time_in !== '' ? $time_in : '—'));
+            wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=bookings&zdp_notice=manual_booking_failed'));
+            exit;
+        }
+
         $result = $this->booking->create_manual_booking([
             'full_name'      => wp_unslash($_POST['full_name'] ?? ''),
             'mobile'         => wp_unslash($_POST['mobile'] ?? ''),
-            'booking_date'   => $gregorian ?? '',
-            'booking_time'   => wp_unslash($_POST['booking_time'] ?? ''),
+            'booking_date'   => $gregorian,
+            'booking_time'   => $time_in,
             'session_type'   => wp_unslash($_POST['session_type'] ?? ''),
             'booking_source' => wp_unslash($_POST['booking_source'] ?? ''),
             'therapist_note' => wp_unslash($_POST['therapist_note'] ?? ''),
         ]);
 
         $notice = $result['success'] ? 'manual_booking_created' : 'manual_booking_failed';
+        if (!$result['success']) {
+            // دلیل دقیق اعتبارسنجی (تاریخ/ساعت/موبایل/نوع جلسه) به‌جای پیام کلی.
+            $this->set_flash_notice((string) ($result['data']['message'] ?? 'ثبت نوبت ناموفق بود.'));
+        }
         wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=bookings&zdp_notice=' . $notice));
         exit;
     }
@@ -470,18 +514,38 @@ final class Admin
 
             $jalali_date = normalize_digits(sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? '')));
             $gregorian   = $jalali_date !== '' ? Jalali::jalali_string_to_gregorian_string($jalali_date) : null;
+            $time_in     = sanitize_text_field(wp_unslash($_POST['booking_time'] ?? ''));
+
+            // خطاها جمع می‌شوند تا ادمین بداند چه چیزی رد شد؛ اگر یکی از
+            // تاریخ/ساعت نامعتبر باشد هیچ‌کدام اعمال نمی‌شود (نه اعمالِ نصفه)
+            // ولی بقیهٔ فیلدها ذخیره می‌شوند.
+            $invalid = [];
+            if ($jalali_date !== '' && $gregorian === null) {
+                $invalid[] = sprintf('تاریخ «%s» معتبر نیست', $jalali_date);
+            }
+            if ($time_in !== '' && !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time_in)) {
+                $invalid[] = sprintf('ساعت «%s» معتبر نیست (نمونه: 09:00)', $time_in);
+            }
 
             $fields = [
-                'booking_time'   => sanitize_text_field(wp_unslash($_POST['booking_time'] ?? '')),
                 'session_type'   => sanitize_text_field(wp_unslash($_POST['session_type'] ?? '')),
                 'booking_source' => sanitize_text_field(wp_unslash($_POST['booking_source'] ?? '')),
                 'therapist_note' => wp_unslash($_POST['therapist_note'] ?? ''),
             ];
-            if ($gregorian !== null) {
-                $fields['booking_date'] = $gregorian;
+            if ($invalid === []) {
+                $fields['booking_time'] = $time_in;
+                if ($gregorian !== null) {
+                    $fields['booking_date'] = $gregorian;
+                }
             }
 
             $this->booking->update_booking_fields($booking_id, $fields);
+
+            if ($invalid !== []) {
+                $this->set_flash_notice(implode('؛ ', $invalid) . '. تاریخ و ساعت نوبت تغییر نکرد؛ بقیهٔ فیلدها ذخیره شد.');
+                wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=bookings&zdp_notice=booking_update_invalid'));
+                exit;
+            }
         }
 
         wp_safe_redirect(admin_url('admin.php?page=zdp-admin&tab=bookings&zdp_notice=booking_updated'));
