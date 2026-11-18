@@ -211,7 +211,7 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 						$html .= '<div class="pas-note-actions">';
 						$html .= '<button type="button" class="pas-btn" data-pas-edit-note="1"'
 							. ' data-note-id="' . esc_attr( (string) $note_id ) . '"'
-							. ' data-session-date="' . esc_attr( (string) ( $note->session_date ?? '' ) ) . '"'
+							. ' data-session-date="' . esc_attr( PAS_Dashboard_Core_Bridge::jalali( (string) ( $note->session_date ?? '' ) ) ) . '"'
 							. ' data-session-number="' . esc_attr( (string) (int) ( $note->session_number ?? 0 ) ) . '">'
 							. esc_html__( 'ویرایش', 'peyvand-amn-dashboard' ) . '</button>';
 						$html .= '<button type="button" class="pas-btn pas-btn-danger" data-pas-delete-note="1" data-case-id="' . esc_attr( (string) $case_id ) . '" data-note-id="' . esc_attr( (string) $note_id ) . '">' . esc_html__( 'حذف یادداشت', 'peyvand-amn-dashboard' ) . '</button>';
@@ -247,8 +247,12 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 				$html .= '<h3 class="pas-note-form-title">' . esc_html__( 'افزودن یادداشت جدید', 'peyvand-amn-dashboard' ) . '</h3>';
 				$html .= '<input type="hidden" name="case_id" value="' . esc_attr( (string) $case_id ) . '" />';
 				$html .= '<input type="hidden" name="note_id" value="0" />';
-				$html .= '<div class="pas-form-row"><label for="pas-session-date">' . esc_html__( 'تاریخ جلسه (میلادی)', 'peyvand-amn-dashboard' ) . '</label>';
-				$html .= '<input class="pas-input" type="date" id="pas-session-date" name="session_date" required /></div>';
+				$html .= '<div class="pas-form-row"><label for="pas-session-date">' . esc_html__( 'تاریخ جلسه (شمسی)', 'peyvand-amn-dashboard' ) . '</label>';
+				$html .= '<input class="pas-input" type="text" id="pas-session-date" name="session_date" dir="ltr" inputmode="numeric"'
+					. ' placeholder="1405/08/27" autocomplete="off" required'
+					. ' value="' . esc_attr( PAS_Dashboard_Core_Bridge::today_jalali() ) . '"'
+					. ' data-default="' . esc_attr( PAS_Dashboard_Core_Bridge::today_jalali() ) . '" />';
+				$html .= '<p class="pas-muted pas-field-hint">' . esc_html__( 'مثال: ۱۴۰۵/۰۸/۲۷ — ارقام فارسی هم پذیرفته می‌شود.', 'peyvand-amn-dashboard' ) . '</p></div>';
 				$html .= '<div class="pas-form-row"><label for="pas-session-number">' . esc_html__( 'شماره‌ی جلسه', 'peyvand-amn-dashboard' ) . '</label>';
 				$html .= '<input class="pas-input" type="number" id="pas-session-number" name="session_number" min="0" max="999" value="0" /></div>';
 				$html .= '<div class="pas-form-row"><label for="pas-note-content">' . esc_html__( 'متن یادداشت', 'peyvand-amn-dashboard' ) . '</label>';

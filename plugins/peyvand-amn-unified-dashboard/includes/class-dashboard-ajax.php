@@ -52,7 +52,17 @@ final class PAS_Dashboard_Ajax {
 
 		$case_id  = PAS_Dashboard_Validation::id( self::post( 'case_id' ) );
 		$note_id  = PAS_Dashboard_Validation::id( self::post( 'note_id' ) );
-		$date     = PAS_Dashboard_Validation::date( self::post( 'session_date' ) );
+		/* فیلد تاریخ شمسی است؛ ابتدا مسیر میلادی (سازگاری با کلاینت قدیمی)
+		 * و بعد تبدیل شمسی → میلادی. ورودی نامعتبر خالی می‌ماند و پیام
+		 * الزامی‌بودن تاریخ برمی‌گردد. */
+		$raw_date = trim( (string) self::post( 'session_date' ) );
+		$date     = PAS_Dashboard_Validation::date( $raw_date );
+		if ( $date === '' ) {
+			$converted = PAS_Dashboard_Core_Bridge::to_gregorian( $raw_date );
+			if ( is_string( $converted ) && $converted !== '' ) {
+				$date = PAS_Dashboard_Validation::date( $converted );
+			}
+		}
 		$content  = PAS_Dashboard_Validation::textarea( self::post( 'content' ) );
 		$number   = absint( self::post( 'session_number' ) );
 
@@ -62,7 +72,7 @@ final class PAS_Dashboard_Ajax {
 		}
 
 		if ( $date === '' || $content === '' ) {
-			wp_send_json_error( array( 'message' => __( 'تاریخ جلسه و متن یادداشت الزامی است.', 'peyvand-amn-dashboard' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'تاریخ جلسه (شمسی) و متن یادداشت الزامی است.', 'peyvand-amn-dashboard' ) ), 400 );
 		}
 
 		if ( $note_id > 0 ) {

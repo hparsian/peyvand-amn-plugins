@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — ارسال ایمیل SMTP
  * Description: تمام ایمیل‌های خروجی وردپرس (wp_mail) را به‌جای mail() پیش‌فرض هاست، از طریق SMTP واقعی یا Brevo API ارسال می‌کند تا در اسپم گیر نکنند.
- * Version: 1.5.4
+ * Version: 1.5.5
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZSM_VERSION', '1.5.4');
+define('ZSM_VERSION', '1.5.5');
 define('ZSM_DIR', plugin_dir_path(__FILE__));
 define('ZSM_URL', plugin_dir_url(__FILE__));
 
@@ -1005,7 +1005,7 @@ final class ZSM_Mail_Queue
                 <?php endif; ?>
                 <?php foreach ($rows as $row) : ?>
                     <tr>
-                        <td><?php echo esc_html($row->created_at); ?></td>
+                        <td><?php echo esc_html(function_exists('pas_jalali_datetime') ? pas_jalali_datetime((string) $row->created_at) : (string) $row->created_at); ?></td>
                         <td dir="ltr"><?php echo esc_html($row->to_address); ?></td>
                         <td><?php echo esc_html($row->subject); ?></td>
                         <td>

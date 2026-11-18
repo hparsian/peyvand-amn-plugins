@@ -183,7 +183,7 @@ final class Pas_Admin
                 <tbody>
                 <?php foreach (Pas_Log::recent(50) as $row) : ?>
                     <tr>
-                        <td><?php echo esc_html($row->created_at); ?></td>
+                        <td><?php echo esc_html(function_exists('pas_jalali_datetime') ? pas_jalali_datetime((string) $row->created_at) : (string) $row->created_at); ?></td>
                         <td dir="ltr"><?php echo esc_html($row->mobile); ?></td>
                         <td><?php echo esc_html((string) $row->body_id); ?></td>
                         <td><?php echo $row->success ? '<span class="pas-log-ok">موفق</span>' : '<span class="pas-log-fail">ناموفق</span>'; ?></td>

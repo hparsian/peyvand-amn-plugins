@@ -952,6 +952,12 @@
 
 /* ── ویرایش یادداشت ─────────────────────────────────────── */
 
+.pas-field-hint {
+    margin-block: 6px 0;
+    font-size: .8125rem;
+    color: var(--pui-text-muted);
+}
+
 .pas-note-actions,
 .pas-note-form-actions {
     display: flex;

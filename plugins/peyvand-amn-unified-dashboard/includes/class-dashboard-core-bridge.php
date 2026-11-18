@@ -417,6 +417,58 @@ final class PAS_Dashboard_Core_Bridge {
 		return $date;
 	}
 
+	/** تاریخ + ساعت شمسی، برای ستون‌های datetime (لاگ، اعلان، ارتباطات). */
+	public static function jalali_datetime( $mysql_datetime ) {
+		$value = trim( (string) $mysql_datetime );
+		if ( $value === '' || str_starts_with( $value, '0000-00-00' ) ) {
+			return '—';
+		}
+
+		if ( class_exists( 'Pas_Core_Jalali' ) && method_exists( 'Pas_Core_Jalali', 'to_jalali_datetime_string' ) ) {
+			try {
+				$out = (string) Pas_Core_Jalali::to_jalali_datetime_string( $value );
+				if ( $out !== '' ) {
+					return $out;
+				}
+			} catch ( Throwable $e ) {
+				// به مقدار خام برمی‌گردیم
+			}
+		}
+
+		return $value;
+	}
+
+	/** امروز به شمسی — مقدار پیش‌فرض فیلدهای تاریخ. */
+	public static function today_jalali() {
+		return self::jalali( gmdate( 'Y-m-d' ) );
+	}
+
+	/**
+	 * رشته‌ی تاریخ شمسی (۱۴۰۵/۰۸/۲۷ یا با ارقام فارسی) → 'Y-m-d' میلادی.
+	 * ورودی نامعتبر → null.
+	 */
+	public static function to_gregorian( $jalali_date ) {
+		$value = trim( (string) $jalali_date );
+		if ( $value === '' ) {
+			return null;
+		}
+
+		foreach ( array( 'Pas_Core_Jalali', 'Pas_CF_Jalali' ) as $class ) {
+			if ( class_exists( $class ) && method_exists( $class, 'jalali_string_to_gregorian_string' ) ) {
+				try {
+					$gregorian = $class::jalali_string_to_gregorian_string( $value );
+					if ( is_string( $gregorian ) && $gregorian !== '' ) {
+						return $gregorian;
+					}
+				} catch ( Throwable $e ) {
+					// کلاس بعدی
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public static function therapist_name( $user_id ) {
 		$user = get_userdata( (int) $user_id );
 

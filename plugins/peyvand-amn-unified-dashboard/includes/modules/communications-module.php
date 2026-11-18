@@ -51,7 +51,7 @@ final class PAS_Dashboard_Module_Communications extends PAS_Dashboard_Module {
 				foreach ( $rows as $row ) {
 					$success = ! empty( $row->success );
 					$html   .= '<tr>';
-					$html   .= '<td data-label="' . esc_attr__( 'زمان', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) ( $row->created_at ?? '' ) ) . '</td>';
+					$html   .= '<td data-label="' . esc_attr__( 'زمان', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::jalali_datetime( (string) ( $row->created_at ?? '' ) ) ) . '</td>';
 					$html   .= '<td data-label="' . esc_attr__( 'گیرنده', 'peyvand-amn-dashboard' ) . '">' . esc_html( PAS_Dashboard_Core_Bridge::mask_mobile( (string) ( $row->mobile ?? '' ) ) ) . '</td>';
 					$html   .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '">' . ( $success
 						? '<span class="pas-badge pas-badge-good">' . esc_html__( 'موفق', 'peyvand-amn-dashboard' ) . '</span>'

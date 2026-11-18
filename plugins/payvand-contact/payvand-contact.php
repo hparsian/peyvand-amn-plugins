@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — فرم ارتباط سریع (Pivand Contact)
  * Description: فرم ارتباط سریع تخصصی زوج‌درمانی با ذخیره در پنل و ارسال ایمیل
- * Version: 1.4.4
+ * Version: 1.4.5
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Requires PHP: 7.4
@@ -15,7 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'PAYVAND_VERSION', '1.4.3' );
+define( 'PAYVAND_VERSION', '1.4.5' );
 
 // ── Theme Color Detection ────────────────────────────────────────────────────
 function payvand_get_theme_colors() {
@@ -847,7 +847,7 @@ function payvand_messages_page() {
                             <?php endforeach; ?>
                         </select>
                     </td>
-                    <td style="direction:ltr;white-space:nowrap"><?php echo esc_html( $row->created_at ); ?></td>
+                    <td style="direction:ltr;white-space:nowrap"><?php echo esc_html( function_exists('pas_jalali_datetime') ? pas_jalali_datetime( (string) $row->created_at ) : (string) $row->created_at ); ?></td>
                     <td>
                         <a href="<?php echo esc_url( $nonce_url . '&action=delete&id=' . (int) $row->id ); ?>" 
                            style="color:red">حذف</a>

@@ -13,6 +13,14 @@ class ACO_Admin {
     use ACO_Admin_Pages;
     use ACO_Admin_Ajax;
 
+    /**
+     * تاریخ/ساعت شمسی برای نمایش. اگر هسته‌ی مشترک اکوسیستم فعال نباشد،
+     * همان مقدار میلادی برمی‌گردد (افزونه بدون هسته هم نباید بشکند).
+     */
+    public static function jalali_dt( string $mysql_datetime ): string {
+        return function_exists( 'pas_jalali_datetime' ) ? pas_jalali_datetime( $mysql_datetime ) : $mysql_datetime;
+    }
+
     public static function init(): void {
         ACO_SEO::inject_schema_hooks();
         ACO_Live_Analyzer::init();

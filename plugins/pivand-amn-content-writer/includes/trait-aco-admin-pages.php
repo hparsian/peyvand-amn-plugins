@@ -311,7 +311,7 @@ trait ACO_Admin_Pages {
                             $cat_lbl   = ! empty( $cats ) ? implode( '، ', array_slice( $cats, 0, 2 ) ) : '—';
                             $status_lbl = $statuses_map[ $p->post_status ] ?? $p->post_status;
                             $in_queue  = ! empty( $queued_ids[ $p->ID ] );
-                            $date_lbl  = mysql2date( 'Y/m/d', $p->post_date );
+                            $date_lbl  = self::jalali_dt( (string) $p->post_date );
                         ?>
                         <tr class="aco-rw-row aco-u30" data-id="<?php echo esc_attr( $p->ID ); ?>">
                             <td class="aco-u31">
@@ -1214,7 +1214,7 @@ trait ACO_Admin_Pages {
                                 <?php endif; ?>
                             </td>
                             <td><span style="background:<?php echo esc_attr( $color ); ?>;color:#fff;padding:2px 8px;border-radius:12px;font-size:12px"><?php echo esc_html( $status_labels[ $item->status ] ?? $item->status ); ?></span></td>
-                            <td><?php echo $item->scheduled_at ? esc_html( $item->scheduled_at ) : wp_kses( '<span class="aco-soft72">—</span>', [ 'span' => [ 'style' => [] ] ] ); ?></td>
+                            <td><?php echo $item->scheduled_at ? esc_html( self::jalali_dt( (string) $item->scheduled_at ) ) : wp_kses( '<span class="aco-soft72">—</span>', [ 'span' => [ 'style' => [] ] ] ); ?></td>
                             <td><?php echo $item->seo_score !== null ? esc_html( $item->seo_score ) . '/۱۰۰' : wp_kses( '<span class="aco-soft72">—</span>', [ 'span' => [ 'style' => [] ] ] ); ?></td>
                             <td>
                                 <?php if ( $item->post_id ) : ?>
@@ -1577,7 +1577,7 @@ trait ACO_Admin_Pages {
                                 <?php echo esc_html( $pr['title'] ); ?>
                             </a>
                             <p class="aco-soft157">
-                                پیشنهاد شده: <?php echo esc_html( $pr['date'] ? date_i18n( 'j F Y — H:i', strtotime( $pr['date'] ) ) : '—' ); ?>
+                                پیشنهاد شده: <?php echo esc_html( $pr['date'] ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $pr['date'] ) ) ) : '—' ); ?>
                                 · تعداد کلمات: <?php echo esc_html( $pr['word_count'] ); ?>
                                 · سئو:
                                 <strong class="aco-soft116"><?php echo esc_html( $pr['score_before'] ); ?></strong>
@@ -1699,7 +1699,7 @@ trait ACO_Admin_Pages {
                     <?php foreach ( $page_slice as $row ) : ?>
                         <tr>
                             <td class="aco-text177">
-                                <?php echo esc_html( $row['date'] ? date_i18n( 'j F Y — H:i', strtotime( $row['date'] ) ) : '—' ); ?>
+                                <?php echo esc_html( $row['date'] ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $row['date'] ) ) ) : '—' ); ?>
                             </td>
                             <td>
                                 <?php if ( $row['post_id'] ) : ?>
@@ -1775,7 +1775,7 @@ trait ACO_Admin_Pages {
                 <div class="aco-flex187">
                     <h3 class="aco-u188">
                         <?php echo esc_html( $label ); ?> —
-                        <?php echo esc_html( $date ? date_i18n( 'j F Y — H:i', strtotime( $date ) ) : '—' ); ?>
+                        <?php echo esc_html( $date ? self::jalali_dt( (string) date( 'Y-m-d H:i:s', (int) strtotime( $date ) ) ) : '—' ); ?>
                     </h3>
                     <div class="aco-flex189">
                         <span>🔍 <?php echo (int) ( $summary['scanned'] ?? 0 ); ?> بررسی</span>

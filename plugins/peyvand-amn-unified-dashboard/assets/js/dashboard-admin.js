@@ -187,7 +187,7 @@
 		}
 
 		$form.find('input[name="note_id"]').val('0');
-		$form.find('#pas-session-date').val('');
+		$form.find('#pas-session-date').val($form.find('#pas-session-date').attr('data-default') || '');
 		$form.find('#pas-session-number').val('0');
 		$form.find('#pas-note-content').val('');
 		$form.removeClass('is-editing');

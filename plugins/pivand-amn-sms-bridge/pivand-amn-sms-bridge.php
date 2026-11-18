@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — پل پیامک (ملی پیامک)
  * Description: تنها نقطه‌ی اتصال واقعی به وب‌سرویس ملی پیامک برای کل اکوسیستم پلاگین‌های زوج‌درمان. هیچ پلاگین دیگری (زوج‌درمان، آزمون‌ها، ...) مستقیماً به ملی پیامک وصل نمی‌شود؛ همه از طریق فیلتر مشترک pas_send_sms درخواست ارسال می‌دهند.
- * Version: 1.1.7
+ * Version: 1.1.8
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -34,7 +34,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_BRIDGE_VERSION', '1.1.7');
+define('PAS_BRIDGE_VERSION', '1.1.8');
 define('PAS_BRIDGE_DIR', plugin_dir_path(__FILE__));
 define('PAS_BRIDGE_URL', plugin_dir_url(__FILE__));
 
