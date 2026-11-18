@@ -21,6 +21,56 @@ class ACO_Admin {
         return function_exists( 'pas_jalali_datetime' ) ? pas_jalali_datetime( $mysql_datetime ) : $mysql_datetime;
     }
 
+    /**
+     * تاریخ زمان‌بندی را از فرم می‌گیرد و به 'Y-m-d H:i:s' محلی سایت
+     * تبدیل می‌کند. ورودی می‌تواند شمسی باشد ('1405/08/27 14:30' — با ارقام
+     * فارسی هم) یا قالب قدیمی datetime-local ('2026-11-18T14:30') که از
+     * کلاینت‌های کش‌شده می‌آید. نامعتبر → null.
+     */
+    public static function parse_scheduled_at( string $raw ): ?string {
+        $raw = trim( $raw );
+        if ( $raw === '' ) {
+            return null;
+        }
+
+        // قالب datetime-local قدیمی: 'YYYY-MM-DDTHH:MM' → 'YYYY-MM-DD HH:MM'
+        $raw = str_replace( 'T', ' ', $raw );
+
+        if ( class_exists( 'Pas_Core_Jalali' ) && method_exists( 'Pas_Core_Jalali', 'to_english_digits' ) ) {
+            $raw = Pas_Core_Jalali::to_english_digits( $raw );
+        }
+
+        if ( ! preg_match( '/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})(?:[\s]+(\d{1,2}):(\d{2}))?$/', $raw, $m ) ) {
+            return null;
+        }
+
+        [$year, $month, $day] = [(int) $m[1], (int) $m[2], (int) $m[3]];
+        $hour   = isset( $m[4] ) ? (int) $m[4] : 0;
+        $minute = isset( $m[5] ) ? (int) $m[5] : 0;
+
+        if ( $hour > 23 || $minute > 59 ) {
+            return null;
+        }
+
+        // سال >= ۱۷۰۰ میلادی است؛ کمتر از آن شمسی (۱۳۰۰ تا ۱۴۵۰ انتظار می‌رود).
+        if ( $year >= 1700 ) {
+            $date = sprintf( '%04d-%02d-%02d', $year, $month, $day );
+            if ( ! checkdate( $month, $day, $year ) ) {
+                return null;
+            }
+        } else {
+            if ( ! class_exists( 'Pas_Core_Jalali' ) || ! method_exists( 'Pas_Core_Jalali', 'jalali_string_to_gregorian_string' ) ) {
+                return null;
+            }
+            $date = Pas_Core_Jalali::jalali_string_to_gregorian_string( sprintf( '%04d/%02d/%02d', $year, $month, $day ) );
+            if ( ! is_string( $date ) || $date === '' ) {
+                return null;
+            }
+        }
+
+        return sprintf( '%s %02d:%02d:00', $date, $hour, $minute );
+    }
+
     public static function init(): void {
         ACO_SEO::inject_schema_hooks();
         ACO_Live_Analyzer::init();

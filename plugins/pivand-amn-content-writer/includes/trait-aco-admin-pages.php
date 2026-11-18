@@ -49,9 +49,10 @@ trait ACO_Admin_Pages {
                     </div>
 
                     <div class="aco-field aco-hidden1" id="aco-scheduled-at-field">
-                        <label for="aco-scheduled-at">تاریخ و ساعت انتشار</label>
-                        <input type="datetime-local" id="aco-scheduled-at" / class="aco-full2">
-                        <p class="description">مقاله در این تاریخ به‌صورت خودکار منتشر می‌شود.</p>
+                        <label for="aco-scheduled-at">تاریخ و ساعت انتشار (شمسی)</label>
+                        <input type="text" id="aco-scheduled-at" dir="ltr" inputmode="numeric"
+                               placeholder="1405/08/27 14:30" autocomplete="off" class="aco-full2">
+                        <p class="description">مثال: ۱۴۰۵/۰۸/۲۷ ۱۴:۳۰ — مقاله در این تاریخ به‌صورت خودکار منتشر می‌شود.</p>
                     </div>
 
                     <div class="aco-actions">
@@ -1127,7 +1128,8 @@ trait ACO_Admin_Pages {
                         </div>
                         <div id="aco-q-schedule-wrap" class="aco-hidden106">
                             <label>تاریخ انتشار</label>
-                            <input type="datetime-local" id="aco-q-scheduled-at" / class="aco-full2">
+                            <input type="text" id="aco-q-scheduled-at" dir="ltr" inputmode="numeric"
+                                   placeholder="1405/08/27 14:30" autocomplete="off" class="aco-full2">
                         </div>
                     </div>
                     <div class="aco-actions">

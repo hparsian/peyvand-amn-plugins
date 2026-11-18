@@ -22,8 +22,8 @@ trait ACO_Admin_Ajax {
 
         $scheduled_mysql = null;
         if ( $post_status === 'future' && $scheduled_at_raw ) {
-            $scheduled_clean = str_replace( 'T', ' ', $scheduled_at_raw ); // 'YYYY-MM-DD HH:MM'
-            $ts_utc = strtotime( get_gmt_from_date( $scheduled_clean ) );
+            $scheduled_clean = self::parse_scheduled_at( $scheduled_at_raw );
+            $ts_utc = $scheduled_clean ? strtotime( get_gmt_from_date( $scheduled_clean ) ) : false;
             if ( $ts_utc && $ts_utc > time() ) {
                 $scheduled_mysql = $scheduled_clean;
             }
@@ -282,9 +282,9 @@ trait ACO_Admin_Ajax {
         $scheduled_mysql = null;
         $status_was_future_invalid = false; // FIX BUG-A1: برای اطلاع‌رسانی به کاربر
         if ( $status === 'future' && $scheduled_at ) {
-            // $scheduled_at = 'YYYY-MM-DDTHH:MM' (فرمت datetime-local) → به MySQL تبدیل کن
-            $scheduled_clean = str_replace( 'T', ' ', $scheduled_at ); // '2026-07-01 14:30'
-            $ts_utc = strtotime( get_gmt_from_date( $scheduled_clean ) ); // WP local → UTC
+            // ورودی شمسی ('1405/08/27 14:30') یا قالب قدیمی datetime-local
+            $scheduled_clean = self::parse_scheduled_at( $scheduled_at );
+            $ts_utc = $scheduled_clean ? strtotime( get_gmt_from_date( $scheduled_clean ) ) : false; // WP local → UTC
             if ( $ts_utc && $ts_utc > time() ) {
                 // scheduled_mysql = WP local time برای ذخیره در post_date
                 $scheduled_mysql = $scheduled_clean;
@@ -598,8 +598,8 @@ trait ACO_Admin_Ajax {
         // راه‌حل: T را با space جایگزین کن و مستقیم به عنوان WP local time ذخیره کن.
         $scheduled_mysql = null;
         if ( $post_status === 'future' && $scheduled_at ) {
-            $scheduled_clean = str_replace( 'T', ' ', $scheduled_at ); // 'YYYY-MM-DD HH:MM'
-            $ts_utc = strtotime( get_gmt_from_date( $scheduled_clean ) );
+            $scheduled_clean = self::parse_scheduled_at( $scheduled_at );
+            $ts_utc = $scheduled_clean ? strtotime( get_gmt_from_date( $scheduled_clean ) ) : false;
             if ( $ts_utc && $ts_utc > time() ) {
                 $scheduled_mysql = $scheduled_clean;
             }

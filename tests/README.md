@@ -17,6 +17,8 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | Uninstall | `wp eval-file tests/wp/uninstall.php` | 13/13 |
 | CSV export | `wp eval-file tests/wp/export.php > out.csv` | 5/5 shell assertions |
 | JS syntax | `node --check` | pass |
+| Jalali parity (standalone) | `php tests/php/test-jalali.php` | 21/21 — 55,152 روز، صفر اختلاف |
+| Jalali + timezone (WP) | `wp eval-file tests/wp/jalali-timezone.php` | 10/10 |
 
 The whole table was executed a second time against builds made from the current
 `plugins/` source — **Core 1.8.1, Case File 1.16.1, Quiz 3.8.17, SMS Bridge
@@ -44,7 +46,19 @@ pinned `dist/` packages and the newer source.
   couple projection. It also exercises relink, self-link, unknown-phone and
   unlink, REST denial, and a static guard that the dashboard never calls
   upstream `get_partner()` directly. 52/52 on both MariaDB and SQLite.
-- **`cleanup-fixtures.php`** removes any leftover synthetic cases/users.
+- **`tests/php/test-jalali.php`** runs without WordPress. It loads the three
+  Jalali converters (core, case file, client panel) and compares them for
+  every day from 1300/01/01 to 1450/12/29 in both directions, then checks
+  reference dates, Persian/Arabic digits, separators and invalid input. Any
+  divergence fails the run, so an algorithm change cannot silently shift
+  stored dates.
+- **`tests/wp/jalali-timezone.php`** proves inside WordPress that `wp_date()`
+  returns site time while `date()` on a UTC server is off by the site offset
+  (Tehran, +3:30), that `pas_jalali_datetime()` agrees with an independent
+  Jalali calculation of `current_time()`, and that the content-writer
+  scheduler accepts `1405/08/29 14:30` (Latin or Persian digits) as well as
+  the legacy `datetime-local` value. It restores the original timezone option
+  before exiting.
 
 ## Environment setup (reproducible)
 
