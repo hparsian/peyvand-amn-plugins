@@ -469,6 +469,16 @@ final class Plugin
             if (class_exists('PUI')) {
                 \PUI::enqueue('auth');
             }
+
+            // پوسته‌ی ۲ (Calm Intelligence): بعد از skin بارگذاری می‌شود و
+            // فقط داخل .zdp-panel-shell اثر دارد؛ توکن‌های --zdp-* را به پالت
+            // برند نگاشت می‌کند تا مارک‌آپ پنل دست‌نخورده بماند.
+            wp_enqueue_style(
+                'zdp-panel-v2',
+                ZDP_PLUGIN_URL . 'assets/css/panel-v2.css',
+                ['zdp-panel-skin'],
+                ZDP_VERSION
+            );
         }
 
         // یادداشت: enqueue داخل خودِ render()/render_shortcode() هر ماژول

@@ -71,6 +71,10 @@ final class Pas_CF_Admin
         }
         wp_enqueue_style('pas-cf-admin-skin', PAS_CF_URL . 'assets/css/admin-skin.css', $skin_deps, PAS_CF_VERSION);
 
+        // پوسته‌ی ۲: هم‌خوان با سیستم طراحی «Calm Intelligence». فقط داخل
+        // .pas-cf-wrap اثر دارد و هیچ قاعده‌ای روی بقیه‌ی پیشخوان نمی‌گذارد.
+        wp_enqueue_style('pas-cf-admin-v2', PAS_CF_URL . 'assets/css/case-file-v2.css', $skin_deps, PAS_CF_VERSION);
+
         // فقط برای فرم «پرونده‌ی جدید» — جست‌وجوی خودکار نام مراجع بر اساس
         // شماره موبایل از طریق نقطه‌ی AJAX مشترک هسته (core).
         wp_enqueue_script('pas-cf-admin', PAS_CF_URL . 'assets/js/admin.js', [], PAS_CF_VERSION, true);

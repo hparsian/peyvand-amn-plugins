@@ -1,0 +1,2712 @@
+/* ============================================================
+   پنل مراجعان — panel.css v1.6.0
+   بازطراحی کامل ظاهری پنل کاربری: پوسته‌ی اپ SaaS با نویگیشن کناری
+   در دسکتاپ و نوار پایین در موبایل، کارت‌های خلاصه‌ی داشبورد، و
+   صفحه‌ی ورود/OTP پرداخته‌تر. تمام رفتارهای عملکردیِ نسخه‌ی قبلی
+   (فرم رزرو، پیام، نظرسنجی، فانل کوییز مستقل، تست‌مونیال‌ها،
+   رفع باگ رنگ متن select/textarea در حالت دارک) دست‌نخورده حفظ
+   شده‌اند — این فایل فقط ظاهر را عوض می‌کند، نه هیچ ID/کلاسی که
+   panel.js یا کلاس‌های PHP دیگر به آن وابسته‌اند.
+
+   از v1.3.0 به بعد: متغیرهای --zdp-* از توکن‌های مشترک اکوسیستم
+   (--pivand-*، تعریف‌شده در پیوند امن — هسته مشترک) می‌خوانند تا
+   ظاهر این پنل با بقیه‌ی افزونه‌ها یکپارچه بماند؛ اگر core فعال
+   نباشد همان مقدار قبلی به‌عنوان fallback استفاده می‌شود.
+   ============================================================ */
+
+:root {
+    /* رفع تقویت‌شده: نسخه‌ی قبلی (v1.6.5.0) color-scheme:light را فقط روی
+       .zdp-panel/.zdp-quiz-wrap ست می‌کرد و برای «متن ناخوانا روی پس‌زمینه‌ی
+       روشن» کافی بود. گزارش جدید: بعضی مرورگرها/وب‌ویوهای موبایل حتی با آن،
+       کل پس‌زمینه‌ی پنل را هم سیاه می‌کنند — یعنی برای آن‌ها color-scheme
+       روی یک div داخلی کافی نیست و باید از سطح خودِ سند (html) اعمال شود.
+       این قانون سراسری همان چیز را روی :root تضمین می‌کند، مستقل از این‌که
+       کدام قالب/شورت‌کد رندر کرده باشد. */
+    color-scheme: light;
+
+    /* fallbackهای زیر فقط وقتی واقعاً اعمال می‌شوند که افزونه‌ی «پیوند
+       امن — هسته مشترک» غیرفعال باشد (پس --pivand-primary و بقیه اصلاً
+       تعریف نشده‌اند). طبق هسته‌ی مشترک v1.3.5 (تغییر رنگ برند از تیل به
+       آبی روشن، به‌درخواست صریح کارفرما)، این مقادیر را هم‌سو با همان
+       رنگ آبی به‌روزرسانی کردیم تا حتی در نبودِ core، پنل با آخرین رنگ
+       رسمی برند (نه رنگ قدیمیِ تیل) fallback بزند. */
+    --zdp-teal:        var(--pivand-primary, #2563eb);
+    --zdp-teal-dark:   var(--pivand-primary-dark, #1d4ed8);
+    --zdp-teal-light:  var(--pivand-primary-light, #60a5fa);
+    --zdp-teal-mid:    var(--pivand-primary-mid, #93c5fd);
+    --zdp-teal-bg:     var(--pivand-primary-bg, #eff6ff);
+    --zdp-indigo:      var(--pivand-info, #6366f1);
+    --zdp-rose:        var(--pivand-danger, #e11d48);
+    --zdp-amber:       var(--pivand-warning, #d97706);
+    --zdp-green:       var(--pivand-success, #16a34a);
+    --zdp-red:         var(--pivand-danger, #dc2626);
+    --zdp-ink:         var(--pivand-ink, #1e293b);
+    --zdp-mid:         var(--pivand-ink-mid, #475569);
+    --zdp-soft:        var(--pivand-ink-soft, #64748b);
+    --zdp-border:      var(--pivand-border, #e2e8f0);
+    --zdp-border-soft: var(--pivand-border-soft, #f1f5f9);
+    --zdp-surface:     var(--pivand-surface, #f8fafc);
+    --zdp-white:       var(--pivand-white, #ffffff);
+    --zdp-radius-lg:   var(--pivand-radius-lg, 20px);
+    --zdp-radius:      var(--pivand-radius, 14px);
+    --zdp-radius-sm:   var(--pivand-radius-sm, 10px);
+    --zdp-shadow-sm:   var(--pivand-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.06));
+    --zdp-shadow:      var(--pivand-shadow, 0 8px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04));
+    --zdp-shadow-lg:   var(--pivand-shadow-lg, 0 16px 48px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.05));
+    --zdp-font:        var(--pivand-font-fa, 'Vazirmatn', Tahoma, Arial, sans-serif);
+    --zdp-transition:  var(--pivand-transition, 0.2s ease);
+    --zdp-space-1:     var(--pivand-space-1, 4px);
+    --zdp-space-2:     var(--pivand-space-2, 8px);
+    --zdp-space-3:     var(--pivand-space-3, 12px);
+    --zdp-space-4:     var(--pivand-space-4, 16px);
+    --zdp-space-5:     var(--pivand-space-5, 24px);
+    --zdp-space-6:     var(--pivand-space-6, 32px);
+}
+
+/* دفاع اضافه برای قالب خالیِ پنل (templates/panel-blank.php، کلاس
+   body.zdp-panel-blank): بعضی موتورهای دارک‌مود اجباری (خصوصاً وب‌ویوهای
+   داخل اپ) به color-scheme اصلاً توجه نمی‌کنند و فقط رنگ‌های صریح
+   background/color را رعایت می‌کنند؛ این قانون همان رنگ‌ها را صریحاً
+   می‌دهد تا حتی چنین موتورهایی هم چیزی برای «حدس زدن» نداشته باشند. */
+body.zdp-panel-blank {
+    background: #ffffff !important;
+    color: #1e293b !important;
+}
+
+/* ============================================================
+   رفع باگ ریشه‌ای واقعی «با دارک‌مود گوشی، کل پنل سیاه می‌شود»
+   (گزارش‌شده بعد از این‌که همه‌ی پچ‌های قبلیِ color-scheme/متاتگ —
+   که فقط جلوی حدس‌زدنِ خودکار مرورگر روی عناصر بدون رنگ صریح را
+   می‌گیرند — کافی نبودند).
+
+   ریشه‌ی واقعی: تمام متغیرهای --zdp-* بالا (ink/white/surface/border/
+   primary/...) نه یک مقدار ثابت، بلکه var(--pivand-x, fallback) هستند —
+   یعنی از توکن‌های مشترک اکوسیستم (تعریف‌شده در پیوند امن: هسته‌ی
+   مشترک) می‌خوانند. fallback فقط وقتی اعمال می‌شود که --pivand-x اصلاً
+   تعریف نشده باشد؛ اگر هسته‌ی مشترک خودش یک بلوک
+   @media (prefers-color-scheme: dark) روی :root داشته باشد که این
+   توکن‌ها را برای بقیه‌ی افزونه‌های اکوسیستم (که برخلاف این پلاگین،
+   دارک‌مود واقعی دارند) به مقادیر تیره تغییر می‌دهد، همان مقادیر تیره
+   بدون هیچ ربطی به color-scheme به این پنل هم می‌رسند — چون
+   color-scheme فقط رفتار پیش‌فرض/حدسیِ مرورگر را کنترل می‌کند، نه
+   مقدار واقعیِ یک custom property که جایی صریحاً ست شده.
+
+   رفع: در حالت دارک‌مودِ سیستم، خودِ --zdp-* مستقیماً روی هر کانتینر
+   ریشه‌ی این پلاگین به مقدار ثابت روشن بازنویسی می‌شود (بدون عبور از
+   var(--pivand-x, ...)) — چون این تعریف روی خودِ عنصر (نه یک والدِ
+   دورتر مثل :root) نزدیک‌ترین مقدار در زنجیره‌ی وراثت است، مستقل از
+   ترتیب بارگذاریِ فایل‌های CSS همیشه برنده‌ی cascade می‌شود. */
+@media (prefers-color-scheme: dark) {
+    /* رفع باگ ۱.۹.۸.۰: .zdp-booking-widget (ویجت رزرو عمومیِ صفحه‌ی اصلی)
+       از این لیست جا افتاده بود — به همین دلیل select خدمت داخلش زیر
+       دارک‌مود سیستم، هم جعبه‌ی بسته و هم پاپ‌آپِ بازشوی گزینه‌ها را با
+       رنگ‌های تیره‌ی حدسیِ مرورگر نشان می‌داد (پس‌زمینه‌ی مشکی/متن سفید)،
+       درحالی‌که خودِ ویجت روشن مانده بود. */
+    .zdp-panel,
+    .zdp-quiz-wrap,
+    .zdp-survey-stage,
+    .zdp-testimonials-section,
+    .zdp-booking-widget,
+    body.zdp-panel-blank {
+        --zdp-teal:        #2563eb;
+        --zdp-teal-dark:   #1d4ed8;
+        --zdp-teal-light:  #60a5fa;
+        --zdp-teal-mid:    #93c5fd;
+        --zdp-teal-bg:     #eff6ff;
+        --zdp-indigo:      #6366f1;
+        --zdp-rose:        #e11d48;
+        --zdp-amber:       #d97706;
+        --zdp-green:       #16a34a;
+        --zdp-red:         #dc2626;
+        --zdp-ink:         #1e293b;
+        --zdp-mid:         #475569;
+        --zdp-soft:        #64748b;
+        --zdp-border:      #e2e8f0;
+        --zdp-border-soft: #f1f5f9;
+        --zdp-surface:     #f8fafc;
+        --zdp-white:       #ffffff;
+    }
+}
+
+/* ============================================================
+   اصلاحیه: نسخه‌ی قبلی این فایل اینجا رنگ‌ها را روی تیل هاردکد کرده بود
+   (حدس اشتباه که --pivand-primary روی این سایت قرمز است). با بررسی خودِ
+   افزونه‌ی «پیوند امن — هسته مشترک» (نسخه‌ی ۱.۳.۵) مشخص شد --pivand-primary
+   هرگز قرمز نبوده: طبق تغییرات ۱.۳.۵.CHANGELOG، طبق درخواست صریح کارفرما
+   از تیل (#0f766e) به آبی روشن (#2563eb) تغییر کرده. هاردکدکردن تیل اینجا
+   عملاً همان تغییر برند رسمی/عمدی را خنثی می‌کرد. حذف شد — رنگ‌ها دوباره
+   از var(--pivand-primary, ...) در بلوک :root بالا می‌آیند، همان‌طور که
+   طراحیِ اصلی (نگاه کن به توضیح بالای فایل) از ابتدا در نظر داشت. */
+
+/* ── Base / Reset ─────────────────────────────────────────── */
+.zdp-panel *, .zdp-quiz-wrap *,
+.zdp-panel *::before, .zdp-quiz-wrap *::before,
+.zdp-panel *::after, .zdp-quiz-wrap *::after {
+    box-sizing: border-box;
+}
+
+/* ── Prevent unbreakable user-generated strings (long service
+   names, emails, tracking codes, testimonial text, etc.) from
+   forcing flex/grid items past their container width and causing
+   page-wide horizontal scroll. Grid/flex items default to
+   min-width:auto, so content-based sizing wins unless overridden. */
+.zdp-panel *, .zdp-quiz-wrap *,
+.zdp-booking-widget *, .zdp-testimonials-section * {
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+/* ── Guard: honor the native `hidden` attribute even on elements
+   whose own class sets `display` (flex/grid/block/...). Author CSS
+   always wins over the browser's built-in `[hidden]{display:none}`
+   rule, regardless of specificity — so any element toggled via
+   el.hidden = true/false (or a bare `hidden` attribute from PHP)
+   silently stays visible if some class also declares display.
+   This caused #zdp-bw-book-loggedin (class zdp-btn-primary,
+   display:inline-flex) to keep showing for guests even while
+   hidden, so both the "ثبت نهایی نوبت" and "ادامه و ورود به پنل"
+   buttons appeared together. .zdp-bw-quickfilters (display:flex)
+   had the same latent issue. This selector's specificity (class +
+   attribute) already outranks any single-class display rule, so it
+   wins regardless of where in the file that rule is declared. */
+.zdp-panel [hidden], .zdp-quiz-wrap [hidden],
+.zdp-booking-widget [hidden], .zdp-testimonials-section [hidden] {
+    display: none;
+}
+
+.zdp-panel,
+.zdp-quiz-wrap {
+    direction: rtl;
+    font-family: var(--zdp-font);
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--zdp-white);
+    border-radius: var(--zdp-radius-lg);
+    padding: 26px 26px 28px;
+    box-shadow: var(--zdp-shadow);
+    color: var(--zdp-ink);
+    line-height: 1.9;
+    animation: zdp-fade-up 0.45s cubic-bezier(.22,.9,.35,1) both;
+    /* رفع باگ کشف‌شده: بدون این، دارک‌مود سیستم‌عامل/مرورگر (مثلاً
+       «force dark» گوشی‌های اندروید) رنگ متن را خودش حدس می‌زد و تیره
+       می‌کرد، درحالی‌که پس‌زمینه همچنان روشن می‌ماند — نتیجه متن تقریباً
+       ناخوانا. این خط + متاتگ color-scheme در <head> (در class-plugin.php)
+       به مرورگر صریحاً می‌گویند این ناحیه فقط روشن است. */
+    color-scheme: light;
+}
+
+@keyframes zdp-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.zdp-landing-body {
+    background: linear-gradient(180deg, var(--zdp-teal-bg) 0%, var(--zdp-surface) 220px);
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+}
+
+/* ── Headings ─────────────────────────────────────────────── */
+.zdp-panel h2, .zdp-quiz-wrap h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--zdp-ink);
+}
+.zdp-panel h3, .zdp-quiz-wrap h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 22px 0 12px;
+    color: var(--zdp-ink);
+}
+.zdp-section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--zdp-ink);
+    margin: 28px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ============================================================
+   صفحه‌ی ورود / OTP
+   ============================================================ */
+.zdp-login-stage {
+    position: relative;
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+    background:
+        radial-gradient(1200px 480px at 15% -10%, var(--zdp-teal-bg) 0%, transparent 60%),
+        radial-gradient(900px 420px at 100% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 55%);
+}
+.zdp-login-stage .zdp-panel {
+    margin: 0;
+}
+.zdp-login {
+    text-align: center;
+    padding: 36px 28px 32px;
+    position: relative;
+    overflow: hidden;
+}
+.zdp-login::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--zdp-teal-light), var(--zdp-indigo), var(--zdp-teal-mid));
+    background-size: 200% 100%;
+    animation: zdp-shimmer 5s linear infinite;
+}
+@keyframes zdp-shimmer {
+    to { background-position: -200% 0; }
+}
+.zdp-login h2 { text-align: center; margin-bottom: 18px; }
+@keyframes zdp-pop {
+    from { opacity: 0; transform: scale(.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Step progress dots ──────────────────────────────────────
+   دو نقطه‌ی ساده‌ی بالای فرم که نشان می‌دهند کاربر در مرحله‌ی «شماره»
+   یا «کد تایید» است — یک اشاره‌ی بصری کوچک، بدون شمارشگر پرسروصدا. */
+.zdp-login-steps {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 2px 0 22px;
+}
+.zdp-step-dot {
+    width: 22px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--zdp-border);
+    transition: background-color 0.25s ease, width 0.25s ease;
+}
+.zdp-login-steps[data-step="mobile"] .zdp-step-dot-1,
+.zdp-login-steps[data-step="email"] .zdp-step-dot-1,
+.zdp-login-steps[data-step="otp"] .zdp-step-dot-1,
+.zdp-login-steps[data-step="otp"] .zdp-step-dot-2 {
+    background: linear-gradient(90deg, var(--zdp-teal-light), var(--zdp-teal));
+    width: 30px;
+}
+
+/* ── تب‌های کانال ورود (موبایل/ایمیل) ────────────────────────
+   دو دکمه‌ی ساده بالای فرم شماره/ایمیل، برای مراجعینی که شماره‌ی
+   ایرانی برای دریافت پیامک ندارند (مثلاً مراجعین خارج از کشور) یا صرفاً
+   می‌خواهند بدون هیچ ثبت قبلی‌ای با ایمیل وارد شوند (مثلاً برای آزمون). */
+.zdp-login-channel-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 16px;
+    background: var(--zdp-teal-bg);
+    border-radius: 12px;
+    padding: 4px;
+}
+.zdp-login-channel-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--zdp-text-soft, #667);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 8px 6px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.zdp-login-channel-tab.active {
+    background: #fff;
+    color: var(--zdp-teal-dark);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    font-weight: 600;
+}
+/* این تب‌ها به‌جای وراثت از --pivand-focus-outline مشترک (که مقدارش با
+   ورژن‌های مختلف افزونه‌ی «هسته مشترک» می‌تواند عوض شود)، عمداً رنگ فوکوس
+   خودشان را از var(--zdp-teal) می‌گیرند — یعنی همیشه دقیقاً هم‌رنگ خودِ
+   حالت «active» همین تب می‌ماند، مستقل از این‌که رنگ برند سراسری در
+   لحظه چه باشد. (یادداشت تاریخی: نسخه‌ی قبلی این کامنت ادعا می‌کرد
+   --pivand-focus-outline روی این سایت قرمز تعریف شده؛ با بررسی خودِ
+   افزونه‌ی هسته مشترک (v1.3.5) این ادعا رد شد — آن توکن هیچ‌وقت قرمز
+   نبوده. نگه‌داشتنِ این override همچنان بی‌ضرر و منطقی است، فقط دلیلش
+   چیز دیگری‌ست.) */
+.zdp-login-channel-tab:focus-visible {
+    outline: 2px solid var(--zdp-teal);
+    outline-offset: 2px;
+}
+
+/* ── Welcome header (login screen) ────────────────────────────
+   نشان «پیوند»: دو حلقه‌ی هم‌پوشان که به آرامی، در ریتم یک نفسِ
+   عمیق (~۴ ثانیه)، به هم نزدیک و از هم دور می‌شوند — استعاره‌ی
+   بصریِ «اتصال» برای یک پنل زوج‌درمانی، نه صرفاً یک لوگوی تزئینی.
+   اگر سایت لوگوی واقعی داشته باشد (render_login_form)، به‌جای این
+   نشان، همان لوگو با همان ریتم ورود (fade+pop) نمایش داده می‌شود.
+   ──────────────────────────────────────────────────────────── */
+.zdp-welcome { padding-bottom: 4px; }
+
+.zdp-welcome-mark {
+    position: relative;
+    width: 132px;
+    height: 88px;
+    margin: 0 auto 18px;
+}
+.zdp-ring {
+    position: absolute;
+    top: 2px;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal)) border-box;
+    border: 4px solid transparent;
+    box-shadow: 0 10px 28px rgba(15, 118, 110, 0.22);
+    animation: zdp-breathe 4.2s cubic-bezier(.45, .05, .35, .95) infinite;
+}
+.zdp-ring-a { right: 8px; }
+.zdp-ring-b {
+    left: 8px;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(135deg, #a5b4fc, var(--zdp-indigo)) border-box;
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.2);
+    animation-delay: -2.1s;
+}
+@keyframes zdp-breathe {
+    0%, 100% { transform: translateX(0) scale(1); }
+    50%      { transform: translateX(6px) scale(1.06); }
+}
+
+.zdp-welcome-logo,
+.zdp-welcome-logo .zdp-welcome-logo-img {
+    margin: 0 auto 18px;
+    display: flex;
+    justify-content: center;
+    animation: zdp-pop 0.5s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.zdp-welcome-logo-img { max-height: 88px; width: auto; }
+
+.zdp-welcome-title {
+    font-size: 22px;
+    animation: zdp-fade-up 0.4s ease 0.1s both;
+}
+.zdp-welcome-sub {
+    font-size: 14px;
+    color: var(--zdp-mid);
+    line-height: 1.7;
+    margin: 0 auto 20px;
+    max-width: 320px;
+    animation: zdp-fade-up 0.4s ease 0.16s both;
+}
+.zdp-login-bridge-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+    background: #fef2f2;
+    color: var(--zdp-red);
+    border: 1px solid #fecaca;
+    border-radius: var(--zdp-radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+.zdp-login-bridge-error svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* بنر راهنما وقتی مراجع از ویجت عمومی نوبت‌دهی برای تکمیل ورود این‌جا
+   هدایت شده — رنگ خنثی/تیل، نه قرمزِ حالت‌های خطا (نگاه کن به initLoginForm
+   در panel.js، جایی که این عنصر ساخته می‌شود). */
+.zdp-login-pending-booking-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+    background: var(--zdp-teal-bg);
+    color: var(--zdp-teal-dark, var(--zdp-teal));
+    border: 1px solid var(--zdp-border-soft);
+    border-radius: var(--zdp-radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+
+/* باگ رفع‌شده: #zdp-email-step این قانون را نداشت — یعنی وقتی مراجع تب
+   «ورود با ایمیل» را باز می‌کرد، برخلاف مرحله‌ی موبایل/کد، هیچ انیمیشن
+   ورودی (fade-up) نداشت و راست‌چین‌بودنش هم فقط از طریق ارث‌بریِ غیرمستقیم
+   از dir="rtl" والد تامین می‌شد، نه صریح. */
+#zdp-mobile-step, #zdp-email-step, #zdp-otp-step {
+    text-align: right;
+    animation: zdp-fade-up 0.35s ease both;
+}
+.zdp-input-affix {
+    position: relative;
+}
+.zdp-input-affix-icon {
+    position: absolute;
+    inset-inline-start: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--zdp-soft);
+    display: flex;
+    pointer-events: none;
+}
+.zdp-input-affix-icon svg { width: 18px; height: 18px; }
+.zdp-input-affix input {
+    padding-inline-start: 42px !important;
+}
+/* راهنمای زیر فیلد (مثلاً فرمت شماره‌ی بین‌المللی یا شرط ایمیل) — قبلاً از
+   کلاس عمومی wp-admin به اسم .description استفاده می‌شد که در این صفحه‌ی
+   فرانت‌اند اصلاً استایلی نداشت و با فونت/رنگ پیش‌فرض مرورگر رندر می‌شد.
+   رفع باگ گزارش‌شده: حاشیه‌ی بالای منفی (-8px) روی برخی صفحه‌کلیدهای
+   موبایل که ورودی را کمی بلندتر می‌رندر می‌کنند باعث می‌شد این متن زیرِ
+   فیلد برود و با آن هم‌پوشانی پیدا کند (خط راهنما داخل کادر ورودی دیده
+   می‌شد). به‌جای فاصله‌ی منفی، فاصله‌ی مثبت و صریح از هر دو طرف. */
+.zdp-field-hint {
+    display: block;
+    margin: 2px 0 16px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--zdp-soft);
+}
+.zdp-otp-resend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    column-gap: 12px;
+    margin-top: -4px;
+}
+.zdp-otp-resend-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.zdp-panel button.zdp-link-btn,
+.zdp-quiz-wrap button.zdp-link-btn,
+.zdp-booking-widget button.zdp-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--zdp-teal-dark);
+    cursor: pointer;
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: none;
+}
+.zdp-link-btn svg { width: 13px; height: 13px; }
+.zdp-panel button.zdp-link-btn:hover,
+.zdp-quiz-wrap button.zdp-link-btn:hover,
+.zdp-booking-widget button.zdp-link-btn:hover {
+    text-decoration: underline;
+    background: none;
+    transform: none;
+}
+.zdp-otp-timer {
+    font-size: 12.5px;
+    color: var(--zdp-soft);
+}
+/* باکس‌های جدا برای هر رقم کد تایید — استاندارد فرم‌های OTP، خوانایی و
+   سرعت تایپ روی کیبورد موبایل بهتر از یک اینپوت تک‌رشته‌ای است. */
+.zdp-otp-boxes {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    direction: ltr;
+    margin: 4px 0 14px;
+}
+.zdp-otp-box {
+    width: 48px;
+    height: 58px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    background: var(--zdp-surface);
+    color: var(--zdp-ink);
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, transform .1s ease;
+}
+.zdp-otp-box:focus {
+    outline: none;
+    border-color: var(--zdp-teal-light);
+    background: var(--zdp-white);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+    transform: translateY(-1px);
+}
+.zdp-otp-box:not(:placeholder-shown) {
+    border-color: var(--zdp-teal-light);
+}
+.zdp-otp-support {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--zdp-soft);
+    margin: 10px 0 0;
+    animation: zdp-fade-up 0.3s ease both;
+}
+.zdp-otp-support a {
+    color: var(--zdp-teal-dark);
+    font-weight: 700;
+    text-decoration: none;
+    direction: ltr;
+    display: inline-block;
+}
+.zdp-otp-support a:hover { text-decoration: underline; }
+.zdp-login label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--zdp-mid);
+    letter-spacing: 0.2px;
+    margin: 0 0 8px;
+}
+
+/* ── Inputs ───────────────────────────────────────────────── */
+.zdp-panel input[type="tel"],
+.zdp-panel input[type="text"],
+.zdp-panel textarea,
+.zdp-quiz-wrap input[type="text"],
+.zdp-booking-widget input[type="tel"],
+.zdp-booking-widget input[type="text"],
+.zdp-booking-widget select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    margin: 6px 0 14px;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--zdp-surface);
+    color: var(--zdp-ink);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    outline: none;
+    /* رفع باگ ۱.۹.۸.۰ — دفاع مستقیم روی خودِ select، مستقل از این‌که
+       رفع سطح-کانتینر (.zdp-booking-widget) به هر دلیلی (مثلاً کش قالب/
+       صفحه‌ساز) به این عنصر نرسد. */
+    color-scheme: light;
+}
+.zdp-panel input[type="tel"]:focus,
+.zdp-panel input[type="text"]:focus,
+.zdp-panel textarea:focus,
+.zdp-quiz-wrap input[type="text"]:focus,
+.zdp-booking-widget input[type="tel"]:focus,
+.zdp-booking-widget input[type="text"]:focus,
+.zdp-booking-widget select:focus {
+    border-color: var(--zdp-teal-light);
+    background: var(--zdp-white);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.zdp-panel button,
+.zdp-quiz-wrap button,
+.zdp-booking-widget button {
+    padding: 13px 26px;
+    border-radius: var(--zdp-radius-sm);
+    background: linear-gradient(135deg, var(--zdp-teal-light) 0%, var(--zdp-teal) 100%);
+    color: #fff;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.zdp-panel button:hover:not(:disabled),
+.zdp-quiz-wrap button:hover:not(:disabled),
+.zdp-booking-widget button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(15, 118, 110, 0.32);
+}
+.zdp-panel button:active:not(:disabled),
+.zdp-quiz-wrap button:active:not(:disabled),
+.zdp-booking-widget button:active:not(:disabled) {
+    transform: translateY(0);
+    filter: brightness(0.97);
+}
+.zdp-panel button:focus-visible,
+.zdp-quiz-wrap button:focus-visible,
+.zdp-booking-widget button:focus-visible {
+    outline: var(--pivand-focus-outline, 2px solid var(--zdp-teal));
+    outline-offset: var(--pivand-focus-offset, 2px);
+}
+.zdp-panel button:disabled,
+.zdp-booking-widget button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+/* باگ رفع‌شده: دکمه‌ی «دریافت کد تایید» داخل #zdp-email-step این قانون را
+   نداشت — یعنی برخلاف دکمه‌ی معادلش در مرحله‌ی موبایل، عرض کامل نمی‌گرفت و
+   حاشیه‌ی بالای یکسانی هم نداشت (ظاهر ناهماهنگ بین دو تب ورود). */
+#zdp-mobile-step > button,
+#zdp-email-step > button,
+#zdp-otp-step > button {
+    width: 100%;
+    margin-top: 4px;
+}
+
+/* ── دکمه‌ی اصلی با اسپینر داخلی ──────────────────────────────
+   جایگزین تدریجیِ متن دکمه (که قبلاً با textContent در JS عوض
+   می‌شد) با یک اسپینر واقعی؛ چون panel.js همچنان فقط button.disabled
+   و button.textContent را ست می‌کند (بدون تغییر منطق JS)، این کلاس
+   صرفاً یک لایه‌ی بصری اضافه‌ست: وقتی دکمه disabled است، اسپینر با
+   CSS-only (:disabled) نمایش داده می‌شود و برچسب کمی کم‌رنگ می‌شود —
+   بدون نیاز به این‌که JS چیزی درباره‌ی spinner بداند. */
+.zdp-btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.zdp-btn-spinner {
+    display: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: zdp-spin 0.7s linear infinite;
+}
+.zdp-btn-primary:disabled .zdp-btn-spinner { display: inline-block; }
+.zdp-btn-primary:disabled .zdp-btn-label { opacity: 0.85; }
+
+/* ============================================================
+   پوسته‌ی داشبورد (Shell) — نوار بالا + ردیف تب‌های افقی زیرش
+   (یکسان در همه‌ی سایزهای صفحه، طبق درخواست کاربر)
+   ============================================================ */
+.zdp-panel.zdp-panel-shell {
+    max-width: 1080px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--zdp-space-4);
+    animation: zdp-fade-up 0.4s ease both;
+}
+
+.zdp-shell-topbar {
+    background: var(--zdp-white);
+    border-radius: var(--zdp-radius-lg);
+    box-shadow: var(--zdp-shadow);
+    padding: var(--zdp-space-3) var(--zdp-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zdp-space-3);
+    flex-wrap: wrap;
+}
+
+.zdp-shell-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.zdp-shell-brand-mark {
+    position: relative;
+    width: 34px;
+    height: 26px;
+    flex-shrink: 0;
+}
+.zdp-shell-brand-mark .zdp-ring {
+    width: 22px;
+    height: 22px;
+    top: 0;
+    animation-duration: 5.5s;
+}
+.zdp-shell-brand-mark .zdp-ring-a { right: 0; }
+.zdp-shell-brand-mark .zdp-ring-b { left: 0; }
+.zdp-shell-brand-name {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--zdp-ink);
+}
+
+.zdp-shell-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.zdp-shell-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal));
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.zdp-shell-user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.zdp-shell-user-name {
+    font-size: 13.5px;
+    color: var(--zdp-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+.zdp-shell-user-mobile {
+    font-size: 11.5px;
+    color: var(--zdp-soft);
+}
+
+.zdp-logout {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--zdp-rose);
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: #fff1f2;
+    transition: background 0.18s ease, transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.zdp-logout svg { width: 15px; height: 15px; }
+.zdp-logout:hover { background: #ffe4e6; transform: translateY(-1px); }
+
+.zdp-shell-main {
+    background: var(--zdp-white);
+    border-radius: var(--zdp-radius-lg);
+    box-shadow: var(--zdp-shadow);
+    padding: var(--zdp-space-5) var(--zdp-space-5) var(--zdp-space-6);
+    min-width: 0;
+}
+
+/* ── کارت‌های خلاصه‌ی داشبورد ─────────────────────────────────
+   سه کارت با داده‌ی واقعی (نوبت بعدی/تعداد آزمون‌های در انتظار/تعداد
+   پیام‌ها) — نه محتوای نمایشی؛ هر عدد مستقیم از همان کوئری‌هایی می‌آید
+   که تب‌های مربوطه هم استفاده می‌کنند. */
+.zdp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--zdp-space-4);
+    margin: var(--zdp-space-5) 0;
+}
+.zdp-stat-card {
+    background: var(--zdp-surface);
+    border: 1px solid var(--zdp-border-soft);
+    border-radius: var(--zdp-radius);
+    padding: var(--zdp-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.zdp-stat-card:hover {
+    box-shadow: var(--zdp-shadow-sm);
+    transform: translateY(-2px);
+}
+.zdp-stat-card-highlight {
+    grid-column: span 1;
+    background: linear-gradient(135deg, var(--zdp-teal-bg), var(--zdp-white));
+    border-color: var(--zdp-teal-light);
+}
+.zdp-stat-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--zdp-teal-dark);
+    background: var(--zdp-white);
+    border-radius: 999px;
+    margin-bottom: 4px;
+    box-shadow: var(--zdp-shadow-sm);
+}
+.zdp-stat-icon svg { width: 16px; height: 16px; }
+.zdp-stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--zdp-soft);
+}
+.zdp-stat-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--zdp-ink);
+}
+.zdp-stat-value-muted { color: var(--zdp-soft); font-weight: 700; font-size: 14px; }
+.zdp-stat-sub {
+    font-size: 12px;
+    color: var(--zdp-soft);
+}
+
+/* ── کارت‌های فرم (رزرو/پیام/نظرسنجی) ──────────────────────── */
+.zdp-card {
+    background: var(--zdp-surface);
+    border: 1px solid var(--zdp-border-soft);
+    border-radius: var(--zdp-radius);
+    padding: var(--zdp-space-4) var(--zdp-space-4) var(--zdp-space-5);
+    margin-bottom: var(--zdp-space-2);
+}
+.zdp-card h3 { margin-top: 0; }
+.zdp-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--zdp-space-3);
+}
+
+/* ── Tabs / نویگیشن ───────────────────────────────────────────
+   طبق درخواست کاربر: یک ردیف افقی بالای صفحه، یکسان در همه‌ی
+   سایزهای صفحه (نه سایدبار دسکتاپ، نه نوار پایین موبایل). */
+.zdp-tabs {
+    background: var(--zdp-white);
+    border-radius: var(--zdp-radius-lg);
+    box-shadow: var(--zdp-shadow);
+    padding: 6px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.zdp-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: none;
+    color: var(--zdp-mid);
+    border: none;
+    padding: 13px 16px;
+    min-height: 44px;
+    border-radius: var(--zdp-radius-sm);
+    font-size: 13.5px;
+    font-weight: 700;
+    box-shadow: none;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+    flex: 1 1 0;
+    text-align: center;
+    transform: none;
+    position: relative;
+}
+.zdp-tab:hover:not(.active) { color: var(--zdp-teal-dark); background: var(--zdp-teal-bg); transform: none; box-shadow: none; }
+.zdp-tab-icon {
+    display: flex;
+    flex-shrink: 0;
+    color: currentColor;
+    opacity: 0.85;
+}
+.zdp-tab-icon svg { width: 18px; height: 18px; }
+.zdp-tab-label { flex: none; }
+.zdp-tab-badge {
+    background: var(--zdp-rose);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.zdp-tab.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal));
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.28);
+}
+.zdp-tab.active .zdp-tab-icon { opacity: 1; }
+.zdp-tab.active .zdp-tab-badge { background: rgba(255,255,255,0.25); }
+
+.zdp-tab-panel {
+    animation: zdp-tab-in 0.32s cubic-bezier(.22,.9,.35,1) both;
+}
+.zdp-tab-panel[hidden] { display: none; }
+@keyframes zdp-tab-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ── Lists (bookings / messages / quizzes) ───────────────── */
+.zdp-booking-list,
+.zdp-message-list,
+.zdp-quiz-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.zdp-booking-list li,
+.zdp-message-list li,
+.zdp-quiz-list li {
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-bottom: none;
+    background: var(--zdp-surface);
+    border: 1px solid var(--zdp-border-soft);
+    border-radius: var(--zdp-radius-sm);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+}
+.zdp-booking-list li,
+.zdp-quiz-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.zdp-booking-list li:hover,
+.zdp-message-list li:hover,
+.zdp-quiz-list li:hover {
+    border-color: #99d8d1;
+    box-shadow: var(--zdp-shadow-sm);
+    transform: translateY(-1px);
+}
+.zdp-list-item-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--zdp-white);
+    color: var(--zdp-teal-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--zdp-shadow-sm);
+}
+.zdp-list-item-icon svg { width: 17px; height: 17px; }
+.zdp-list-item-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.zdp-list-item-meta {
+    font-size: 12.5px;
+    color: var(--zdp-soft);
+}
+.zdp-list-item-cta {
+    flex-shrink: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal));
+    padding: 8px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.22);
+}
+.zdp-list-item-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15, 118, 110, 0.3); }
+
+/* ── Status badges ────────────────────────────────────────── */
+.zdp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.zdp-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.zdp-status-تایید-شده,
+.zdp-status-فعال,
+.zdp-status-انجام-شده { color: var(--zdp-green); background: #f0fdf4; font-weight: 700; }
+.zdp-status-ناموفق,
+.zdp-status-لغو-شده,
+.zdp-status-عدم-حضور { color: var(--zdp-red); background: #fef2f2; font-weight: 700; }
+.zdp-status-در-انتظار-پرداخت,
+.zdp-status-در-انتظار-تایید-واریز,
+.zdp-status-در-انتظار-بررسی { color: var(--zdp-amber); background: #fffbeb; font-weight: 700; }
+
+.zdp-admin-reply {
+    background: var(--zdp-teal-bg);
+    border-right: 3px solid var(--zdp-teal);
+    padding: 10px 14px;
+    border-radius: var(--zdp-radius-sm);
+    margin-top: 8px;
+    font-size: 13.5px;
+}
+.zdp-admin-reply-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--zdp-teal-dark);
+    margin-bottom: 3px;
+}
+.zdp-message-pending {
+    font-size: 12px;
+    color: var(--zdp-soft);
+    margin-top: 6px;
+}
+
+/* ── فرم عمومی (نظرسنجی) ───────────────────────────────────── */
+.zdp-form label {
+    display: block;
+    margin: 14px 0 4px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--zdp-mid);
+}
+.zdp-form select,
+.zdp-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    margin-top: 4px;
+    font-family: inherit;
+    font-size: 14.5px;
+    background: var(--zdp-white);
+    color: var(--zdp-ink);
+    /* بدون این خط، مرورگر در حالت دارک سیستم‌عامل رنگ متن select/textarea
+       را خودکار روشن می‌کند، در حالی که پس‌زمینه همچنان صریحاً سفید
+       (--zdp-white) است — یعنی متن سفید روی سفید، عملاً نامرئی. چون این
+       پروژه عمداً دارک‌مود ندارد (طبق تصمیم قبلی)، اینجا صراحتاً از
+       تم‌دهی خودکار مرورگر خارج می‌شویم تا همیشه همان ظاهر روشن ثابت بماند.
+       این باگ روی هر select/textarea داخل .zdp-form بود، از جمله سوالات
+       نظرسنجی. */
+    color-scheme: light;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.zdp-form select:focus,
+.zdp-form textarea:focus {
+    outline: none;
+    border-color: var(--zdp-teal-light);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+}
+.zdp-form label:has(input[type="checkbox"]) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+    color: var(--zdp-ink);
+}
+.zdp-form input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--zdp-teal);
+}
+.zdp-form button[type="submit"] {
+    width: 100%;
+    margin-top: 16px;
+}
+
+/* ── صفحه‌ی مستقل نظرسنجی: چیدمان کامل صفحه (بدون هدر/فوتر قالب) ──
+   مشابه .zdp-login-stage — چون این شورت‌کد معمولاً روی یک صفحه‌ی
+   Canvas/Blank (بدون هدر و فوتر تم) قرار می‌گیرد، خودش مسئول
+   وسط‌چین‌کردن عمودی/افقی کارت در کل صفحه است. */
+.zdp-survey-stage {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background:
+        radial-gradient(1200px 480px at 15% -10%, var(--zdp-teal-bg) 0%, transparent 60%),
+        radial-gradient(900px 420px at 100% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 55%);
+    color-scheme: light; /* همان رفع باگ force-dark بالا؛ این بار برای کل صفحه‌ی مستقل نظرسنجی */
+}
+.zdp-survey-stage .zdp-panel {
+    margin: 0;
+}
+.zdp-survey-panel {
+    max-width: 640px;
+    padding: 34px 32px 30px;
+}
+
+/* عنوان صفحه‌ی مستقل ثبت نظر — عمداً همان سطح از سادگی‌ی عنوان تب
+   نظرسنجی داخل پنل (یک h3 ساده داخل .zdp-card) را دارد، نه هدر
+   خوش‌آمدِ رینگ‌دار صفحه‌ی ورود؛ هدف یکسان‌بودن ظاهر با صفحه‌ی
+   نظرسنجی داخل پنل است. */
+.zdp-card-form-heading { margin-bottom: 4px; }
+.zdp-card-form-heading h3 { margin-top: 0; }
+.zdp-survey-anon-note {
+    font-size: 13.5px;
+    color: var(--zdp-soft);
+    line-height: 1.7;
+    margin: 4px 0 0;
+}
+
+/* ردیف هر سوال: عدد راهنما + بدنه‌ی سوال، مثل یک چک‌لیست آرام و مرحله‌به‌مرحله
+   به‌جای یک فرم بلند و خسته‌کننده — با فاصله‌ی سخاوتمندانه بین سوالات. */
+.zdp-survey-q {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 26px 0 0;
+    padding-top: 22px;
+    border-top: 1px solid var(--zdp-border-soft);
+}
+.zdp-survey-q:first-child {
+    margin-top: 22px;
+    padding-top: 0;
+    border-top: none;
+}
+.zdp-survey-qnum {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--zdp-teal-bg);
+    color: var(--zdp-teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.zdp-survey-qbody { flex: 1; min-width: 0; }
+.zdp-survey-qlabel {
+    display: block;
+    margin: 0 0 12px;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--zdp-ink);
+    line-height: 1.7;
+}
+.zdp-survey-optional {
+    font-weight: 400;
+    color: var(--zdp-soft);
+    font-size: 12.5px;
+}
+.zdp-survey-qbody textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* گزینه‌های چندگزینه‌ای به‌صورت «پیل» لمسی به‌جای یک dropdown خشک —
+   برای مخاطب یک کلینیک روانشناسی، انتخاب با لمس/کلیک مستقیم روی گزینه
+   محسوس‌تر و آرام‌بخش‌تر از باز کردن یک select است. */
+.zdp-choice-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.zdp-choice-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 18px;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--zdp-mid);
+    background: var(--zdp-white);
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .1s ease;
+}
+.zdp-choice-pill input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+.zdp-choice-pill:hover {
+    border-color: var(--zdp-teal-light);
+    background: var(--zdp-teal-bg);
+}
+.zdp-choice-pill:has(input:checked) {
+    background: var(--zdp-teal);
+    border-color: var(--zdp-teal);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.zdp-choice-pill:has(input:focus-visible) {
+    outline: var(--pivand-focus-outline, 2px solid var(--zdp-teal));
+    outline-offset: var(--pivand-focus-offset, 2px);
+}
+
+.zdp-consent-row {
+    margin-top: 22px !important;
+    padding-top: 18px;
+    border-top: 1px solid var(--zdp-border-soft);
+}
+
+.zdp-survey-submit {
+    margin-top: 22px !important;
+}
+
+@media (max-width: 460px) {
+    /* specificity رو با تکرار کلاس بالاتر می‌بریم چون قانون عمومی‌تر
+       .zdp-panel:not(.zdp-panel-shell) پایین‌تر در همین بلوک، این
+       padding رو بازنویسی می‌کرد و عملاً بی‌اثر می‌شد. */
+    .zdp-survey-stage .zdp-panel.zdp-survey-panel { padding: 26px 18px 24px; }
+    .zdp-survey-q { gap: 10px; }
+    /* روی موبایل پیل‌ها را کوچیک‌تر نمی‌کنیم — دقیقاً همون‌جاست که
+       تاچ‌تارگت راحت (~۴۴px) بیشترین اهمیت رو داره. */
+    .zdp-choice-pill { padding: 11px 18px; font-size: 13.5px; }
+}
+
+#zdp-login-message.zdp-error,
+#zdp-booking-result.zdp-error,
+#zdp-message-result.zdp-error,
+#zdp-survey-result.zdp-error,
+#zdp-receipt-result.zdp-error {
+    color: var(--zdp-red);
+    background: #fef2f2;
+    border-radius: var(--zdp-radius-sm);
+    padding: 10px 14px;
+    margin-top: 4px;
+    font-size: 13.5px;
+    animation: zdp-shake 0.4s ease;
+}
+@keyframes zdp-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+
+#zdp-login-message[role="status"]:not(.zdp-error):not(:empty),
+#zdp-booking-result[role="status"]:not(.zdp-error):not(:empty),
+#zdp-message-result[role="status"]:not(.zdp-error):not(:empty),
+#zdp-survey-result[role="status"]:not(.zdp-error):not(:empty),
+#zdp-receipt-result[role="status"]:not(.zdp-error):not(:empty) {
+    color: var(--zdp-teal-dark);
+    background: var(--zdp-teal-bg);
+    border-radius: var(--zdp-radius-sm);
+    padding: 10px 14px;
+    margin-top: 4px;
+    font-size: 13.5px;
+}
+
+.zdp-quiz-question label {
+    display: block;
+    margin: 6px 0;
+}
+
+/* ── Quiz CTA cards ───────────────────────────────────────── */
+.zdp-quiz-cta-mid,
+.zdp-quiz-cta-end {
+    padding: 20px;
+    margin: 26px 0;
+    border-radius: var(--zdp-radius);
+    transition: transform 0.2s ease;
+}
+
+.zdp-quiz-cta-mid {
+    background: linear-gradient(135deg, var(--zdp-teal-bg), #ecfeff);
+    border-right: 4px solid var(--zdp-teal);
+}
+.zdp-quiz-cta-end {
+    background: linear-gradient(135deg, #fff1f2, #fef2f2);
+    border-right: 4px solid var(--zdp-rose);
+}
+
+.zdp-quiz-cta-button {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 13px 28px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fb7185, var(--zdp-rose));
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(225, 29, 72, 0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.zdp-quiz-cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(225, 29, 72, 0.34);
+}
+.zdp-quiz-cta-button:focus-visible {
+    outline: var(--pivand-focus-outline, 2px solid var(--zdp-teal));
+    outline-offset: var(--pivand-focus-offset, 2px);
+}
+
+.zdp-card-item {
+    background: var(--zdp-surface);
+    border: 1px solid var(--zdp-border-soft);
+    border-radius: var(--zdp-radius-sm);
+    padding: 14px 16px;
+    margin: 8px 0;
+    transition: box-shadow 0.18s ease, transform 0.15s ease;
+}
+.zdp-card-item:hover {
+    box-shadow: var(--zdp-shadow-sm);
+    transform: translateY(-1px);
+}
+
+/* ── Booking form ─────────────────────────────────────────── */
+#zdp-booking-form { background: transparent; border: none; padding: 0; margin: 0; }
+#zdp-booking-form h3 { margin-top: 0; }
+#zdp-booking-form label {
+    display: block;
+    margin: 12px 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--zdp-mid);
+    position: relative;
+}
+
+#zdp-booking-form select,
+#zdp-booking-form input[type="date"],
+#zdp-booking-form input[type="time"],
+#zdp-booking-form .zdp-jalali-date-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    margin-top: 2px;
+    font-family: inherit;
+    font-size: 14.5px;
+    background: var(--zdp-white);
+    color: var(--zdp-ink);
+    color-scheme: light; /* همان باگ متن نامرئی در دارک‌مود که در .zdp-form رفع شد */
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+#zdp-booking-form select:focus,
+#zdp-booking-form input[type="date"]:focus,
+#zdp-booking-form input[type="time"]:focus,
+#zdp-booking-form .zdp-jalali-date-input:focus {
+    outline: none;
+    border-color: var(--zdp-teal-light);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+}
+#zdp-booking-form .zdp-jalali-date-input {
+    cursor: pointer;
+    caret-color: transparent;
+}
+#zdp-book-btn { width: 100%; margin-top: 16px; }
+
+/* ── تقویم شمسی برای انتخاب تاریخ نوبت ────────────────────────
+   جایگزین input[type="date"] بومی مرورگر (که همیشه میلادی است و
+   ورودی/تقویمش را نمی‌شود شمسی کرد) — یک تقویم سبک و مستقل که خودش
+   محاسبات شمسی↔میلادی را (پورت همان الگوریتم PHP class-jalali.php)
+   در panel.js انجام می‌دهد؛ مقدار واقعی که به سرور می‌رود همچنان
+   میلادی (input[type=hidden]#zdp-booking-date) است — هیچ فرمتی در
+   دیتابیس/اعتبارسنجی سمت سرور عوض نشده. */
+.zdp-jalali-calendar {
+    position: absolute;
+    /* عمداً بالاتر از .zdp-tabs (z-index: 40، نوار پایین موبایل) تا مستقل
+       از ترتیب DOM همیشه روی نوار تب دیده شود، نه فقط به‌خاطر این‌که در
+       مارک‌آپ بعد از آن می‌آید. */
+    z-index: 45;
+    margin-top: 6px;
+    width: 280px;
+    max-width: calc(100vw - 40px);
+    background: var(--zdp-white);
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius);
+    box-shadow: var(--zdp-shadow-lg);
+    padding: 12px;
+    color-scheme: light;
+}
+.zdp-jalali-cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.zdp-jalali-cal-head strong { font-size: 14px; color: var(--zdp-ink); }
+.zdp-jalali-cal-nav {
+    background: var(--zdp-teal-bg);
+    color: var(--zdp-teal-dark);
+    border: none;
+    border-radius: var(--zdp-radius-sm);
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1;
+}
+.zdp-jalali-cal-nav:hover { background: var(--zdp-teal-light); color: var(--zdp-white); }
+.zdp-jalali-cal-weekdays,
+.zdp-jalali-cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    text-align: center;
+}
+.zdp-jalali-cal-weekdays span {
+    font-size: 11px;
+    color: var(--zdp-soft);
+    padding: 4px 0;
+}
+.zdp-jalali-cal-days button {
+    border: none;
+    background: transparent;
+    border-radius: var(--zdp-radius-sm);
+    padding: 7px 0;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--zdp-ink);
+    cursor: pointer;
+}
+.zdp-jalali-cal-days button:hover:not(:disabled) { background: var(--zdp-teal-bg); }
+.zdp-jalali-cal-days button.zdp-jalali-today { font-weight: 800; color: var(--zdp-teal-dark); }
+.zdp-jalali-cal-days button.zdp-jalali-selected { background: var(--zdp-teal); color: var(--zdp-white); }
+.zdp-jalali-cal-days button:disabled { color: var(--zdp-border); cursor: not-allowed; }
+.zdp-jalali-cal-days span.zdp-jalali-cal-empty { visibility: hidden; }
+
+/* ── Message composer ─────────────────────────────────────── */
+#zdp-message-form { background: transparent; padding: 0; }
+#zdp-message-form textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+#zdp-send-message-btn { width: 100%; }
+
+/* ── Testimonials (شورت‌کد عمومی [zdp_approved_testimonials]) ──────
+   برخلاف بقیه‌ی این فایل، این بخش داخل .zdp-panel/.zdp-quiz-wrap قرار
+   نمی‌گیرد — قرار است داخل محتوای معمولی سایت (کنار هدر/فوتر قالب)
+   جا بگیرد، نه یک صفحه‌ی مستقل. به همین دلیل ریست باکس‌مدل/جهت/فونت
+   را جداگانه برای خودش تعریف می‌کند تا به CSS قالب وابسته نباشد. */
+.zdp-testimonials-section,
+.zdp-testimonials-section *,
+.zdp-testimonials-section *::before,
+.zdp-testimonials-section *::after {
+    box-sizing: border-box;
+}
+.zdp-testimonials-section {
+    direction: rtl;
+    font-family: var(--zdp-font);
+    margin: 8px 0;
+    color-scheme: light; /* همان رفع باگ force-dark موبایل، برای بلوک نظرات تاییدشده */
+}
+.zdp-testimonials-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--zdp-ink);
+    margin: 0 0 20px;
+}
+.zdp-testimonials-title::before {
+    content: '';
+    width: 6px;
+    height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--zdp-teal-light), var(--zdp-teal));
+    flex-shrink: 0;
+}
+
+/* ── ویوپورت مارکیِ نظرات: عرض کامل با محو تدریجی دو لبه ─────────
+   overflow:hidden لبه‌های کارت‌های در حال ورود/خروج را می‌بُرد؛ گرادیانِ
+   mask باعث می‌شود کارت‌ها به‌جای بریده‌شدنِ ناگهانی، در دو طرف محو شوند. */
+.zdp-testimonials-viewport {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to left, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to left, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+}
+
+.zdp-testimonials-track {
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    animation: zdp-testimonials-scroll var(--zdp-marquee-duration, 30s) linear infinite;
+    will-change: transform;
+}
+/* توقف نرم هنگام هاور/فوکوس — تا کاربر بتواند یک نظر را کامل بخواند.
+   :hover فقط برای دستگاه‌هایی با ماوس واقعی (hover:hover) فعال می‌شود؛
+   وگرنه در موبایل/تاچ (که mouseleave واقعی وجود ندارد)، لمسِ صفحه برای
+   اسکرول باعث «گیر کردن» دائمیِ حالت هاور و توقف همیشگیِ مارکی می‌شد —
+   دقیقاً همان باگِ «روی موبایل هیچ حرکتی نمی‌کند». فوکوس کیبورد
+   (focus-visible) مستقل از این محدودیت، برای همه‌ی دستگاه‌ها فعال می‌ماند. */
+@media (hover: hover) and (pointer: fine) {
+    .zdp-testimonials-viewport:hover .zdp-testimonials-track {
+        animation-play-state: paused;
+    }
+}
+.zdp-testimonials-track:has(.zdp-testimonial-card:focus-visible) {
+    animation-play-state: paused;
+}
+
+@keyframes zdp-testimonials-scroll {
+    from { transform: translateX(0); }
+    /* چون لیست کارت‌ها در PHP دقیقاً دوبار پشت‌سرهم رندر شده،
+       جابه‌جایی به‌اندازه‌ی نصف عرض کل، حلقه را کاملاً بی‌درز می‌کند.
+       جهت RTL یعنی حرکت باید به سمت راست (مثبت) باشد. */
+    to { transform: translateX(50%); }
+}
+
+/* کسانی که حرکت زیاد را ترجیح نمی‌دهند (تنظیمات دسترس‌پذیری سیستم‌عامل) */
+@media (prefers-reduced-motion: reduce) {
+    .zdp-testimonials-track {
+        animation: none;
+        flex-wrap: wrap;
+        transform: none;
+    }
+    .zdp-testimonials-viewport {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
+.zdp-testimonial-card {
+    position: relative;
+    flex: 0 0 300px;
+    width: 300px;
+    background: var(--zdp-surface);
+    padding: 24px 22px 18px;
+    border-radius: var(--zdp-radius);
+    box-shadow: var(--zdp-shadow-sm);
+    border: 1px solid var(--zdp-border-soft);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.zdp-testimonial-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--zdp-shadow);
+    border-color: var(--zdp-teal-mid);
+}
+
+.zdp-testimonial-quote-mark {
+    position: absolute;
+    top: 6px;
+    right: 18px;
+    font-size: 54px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--zdp-teal-bg);
+    font-family: Georgia, 'Times New Roman', serif;
+    user-select: none;
+    z-index: 0;
+}
+
+.zdp-testimonial-text {
+    position: relative;
+    z-index: 1;
+    margin: 6px 0 16px;
+    padding: 0;
+    font-size: 14.5px;
+    font-style: normal;
+    color: var(--zdp-ink);
+    line-height: 1.9;
+    /* خیلی از قالب‌های وردپرس روی خودِ تگ <blockquote> استایل پیش‌فرض
+       می‌ذارن (border سمت راست، پس‌زمینه، ایتالیک، quotes تولیدی با
+       content). چون این عنصر واقعاً یک <blockquote> هست، بدون این
+       ریست صریح، اون استایل‌های قالب رو properties هایی که اینجا
+       ست نکردیم می‌تونن نشت کنن و ظاهر رو به‌هم بریزن. */
+    border: 0;
+    background: none;
+    quotes: none;
+}
+.zdp-testimonial-text::before,
+.zdp-testimonial-text::after {
+    content: none;
+}
+
+.zdp-testimonial-meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--zdp-border-soft);
+}
+.zdp-testimonial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--zdp-teal-dark);
+}
+.zdp-testimonial-badge svg {
+    width: 15px;
+    height: 15px;
+    fill: var(--zdp-teal);
+    flex-shrink: 0;
+}
+.zdp-testimonial-date {
+    font-size: 11.5px;
+    color: var(--zdp-soft);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── Loading / spinner (for JS-driven busy states) ───────── */
+.zdp-loading::after {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: zdp-spin 0.7s linear infinite;
+}
+@keyframes zdp-spin { to { transform: rotate(360deg); } }
+
+/* ── Scrollbar polish (webkit) ───────────────────────────── */
+.zdp-panel ::-webkit-scrollbar { width: 8px; height: 8px; }
+.zdp-panel ::-webkit-scrollbar-thumb { background: var(--zdp-border); border-radius: 8px; }
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .zdp-panel, .zdp-quiz-wrap, .zdp-panel *, .zdp-quiz-wrap *,
+    .zdp-testimonials-section, .zdp-testimonials-section * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================================
+   ریسپانسیو
+   ============================================================ */
+
+/* زیر ۹۶۰px: نوار بالا (لوگو + کاربر/خروج) همچنان بالای صفحه می‌ماند،
+   ولی خودِ تب‌ها به یک نوار پایین ثابت منتقل می‌شوند — چون طبق قانون
+   فیتس/ناحیه‌ی راحت شست، ناوبری پایین روی موبایل راحت‌تر از بالا است.
+   این یعنی ترکیبی از هر دو خواسته: ظاهر تمیز بالا + راحتی لمسی پایین. */
+@media (max-width: 960px) {
+    .zdp-shell-main {
+        padding: var(--zdp-space-4);
+        padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    }
+    .zdp-shell-user-name { max-width: 90px; }
+
+    .zdp-tabs {
+        position: fixed;
+        inset-inline: 0;
+        bottom: 0;
+        z-index: 40;
+        justify-content: space-around;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+        border-radius: 0;
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+    }
+}
+
+@media (max-width: 640px) {
+    .zdp-shell-topbar {
+        padding: 10px 12px;
+    }
+    .zdp-tab {
+        flex-direction: column;
+        gap: 3px;
+        padding: 8px 4px;
+        min-height: 48px;
+        font-size: 10.5px;
+    }
+    .zdp-tab-badge {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        margin: 0;
+    }
+    .zdp-shell-logout-label { display: none; }
+}
+
+/* تبلت / صفحه‌های متوسط */
+@media (max-width: 640px) {
+    .zdp-panel:not(.zdp-panel-shell), .zdp-quiz-wrap {
+        max-width: 100%;
+        border-radius: var(--zdp-radius);
+        padding: 20px 18px 22px;
+    }
+    .zdp-landing-body { padding: 20px 12px 48px; }
+    .zdp-stats-grid { grid-template-columns: 1fr 1fr; }
+    .zdp-stat-card-highlight { grid-column: span 2; }
+    .zdp-field-row { grid-template-columns: 1fr; }
+}
+
+/* موبایل */
+@media (max-width: 460px) {
+    .zdp-panel:not(.zdp-panel-shell), .zdp-quiz-wrap {
+        border-radius: 0;
+        padding: 18px 14px 20px;
+        box-shadow: none;
+        border-bottom: 1px solid var(--zdp-border-soft);
+    }
+    .zdp-login { padding: 26px 14px 24px; }
+    .zdp-login-stage { min-height: 0; padding: 12px 0; }
+    .zdp-welcome-mark { width: 108px; height: 72px; }
+    .zdp-ring { width: 62px; height: 62px; }
+    .zdp-welcome-logo-img { max-height: 68px; }
+    .zdp-panel h2, .zdp-quiz-wrap h2 { font-size: 18px; }
+    .zdp-panel button, .zdp-quiz-wrap button { padding: 13px 20px; font-size: 14.5px; }
+    .zdp-testimonials-container { gap: 12px; grid-template-columns: 1fr; }
+    .zdp-testimonial-card { padding: 20px 16px 14px; }
+    .zdp-testimonial-quote-mark { font-size: 42px; right: 14px; }
+    .zdp-stats-grid { grid-template-columns: 1fr; }
+    .zdp-stat-card-highlight { grid-column: span 1; }
+}
+
+/* موبایل خیلی کوچک */
+@media (max-width: 360px) {
+    .zdp-panel:not(.zdp-panel-shell), .zdp-quiz-wrap { padding: 16px 12px 18px; }
+    .zdp-panel h2, .zdp-quiz-wrap h2 { font-size: 17px; }
+    .zdp-tab-label { display: none; }
+}
+
+/* صفحه‌های بزرگ‌تر — کمی جادهی بیشتر و عرض راحت‌تر برای خواندن */
+@media (min-width: 900px) {
+    .zdp-panel:not(.zdp-panel-shell), .zdp-quiz-wrap { max-width: 600px; padding: 32px 34px 34px; }
+    .zdp-landing-body { max-width: 640px; }
+    /* عرض survey باید ۶۴۰px بماند؛ specificity رو با تکرار کلاس بالاتر می‌بریم
+       تا قانون عمومی بالا (۶۰۰px) اونو بازنویسی نکنه. */
+    .zdp-survey-stage .zdp-panel.zdp-survey-panel { max-width: 640px; }
+}
+
+/* حالت لودینگِ shell پنل (نگاه کن به Client_Panel::render و panel.js#loadPanelApp) */
+#zdp-panel-app {
+    width: 100%;
+}
+
+.zdp-panel-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--zdp-soft);
+}
+.zdp-panel-loading-text {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.zdp-panel-loading-text::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid var(--zdp-border);
+    border-top-color: var(--zdp-teal);
+    border-radius: 50%;
+    animation: zdp-spin 0.7s linear infinite;
+}
+#zdp-panel-app .zdp-error {
+    color: #b91c1c;
+    margin-bottom: 12px;
+}
+#zdp-panel-app #zdp-panel-retry-btn {
+    background: var(--zdp-teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* ── فوتر پنل: پشتیبانی + بازگشت به سایت ─────────────────────
+   برخلاف صفحه‌ی ورود، اینجا کاربر احراز هویت شده و ریسک ترکِ
+   فرآیند کمتر است؛ پس دسترسی کامل‌تر به پشتیبانی و سایت منطقی است،
+   اما همچنان کم‌رنگ و در پایین صفحه، نه در جریان اصلی کار کاربر. */
+.zdp-panel-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 26px;
+    padding-top: 16px;
+    border-top: 1px solid var(--zdp-border-soft);
+    font-size: 12.5px;
+}
+.zdp-panel-support-link,
+.zdp-panel-back-link {
+    color: var(--zdp-soft);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color .15s ease, background-color .15s ease;
+}
+.zdp-panel-support-link { direction: ltr; unicode-bidi: embed; }
+.zdp-login-footer .zdp-panel-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.zdp-login-footer .zdp-panel-back-link svg { width: 13px; height: 13px; }
+.zdp-panel-support-link:hover,
+.zdp-panel-back-link:hover {
+    color: var(--zdp-teal-dark);
+    background: var(--zdp-teal-bg);
+    text-decoration: none;
+}
+.zdp-panel-support-link:focus-visible,
+.zdp-panel-back-link:focus-visible {
+    outline: var(--pivand-focus-outline, 2px solid var(--zdp-teal));
+    outline-offset: var(--pivand-focus-offset, 2px);
+    background: var(--zdp-teal-bg);
+}
+
+/* ── Empty States ─────────────────────────────────────────────
+   کامپوننت مشترک برای حالت خالی (بدون نوبت/آزمون/پیام). طبق اصل
+   "حالت خالی یک دعوت‌به‌عمل است، نه فقط یک جمله‌ی خنثی": متن باید
+   بگوید الان چه کاری ممکنه انجام بشه، نه فقط این‌که چیزی نیست. */
+.zdp-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 32px 20px;
+    border: 1px dashed var(--zdp-border);
+    border-radius: var(--zdp-radius);
+    background: var(--zdp-surface);
+    color: var(--zdp-soft);
+}
+.zdp-empty-state-icon {
+    font-size: 28px;
+    line-height: 1;
+    opacity: 0.85;
+}
+.zdp-empty-state p {
+    margin: 0;
+    font-size: 14px;
+    max-width: 32em;
+}
+
+/* ============================================================
+   شورت‌کد عمومی نوبت‌دهی [zdp_booking_widget] — جدول ریسپانسیوِ
+   روز×ساعت روی صفحه‌ی اصلی/هر صفحه‌ی معمولی سایت. مستقل از .zdp-panel
+   (چون برای بازدیدکننده‌ی لاگین‌نشده هم نمایش داده می‌شود)، پس
+   font/box-sizing خودش را ریست می‌کند — دقیقاً مثل .zdp-testimonials-section.
+   ============================================================ */
+.zdp-booking-widget,
+.zdp-booking-widget * {
+    box-sizing: border-box;
+}
+.zdp-booking-widget {
+    font-family: inherit;
+    direction: rtl;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px;
+    background: var(--zdp-white);
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+    /* رفع باگ ۱.۹.۸.۰: همان رفع force-dark که .zdp-panel/.zdp-quiz-wrap
+       دارند، اینجا جا افتاده بود — نتیجه‌اش select خدمت (و پاپ‌آپ گزینه‌های
+       بازشوی مرورگر/سیستم‌عاملش) در دارک‌مود، تیره و ناهماهنگ با ظاهر
+       روشنِ ویجت باز می‌شد. */
+    color-scheme: light;
+}
+/* حالت تمام‌عرض: [zdp_booking_widget width="full"] — برای صفحه‌ی اصلی،
+   جایی که ویجت باید تمام عرض ستون محتوا را بگیرد نه فقط ۷۶۰ پیکسل
+   وسط‌چین. جدول داخلش همچنان min-width دارد (نگاه کن به .zdp-bw-table)
+   پس روی صفحه‌های خیلی عریض هم کشیده/بدشکل نمی‌شود، فقط پدینگ/فاصله‌ها
+   کمی بازتر می‌شوند. */
+.zdp-booking-widget.zdp-booking-widget--full {
+    max-width: none;
+    width: 100%;
+}
+@media (min-width: 900px) {
+    .zdp-booking-widget.zdp-booking-widget--full {
+        padding: 32px 40px;
+    }
+}
+.zdp-booking-widget-title {
+    position: relative;
+    margin: 0 0 22px;
+    padding-bottom: 12px;
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--zdp-ink);
+    text-align: center;
+}
+.zdp-booking-widget-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    transform: translateX(50%);
+    width: 46px;
+    height: 3px;
+    border-radius: 999px;
+    /* مقدار صریح، نه var(--zdp-teal-*) — نگاه کن به توضیح کامل بالای
+       .zdp-bw-table برای دلیل (باگ ۱.۷.۰.۱). */
+    background: linear-gradient(90deg, #14b8a6, #0f766e);
+}
+.zdp-bw-field { margin-bottom: 16px; }
+.zdp-bw-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--zdp-soft);
+    margin-bottom: 6px;
+}
+
+/* ── جدول: ستون اول (ساعت) sticky، اسکرول افقی برای بقیه‌ی ستون‌ها (تاریخ‌ها) —
+      این همان معنای «ریسپانسیو» برای یک جدول واقعی روی موبایل است: به‌جای
+      فشرده‌شدن/شکستنِ ناخوانای ستون‌ها، با انگشت به چپ/راست اسکرول می‌شود،
+      درست مثل جدول‌های رزرو پرواز/هتل. ── */
+.zdp-bw-grid-wrap { position: relative; margin: 4px 0 18px; }
+.zdp-bw-grid-loading {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--zdp-soft);
+    font-size: 14px;
+}
+/* حالت خطا در بارگذاری جدول: قبلاً فقط یک متنِ ساده بود که کاربر را در
+   بن‌بست می‌گذاشت (باید خودش صفحه را رفرش می‌کرد). حالا آیکون + پیام +
+   دکمه‌ی «تلاش مجدد» دارد که همان loadGrid() را دوباره صدا می‌زند. */
+.zdp-bw-grid-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 16px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+}
+.zdp-bw-grid-error-icon { font-size: 22px; line-height: 1; }
+.zdp-bw-grid-error-text { font-size: 13.5px; font-weight: 600; }
+.zdp-bw-grid-retry-btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    border: none;
+    border-radius: 999px;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: transform .1s ease, box-shadow .15s ease;
+}
+.zdp-bw-grid-retry-btn:hover { box-shadow: 0 4px 12px rgba(185, 28, 28, .28); }
+.zdp-bw-grid-retry-btn:active { transform: scale(.96); }
+/* --------------------------------------------------------------------
+   بازطراحیِ کامل جدول گرید نوبت‌دهی (نسخه‌ی ۲):
+   ۱) رنگ‌بندیِ برند: قبلاً این جدول از یک پالت بنفش/آبی/صورتیِ کاملاً
+      جدا (#312e81 / #4338ca / #eef2ff / #eff6ff و...) استفاده می‌کرد که
+      هیچ ربطی به هویت رنگی پنل نداشت. طبق نظر کارفرما («همون آبی پنل
+      خوبه»)، هدر ستون‌ها/ستون ساعت/فیلترهای سریع الان همان سبزآبی/تیل
+      پنل را دارند — ولی **عمداً به‌صورت مقدار صریح (#0f766e و...)، نه
+      var(--zdp-teal-*)**. دلیلش دقیقاً همان باگِ مستندشده در ۱.۷.۰.۱ است:
+      --zdp-teal-* از var(--pivand-primary, ...) عبور می‌کند، یعنی اگر
+      هسته‌ی مشترک اکوسیستم روی این سایت یک رنگ دیگر (آن‌موقع یک بنفش
+      کم‌کنتراست) برای --pivand-primary تعریف کرده باشد، همان مقدار به‌جای
+      فالبک سبزآبی این فایل وارد جدول می‌شود. استفاده از var() اینجا دقیقاً
+      همان علامتِ آن باگ را دوباره برمی‌گرداند؛ برای همین بازطراحی رنگی این
+      نسخه هم، مثل رفعِ ۱.۷.۰.۱/۱.۶.۸.۲، با مقدار ثابت نوشته شده — برنده‌ی
+      cascade می‌ماند، مستقل از این‌که هسته‌ی مشترک چه چیزی تعریف کرده.
+      رنگ‌های سبز (خالی) و قرمز (رزروشده) هم به همین دلیل از قبل صریح
+      بودند و همچنان صریح‌اند؛ این‌ها علاوه‌براین معنای وضعیتی هم دارند
+      (سبز=آزاد، قرمز=گرفته‌شده) که تغییرشان به رنگ برند خوانایی را کم
+      می‌کند.
+   ۲) سلول‌ها کارت‌های بزرگ‌تر و گردتر با فاصله‌ی واقعی بین‌شان‌اند
+      (border-spacing به‌جای border مشترک) و روز+ساعت به‌صورت متن داخل
+      خودِ هر کارت نوشته می‌شود (نگاه کن به renderGrid() در panel.js).
+   ۳) این فایل واحد و markup مشترک (Booking::render_grid_widget_markup)
+      یعنی این بازطراحی هم روی شورت‌کد عمومی صفحه‌ی اصلی و هم روی تب
+      «نوبت‌ها»ی داخل پنل اعمال می‌شود، و هر تغییر بعدی روی این کلاس‌ها هم
+      به‌صورت خودکار هر دو جا را هم‌زمان به‌روز نگه می‌دارد.
+   -------------------------------------------------------------------- */
+.zdp-bw-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 100%;
+    min-height: 68px;
+    border: none;
+    border-radius: 12px;
+    background: none;
+    box-shadow: none;
+    font-family: inherit;
+    position: relative;
+}
+.zdp-bw-cell-day { font-size: 11px; font-weight: 700; opacity: .8; }
+.zdp-bw-cell-time { font-size: 15px; font-weight: 800; }
+
+button.zdp-bw-cell-open {
+    cursor: pointer;
+    background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #047857;
+    box-shadow: inset 0 0 0 1.5px #6ee7b7;
+    transition: transform .12s ease, box-shadow .12s ease, background .15s ease;
+}
+button.zdp-bw-cell-open:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(160deg, #d1fae5 0%, #a7f3d0 100%);
+    box-shadow: inset 0 0 0 1.5px #10b981, 0 6px 14px rgba(16, 185, 129, .22);
+}
+button.zdp-bw-cell-open::before {
+    content: "○";
+    position: absolute;
+    top: 4px;
+    left: 7px;
+    font-size: 9px;
+    color: #10b981;
+}
+button.zdp-bw-cell-open.zdp-bw-cell-selected {
+    background: linear-gradient(160deg, #14b8a6 0%, #0f766e 100%);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(15, 118, 110, .38);
+    transform: translateY(-1px) scale(1.04);
+}
+button.zdp-bw-cell-open.zdp-bw-cell-selected::before { content: "✓"; color: #fff; font-weight: 800; }
+.zdp-bw-cell-taken {
+    background: #fef2f2;
+    color: #fca5a5;
+    box-shadow: inset 0 0 0 1px #fecaca;
+}
+.zdp-bw-cell-taken .zdp-bw-cell-time { text-decoration: line-through; }
+.zdp-bw-cell-closed {
+    background: #f8fafc;
+    color: #cbd5e1;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+}
+
+/* یادداشت قوانین رزرو (مدت جلسه/تماس تلفنی/مهلت جابه‌جایی/محرمانگی) —
+   طبق درخواست صریح کارفرما، زیر انتخاب «خدمت مورد نظر» و بالای راهنمای
+   رنگ جدول. رنگ‌ها عمداً مقدار صریح‌اند (نه var(--zdp-teal-*))، به همان
+   دلیلِ مستندشده‌ی بالای .zdp-bw-table (باگ ۱.۷.۰.۱). */
+.zdp-bw-notice {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 12px 16px;
+    background: #f0fdfa;
+    border: 1px solid #5eead4;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.zdp-bw-notice li {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #0b5a54;
+}
+.zdp-bw-notice li:first-child { font-weight: 800; }
+
+/* راهنمای رنگ — بالای کارتِ روز، به‌شکل چیپ‌های پرشده (نه فقط یک نقطه‌ی
+   کوچک کنار متن)؛ چون نمای یک‌روزه هر سه وضعیت (خالی/رزروشده/گذشته) را
+   هم‌زمان نشان می‌دهد، هر سه چیپ همیشه دیده می‌شوند. */
+.zdp-bw-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.zdp-bw-legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+.zdp-bw-legend-open   { background: #ecfdf5; color: #047857; box-shadow: inset 0 0 0 1px #6ee7b7; }
+.zdp-bw-legend-taken  { background: #fef2f2; color: #b91c1c; box-shadow: inset 0 0 0 1px #fecaca; }
+.zdp-bw-legend-closed { background: #f8fafc; color: #64748b; box-shadow: inset 0 0 0 1px #e2e8f0; }
+.zdp-bw-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.zdp-bw-dot-open   { background: #10b981; }
+.zdp-bw-dot-taken  { background: #fca5a5; }
+.zdp-bw-dot-closed { background: #cbd5e1; }
+
+/* فیلتر سریع امروز/فردا — میان‌بر برای پرش مستقیم به نمای یک‌روزه‌ی همان
+   روز؛ برای روزهای دیگر دکمه‌های ‹ › داخل کارتِ روز استفاده می‌شود
+   (نگاه کن به initBookingWidget در panel.js). */
+.zdp-bw-quickfilters {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.zdp-bw-qf-btn {
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0b5a54;
+    background: #f0fdfa;
+    border: 1.5px solid #5eead4;
+    border-radius: 999px;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: background-color .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+.zdp-bw-qf-btn:hover { background: #5eead4; box-shadow: 0 2px 8px rgba(15, 118, 110, .18); }
+.zdp-bw-qf-btn:active { transform: scale(.96); }
+.zdp-bw-qf-btn.zdp-bw-qf-active {
+    color: #fff;
+    background: linear-gradient(135deg, #14b8a6, #0f766e);
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(15, 118, 110, .28);
+}
+
+/* بج تعداد نوبت خالی هر روز، زیر تاریخ در هدر ستون */
+.zdp-bw-col-count {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #047857;
+    background: #d1fae5;
+    border-radius: 999px;
+    padding: 1.5px 7px;
+}
+.zdp-bw-col-count-zero { color: #94a3b8; background: #f1f5f9; }
+
+/* ── نمای «یک‌روزه» (کلیک روی امروز/فردا): طبق درخواست کارفرما، به‌جای
+   اسکرول در جدول فشرده‌ی هفتگی، فقط سلول‌های همان یک روز را در کارت‌های
+   بزرگ‌تر و در یک گرید ریسپانسیو (نه جدول) نشان می‌دهد — چون فضای افقیِ
+   آزادشده (به‌خاطر حذف ۶ ستون دیگر) اجازه می‌دهد سلول‌ها خیلی بزرگ‌تر و
+   خواناتر باشند. رنگ‌ها هم‌راستا با بقیه‌ی .zdp-bw-* (مقدار صریح، نه
+   var(--zdp-teal-*) — همان دلیل مستندشده‌ی بالای .zdp-bw-table). ── */
+.zdp-bw-day-view {
+    padding: 4px 2px 2px;
+}
+.zdp-bw-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #f0fdfa;
+    border: 1px solid #5eead4;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+}
+.zdp-bw-day-header .zdp-bw-col-weekday { font-size: 15px; }
+.zdp-bw-day-header .zdp-bw-col-date { font-size: 12.5px; margin-inline-start: 6px; }
+.zdp-bw-day-header.zdp-bw-col-closed { background: #f1f5f9; border-color: #e2e8f0; }
+/* دکمه‌های ‹ › روزِ قبل/بعد — سوییچ بین روزهای مجاور بدون برگشت به نمای
+   هفته (طبق Hick's Law: کاهش تعداد کلیک/تصمیم لازم). */
+.zdp-bw-day-nav {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid #5eead4;
+    background: #fff;
+    color: #0f766e;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .15s ease, transform .1s ease;
+}
+.zdp-bw-day-nav:hover:not(:disabled) { background: #ccfbf1; }
+.zdp-bw-day-nav:active:not(:disabled) { transform: scale(.94); }
+.zdp-bw-day-nav:disabled { opacity: .35; cursor: not-allowed; }
+.zdp-bw-empty-row {
+    grid-column: 1 / -1;
+    padding: 22px 10px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 14px;
+    background: #f8fafc;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.zdp-bw-day-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+}
+td.zdp-bw-empty-row {
+    padding: 22px 10px;
+}
+.zdp-bw-day-slot {
+    min-height: 64px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
+}
+.zdp-bw-day-slot.zdp-bw-cell-open:hover {
+    transform: translateY(-2px) scale(1.03);
+}
+.zdp-bw-day-slot.zdp-bw-cell-open.zdp-bw-cell-selected {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* انیمیشنِ ورودِ کارتِ روز هنگام سوییچ بین روزها — یک فید+اسلایدِ ملایم، نه
+   یک جابه‌جاییِ خشک. کلاس در JS حذف/دوباره اضافه می‌شود (renderDayView) تا
+   هر بار سوییچ، انیمیشن از نو با requestAnimationFrame اجرا شود. */
+@keyframes zdp-bw-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.zdp-bw-fade-in { animation: zdp-bw-fade-in .28s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+    .zdp-bw-fade-in { animation: none; }
+}
+
+/* اسکلتون لودینگ: شبکه‌ی ضربان‌دار هم‌شکل نمای یک‌روزه‌ی واقعی (یک نوارِ
+   هدرِ روز + چند کارتِ ساعتِ خالی)، به‌جای فقط متنِ «در حال دریافت...» —
+   حس سریع‌تر/مدرن‌تر می‌دهد. */
+.zdp-bw-skel { display: flex; flex-direction: column; gap: 10px; padding: 4px; }
+.zdp-bw-skel-day-header {
+    display: block;
+    height: 58px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #d9f5ef 25%, #eefaf7 37%, #d9f5ef 63%);
+    background-size: 400% 100%;
+    animation: zdp-bw-shimmer 1.4s ease infinite;
+}
+.zdp-bw-skel-day-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+}
+.zdp-bw-skel-cell {
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(90deg, #eef2f7 25%, #f7f9fb 37%, #eef2f7 63%);
+    background-size: 400% 100%;
+    animation: zdp-bw-shimmer 1.4s ease infinite;
+}
+@keyframes zdp-bw-shimmer {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zdp-bw-skel-cell, .zdp-bw-skel-day-header { animation: none; }
+}
+
+.zdp-bw-confirm {
+    border-top: 1px dashed var(--zdp-border);
+    padding-top: 18px;
+}
+.zdp-bw-selected-summary {
+    font-weight: 700;
+    color: #047857;
+    background: #d1fae5;
+    box-shadow: inset 0 0 0 1.5px #6ee7b7;
+    border-radius: var(--zdp-radius-sm);
+    padding: 10px 14px;
+    margin: 0 0 14px;
+    text-align: center;
+}
+.zdp-bw-step input { margin-bottom: 10px; }
+#zdp-bw-otp {
+    text-align: center;
+    letter-spacing: 6px;
+    font-size: 20px;
+    direction: ltr;
+}
+#zdp-bw-result:not(:empty) {
+    margin-top: 10px;
+    font-size: 13.5px;
+    text-align: center;
+}
+#zdp-bw-result.zdp-error { color: #b91c1c; }
+
+/* ── نوبت‌های همین‌الان ثبت‌شده از مسیر ویجت صفحه‌ی اصلی (تب «نوبت‌های من») ── */
+.zdp-pending-payment-box {
+    border: 1.5px solid var(--zdp-teal-light);
+    background: var(--zdp-teal-bg);
+}
+.zdp-pending-payment-box h3 { margin-top: 0; }
+.zdp-card-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.zdp-card-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--zdp-white);
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    margin-bottom: 8px;
+    direction: ltr;
+    text-align: right;
+}
+
+/* ── آپلود رسید کارت‌به‌کارت (تب «نوبت‌ها»، تا وقتی ادمین تایید نکرده) ── */
+.zdp-receipt-upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    max-width: 360px;
+}
+.zdp-receipt-upload-form label { font-size: 13.5px; font-weight: 600; }
+.zdp-receipt-upload-form input[type="file"] {
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius-sm);
+    padding: 8px;
+    background: var(--zdp-white);
+    color-scheme: light;
+}
+.zdp-receipt-uploaded-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--zdp-teal-bg);
+    border: 1px solid var(--zdp-teal-light);
+    border-radius: var(--zdp-radius-sm);
+}
+.zdp-receipt-uploaded-box p:first-child { margin-top: 0; font-weight: 600; }
+
+@media (max-width: 460px) {
+    .zdp-booking-widget { padding: 16px; }
+    .zdp-bw-cell { min-height: 56px; }
+    .zdp-bw-cell-time { font-size: 13.5px; }
+}
+
+/* حالت فشرده برای صفحه‌نمایش خیلی کوچیک: فقط ساعت داخل مربع نشان داده
+   می‌شود (نه روز)، چون هدر ستون بالای جدول همچنان تاریخ کامل را دارد.
+   روز هنوز از طریق title (تپ/نگه‌داشتن روی مربع، یا هاور روی دسکتاپ) و
+   aria-label دکمه‌های خالی در دسترس است — چیزی از اطلاعات حذف نمی‌شود،
+   فقط چگالی بصری در عرض کم کاهش پیدا می‌کند. */
+@media (max-width: 360px) {
+    .zdp-bw-cell { min-height: 46px; gap: 0; }
+    /* قبلاً این‌جا zdp-bw-cell-day به‌طور کامل مخفی می‌شد و فقط با title
+       (که روی لمسی قابل دسترسی نیست) جایگزین می‌شد — یعنی روی موبایلِ
+       کوچک، کاربر اصلاً نمی‌فهمید این ساعت مال کدام روز است (ریسک واقعیِ
+       رزرو روز اشتباه). به‌جایش فقط کوچک‌تر می‌شود ولی همیشه دیده می‌شود. */
+    .zdp-bw-cell-day { font-size: 9px; }
+    .zdp-bw-cell-time { font-size: 13px; }
+    .zdp-bw-quickfilters { gap: 6px; }
+    .zdp-bw-qf-btn { padding: 5px 11px; font-size: 11.5px; }
+}
+
+/* ── فرم ارزیابی (Intake) ───────────────────────────────────────────── */
+.zdp-intake-banner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; margin-bottom: 16px; border-radius: 12px;
+    background: #fff8e6; border: 1px solid #f0d58a; color: #5b4300;
+}
+.zdp-intake-banner-text { font-weight: 600; line-height: 1.8; }
+.zdp-intake-lead, .zdp-intake-done { line-height: 1.9; margin: 0 0 14px; }
+.zdp-intake-done { color: #166534; }
+.zdp-intake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 16px; }
+.zdp-intake-fieldset { border: 0; padding: 0; margin: 12px 0; min-width: 0; }
+.zdp-intake-fieldset legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
+.zdp-intake-confirm label { display: flex; gap: 8px; align-items: flex-start; line-height: 1.8; }
+
+
+/* ============================================================
+   v2 — بازطراحی ظاهری (۱.۱۱.۰.۰)
+   فقط ظاهر: هیچ ID/کلاسی که panel.js یا PHP به آن وابسته است تغییر نکرده.
+   رنگ برند همچنان از توکن‌های هسته (--pivand-*) می‌آید؛ این لایه سطوح،
+   سایه، گوشه‌ها، فاصله‌ها و چیدمان را پرداخته‌تر می‌کند.
+   ============================================================ */
+.zdp-panel,
+.zdp-login-stage,
+.zdp-services-prices {
+    --zdp-surface: #f6f8fc;
+    --zdp-border: #e3e8f2;
+    --zdp-border-soft: #edf1f8;
+    --zdp-radius-lg: 22px;
+    --zdp-radius: 16px;
+    --zdp-shadow: 0 10px 30px rgba(30, 41, 90, 0.07), 0 2px 8px rgba(30, 41, 90, 0.04);
+}
+
+/* ---------- صفحه‌ی ورود ---------- */
+.zdp-login-stage {
+    background:
+        radial-gradient(760px 380px at 88% -8%, rgba(99, 102, 241, 0.16), transparent 62%),
+        radial-gradient(700px 380px at 6% 112%, rgba(37, 99, 235, 0.13), transparent 62%),
+        linear-gradient(180deg, #f8faff, #eef2fb);
+    border-radius: 28px;
+    padding: 36px 16px;
+}
+.zdp-login-stage .zdp-login {
+    width: 100%;
+    max-width: 440px;
+    padding: 40px 32px 28px;
+    border-radius: 26px;
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 28px 64px rgba(30, 41, 90, 0.14), 0 4px 14px rgba(30, 41, 90, 0.06);
+}
+.zdp-login .zdp-welcome-title { font-size: 23px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 8px; }
+.zdp-login .zdp-welcome-sub { font-size: 13.5px; color: var(--zdp-soft); max-width: 330px; margin: 0 auto 22px; }
+.zdp-login .zdp-login-channel-tabs {
+    background: var(--zdp-surface);
+    border: 1px solid var(--zdp-border);
+    border-radius: 14px;
+    padding: 4px;
+    gap: 4px;
+}
+.zdp-login .zdp-login-channel-tab { padding: 10px 8px; border-radius: 11px; font-weight: 600; }
+.zdp-login .zdp-login-channel-tab.active { background: #fff; box-shadow: 0 2px 8px rgba(30, 41, 90, 0.1); }
+.zdp-login input[type="tel"],
+.zdp-login input[type="email"],
+.zdp-login input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 52px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--zdp-border);
+    border-radius: 14px;
+    background: #fff;
+    font-size: 16px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.zdp-login input[type="tel"]:focus,
+.zdp-login input[type="email"]:focus,
+.zdp-login input[type="text"]:focus {
+    outline: none;
+    border-color: var(--zdp-teal-light);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+}
+.zdp-login .zdp-btn-primary,
+.zdp-panel .zdp-btn-primary {
+    min-height: 50px;
+    border: 0;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal));
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.26);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.zdp-login .zdp-btn-primary:hover:not(:disabled),
+.zdp-panel .zdp-btn-primary:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); box-shadow: 0 12px 26px rgba(37, 99, 235, 0.3); }
+.zdp-login .zdp-btn-primary:disabled { opacity: 0.7; box-shadow: none; }
+.zdp-otp-box { border-radius: 14px; }
+
+/* ---------- پوسته‌ی پنل ---------- */
+.zdp-shell-topbar {
+    border: 1px solid var(--zdp-border-soft);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+}
+.zdp-shell-main { border: 1px solid var(--zdp-border-soft); }
+.zdp-tabs { border: 1px solid var(--zdp-border-soft); }
+.zdp-tab { font-weight: 600; }
+.zdp-tab.active {
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--zdp-teal) 32%, transparent);
+}
+.zdp-card { border-radius: var(--zdp-radius); background: var(--zdp-white); border: 1px solid var(--zdp-border); box-shadow: var(--zdp-shadow-sm); }
+.zdp-card-form { background: var(--zdp-white); }
+.zdp-card h3 { font-size: 17px; font-weight: 800; color: var(--zdp-ink); }
+
+/* کارت‌های خلاصه: هر کدام یک رنگ تأکید */
+.zdp-stat-card { background: var(--zdp-white); border: 1px solid var(--zdp-border); box-shadow: var(--zdp-shadow-sm); }
+.zdp-stat-card:nth-child(2) .zdp-stat-icon { color: #7c3aed; background: #f3edff; }
+.zdp-stat-card:nth-child(3) .zdp-stat-icon { color: #0d9488; background: #e6f7f5; }
+.zdp-stat-card .zdp-stat-icon { box-shadow: none; }
+.zdp-stat-card-highlight .zdp-stat-icon { background: #fff; box-shadow: var(--zdp-shadow-sm); }
+
+/* ---------- دسکتاپ: نوار کناری ---------- */
+@media (min-width: 960px) {
+    .zdp-panel.zdp-panel-shell {
+        display: grid;
+        grid-template-columns: 252px minmax(0, 1fr);
+        grid-template-areas: "top top" "nav main";
+        gap: 18px;
+        align-items: start;
+        max-width: 1180px;
+    }
+    .zdp-panel-shell > .zdp-shell-topbar { grid-area: top; }
+    .zdp-panel-shell > .zdp-shell-main { grid-area: main; }
+    .zdp-panel-shell > .zdp-tabs {
+        grid-area: nav;
+        position: sticky;
+        top: 16px;
+        bottom: auto;
+        inset-inline: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        overflow: visible;
+        border-radius: var(--zdp-radius-lg);
+        box-shadow: var(--zdp-shadow);
+    }
+    .zdp-panel-shell > .zdp-tabs .zdp-tab {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 13px 14px;
+        font-size: 14px;
+        min-height: 46px;
+    }
+    .zdp-panel-shell > .zdp-tabs .zdp-tab-badge { position: static; margin-inline-start: auto; }
+}
+
+/* موبایل: برچسب بلندِ «فرم ارزیابی مراجع» در نوار پایین دو‌خطی می‌شود */
+@media (max-width: 760px) {
+    .zdp-tab[data-tab="intake"] .zdp-tab-label { font-size: 9.5px; line-height: 1.25; text-align: center; max-width: 64px; }
+    .zdp-login-stage { padding: 20px 10px; border-radius: 20px; }
+    .zdp-login-stage .zdp-login { padding: 30px 18px 22px; border-radius: 22px; }
+}
+
+/* ---------- فرم ارزیابی مراجع ---------- */
+.zdp-intake-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--zdp-border);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--zdp-ink);
+}
+.zdp-intake-section-title:first-of-type { margin-top: 8px; }
+.zdp-intake-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--zdp-teal-bg);
+    color: var(--zdp-teal-dark);
+    font-size: 13px;
+    font-weight: 800;
+}
+.zdp-intake-privacy {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f1f6ff;
+    color: var(--zdp-mid);
+    font-size: 13px;
+    line-height: 1.9;
+}
+.zdp-intake-health {
+    padding: 14px 16px 16px;
+    margin: 12px 0;
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius);
+    background: var(--zdp-surface);
+}
+.zdp-intake-health legend { padding: 0 8px; font-weight: 800; color: var(--zdp-ink); }
+.zdp-intake-sublabel { margin-top: 12px !important; font-weight: 600 !important; font-size: 12.5px !important; color: var(--zdp-soft) !important; }
+.zdp-intake-health textarea { background: #fff; }
+
+/* ---------- شورت‌کد [zdp_services_prices] ---------- */
+.zdp-services-prices { font-family: var(--zdp-font); }
+.zdp-services-prices-title { margin: 0 0 14px; font-size: 20px; font-weight: 800; color: var(--zdp-ink); }
+.zdp-services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.zdp-service-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: var(--zdp-white);
+    border: 1px solid var(--zdp-border);
+    border-radius: var(--zdp-radius);
+    box-shadow: var(--zdp-shadow-sm);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.zdp-service-card:hover { transform: translateY(-3px); box-shadow: var(--zdp-shadow); }
+.zdp-service-name { margin: 0; font-size: 16px; font-weight: 800; color: var(--zdp-ink); }
+.zdp-service-type { align-self: flex-start; padding: 3px 12px; border-radius: 999px; background: var(--zdp-teal-bg); color: var(--zdp-teal-dark); font-size: 12px; font-weight: 700; }
+.zdp-service-price { margin: 6px 0 4px; color: var(--zdp-soft); font-size: 13px; }
+.zdp-service-price strong { font-size: 24px; font-weight: 800; color: var(--zdp-ink); margin-inline-end: 4px; }
+.zdp-service-cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal));
+    color: #fff !important;
+    font-weight: 700;
+    text-decoration: none !important;
+}
+
+/* ---------- v2.1: ثابت‌ماندن رنگ دکمه‌ها در hover/focus ----------
+   بعضی قالب‌ها/صفحه‌سازها برای button:hover پس‌زمینه‌ی سفید و متن سفید می‌گذارند
+   و نوشته‌ی دکمه ناپدید می‌شود. این قواعد رنگ را در همه‌ی حالت‌ها صریحاً تعیین می‌کنند. */
+.zdp-login .zdp-btn-primary,
+.zdp-login .zdp-btn-primary:hover,
+.zdp-login .zdp-btn-primary:focus,
+.zdp-login .zdp-btn-primary:active,
+.zdp-panel .zdp-btn-primary,
+.zdp-panel .zdp-btn-primary:hover,
+.zdp-panel .zdp-btn-primary:focus,
+.zdp-panel .zdp-btn-primary:active {
+    background-color: var(--zdp-teal) !important;
+    background-image: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal)) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+}
+.zdp-login .zdp-btn-primary:hover .zdp-btn-label,
+.zdp-panel .zdp-btn-primary:hover .zdp-btn-label { color: #fff !important; }
+
+.zdp-login .zdp-login-channel-tab,
+.zdp-login .zdp-login-channel-tab:hover,
+.zdp-login .zdp-login-channel-tab:focus {
+    background-image: none !important;
+    box-shadow: none;
+}
+.zdp-login .zdp-login-channel-tab:not(.active),
+.zdp-login .zdp-login-channel-tab:not(.active):hover,
+.zdp-login .zdp-login-channel-tab:not(.active):focus {
+    background-color: transparent !important;
+    color: var(--zdp-soft) !important;
+}
+.zdp-login .zdp-login-channel-tab:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.75) !important;
+    color: var(--zdp-teal-dark) !important;
+}
+.zdp-login .zdp-login-channel-tab.active,
+.zdp-login .zdp-login-channel-tab.active:hover,
+.zdp-login .zdp-login-channel-tab.active:focus {
+    background-color: #fff !important;
+    color: var(--zdp-teal-dark) !important;
+    box-shadow: 0 2px 8px rgba(30, 41, 90, 0.1);
+}
+
+.zdp-login button.zdp-link-btn,
+.zdp-login button.zdp-link-btn:hover,
+.zdp-login button.zdp-link-btn:focus,
+.zdp-login button.zdp-link-btn:active,
+.zdp-panel button.zdp-link-btn,
+.zdp-panel button.zdp-link-btn:hover,
+.zdp-panel button.zdp-link-btn:focus,
+.zdp-panel button.zdp-link-btn:active {
+    background: none !important;
+    background-color: transparent !important;
+    color: var(--zdp-teal-dark) !important;
+    box-shadow: none !important;
+}
+
+.zdp-tabs .zdp-tab:not(.active):hover,
+.zdp-tabs .zdp-tab:not(.active):focus {
+    background-color: var(--zdp-teal-bg) !important;
+    background-image: none !important;
+    color: var(--zdp-teal-dark) !important;
+}
+.zdp-tabs .zdp-tab.active,
+.zdp-tabs .zdp-tab.active:hover,
+.zdp-tabs .zdp-tab.active:focus {
+    background-color: var(--zdp-teal) !important;
+    background-image: linear-gradient(135deg, var(--zdp-teal-light), var(--zdp-teal)) !important;
+    color: #fff !important;
+}
+
+/* وقتی تب انتخاب می‌شود و صفحه به محتوایش اسکرول می‌شود، کمی فاصله از بالا بماند */
+.zdp-tab-panel { scroll-margin-top: 14px; }

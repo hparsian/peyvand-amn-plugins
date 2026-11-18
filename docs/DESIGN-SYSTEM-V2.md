@@ -84,7 +84,38 @@ plugins/peyvand-amn-unified-dashboard/
   templates/layout.php | header.php | sidebar.php
   assets/css/shell-v2.css                 (جدید)
   assets/js/dashboard-admin.js            (scrim/Esc/فوکوس پرش)
+plugins/pivand-amn-client-portal/          (۱.۱۳.۲.۰)
+  assets/css/panel-v2.css                 (جدید)
+  includes/class-plugin.php               (enqueue بعد از skin)
+plugins/pivand-amn-case-file/              (۱.۱۷.۰)
+  assets/css/case-file-v2.css             (جدید)
+  includes/class-admin.php                (enqueue بعد از skin)
 ```
+
+## سه تجربهٔ هماهنگ
+
+### ۱) داشبورد درمانگر — «میز کار»
+
+پوستهٔ `.pvn-shell` با نوار بالا، ناوبری گروه‌بندی‌شده و شبکهٔ ۱۲ ستونی
+نامتقارن. مدیر سایت همان پوسته را با کلاس `.pvn-shell--console` و تراکم
+بیشتر می‌گیرد (عرض ۱۴۴۰px، پدینگ کمتر) — تفاوت فقط چیدمان است، نه مجوز.
+
+### ۲) پنل مراجع — «آستانه»
+
+`panel-v2.css` بعد از `panel-skin.css` و **فقط داخل `.zdp-panel-shell`**.
+متغیرهای `--zdp-*` به پالت برند نگاشت شده‌اند، بنابراین تمام قواعد موجود پنل
+رنگ جدید می‌گیرند بدون تغییر یک خط مارک‌آپ.
+
+- کارت «نوبت بعدی» دو ستون و دو ردیف می‌گیرد → چیدمان نامتقارن واقعی.
+- تب‌ها: نوار زیرین ۲px، بدون کارت و بدون سایه.
+- زیر ۷۲۰px: یک ستون، برچسب خروج پنهان، تب‌های قابل اسکرول افقی.
+
+### ۳) پروندهٔ بالینی
+
+`case-file-v2.css` **فقط داخل `.pas-cf-wrap`**: تیتر Display، جدول‌های
+`widefat` با هدر کم‌رنگ و سطرهای ۴۴px، اعلان‌های نواری، دکمه‌های
+`button`/`button-primary` با پالت برند. زیر ۷۸۲px جدول عریض داخل خودش
+اسکرول می‌شود تا صفحه سرریز افقی نگیرد.
 
 ## بررسی انجام‌شده
 
@@ -107,5 +138,6 @@ plugins/peyvand-amn-unified-dashboard/
 
 ## پیش‌نمایش
 
-`artifacts/design-preview/index.html` — هارنس مستقل با همان CSS و همان مارک‌آپ
-(برای مشاهده: `python3 -m http.server` در همان پوشه).
+`artifacts/design-preview/` — سه هارنس مستقل با همان CSS و همان مارک‌آپ:
+`index.html` (داشبورد)، `portal.html` (پنل مراجع)، `case-file.html`
+(پروندهٔ بالینی). برای مشاهده: `python3 -m http.server` در همان پوشه.

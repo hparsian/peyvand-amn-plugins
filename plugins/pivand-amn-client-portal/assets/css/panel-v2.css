@@ -1,0 +1,466 @@
+/**
+ * پیوند امن — پنل مراجع، پوستهٔ ۲ («آستانه»)
+ * نسخه 2.0.0
+ *
+ * فقط داخل .zdp-panel-shell اثر دارد و بعد از panel.css و panel-skin.css
+ * بارگذاری می‌شود. با نگاشت متغیرهای --zdp-* به پالت برند، تمام قواعد
+ * موجود پنل رنگ جدید می‌گیرند؛ سپس چند اصلاح چیدمانی اضافه می‌شود.
+ * هیچ سلکتور سراسری (body/html/:root) در این فایل نیست.
+ */
+
+.zdp-panel-shell {
+    /* نگاشت برند: همان نام‌ها، مقادیر جدید */
+    --zdp-white: #FCFBF8;
+    --zdp-surface: #FCFBF8;
+    --zdp-border: #DCD5C9;
+    --zdp-border-soft: #E8E2D8;
+    --zdp-ink: #292D2A;
+    --zdp-mid: #5C615D;
+    --zdp-soft: #7A7F79;
+    --zdp-teal: #344A42;
+    --zdp-teal-dark: #26382F;
+    --zdp-teal-mid: #3F6B4F;
+    --zdp-teal-light: #E4ECE7;
+    --zdp-teal-bg: #F1F4F1;
+    --zdp-indigo: #4A6B7C;
+    --zdp-green: #3F6B4F;
+    --zdp-amber: #8A5A18;
+    --zdp-rose: #9B3A2E;
+    --zdp-radius: 16px;
+    --zdp-radius-lg: 20px;
+    --zdp-radius-sm: 10px;
+    --zdp-shadow-sm: 0 1px 2px rgba(41, 45, 42, .06);
+    --zdp-shadow: 0 1px 2px rgba(41, 45, 42, .05), 0 8px 20px -8px rgba(41, 45, 42, .14);
+    --zdp-shadow-md: 0 2px 4px rgba(41, 45, 42, .05), 0 18px 40px -12px rgba(41, 45, 42, .18);
+
+    /* متغیرهای محلی پوسته */
+    --pvn-bg: #F4F1EC;
+    --pvn-ink: #292D2A;
+    --pvn-muted: #5C615D;
+    --pvn-line: #E8E2D8;
+    --pvn-primary: #344A42;
+    --pvn-accent: #6E9182;
+    --pvn-focus: #2F6B57;
+
+    background: var(--pvn-bg);
+    color: var(--pvn-ink);
+    font-family: 'Vazirmatn', Tahoma, system-ui, sans-serif;
+    line-height: 1.8;
+}
+
+.zdp-panel-shell *,
+.zdp-panel-shell *::before,
+.zdp-panel-shell *::after {
+    box-sizing: border-box;
+}
+
+.zdp-panel-shell :focus-visible {
+    outline: 2px solid var(--pvn-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ── نوار بالا ───────────────────────────────────────────── */
+
+.zdp-panel-shell .zdp-shell-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px clamp(16px, 3vw, 28px);
+    background: var(--zdp-white);
+    border-block-end: 1px solid var(--pvn-line);
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 1px 2px rgba(41, 45, 42, .04);
+}
+
+.zdp-panel-shell .zdp-shell-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zdp-panel-shell .zdp-shell-brand-name {
+    font-family: 'IBM Plex Sans Arabic', 'Vazirmatn', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -.01em;
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark {
+    position: relative;
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: 9px 3px 9px 9px;
+    background: var(--pvn-primary);
+    flex: 0 0 auto;
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring {
+    position: absolute;
+    border: 1.4px solid rgba(246, 243, 236, .85);
+    border-radius: 50%;
+}
+
+.zdp-panel-shell .zdp-ring-a {
+    inset-block-start: 7px;
+    inset-inline-start: 6px;
+    inline-size: 9px;
+    block-size: 9px;
+}
+
+.zdp-panel-shell .zdp-ring-b {
+    inset-block-start: 12px;
+    inset-inline-start: 12px;
+    inline-size: 9px;
+    block-size: 9px;
+}
+
+.zdp-panel-shell .zdp-shell-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zdp-panel-shell .zdp-shell-user-avatar {
+    inline-size: 32px;
+    block-size: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--zdp-teal-light);
+    color: var(--pvn-primary);
+    font-family: 'IBM Plex Sans Arabic', 'Vazirmatn', sans-serif;
+    font-weight: 600;
+}
+
+.zdp-panel-shell .zdp-shell-user-name {
+    display: block;
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--pvn-ink);
+    line-height: 1.4;
+}
+
+.zdp-panel-shell .zdp-shell-user-mobile {
+    display: block;
+    font-size: 11px;
+    color: var(--zdp-soft);
+    font-variant-numeric: tabular-nums;
+}
+
+.zdp-panel-shell .zdp-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid var(--pvn-line);
+    border-radius: 9px 3px 9px 9px;
+    color: var(--pvn-muted);
+    font-size: 11.5px;
+    text-decoration: none;
+    transition: background 180ms cubic-bezier(.22,.61,.36,1), color 180ms;
+}
+
+.zdp-panel-shell .zdp-logout:hover {
+    background: var(--zdp-teal-bg);
+    color: var(--pvn-primary);
+}
+
+/* ── تب‌ها ──────────────────────────────────────────────── */
+
+.zdp-panel-shell .zdp-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    margin: 0;
+    padding: 0 clamp(8px, 2.4vw, 20px);
+    background: transparent;
+    border-block-end: 1px solid var(--pvn-line);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.zdp-panel-shell .zdp-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 14px;
+    border: 0;
+    border-block-end: 2px solid transparent;
+    background: transparent;
+    color: var(--pvn-muted);
+    font-family: inherit;
+    font-size: .8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 180ms cubic-bezier(.22,.61,.36,1), border-color 180ms;
+}
+
+.zdp-panel-shell .zdp-tab:hover {
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-tab.active {
+    color: var(--pvn-primary);
+    border-block-end-color: var(--pvn-primary);
+    font-weight: 600;
+}
+
+.zdp-panel-shell .zdp-tab-icon svg {
+    inline-size: 16px;
+    block-size: 16px;
+    opacity: .85;
+}
+
+.zdp-panel-shell .zdp-tab.active .zdp-tab-icon svg {
+    opacity: 1;
+}
+
+.zdp-panel-shell .zdp-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 18px;
+    block-size: 18px;
+    padding-inline: 5px;
+    border-radius: 999px;
+    background: var(--zdp-teal-light);
+    color: var(--pvn-primary);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ── ناحیهٔ محتوا ──────────────────────────────────────── */
+
+.zdp-panel-shell .zdp-shell-main {
+    max-inline-size: 1040px;
+    margin-inline: auto;
+    padding: clamp(16px, 2.6vw, 28px) clamp(14px, 3vw, 26px) 48px;
+}
+
+/* ── کارت‌های آماری: چیدمان نامتقارن ────────────────────── */
+
+.zdp-panel-shell .zdp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-block-end: 18px;
+}
+
+.zdp-panel-shell .zdp-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 18px;
+    background: var(--zdp-white);
+    border: 1px solid var(--pvn-line);
+    border-start-start-radius: 4px;
+    border-start-end-radius: 18px;
+    border-end-start-radius: 18px;
+    border-end-end-radius: 18px;
+    box-shadow: var(--zdp-shadow-sm);
+}
+
+/* بلوک «نوبت بعدی» بزرگ‌تر می‌شود تا صفحه شکل نامتقارن بگیرد. */
+.zdp-panel-shell .zdp-stat-card-highlight {
+    grid-column: span 2;
+    grid-row: span 2;
+    justify-content: center;
+    background:
+        radial-gradient(360px 140px at 90% -20%, rgba(143, 174, 155, .30), transparent 70%),
+        var(--zdp-teal-bg);
+    border-color: transparent;
+}
+
+.zdp-panel-shell .zdp-stat-label {
+    font-size: 11px;
+    letter-spacing: .03em;
+    color: var(--pvn-muted);
+}
+
+.zdp-panel-shell .zdp-stat-value {
+    font-family: 'IBM Plex Sans Arabic', 'Vazirmatn', sans-serif;
+    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.35;
+    color: var(--pvn-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.zdp-panel-shell .zdp-stat-card-highlight .zdp-stat-value {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+    color: var(--pvn-primary);
+}
+
+.zdp-panel-shell .zdp-stat-card-highlight .zdp-stat-label {
+    font-size: 12px;
+}
+
+.zdp-panel-shell .zdp-stat-sub {
+    font-size: 11.5px;
+    color: var(--pvn-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.zdp-panel-shell .zdp-stat-icon svg {
+    inline-size: 18px;
+    block-size: 18px;
+    color: var(--pvn-accent);
+}
+
+/* ── وضعیت‌ها ──────────────────────────────────────────── */
+
+.zdp-panel-shell .zdp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    margin-block-start: 6px;
+    padding: 2px 9px;
+    border-radius: 4px 999px 999px 999px;
+    background: var(--zdp-teal-light);
+    color: var(--pvn-primary);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.zdp-panel-shell .zdp-status-pending,
+.zdp-panel-shell .zdp-status-awaiting {
+    background: #F7EFDF;
+    color: #8A5A18;
+}
+
+.zdp-panel-shell .zdp-status-canceled,
+.zdp-panel-shell .zdp-status-cancelled {
+    background: #F7E9E5;
+    color: #9B3A2E;
+}
+
+/* ── فرم‌ها و دکمه‌ها ──────────────────────────────────── */
+
+.zdp-panel-shell input[type="text"],
+.zdp-panel-shell input[type="tel"],
+.zdp-panel-shell input[type="email"],
+.zdp-panel-shell input[type="date"],
+.zdp-panel-shell input[type="number"],
+.zdp-panel-shell select,
+.zdp-panel-shell textarea {
+    inline-size: 100%;
+    padding: 10px 12px;
+    border: 1px solid #C8BFB0;
+    border-radius: 9px 3px 9px 9px;
+    background: var(--zdp-white);
+    color: var(--pvn-ink);
+    font-family: inherit;
+    font-size: .8125rem;
+}
+
+.zdp-panel-shell input:focus,
+.zdp-panel-shell select:focus,
+.zdp-panel-shell textarea:focus {
+    outline: 2px solid var(--pvn-focus);
+    outline-offset: 1px;
+    border-color: var(--pvn-focus);
+}
+
+.zdp-panel-shell .zdp-btn,
+.zdp-panel-shell button.zdp-btn,
+.zdp-panel-shell a.zdp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-block-size: 40px;
+    padding: 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 10px 4px 10px 10px;
+    background: var(--pvn-primary);
+    color: #F6F3EC;
+    font-family: inherit;
+    font-size: .8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 180ms cubic-bezier(.22,.61,.36,1), transform 180ms;
+}
+
+.zdp-panel-shell .zdp-btn:hover {
+    background: var(--zdp-teal-dark);
+    color: #F6F3EC;
+    transform: translateY(-1px);
+}
+
+.zdp-panel-shell .zdp-btn:active {
+    transform: translateY(0);
+}
+
+.zdp-panel-shell .zdp-btn-secondary {
+    background: transparent;
+    border-color: #C8BFB0;
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-btn-secondary:hover {
+    background: var(--zdp-teal-bg);
+    color: var(--pvn-primary);
+}
+
+/* ── پرونده/کارت‌های محتوایی ───────────────────────────── */
+
+.zdp-panel-shell .zdp-card,
+.zdp-panel-shell .zdp-tab-panel > section {
+    padding: 20px;
+    background: var(--zdp-white);
+    border: 1px solid var(--pvn-line);
+    border-start-start-radius: 4px;
+    border-start-end-radius: 18px;
+    border-end-start-radius: 18px;
+    border-end-end-radius: 18px;
+    box-shadow: var(--zdp-shadow-sm);
+}
+
+/* ── واکنش‌گرایی ───────────────────────────────────────── */
+
+@media (max-width: 720px) {
+    .zdp-panel-shell .zdp-stats-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .zdp-panel-shell .zdp-stat-card-highlight {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    .zdp-panel-shell .zdp-shell-topbar {
+        padding: 12px 14px;
+        border-radius: 0 0 14px 14px;
+    }
+
+    .zdp-panel-shell .zdp-shell-logout-label {
+        display: none;
+    }
+
+    .zdp-panel-shell .zdp-tab {
+        padding: 11px 10px;
+        font-size: .75rem;
+    }
+
+    .zdp-panel-shell .zdp-tab-label {
+        font-size: .75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zdp-panel-shell .zdp-btn,
+    .zdp-panel-shell .zdp-logout,
+    .zdp-panel-shell .zdp-tab {
+        transition: none;
+    }
+}

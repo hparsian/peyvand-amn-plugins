@@ -893,6 +893,25 @@
 .pvn-attention__mark--danger { background: var(--pui-danger); }
 .pvn-attention__mark--info   { background: var(--pui-accent-line); }
 
+/* ── حالت کنسول مدیر ──────────────────────────────────────
+   همان پوسته، تراکم بیشتر: مدیر به‌جای کار روزمره، ناظر سیستم است. */
+
+.pvn-shell--console .pvn-main-inner {
+    max-inline-size: 1440px;
+}
+
+.pvn-shell--console .pas-card {
+    padding: 18px 20px;
+}
+
+.pvn-shell--console .pvn-nav__label {
+    letter-spacing: .12em;
+}
+
+.pvn-shell--console .pvn-deck {
+    gap: 12px;
+}
+
 /* ── پابرگ ──────────────────────────────────────────────── */
 
 .pvn-shell .pas-footer {
