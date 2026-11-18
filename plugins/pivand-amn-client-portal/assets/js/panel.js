@@ -1190,6 +1190,25 @@
                     if (badge) badge.remove();
                     var banner = document.querySelector('.zdp-intake-banner');
                     if (banner) banner.remove();
+
+                    // متن تأیید و برچسب دکمه بدون رفرش به‌روز می‌شوند تا
+                    // مراجع بلافاصله ببیند فرم در چه تاریخی ثبت شده است.
+                    var doneText = res.data && res.data.done_text;
+                    if (doneText) {
+                        var done = document.querySelector('.zdp-intake-done');
+                        if (done) {
+                            done.textContent = doneText;
+                        } else {
+                            var lead = document.querySelector('.zdp-intake-lead');
+                            if (lead) {
+                                lead.className = 'zdp-intake-done';
+                                lead.textContent = doneText;
+                            }
+                        }
+                    }
+                    if (btn && /ثبت فرم/.test(btn.textContent)) {
+                        btn.textContent = 'به‌روزرسانی فرم';
+                    }
                 }
             });
         });

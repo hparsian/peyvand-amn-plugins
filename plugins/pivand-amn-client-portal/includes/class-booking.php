@@ -1480,7 +1480,8 @@ final class Booking
         if (!is_valid_mobile($mobile)) {
             return ['success' => false, 'data' => ['message' => 'شماره موبایل معتبر نیست.']];
         }
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time)) {
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $dm) || !checkdate((int) $dm[2], (int) $dm[3], (int) $dm[1])
+            || !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time)) {
             return ['success' => false, 'data' => ['message' => 'تاریخ یا ساعت جلسه نامعتبر است.']];
         }
         if (!array_key_exists($session, self::SESSION_TYPES)) {

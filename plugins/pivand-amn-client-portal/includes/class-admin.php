@@ -432,7 +432,9 @@ final class Admin
         $this->assert_can_manage();
         check_admin_referer('zdp_create_manual_booking', 'zdp_manual_booking_nonce');
 
-        $jalali_date = sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? ''));
+        // ارقام فارسی هم پذیرفته شود؛ بدون این، ورودی «۱۴۰۵/۰۵/۰۱» بی‌صدا
+        // نامعتبر شمرده می‌شد و درمانگر فقط پیام کلی خطا می‌دید.
+        $jalali_date = normalize_digits(sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? '')));
         $gregorian   = Jalali::jalali_string_to_gregorian_string($jalali_date);
 
         $result = $this->booking->create_manual_booking([
@@ -466,7 +468,7 @@ final class Admin
                 $this->booking->update_status($booking_id, $status);
             }
 
-            $jalali_date = sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? ''));
+            $jalali_date = normalize_digits(sanitize_text_field(wp_unslash($_POST['booking_date_jalali'] ?? '')));
             $gregorian   = $jalali_date !== '' ? Jalali::jalali_string_to_gregorian_string($jalali_date) : null;
 
             $fields = [

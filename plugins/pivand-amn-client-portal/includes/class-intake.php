@@ -242,7 +242,14 @@ final class Intake
         audit_log($existing ? 'intake_updated' : 'intake_submitted', ['user_id' => $user_id]);
         do_action('zdp_intake_submitted', $user_id, $clean);
 
-        wp_send_json_success(['message' => 'فرم ارزیابی مراجع شما ثبت شد. سپاسگزاریم.']);
+        // تاریخ ثبت به وقت محلی سایت (submitted_at در UTC ذخیره می‌شود) تا هم
+        // جمله‌ی تأیید بدون رفرش درست باشد و هم نزدیک نیمه‌شب روز اشتباه نیاید.
+        $submitted_local = get_date_from_gmt((string) ($existing ? $existing->submitted_at : $now), 'Y-m-d');
+
+        wp_send_json_success([
+            'message'   => 'فرم ارزیابی مراجع شما ثبت شد. سپاسگزاریم.',
+            'done_text' => 'فرم شما در تاریخ ' . Jalali::gregorian_to_jalali_string($submitted_local) . ' ثبت شده است. در صورت نیاز می‌توانید اطلاعات را اصلاح کنید.',
+        ]);
     }
 
     /**
@@ -404,7 +411,7 @@ final class Intake
         <div class="zdp-card zdp-card-form">
             <h3>فرم ارزیابی مراجع</h3>
             <?php if ($row) : ?>
-                <p class="zdp-intake-done"><span class="zdp-icon-inline"><?php echo zdp_icon('check', 16); ?></span> فرم شما در تاریخ <?php echo esc_html(Jalali::gregorian_to_jalali_string(substr((string) $row->submitted_at, 0, 10))); ?> ثبت شده است. در صورت نیاز می‌توانید اطلاعات را اصلاح کنید.</p>
+                <p class="zdp-intake-done"><span class="zdp-icon-inline"><?php echo zdp_icon('check', 16); ?></span> فرم شما در تاریخ <?php echo esc_html(Jalali::gregorian_to_jalali_string(get_date_from_gmt((string) $row->submitted_at, 'Y-m-d'))); ?> ثبت شده است. در صورت نیاز می‌توانید اطلاعات را اصلاح کنید.</p>
             <?php else : ?>
                 <p class="zdp-intake-lead">لطفاً پیش از اولین جلسه این فرم را کامل کنید. اطلاعات شما محرمانه است و فقط برای درمانگر نمایش داده می‌شود.</p>
             <?php endif; ?>
@@ -635,7 +642,7 @@ final class Intake
                 esc_html((string) ($d['full_name'] ?? '—')),
                 esc_html((string) ($d['phone'] ?? '')),
                 esc_html((string) $r->file_number !== '' ? (string) $r->file_number : '—'),
-                esc_html(Jalali::gregorian_to_jalali_string(substr((string) $r->submitted_at, 0, 10))),
+                esc_html(Jalali::gregorian_to_jalali_string(get_date_from_gmt((string) $r->submitted_at, 'Y-m-d'))),
                 esc_url(admin_url('admin.php?page=zdp-admin&tab=intake&view=' . (int) $r->id))
             );
         }
