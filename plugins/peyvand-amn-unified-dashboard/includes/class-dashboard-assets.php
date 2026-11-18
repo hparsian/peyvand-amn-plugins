@@ -35,20 +35,17 @@ final class PAS_Dashboard_Assets {
 		$default = class_exists( 'PUI' ) ? PUI::theme_attr() : 'light';
 		$default = in_array( $default, array( 'light', 'dark' ), true ) ? $default : 'light';
 
-		echo "<script>try{var t=localStorage.getItem('pvn-theme')||'" . esc_js( $default ) . "';if(t==='auto'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-pui-theme',t);}catch(e){}</script>\n";
+		/*
+		 * کلید ذخیره‌سازی و attributes همان چیزی است که کیت رابط (ui.js) هم
+		 * می‌خواند؛ وگرنه ui.js در همان بارگذاری مقدار خودش را می‌نشاند و
+		 * انتخاب سرور/کاربر را بازنویسی می‌کرد. مقدار اولیه از تم سرور است.
+		 */
+		echo "<script>try{var r=document.documentElement,t=localStorage.getItem('pui-theme')||'" . esc_js( $default ) . "';r.setAttribute('data-pui-theme-choice',t);r.setAttribute('data-pui-theme',t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):(t==='dark'?'dark':'light'));}catch(e){}</script>\n";
 	}
 
 	public static function enqueue( $hook_suffix ) {
 		if ( 'toplevel_page_' . PAS_DASHBOARD_SLUG !== $hook_suffix ) {
 			return;
-		}
-
-		$theme = 'light';
-		if ( class_exists( 'PUI' ) ) {
-			$theme = PUI::theme_attr();
-		}
-		if ( ! in_array( $theme, array( 'light', 'dark' ), true ) ) {
-			$theme = 'light';
 		}
 
 		/*
@@ -89,7 +86,6 @@ final class PAS_Dashboard_Assets {
 			'PasDashboard',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'theme'   => $theme,
 				'nonces'  => array(
 					'note_save'         => PAS_Dashboard_Security::nonce( 'note_save' ),
 					'note_delete'       => PAS_Dashboard_Security::nonce( 'note_delete' ),

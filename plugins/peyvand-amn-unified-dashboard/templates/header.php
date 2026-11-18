@@ -23,6 +23,14 @@ $pas_home = add_query_arg(
 );
 
 $pas_today = PAS_Dashboard_Core_Bridge::jalali( gmdate( 'Y-m-d' ) );
+
+/*
+ * حالت اولیه‌ی کلید رنگ از تم سرور می‌آید تا پیش از اجرای JS هم
+ * aria-pressed با آنچه واقعاً رندر می‌شود یکی باشد. اگر کاربر انتخاب
+ * محلی داشته باشد، JS بلافاصله همین مقدار را اصلاح می‌کند.
+ */
+$pas_theme = class_exists( 'PUI' ) ? PUI::theme_attr() : 'light';
+$pas_is_dark = 'dark' === $pas_theme;
 $pas_bell  = add_query_arg(
 	array(
 		'page'   => PAS_DASHBOARD_SLUG,
@@ -58,7 +66,9 @@ $pas_bell  = add_query_arg(
 	<div class="pvn-topbar-end">
 		<span class="pvn-date"><?php echo esc_html( sprintf( /* translators: %s: Jalali date */ __( 'امروز · %s', 'peyvand-amn-dashboard' ), $pas_today ) ); ?></span>
 
-		<button type="button" class="pvn-icon-btn pvn-theme-toggle" aria-pressed="false"
+		<button type="button" class="pvn-icon-btn pvn-theme-toggle" data-pui-theme-toggle
+			aria-pressed="<?php echo $pas_is_dark ? 'true' : 'false'; ?>"
+			data-pui-theme-default="<?php echo esc_attr( $pas_is_dark ? 'dark' : 'light' ); ?>"
 			title="<?php esc_attr_e( 'تغییر حالت روشن/تاریک', 'peyvand-amn-dashboard' ); ?>">
 			<svg class="pvn-theme-toggle__moon" width="18" height="18" viewBox="0 0 24 24" fill="none"
 				stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">

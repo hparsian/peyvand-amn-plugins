@@ -63,10 +63,21 @@
 	/* ── حالت رنگ ───────────────────────────────────────────
 	   انتخاب در localStorage ذخیره می‌شود؛ اسکریپت زودهنگام در <head>
 	   attribute را پیش از رندر می‌گذارد تا پرش رنگ نداشته باشیم. */
-	var THEME_KEY = 'pvn-theme';
+	/*
+	 * همان کلید و همان attributes کیت رابط (ui.js). اگر کیت فعال باشد،
+	 * مدیریت کلیک را به [data-pui-theme-toggle] خودش می‌سپاریم تا دو
+	 * هندلر روی یک کلیک همدیگر را خنثی نکنند. اگر کیت نباشد (حالت تنزل)،
+	 * همین کد کار می‌کند.
+	 */
+	var THEME_KEY = 'pui-theme';
 
 	function applyTheme(theme) {
+		if (window.PUI) {
+			return;
+		}
+
 		document.documentElement.setAttribute('data-pui-theme', theme);
+		document.documentElement.setAttribute('data-pui-theme-choice', theme);
 		try {
 			window.localStorage.setItem(THEME_KEY, theme);
 		} catch (e) {}
@@ -74,6 +85,10 @@
 	}
 
 	(function () {
+		if (window.PUI) {
+			return;
+		}
+
 		var saved = null;
 		try {
 			saved = window.localStorage.getItem(THEME_KEY);
@@ -84,6 +99,10 @@
 	})();
 
 	$(document).on('click', '.pvn-theme-toggle', function () {
+		if (window.PUI) {
+			return;
+		}
+
 		var current = document.documentElement.getAttribute('data-pui-theme');
 		applyTheme(current === 'dark' ? 'light' : 'dark');
 	});
