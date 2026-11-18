@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 // مدیر سایت، چیدمان فشرده‌تر «اتاق کنترل» می‌گیرد؛ درمانگر همان پوسته
 // «میز کار» را می‌بیند. تفاوت فقط در کلاس و تراکم است، نه در مجوز.
-$pas_console = PAS_Dashboard_Permissions::can_manage();
+$pas_console = PAS_Dashboard_Security::can_manage();
 ?>
 <div class="pvn-shell pas-dashboard<?php echo $pas_console ? ' pvn-shell--console' : ''; ?>" dir="rtl">
 

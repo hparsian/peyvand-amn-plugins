@@ -42,9 +42,16 @@
     --pas-shadow-lg: 0 2px 4px rgba(41, 45, 42, .05), 0 18px 40px -12px rgba(41, 45, 42, .20);
     --pas-ring: 0 0 0 3px rgba(47, 107, 87, .22);
 
-    /* شکستن حاشیهٔ پیشخوان وردپرس برای چیدمان تمام‌عرض */
+    /* ارتفاع نوار مدیریت وردپرس: ۳۲px در دسکتاپ، ۴۶px زیر ۷۸۲px */
+    --pvn-adminbar-h: 32px;
+
+    /*
+     * تمام‌عرض‌سازی با مارجین منفی در پیشخوان RTL باعث سرریز افقی
+     * می‌شد (اندازه‌گیری‌شده: 20px روی staging). پس فقط بالا را جبران
+     * می‌کنیم و عرض را دست‌نخورده می‌گذاریم.
+     */
     margin-block-start: -10px;
-    margin-inline: -20px;
+    margin-inline: 0;
     min-block-size: calc(100vh - 32px);
     background: var(--pui-bg);
     color: var(--pui-text);
@@ -94,7 +101,7 @@
 
 .pvn-topbar {
     position: sticky;
-    inset-block-start: 32px;
+    inset-block-start: var(--pvn-adminbar-h);
     z-index: 30;
     display: flex;
     align-items: center;
@@ -295,12 +302,12 @@
 
 .pvn-nav {
     position: sticky;
-    inset-block-start: calc(32px + var(--pui-topbar-h));
+    inset-block-start: calc(var(--pvn-adminbar-h) + var(--pui-topbar-h));
     align-self: start;
     display: flex;
     flex-direction: column;
     gap: var(--pui-s5);
-    block-size: calc(100vh - 32px - var(--pui-topbar-h));
+    block-size: calc(100vh - var(--pvn-adminbar-h) - var(--pui-topbar-h));
     padding: var(--pui-s5) var(--pui-s4) var(--pui-s4);
     border-inline-end: 1px solid var(--pui-border-soft);
     background:
@@ -893,6 +900,133 @@
 .pvn-attention__mark--danger { background: var(--pui-danger); }
 .pvn-attention__mark--info   { background: var(--pui-accent-line); }
 
+/* ── کلید حالت رنگ ──────────────────────────────────────── */
+
+.pvn-theme-toggle__sun {
+    display: none;
+}
+
+[data-pui-theme="dark"] .pvn-theme-toggle__sun {
+    display: block;
+}
+
+[data-pui-theme="dark"] .pvn-theme-toggle__moon {
+    display: none;
+}
+
+/* ── تب‌های پرونده ──────────────────────────────────────── */
+
+.pvn-case-tabs {
+    display: flex;
+    gap: 2px;
+    margin-block-end: var(--pui-s4);
+    border-block-end: 1px solid var(--pui-border-soft);
+}
+
+.pvn-case-tab {
+    padding: 10px 16px;
+    border: 0;
+    border-block-end: 2px solid transparent;
+    background: transparent;
+    color: var(--pui-text-muted);
+    font-family: inherit;
+    font-size: var(--pui-fs-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
+}
+
+.pvn-case-tab:hover {
+    color: var(--pui-text);
+}
+
+.pvn-case-tab.is-active {
+    color: var(--pui-primary);
+    border-block-end-color: var(--pui-primary);
+    font-weight: 600;
+}
+
+.pvn-cpanel[hidden] {
+    display: none;
+}
+
+
+
+/* ── حالت تاریک ───────────────────────────────────────────
+   توکن‌های --pui-* با [data-pui-theme="dark"] خودشان عوض می‌شوند؛ این
+   بلوک فقط نگاشت --pas-* را برای ماژول‌های قدیمی به‌روز می‌کند. */
+
+[data-pui-theme="dark"] .pvn-shell {
+    --pas-bg: #171B18;
+    --pas-bg-soft: #1E231F;
+    --pas-card: #1E231F;
+    --pas-ink: #F1EDE5;
+    --pas-ink-soft: #D6DBD4;
+    --pas-muted: #B9C0B8;
+    --pas-line: #2E352F;
+    --pas-line-strong: #3A423B;
+
+    --pas-primary: #A9C7B6;
+    --pas-primary-dark: #C0D8C9;
+    --pas-primary-soft: #26332B;
+    --pas-primary-ink: #171B18;
+    --pas-accent: #8FAE9B;
+
+    --pas-good: #86C6A2;
+    --pas-good-bg: #24322A;
+    --pas-warn: #E2B36B;
+    --pas-warn-bg: #332B20;
+    --pas-danger: #E79A8C;
+    --pas-danger-bg: #33221F;
+
+    --pas-shadow-sm: 0 1px 2px rgba(0, 0, 0, .40);
+    --pas-shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 24px -10px rgba(0, 0, 0, .55);
+    --pas-shadow-lg: 0 2px 4px rgba(0, 0, 0, .35), 0 22px 46px -14px rgba(0, 0, 0, .65);
+    --pas-ring: 0 0 0 3px rgba(169, 199, 182, .26);
+}
+
+[data-pui-theme="dark"] .pvn-shell .pvn-main {
+    background:
+        radial-gradient(900px 220px at 88% -6%, rgba(143, 174, 155, .10), transparent 70%),
+        var(--pui-bg);
+}
+
+[data-pui-theme="dark"] .pvn-shell .pvn-focus {
+    background:
+        radial-gradient(420px 160px at 92% -20%, rgba(143, 174, 155, .14), transparent 70%),
+        var(--pui-surface);
+}
+
+[data-pui-theme="dark"] .pvn-shell .pvn-mark,
+[data-pui-theme="dark"] .pvn-shell .pvn-avatar {
+    background: #A9C7B6;
+    color: #171B18;
+}
+
+[data-pui-theme="dark"] .pvn-shell .pvn-mark::after {
+    border-color: rgba(23, 27, 24, .75);
+}
+
+[data-pui-theme="dark"] .pvn-shell .pas-skip-link {
+    color: #171B18;
+}
+
+/*
+ * در پیشخوان، پس‌زمینهٔ خود وردپرس بیرون از پوسته می‌ماند و در حالت
+ * تاریک یک حاشیهٔ روشن دور داشبورد می‌ساخت. با :has فقط روی صفحه‌هایی
+ * اثر می‌گذارد که پوسته را دارند؛ بقیهٔ پیشخوان دست‌نخورده می‌ماند.
+ */
+html[data-pui-theme="dark"] body:has(.pvn-shell) #wpcontent,
+html[data-pui-theme="dark"] body:has(.pvn-shell) #wpbody-content,
+html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter {
+    background: #171B18;
+}
+
+html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter,
+html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
+    color: #B9C0B8;
+}
+
 /* ── حالت کنسول مدیر ──────────────────────────────────────
    همان پوسته، تراکم بیشتر: مدیر به‌جای کار روزمره، ناظر سیستم است. */
 
@@ -998,13 +1132,26 @@
     }
 }
 
+@media (max-width: 782px) {
+    /* نوار مدیریت وردپرس در این عرض ۴۶px است؛ چسبیدن نوار بالا به ۳۲px
+       باعث می‌شد زیر نوار مدیریت پنهان شود. */
+    .pvn-shell {
+        --pvn-adminbar-h: 46px;
+    }
+}
+
 @media (max-width: 600px) {
     .pvn-main {
         padding-inline: 14px;
     }
 
+    /*
+     * هر نوع مارجین منفی روی #wpcontent در این عرض 10px سرریز افقی
+     * می‌ساخت (اندازه‌گیری‌شده روی staging در 375px)؛ پس در موبایل
+     * پوسته بدون جبران می‌نشیند و همان پدینگ خود وردپرس را می‌پذیرد.
+     */
     .pvn-shell {
-        margin-inline: -10px;
+        margin-inline: 0;
     }
 
     .pvn-span-4,

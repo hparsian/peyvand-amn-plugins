@@ -60,6 +60,88 @@
 		}
 	});
 
+	/* ── حالت رنگ ───────────────────────────────────────────
+	   انتخاب در localStorage ذخیره می‌شود؛ اسکریپت زودهنگام در <head>
+	   attribute را پیش از رندر می‌گذارد تا پرش رنگ نداشته باشیم. */
+	var THEME_KEY = 'pvn-theme';
+
+	function applyTheme(theme) {
+		document.documentElement.setAttribute('data-pui-theme', theme);
+		try {
+			window.localStorage.setItem(THEME_KEY, theme);
+		} catch (e) {}
+		$('.pvn-theme-toggle').attr('aria-pressed', theme === 'dark' ? 'true' : 'false');
+	}
+
+	(function () {
+		var saved = null;
+		try {
+			saved = window.localStorage.getItem(THEME_KEY);
+		} catch (e) {}
+		if (saved === 'dark' || saved === 'light') {
+			applyTheme(saved);
+		}
+	})();
+
+	$(document).on('click', '.pvn-theme-toggle', function () {
+		var current = document.documentElement.getAttribute('data-pui-theme');
+		applyTheme(current === 'dark' ? 'light' : 'dark');
+	});
+
+	/* ── تب‌های پرونده ────────────────────────────────────── */
+	function activateCaseTab(name, focus) {
+		$('.pvn-case-tab').each(function () {
+			var on = String($(this).attr('data-pvn-case-tab')) === name;
+			$(this).toggleClass('is-active', on)
+				.attr('aria-selected', on ? 'true' : 'false')
+				.attr('tabindex', on ? '0' : '-1');
+		});
+
+		$('[data-pvn-case-panel]').each(function () {
+			if (String($(this).attr('data-pvn-case-panel')) === name) {
+				$(this).removeAttr('hidden');
+			} else {
+				$(this).attr('hidden', 'hidden');
+			}
+		});
+
+		if (focus) {
+			$('#pvn-ctab-' + name).trigger('focus');
+		}
+
+		if (window.history && window.history.replaceState) {
+			window.history.replaceState(null, '', '#' + name);
+		}
+	}
+
+	$(document).on('click', '.pvn-case-tab', function () {
+		activateCaseTab(String($(this).attr('data-pvn-case-tab')), false);
+	});
+
+	$(document).on('keydown', '.pvn-case-tab', function (event) {
+		if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+			return;
+		}
+
+		event.preventDefault();
+
+		var $tabs = $('.pvn-case-tab');
+		var index = $tabs.index(this);
+		var next = event.key === 'ArrowLeft' ? index + 1 : index - 1;
+
+		if (next < 0) { next = $tabs.length - 1; }
+		if (next >= $tabs.length) { next = 0; }
+
+		activateCaseTab(String($tabs.eq(next).attr('data-pvn-case-tab')), true);
+	});
+
+	(function () {
+		var hash = String(window.location.hash || '').replace('#', '');
+		if (hash === 'summary' || hash === 'notes') {
+			activateCaseTab(hash, false);
+		}
+	})();
+
 	/* فوکوس پس از پرش به محتوا */
 	$(document).on('click', '.pas-skip-link', function () {
 		window.setTimeout(function () {

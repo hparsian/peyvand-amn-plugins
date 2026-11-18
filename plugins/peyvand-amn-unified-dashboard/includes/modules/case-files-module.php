@@ -104,6 +104,23 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 		$can_write = PAS_Dashboard_Security::notes_writable();
 
 		$html  = $this->notice( 'info', __( 'دسترسی شما به این پرونده در سمت سرور تأیید شد.', 'peyvand-amn-dashboard' ) );
+
+		/* تب‌بندی: اطلاعات پایه از یادداشت‌ها جدا می‌شود تا صفحه یک اسکرول
+		 * طولانی و غیرقابل‌اسکن نباشد. هر دو پنل در همان درخواست رندر
+		 * می‌شوند؛ تب فقط نمایش را عوض می‌کند، نه مجوز را. */
+		$html .= '<div class="pvn-case">';
+		$html .= '<div class="pvn-case-tabs" role="tablist" aria-label="' . esc_attr__( 'بخش‌های پرونده', 'peyvand-amn-dashboard' ) . '">';
+		$html .= '<button type="button" class="pvn-case-tab is-active" role="tab" id="pvn-ctab-summary"'
+			. ' aria-controls="pvn-cpanel-summary" aria-selected="true" data-pvn-case-tab="summary">'
+			. esc_html__( 'خلاصه', 'peyvand-amn-dashboard' ) . '</button>';
+		$html .= '<button type="button" class="pvn-case-tab" role="tab" id="pvn-ctab-notes"'
+			. ' aria-controls="pvn-cpanel-notes" aria-selected="false" data-pvn-case-tab="notes">'
+			. esc_html__( 'یادداشت‌های جلسه', 'peyvand-amn-dashboard' ) . '</button>';
+		$html .= '</div>';
+
+		$html .= '<section class="pvn-cpanel" id="pvn-cpanel-summary" role="tabpanel"'
+			. ' aria-labelledby="pvn-ctab-summary" data-pvn-case-panel="summary">';
+
 		$html .= $this->card_open( __( 'مشخصات پرونده', 'peyvand-amn-dashboard' ) );
 		$html .= '<div class="pas-grid">';
 		$html .= '<div class="pas-stat"><span class="pas-stat-value">#' . esc_html( (string) $case_id ) . '</span><span class="pas-stat-label">' . esc_html__( 'شناسه', 'peyvand-amn-dashboard' ) . '</span></div>';
@@ -151,6 +168,11 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 		}
 
 		$html .= $this->card_close();
+
+		$html .= '</section>';
+
+		$html .= '<section class="pvn-cpanel" id="pvn-cpanel-notes" role="tabpanel"'
+			. ' aria-labelledby="pvn-ctab-notes" data-pvn-case-panel="notes" hidden>';
 
 		/* یادداشت‌ها */
 		$html .= $this->card_open( __( 'یادداشت‌های جلسه', 'peyvand-amn-dashboard' ) );
@@ -232,6 +254,9 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 		}
 
 		$html .= $this->card_close();
+		$html .= '</section>';
+		$html .= '</div>'; // .pvn-case
+
 		$html .= '<p><a class="pas-btn" href="' . esc_url( $this->url() ) . '">' . esc_html__( 'بازگشت به فهرست پرونده‌ها', 'peyvand-amn-dashboard' ) . '</a></p>';
 
 		return $html;

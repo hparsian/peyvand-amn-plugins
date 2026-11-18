@@ -9,11 +9,46 @@ final class PAS_Dashboard_Assets {
 
 	public static function init() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+		add_action( 'admin_head', array( __CLASS__, 'early_theme' ) );
+	}
+
+	/** آیا صفحهٔ جاری، صفحهٔ داشبورد است؟ */
+	private static function is_dashboard_page() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$screen = get_current_screen();
+
+		return $screen && 'toplevel_page_' . PAS_DASHBOARD_SLUG === $screen->id;
+	}
+
+	/**
+	 * انتخاب رنگ کاربر را پیش از رندر اعمال می‌کند تا صفحه با حالت روشن
+	 * نقاشی نشود و بعد به تاریک بپرد (پرش رنگ).
+	 */
+	public static function early_theme() {
+		if ( ! self::is_dashboard_page() ) {
+			return;
+		}
+
+		$default = class_exists( 'PUI' ) ? PUI::theme_attr() : 'light';
+		$default = in_array( $default, array( 'light', 'dark' ), true ) ? $default : 'light';
+
+		echo "<script>try{var t=localStorage.getItem('pvn-theme')||'" . esc_js( $default ) . "';if(t==='auto'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-pui-theme',t);}catch(e){}</script>\n";
 	}
 
 	public static function enqueue( $hook_suffix ) {
 		if ( 'toplevel_page_' . PAS_DASHBOARD_SLUG !== $hook_suffix ) {
 			return;
+		}
+
+		$theme = 'light';
+		if ( class_exists( 'PUI' ) ) {
+			$theme = PUI::theme_attr();
+		}
+		if ( ! in_array( $theme, array( 'light', 'dark' ), true ) ) {
+			$theme = 'light';
 		}
 
 		/*
@@ -54,6 +89,7 @@ final class PAS_Dashboard_Assets {
 			'PasDashboard',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'theme'   => $theme,
 				'nonces'  => array(
 					'note_save'         => PAS_Dashboard_Security::nonce( 'note_save' ),
 					'note_delete'       => PAS_Dashboard_Security::nonce( 'note_delete' ),
