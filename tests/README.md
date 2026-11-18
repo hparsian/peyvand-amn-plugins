@@ -19,6 +19,7 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | JS syntax | `node --check` | pass |
 | Jalali parity (standalone) | `php tests/php/test-jalali.php` | 21/21 — 55,152 روز، صفر اختلاف |
 | Jalali + timezone (WP) | `wp eval-file tests/wp/jalali-timezone.php` | 10/10 |
+| Client intake validation (WP) | `wp eval-file tests/wp/intake-validation.php` | 21/21 |
 
 The whole table was executed a second time against builds made from the current
 `plugins/` source — **Core 1.8.1, Case File 1.16.1, Quiz 3.8.17, SMS Bridge
@@ -52,6 +53,14 @@ pinned `dist/` packages and the newer source.
   reference dates, Persian/Arabic digits, separators and invalid input. Any
   divergence fails the run, so an algorithm change cannot silently shift
   stored dates.
+- **`tests/wp/intake-validation.php`** calls the private `Intake::validate()`
+  through Reflection and asserts every rule of the client intake form: future
+  birth dates are rejected (a real bug fixed in 1.13.2.1 — `diff()` is
+  absolute, so age 0 slipped through), age > 120, invalid Jalali dates,
+  Persian digits, required enums, children range, mobile format, address,
+  confirmation, health options (invalid value rejected, details cleared on
+  «خیر»), and the Jalali `form_date`. It skips cleanly when the client portal
+  is not active.
 - **`tests/wp/jalali-timezone.php`** proves inside WordPress that `wp_date()`
   returns site time while `date()` on a UTC server is off by the site offset
   (Tehran, +3:30), that `pas_jalali_datetime()` agrees with an independent

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — پنل مراجعان
  * Description: بازطراحی کامل و ماژولار پنل مراجعان OTP، نوبت‌دهی + زرین‌پال، پیام‌ها، نظرسنجی، لید مگنت و اتصال فیلتر-محور به افزونه‌ی آزمون‌ها (psy-quiz-enterprise). جایگزین کامل «custom-psychology-portal».
- * Version: 1.13.2.0
+ * Version: 1.13.2.1
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZDP_VERSION', '1.13.2.0');
+define('ZDP_VERSION', '1.13.2.1');
 define('ZDP_PLUGIN_FILE', __FILE__);
 define('ZDP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZDP_PLUGIN_URL', plugin_dir_url(__FILE__));
