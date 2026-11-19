@@ -631,14 +631,22 @@ class Psy_Quiz_Invitation_Manager {
     }
 
     /**
-     * اعتبارسنجی خروجی to_local_format(): شماره‌ی ایرانی محلی (09xxxxxxxxx)
-     * یا شماره‌ی خارجی به فرمت E.164 (+<کدکشور><شماره>، ۸ تا ۱۵ رقم).
+     * اعتبارسنجی شماره: خروجی to_local_format() یعنی «شماره‌ی ایرانی محلی
+     * (09xxxxxxxxx)» یا «شماره‌ی خارجی به فرمت E.164 (+<کدکشور><شماره>، ۸ تا
+     * ۱۵ رقم)» معتبر است.
+     *
+     * ورودی اول با همان to_local_format نرمال می‌شود (که برای شماره‌های
+     * ایرانی به Pas_Core_Helpers::normalize_mobile سپرده می‌شود)؛ وگرنه
+     * فراخوان مستقیم با ارقام فارسی/عربی — حتی با کد درست — «شماره معتبر
+     * نیست» می‌گرفت. برای شماره‌ی از قبل نرمال‌شده idempotent است.
      */
     public static function is_valid_mobile( string $phone ): bool {
-        if ( preg_match( '/^09[0-9]{9}$/', $phone ) ) {
+        $local = self::to_local_format( $phone );
+
+        if ( preg_match( '/^09[0-9]{9}$/', $local ) ) {
             return true;
         }
 
-        return (bool) preg_match( '/^\+[1-9][0-9]{7,14}$/', $phone );
+        return (bool) preg_match( '/^\+[1-9][0-9]{7,14}$/', $local );
     }
 }

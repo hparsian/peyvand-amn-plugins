@@ -44,7 +44,7 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | ۷ | `payvand-contact-1.4.5.zip` | 1.4.5 |
 | ۸ | `piwand-daily-feed-1.1.6.zip` | 1.1.6 |
 | ۹ | `pivand-amn-content-writer-2.9.21.zip` | 2.9.21 |
-| ۱۰ | `pivand-amn-quiz-enterprise-3.8.18.zip` | 3.8.18 |
+| ۱۰ | `pivand-amn-quiz-enterprise-3.8.19.zip` | 3.8.19 |
 | ۱۱ | `pivand-amn-client-portal-1.13.2.5.zip` | 1.13.2.5 |
 | ۱۲ | `peyvand-amn-unified-dashboard-2.4.0.zip` | 2.4.0 |
 
@@ -61,7 +61,7 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | `payvand-contact-1.4.5.zip` | `be85d8d0eb5eabc0b5db05c817aad493c9281dcc4cfcf76ead81eab25f7e3600` |
 | `piwand-daily-feed-1.1.6.zip` | `64df3d4864a277e7fa34e91a67a1f63464fc5ca0c4da32abca4b8e0fc1696793` |
 | `pivand-amn-content-writer-2.9.21.zip` | `2b8f0de27119e0cc33e50eedfd750bdf850dc4bcf708e5c40c117d3f998af0a1` |
-| `pivand-amn-quiz-enterprise-3.8.18.zip` | `e2a1db8a63895ea34485e3e686720ae5710461c0c82e5d89257c6440ce5a4290` |
+| `pivand-amn-quiz-enterprise-3.8.19.zip` | `6f6afb333d16b6df9c2723fd8c4ab47c3b534f916ec6b926119bc139e8c0f5a3` |
 | `pivand-amn-client-portal-1.13.2.5.zip` | `1f98b34d62456a3403d04a21b71eeae4c25505c1b4342b28265537c49b22ae0b` |
 | `peyvand-amn-unified-dashboard-2.4.0.zip` | `471daa504eb8fc5ad2ea7c5ab297bea11c321d49577ac444d2f6883b29972efa` |
 
