@@ -183,7 +183,7 @@ final class Plugin
         }
 
         if (zdp_get_user_mobile(get_current_user_id()) !== '') {
-            wp_safe_redirect(home_url('/panel/'));
+            wp_safe_redirect(zdp_panel_url());
             exit;
         }
     }
@@ -204,7 +204,7 @@ final class Plugin
      * (مثلاً پیوند امن — آزمون‌های سازمانی) بتوانند مراجع را برای ورود به
      * آنجا هدایت کنند، بدون این‌که آدرس را هاردکد کنند یا از include مستقیم
      * استفاده کنند. اگر صفحه‌ی پنل هنوز ساخته/تنظیم نشده، مقدار پیش‌فرض
-     * home_url('/panel/') برگردانده می‌شود (همان مقداری که در جای دیگر این
+     * zdp_panel_url() برگردانده می‌شود (همان مقداری که در جای دیگر این
      * پلاگین هم به‌عنوان fallback استفاده می‌شود).
      */
     public function filter_client_panel_url(string $default_url): string
@@ -217,7 +217,7 @@ final class Plugin
             }
         }
 
-        return $default_url !== '' ? $default_url : home_url('/panel/');
+        return $default_url !== '' ? $default_url : zdp_panel_url();
     }
 
     /**
@@ -380,7 +380,7 @@ final class Plugin
             // آدرس واقعی صفحه‌ی پنل (نه یک مسیر ثابتِ حدسی '/panel/' در
             // جاوااسکریپت) — برای هدایتِ مراجعِ مهمان از شورت‌کد عمومی
             // نوبت‌دهی به پنل، جایی که موبایل+کد تایید را وارد می‌کند.
-            'panel_url'       => home_url('/panel/'),
+            'panel_url'       => zdp_panel_url(),
             'i18n'     => [
                 'network_error'   => 'خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.',
                 'sending'         => 'در حال ارسال...',

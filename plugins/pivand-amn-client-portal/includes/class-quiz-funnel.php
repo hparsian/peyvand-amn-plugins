@@ -218,7 +218,7 @@ final class Quiz_Funnel
 
     private function booking_url(): string
     {
-        return apply_filters('zdp_leads_booking_url', home_url('/panel/'));
+        return apply_filters('zdp_leads_booking_url', zdp_panel_url());
     }
 
     // ------------------------------------------------------------------

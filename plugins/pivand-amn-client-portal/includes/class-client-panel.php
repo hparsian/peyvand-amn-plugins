@@ -440,7 +440,7 @@ final class Client_Panel
                             <span class="zdp-shell-user-mobile" dir="ltr"><?php echo esc_html($identity); ?></span>
                         <?php endif; ?>
                     </span>
-                    <a href="<?php echo esc_url(wp_logout_url(home_url('/panel/'))); ?>" class="zdp-logout" title="خروج">
+                    <a href="<?php echo esc_url(wp_logout_url(zdp_panel_url())); ?>" class="zdp-logout" title="خروج">
                         <?php echo $this->icon('logout'); ?>
                         <span class="zdp-shell-logout-label">خروج</span>
                     </a>

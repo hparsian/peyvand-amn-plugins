@@ -20,6 +20,7 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | Jalali parity (standalone) | `php tests/php/test-jalali.php` | 21/21 — 55,152 روز، صفر اختلاف |
 | Jalali + timezone (WP) | `wp eval-file tests/wp/jalali-timezone.php` | 10/10 |
 | Client intake validation (WP) | `wp eval-file tests/wp/intake-validation.php` | 21/21 |
+| Client login entry (WP) | `wp eval-file tests/wp/otp-login-entry.php` | 8/8 |
 
 The whole table was executed a second time against builds made from the current
 `plugins/` source — **Core 1.8.1, Case File 1.16.1, Quiz 3.8.17, SMS Bridge
@@ -61,6 +62,14 @@ pinned `dist/` packages and the newer source.
   confirmation, health options (invalid value rejected, details cleared on
   «خیر»), and the Jalali `form_date`. It skips cleanly when the client portal
   is not active.
+- **`tests/wp/otp-login-entry.php`** covers the client login entry: it asserts
+  `zdp_panel_url()` returns the real permalink of the page stored in
+  `zdp_panel_page_id` (so login no longer lands on the site root when
+  permalinks are plain), and that an email OTP sent to
+  `Case.Test…@Example.COM` verifies successfully when the user retypes it as
+  lowercase — the transient must be keyed on the normalized address and the
+  redirect must carry a `zdp_auth` login token. The temporary user and OTP
+  transients are removed at the end.
 - **`tests/wp/jalali-timezone.php`** proves inside WordPress that `wp_date()`
   returns site time while `date()` on a UTC server is off by the site offset
   (Tehran, +3:30), that `pas_jalali_datetime()` agrees with an independent

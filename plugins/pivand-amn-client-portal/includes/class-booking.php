@@ -693,7 +693,7 @@ final class Booking
         $payment = $this->gateway->request_payment(
             (int) $price,
             "پرداخت نوبت {$service_name}",
-            add_query_arg(['zdp_payment_callback' => $booking_id], home_url('/panel/'))
+            add_query_arg(['zdp_payment_callback' => $booking_id], zdp_panel_url())
         );
 
         if (!$payment['success']) {
@@ -728,7 +728,7 @@ final class Booking
         $table   = Installer::table('bookings');
         $booking = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d AND authority = %s", $booking_id, $authority));
 
-        $redirect_base = home_url('/panel/');
+        $redirect_base = zdp_panel_url();
 
         if (!$booking || $status !== 'OK') {
             if ($booking) {
@@ -901,7 +901,7 @@ final class Booking
         }
 
         $labels = ['both' => 'تلفنی و حضوری', 'phone' => 'تلفنی', 'online' => 'آنلاین (تصویری)', 'in_person' => 'حضوری'];
-        $link   = trim((string) $atts['link']) !== '' ? (string) $atts['link'] : home_url('/panel/');
+        $link   = trim((string) $atts['link']) !== '' ? (string) $atts['link'] : zdp_panel_url();
         // اثر انگشت کوتاهِ لیست فعلی: با مقدار همین صفحه مقایسه کنید تا مشخص شود
         // صفحه از کش قدیمی می‌آید یا لیست واقعاً عوض نشده است.
         $rev = substr(md5((string) wp_json_encode($all)), 0, 8);

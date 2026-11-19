@@ -495,7 +495,7 @@ final class OTP_Auth
         // کوکی واقعی وقتی ست می‌شود که مرورگر با همین توکن به‌صورت یک ناوبری
         // واقعی صفحه (نه fetch/XHR) به /panel/ برود. توضیح کامل چرایی این
         // تصمیم داخل Login_Service آمده است.
-        $redirect = Login_Service::build_redirect_url($user_id, home_url('/panel/'));
+        $redirect = Login_Service::build_redirect_url($user_id, zdp_panel_url());
 
         // پل به Booking (نگاه کن به توضیح کامل بالای Booking::__construct):
         // اگر این تایید OTP از شورت‌کد عمومی نوبت‌دهی روی صفحه‌ی اصلی آمده
@@ -544,7 +544,14 @@ final class OTP_Auth
      */
     private function process_send_otp_email(string $email): array
     {
-        $email = sanitize_email($email);
+        // نرمال‌سازی حروف کوچک (رفع باگ «کد منقضی شده»): کلید transient با
+        // md5 خود آدرس ساخته می‌شود و ایمیل از نظر RFC در بخش دامنه و عملاً
+        // در بخش محلی هم حساس به بزرگی/کوچکی حروف نیست. اگر کاربر همان ایمیل
+        // را در مرحله ارسال با حرف بزرگ و در مرحله تایید با حرف کوچک وارد کند
+        // (یا مرورگر خودکار lowercase کند)، قبلاً کلید متفاوتی ساخته می‌شد و
+        // کد معتبرِ ارسال‌شده «منقضی/استفاده‌شده» گزارش می‌شد. حالا همه‌جا
+        // یکسان به حروف کوچک تبدیل می‌شود.
+        $email = strtolower(sanitize_email($email));
 
         if (!is_email($email)) {
             return ['success' => false, 'data' => ['message' => 'ایمیل وارد شده معتبر نیست.']];
@@ -612,7 +619,8 @@ final class OTP_Auth
      */
     private function process_verify_otp_email(string $email, string $user_otp, array $pending_booking = []): array
     {
-        $email = sanitize_email($email);
+        // همان نرمال‌سازی حروف کوچک مرحله ارسال (نگاه کن به process_send_otp_email).
+        $email = strtolower(sanitize_email($email));
 
         if (!is_email($email)) {
             return ['success' => false, 'data' => ['message' => 'ایمیل وارد شده معتبر نیست.']];
@@ -880,6 +888,21 @@ final class OTP_Auth
         $users = get_users(['meta_key' => 'zdp_email', 'meta_value' => $email, 'number' => 1]);
         if (!empty($users)) {
             return (int) $users[0]->ID;
+        }
+
+        // سازگاری با حساب‌هایی که پیش از نرمال‌سازی حروف کوچک ساخته شده‌اند
+        // و متای zdp_email آن‌ها با حرف بزرگ ذخیره شده است؛ بدون این چک،
+        // همان کاربر یک حساب تکراری می‌گرفت.
+        global $wpdb;
+        $legacy_email_user = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND LOWER(meta_value) = %s LIMIT 1",
+            'zdp_email',
+            $email
+        ));
+        if ($legacy_email_user > 0) {
+            update_user_meta($legacy_email_user, 'zdp_email', $email);
+
+            return $legacy_email_user;
         }
 
         // اگر کاربری با همین user_email دقیقاً از قبل روی سایت وجود دارد

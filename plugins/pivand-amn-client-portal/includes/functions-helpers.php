@@ -298,6 +298,26 @@ function get_client_ip(): string
 }
 
 /**
+ * آدرس واقعی صفحهٔ پنل مراجع. روی سایت‌هایی که «پیوند یکتای ساده» دارند
+ * (permalink_structure خالی) آدرس ثابت /panel/ وجود ندارد و ریدایرکت
+ * بعد از ورود کاربر را به صفحهٔ اصلی/۴۰۴ می‌برد؛ پس اول permalink همان
+ * صفحه‌ای که شناسه‌اش در zdp_panel_page_id ذخیره شده برگردانده می‌شود و
+ * تنها اگر آن صفحه نبود، /panel/ به‌عنوان fallback می‌آید.
+ */
+function zdp_panel_url(): string
+{
+    $page_id = (int) get_option('zdp_panel_page_id');
+    if ($page_id > 0 && 'page' === get_post_type($page_id) && 'publish' === get_post_status($page_id)) {
+        $permalink = get_permalink($page_id);
+        if (is_string($permalink) && $permalink !== '') {
+            return $permalink;
+        }
+    }
+
+    return home_url('/panel/');
+}
+
+/**
  * زمان فعلی به‌صورت یکدست بر مبنای UTC برای هر مقایسه‌ی زمانی داخل پلاگین.
  * تمام ستون‌های datetime هم با gmdate ذخیره می‌شوند تا هیچ‌گاه تایم‌زون سایت
  * (current_time('mysql') که local است) با UTC مقایسه نشود — این دقیقاً همان

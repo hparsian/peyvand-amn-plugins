@@ -155,7 +155,7 @@ final class Login_Service
         // فرمت توکن همیشه ۶۴ کاراکتر هگزادسیمال است (random_bytes(32)); هر
         // چیز دیگری قطعاً جعلی/خراب است و حتی نیازی به کوئری transient ندارد.
         if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
-            $this->redirect_with_error(home_url('/panel/'));
+            $this->redirect_with_error(zdp_panel_url());
 
             return;
         }
@@ -169,7 +169,7 @@ final class Login_Service
 
         if (!is_array($payload) || empty($payload['user_id'])) {
             audit_log('otp_login_bridge_token_invalid_or_expired', ['token_prefix' => substr($token, 0, 8)]);
-            $this->redirect_with_error(home_url('/panel/'));
+            $this->redirect_with_error(zdp_panel_url());
 
             return;
         }
@@ -177,12 +177,12 @@ final class Login_Service
         $user_id     = (int) $payload['user_id'];
         $redirect_to = is_string($payload['redirect_to'] ?? null) && $payload['redirect_to'] !== ''
             ? $payload['redirect_to']
-            : home_url('/panel/');
+            : zdp_panel_url();
 
         $user = get_user_by('id', $user_id);
         if (!$user) {
             audit_log('otp_login_bridge_user_missing', ['user_id' => $user_id]);
-            $this->redirect_with_error(home_url('/panel/'));
+            $this->redirect_with_error(zdp_panel_url());
 
             return;
         }
