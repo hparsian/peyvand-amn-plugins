@@ -1611,14 +1611,38 @@ final class Booking
         $now    = new \DateTimeImmutable('now', wp_timezone());
         $window = $now->modify(sprintf('+%d hours', max(1, $hours_before)));
 
-        return $wpdb->get_results($wpdb->prepare(
+        // مقایسهٔ دقیق در PHP انجام می‌شود و در SQL فقط بازهٔ روزانه فیلتر
+        // می‌شود. دلیل: TIMESTAMP(booking_date, booking_time) مخصوص MySQL
+        // است و در SQLite (محیط آزمون) خطا می‌دهد؛ نتیجه‌اش صفر ردیف بود که
+        // یعنی هیچ یادآوری‌ای ارسال نمی‌شد، بدون هیچ خطای دیده‌شدنی.
+        $rows = $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM $table
              WHERE status IN ('فعال', 'تایید شده')
                AND reminder_sent_at IS NULL
-               AND TIMESTAMP(booking_date, booking_time) BETWEEN %s AND %s",
-            $now->format('Y-m-d H:i:s'),
-            $window->format('Y-m-d H:i:s')
+               AND booking_date BETWEEN %s AND %s",
+            $now->format('Y-m-d'),
+            $window->format('Y-m-d')
         ));
+
+        $due = [];
+        foreach ($rows as $row) {
+            $time = substr((string) $row->booking_time, 0, 8);
+            if (strlen($time) === 5) {
+                $time .= ':00';
+            }
+
+            $slot = \DateTimeImmutable::createFromFormat(
+                'Y-m-d H:i:s',
+                $row->booking_date . ' ' . $time,
+                wp_timezone()
+            );
+
+            if ($slot && $slot >= $now && $slot <= $window) {
+                $due[] = $row;
+            }
+        }
+
+        return $due;
     }
 
     public function mark_reminder_sent(int $booking_id): void

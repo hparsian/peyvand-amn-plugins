@@ -218,6 +218,43 @@ function zdp_get_user_mobile(int $user_id): string
 }
 
 /**
+ * ایمیل واقعی مراجع برای اطلاع‌رسانی‌های دو‌کاناله (یادآوری نوبت).
+ *
+ * ترتیب: متای zdp_email (همان ایمیل تأییدشده در ورود با ایمیل) و بعد
+ * user_email. اما حساب‌هایی که فقط با موبایل ساخته می‌شوند یک ایمیل
+ * ساختگی `0912...@دامنه` دارند؛ ارسال به آن بی‌معنی و مضر (باونس) است، پس
+ * اگر بخش محلیِ ایمیل دقیقاً همان شماره موبایلِ کاربر باشد، رشته‌ی خالی
+ * برمی‌گردد تا فقط کانال پیامک استفاده شود.
+ */
+function zdp_user_email(int $user_id): string
+{
+    $meta_email = trim((string) get_user_meta($user_id, 'zdp_email', true));
+    $email      = $meta_email !== '' && is_email($meta_email) ? $meta_email : '';
+
+    if ($email === '') {
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return '';
+        }
+
+        $email = trim((string) $user->user_email);
+        if ($email === '' || !is_email($email)) {
+            return '';
+        }
+    }
+
+    $mobile = zdp_get_user_mobile($user_id);
+    if ($mobile !== '') {
+        $local = strstr($email, '@', true);
+        if (is_string($local) && strcasecmp($local, str_replace('+', '', $mobile)) === 0) {
+            return '';
+        }
+    }
+
+    return $email;
+}
+
+/**
  * ذخیره‌ی شماره موبایل یک کاربر. همیشه هر دو کلید را می‌نویسد: `cellphone`
  * به‌عنوان کلید مشترک اکوسیستم (تا سایر پلاگین‌ها این کاربر را پیدا کنند) و
  * `zdp_mobile` برای سازگاری با کوئری‌های قدیمی/باقیمانده‌ی همین پلاگین.

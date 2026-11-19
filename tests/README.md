@@ -21,6 +21,7 @@ All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
 | Jalali + timezone (WP) | `wp eval-file tests/wp/jalali-timezone.php` | 10/10 |
 | Client intake validation (WP) | `wp eval-file tests/wp/intake-validation.php` | 21/21 |
 | Client login entry (WP) | `wp eval-file tests/wp/otp-login-entry.php` | 8/8 |
+| Reminder channels (WP) | `wp eval-file tests/wp/reminder-channels.php` | 7/7 |
 
 The whole table was executed a second time against builds made from the current
 `plugins/` source — **Core 1.8.1, Case File 1.16.1, Quiz 3.8.17, SMS Bridge
@@ -70,6 +71,12 @@ pinned `dist/` packages and the newer source.
   lowercase — the transient must be keyed on the normalized address and the
   redirect must carry a `zdp_auth` login token. The temporary user and OTP
   transients are removed at the end.
+- **`tests/wp/reminder-channels.php`** pins the two-channel appointment
+  reminder: an Iranian mobile plus a real email sends both, an international
+  `+…` number gets email only, an account with no mobile gets email only, and
+  an account whose only “email” is the synthetic `mobile@domain` address gets
+  nothing but still leaves the reminder queue (so it is not retried hourly).
+  It also asserts every due booking is marked `reminder_sent_at`.
 - **`tests/wp/jalali-timezone.php`** proves inside WordPress that `wp_date()`
   returns site time while `date()` on a UTC server is off by the site offset
   (Tehran, +3:30), that `pas_jalali_datetime()` agrees with an independent

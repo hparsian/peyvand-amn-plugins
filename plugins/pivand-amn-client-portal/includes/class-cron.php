@@ -47,13 +47,25 @@ final class Cron
     }
 
     /**
-     * یادآوری پیامکی خودکار قبل از جلسه — طبق تنظیمات «یادآوری نوبت» در
-     * پیشخوان: zdp_appointment_reminder_enabled (فعال/غیرفعال)،
-     * zdp_appointment_reminder_hours_before (چند ساعت قبل، پیش‌فرض ۲۴) و
-     * zdp_sms_reminder_body_id (پترن ملی‌پیامک با متغیرهای DATE/TIME).
-     * دقیقاً هم‌الگوی process_followups: هرساعته اجرا می‌شود، هر نوبت را فقط
-     * یک‌بار پیامک می‌کند (reminder_sent_at)، و در صورت شکست ارسال، به‌جای
-     * سکوت، به ادمین ایمیل هشدار می‌رود (throttled) تا خودش تماس بگیرد.
+     * یادآوری خودکار قبل از جلسه — دو‌کاناله: هم پیامک و هم ایمیل.
+     *
+     * قواعد (طبق درخواست کارفرما):
+     *  - شماره‌ی ایرانی + ایمیل واقعی: هر دو کانال تلاش می‌شوند.
+     *  - شماره‌ی خارجی (E.164 با «+»): فقط ایمیل؛ پل پیامک فقط 09xxxxxxxxx
+     *    را می‌شناسد و پیامکِ شماره‌ی خارجی همیشه شکست می‌خورد.
+     *  - شمارهٔ خالی: فقط ایمیل (حساب‌هایی که فقط با ایمیل ساخته شده‌اند).
+     *  - ایمیل ساختگیِ موبایل (`0912...@دامنه`): نادیده گرفته می‌شود، وگرنه
+     *    هر یادآوری یک ایمیل باونس می‌شود؛ نگاه کن به zdp_user_email().
+     *
+     * تنظیمات: zdp_appointment_reminder_enabled،
+     * zdp_appointment_reminder_hours_before (پیش‌فرض ۲۴) و
+     * zdp_sms_reminder_body_id. نبودِ پترن پیامک دیگر کل یادآوری را متوقف
+     * نمی‌کند؛ ایمیل مستقل از آن ارسال می‌شود.
+     *
+     * هر نوبت فقط یک بار (reminder_sent_at) و تنها وقتی حداقل یک کانال
+     * موفق شود علامت می‌خورد، تا خطای گذرای همان ساعت، یادآوری را برای همیشه
+     * از دست ندهد؛ اگر هیچ کانالی موفق نشد، ایمیل هشدار (throttled) به ادمین
+     * می‌رود تا خودش تماس بگیرد.
      */
     public function process_appointment_reminders(): void
     {
@@ -62,42 +74,72 @@ final class Cron
         }
 
         $body_id = (string) get_option('zdp_sms_reminder_body_id', '');
-        if ($body_id === '') {
-            return;
-        }
-
         $hours_before = (int) get_option('zdp_appointment_reminder_hours_before', 24);
 
         foreach ($this->booking->get_bookings_needing_reminder($hours_before) as $b) {
-            $mobile = zdp_get_user_mobile((int) $b->user_id);
-            if ($mobile === '') {
+            $user_id = (int) $b->user_id;
+            $mobile  = zdp_get_user_mobile($user_id);
+            $email   = zdp_user_email($user_id);
+
+            // شماره‌ی خارجی با پل پیامک فعلی ارسال نمی‌شود؛ فقط ایمیل.
+            $sms_allowed = $mobile !== '' && $body_id !== '' && !str_starts_with($mobile, '+');
+
+            if (!$sms_allowed && $email === '') {
+                // هیچ کانال قابل‌استفاده‌ای نیست (نه شماره‌ی ایرانی، نه ایمیل)؛
+                // علامت می‌زنیم تا هر ساعت دوباره تلاش بی‌نتیجه نشود.
                 $this->booking->mark_reminder_sent((int) $b->id);
+                audit_log('appointment_reminder_skipped_no_channel', ['booking_id' => $b->id]);
                 continue;
             }
 
-            $sent = apply_filters('pas_send_sms', null, $mobile, $body_id, [
-                'DATE' => Jalali::gregorian_to_jalali_string($b->booking_date),
-                'TIME' => substr((string) $b->booking_time, 0, 5),
+            $date = Jalali::gregorian_to_jalali_string($b->booking_date);
+            $time = substr((string) $b->booking_time, 0, 5);
+
+            $sms_sent = $sms_allowed && apply_filters('pas_send_sms', null, $mobile, $body_id, [
+                'DATE' => $date,
+                'TIME' => $time,
             ]);
 
+            $email_sent = $email !== '' && $this->send_reminder_email($email, $date, $time);
+
+            $sent = $sms_sent || $email_sent;
+
             if ($sent) {
-                // قبلاً mark_reminder_sent() بدون قید و شرط (چه ارسال موفق بود
-                // چه نبود) صدا زده می‌شد؛ یعنی یک خطای گذرا در همان تیک
-                // ساعتی (مثلاً قطعی لحظه‌ای اتصال به ملی‌پیامک) نوبت را برای
-                // همیشه از چرخه‌ی یادآوری خارج می‌کرد و دیگر هیچ‌وقت دوباره
-                // تلاش نمی‌شد — فقط یک ایمیل هشدار یک‌باره به ادمین می‌رفت.
-                // حالا فقط روی ارسال موفق علامت زده می‌شود تا اگر تلاش این
-                // ساعت شکست بخورد، ساعت بعد دوباره امتحان شود (دقیقاً هم‌الگو
-                // با process_followups روی لیدها).
+                if ($sms_allowed && !$sms_sent) {
+                    audit_log('appointment_reminder_sms_failed', ['booking_id' => $b->id]);
+                }
+                if ($email !== '' && !$email_sent) {
+                    audit_log('appointment_reminder_email_failed', ['booking_id' => $b->id]);
+                }
                 $this->booking->mark_reminder_sent((int) $b->id);
-                audit_log('appointment_reminder_sms_sent', ['booking_id' => $b->id]);
-            } else {
-                $this->notify_admin_reminder_failed($b, $mobile);
+                audit_log('appointment_reminder_sent', [
+                    'booking_id' => $b->id,
+                    'channels'   => array_values(array_filter([
+                        $sms_sent ? 'sms' : null,
+                        $email_sent ? 'email' : null,
+                    ])),
+                ]);
+                continue;
             }
+
+            $this->notify_admin_reminder_failed($b, $mobile);
         }
     }
 
-    /** ایمیل هشدار به ادمین وقتی ارسال پیامک یادآوری نوبت ناموفق بود (حداکثر یک‌بار در ۶ ساعت برای هر نوبت). */
+    /** ایمیل یادآوری نوبت به مراجع؛ متن هم‌معنی پیامک، با تاریخ و ساعت شمسی. */
+    private function send_reminder_email(string $email, string $date, string $time): bool
+    {
+        $site_name = wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES);
+        $subject   = 'یادآوری نوبت شما در ' . $site_name;
+        $body      = "سلام،\n\n"
+            . "یادآوری می‌کنیم نوبت شما در {$site_name} در تاریخ {$date} ساعت {$time} ثبت شده است.\n"
+            . "اگر نیاز به تغییر یا لغو نوبت دارید، پیش از زمان جلسه با ما تماس بگیرید.\n\n"
+            . "با احترام\n{$site_name}";
+
+        return (bool) wp_mail($email, $subject, $body);
+    }
+
+    /** ایمیل هشدار به ادمین وقتی هیچ کانالی برای یادآوری نوبت موفق نشد (حداکثر یک‌بار در ۶ ساعت برای هر نوبت). */
     private function notify_admin_reminder_failed(object $booking, string $mobile): void
     {
         $throttle_key = 'zdp_reminder_fail_notified_' . $booking->id;
@@ -113,10 +155,10 @@ final class Cron
 
         wp_mail(
             $admin_email,
-            '⚠️ پیامک یادآوری نوبت ارسال نشد',
+            '⚠️ یادآوری نوبت ارسال نشد',
             sprintf(
-                "پیامک یادآوری برای نوبت شماره %d (شماره مراجع: %s، تاریخ: %s، ساعت: %s) ارسال نشد.\n" .
-                "لطفاً اعتبار پنل پیامکی را بررسی کن و در صورت نیاز خودت با مراجع تماس بگیر.",
+                "یادآوری نوبت شماره %d (شماره مراجع: %s، تاریخ: %s، ساعت: %s) از هیچ کانالی (پیامک/ایمیل) ارسال نشد.\n" .
+                "لطفاً اعتبار پنل پیامکی و تنظیمات ایمیل سایت را بررسی کن و در صورت نیاز خودت با مراجع تماس بگیر.",
                 $booking->id,
                 $mobile,
                 Jalali::gregorian_to_jalali_string($booking->booking_date),
