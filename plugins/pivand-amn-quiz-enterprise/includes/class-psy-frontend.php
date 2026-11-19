@@ -298,6 +298,18 @@ add_action( 'wp_enqueue_scripts', function () {
 add_action( 'template_redirect', function () {
     if ( ! isset( $_GET['psy_exam'] ) ) return;
 
+    // صفحه‌ی آزمون نام و توکن مراجع را در همان URL/HTML دارد؛ اگر یک افزونه‌ی
+    // کش صفحه (WP Rocket، LiteSpeed، W3TC، کش CDN) آن را ذخیره کند، همان
+    // نسخه با نام و لینک یک مراجع به نفر بعدی نمایش داده می‌شود. پس این صفحه
+    // هرگز نباید کش شود — هم به افزونه‌های کش وردپرسی اعلام می‌شود، هم هدرهای
+    // no-store فرستاده می‌شوند.
+    if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+        define( 'DONOTCACHEPAGE', true );
+    }
+    if ( function_exists( 'nocache_headers' ) ) {
+        nocache_headers();
+    }
+
     $token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
 
     // validate یک‌بار — نتیجه را cache می‌کنیم تا render() دوباره کوئری نزند
