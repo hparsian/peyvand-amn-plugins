@@ -1,7 +1,7 @@
 # FINAL RELEASE READINESS (PHASE TWO)
 
 **Version:** 2.0.0
-**Package:** `dist/peyvand-amn-unified-dashboard.zip`
+**Package:** `dist/peyvand-amn-unified-dashboard-2.4.0.zip`
 **Decision:** **CONDITIONAL GO** — staging deployment approved; production
 pending the couple/partner path, multisite and Oracle MySQL 8.0, if used.
 

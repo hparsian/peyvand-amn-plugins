@@ -28,9 +28,9 @@ degraded, non-clinical surface.
 ## 3. Install
 
 ```
-# via WP admin: Plugins → Add New → Upload → peyvand-amn-unified-dashboard.zip
+# via WP admin: Plugins → Add New → Upload → peyvand-amn-unified-dashboard-2.4.0.zip
 # or CLI:
-wp plugin install /path/peyvand-amn-unified-dashboard.zip --activate
+wp plugin install /path/peyvand-amn-unified-dashboard-2.4.0.zip --activate
 ```
 
 Activation creates two tables and grants `pas_dashboard_access` to the
