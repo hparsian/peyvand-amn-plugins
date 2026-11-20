@@ -81,6 +81,26 @@ final class PAS_Dashboard_Assets {
 			true
 		);
 
+		/* صفحهٔ گزارش آزمون: CSS و Chart.js مالک آزمون لازم است، وگرنه canvas‌ها
+		 * و کلاس‌های psy-report بدون استایل/نمودار می‌مانند. */
+		$module  = isset( $_GET['module'] ) ? sanitize_key( wp_unslash( $_GET['module'] ) ) : '';
+		$attempt = isset( $_GET['attempt_id'] ) ? absint( wp_unslash( $_GET['attempt_id'] ) ) : 0;
+
+		if ( 'assessments' === $module && $attempt > 0 ) {
+			if ( class_exists( 'Psy_Quiz_Assets' ) ) {
+				Psy_Quiz_Assets::enqueue_chart_js();
+			}
+
+			if ( defined( 'PSY_URL' ) ) {
+				wp_enqueue_style(
+					'psy-quiz-report-css',
+					PSY_URL . 'assets/css/frontend.css',
+					array(),
+					defined( 'PSY_VERSION' ) ? PSY_VERSION : PAS_DASHBOARD_VERSION
+				);
+			}
+		}
+
 		wp_localize_script(
 			'pas-dashboard-admin',
 			'PasDashboard',

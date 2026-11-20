@@ -67,7 +67,7 @@ $pas_bell  = add_query_arg(
 		<span class="pvn-date"><?php echo esc_html( sprintf( /* translators: %s: Jalali date */ __( 'امروز · %s', 'peyvand-amn-dashboard' ), $pas_today ) ); ?></span>
 
 		<button type="button" class="pvn-icon-btn pvn-theme-toggle" data-pui-theme-toggle
-			aria-pressed="<?php echo $pas_is_dark ? 'true' : 'false'; ?>"
+			aria-pressed="<?php echo esc_attr( $pas_is_dark ? 'true' : 'false' ); ?>"
 			data-pui-theme-default="<?php echo esc_attr( $pas_is_dark ? 'dark' : 'light' ); ?>"
 			title="<?php esc_attr_e( 'تغییر حالت روشن/تاریک', 'peyvand-amn-dashboard' ); ?>">
 			<svg class="pvn-theme-toggle__moon" width="18" height="18" viewBox="0 0 24 24" fill="none"

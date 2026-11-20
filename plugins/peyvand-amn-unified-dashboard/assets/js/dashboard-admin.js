@@ -155,8 +155,8 @@
 	});
 
 	(function () {
-		var hash = String(window.location.hash || '').replace('#', '');
-		if (hash === 'summary' || hash === 'notes') {
+		var hash = String(window.location.hash || '').replace('#', '').replace(/[^a-z_]/g, '');
+		if (hash !== '' && $('.pvn-case-tab[data-pvn-case-tab="' + hash + '"]').length) {
 			activateCaseTab(hash, false);
 		}
 	})();
@@ -166,6 +166,33 @@
 		window.setTimeout(function () {
 			$('#pas-main').trigger('focus');
 		}, 0);
+	});
+
+	/* کپی لینک دعوت آزمون */
+	$(document).on('click', '[data-pas-copy]', function () {
+		var $button = $(this);
+		var text = String($button.attr('data-pas-copy') || '');
+
+		if (!text) {
+			return;
+		}
+
+		var original = $button.text();
+		var done = function () {
+			$button.text('کپی شد');
+			window.setTimeout(function () { $button.text(original); }, 2000);
+		};
+
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(text).then(done).catch(function () {
+				$button.prev('input').trigger('select');
+			});
+			return;
+		}
+
+		$button.prev('input').trigger('select');
+		document.execCommand('copy');
+		done();
 	});
 
 	/* تأیید عملیات مخرب */

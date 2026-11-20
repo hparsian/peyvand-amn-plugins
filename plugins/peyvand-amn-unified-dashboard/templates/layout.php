@@ -35,6 +35,8 @@ $pas_console = PAS_Dashboard_Security::can_manage();
 						</div>
 					</div>
 
+					<?php echo PAS_Dashboard_Flash::render(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+
 					<?php
 					$content = $module->render();
 					// خروجی ماژول‌ها در همان فایل با esc_html/esc_url ساخته شده است.

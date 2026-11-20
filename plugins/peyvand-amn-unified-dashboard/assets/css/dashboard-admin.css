@@ -967,3 +967,172 @@
 		animation: none !important;
 	}
 }
+
+/* ── فاز ۱: فرم‌های پرونده و مدیریت نوبت ─────────────────────────────── */
+.pas-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px 18px;
+}
+
+.pas-form-row--full {
+	grid-column: 1 / -1;
+}
+
+.pas-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 600;
+}
+
+.pas-readonly {
+	margin: 0;
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.04);
+	font-family: inherit;
+}
+
+.pas-form-section {
+	margin: 18px 0;
+	padding: 12px 14px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+}
+
+.pas-form-section > summary {
+	cursor: pointer;
+	font-weight: 700;
+}
+
+.pas-form-section[open] > summary {
+	margin-bottom: 12px;
+}
+
+.pas-row-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.pas-inline-form {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+	margin: 0;
+}
+
+.pas-btn-sm {
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.pas-select-sm {
+	min-width: 130px;
+	padding: 5px 8px;
+	font-size: 12px;
+}
+
+.pas-row-details {
+	margin-top: 8px;
+}
+
+.pas-row-details > summary {
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--pas-link, #2563eb);
+}
+
+.pas-row-details .pas-form {
+	margin-top: 8px;
+	padding: 10px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.03);
+}
+
+.pas-actions {
+	margin: 0 0 12px;
+}
+
+@media (max-width: 782px) {
+	.pas-form-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ── فاز ۲: دعوت آزمون و صندوق پیام ──────────────────────────────────── */
+.pas-invite-link {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.pas-invite-link .pas-input {
+	flex: 1 1 320px;
+}
+
+.pas-message-card {
+	margin: 0 0 12px;
+	padding: 12px 14px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.6);
+}
+
+.pas-message-card.is-unread {
+	border-inline-start: 4px solid var(--pas-warn, #d97706);
+}
+
+.pas-message-head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.pas-message-body {
+	line-height: 1.9;
+	white-space: normal;
+	word-break: break-word;
+}
+
+.pas-message-reply {
+	margin-top: 8px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.035);
+	line-height: 1.8;
+}
+
+.pas-message-form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: flex-start;
+	margin-top: 10px;
+}
+
+.pas-message-form .pas-textarea {
+	flex: 1 1 260px;
+}
+
+.pas-report {
+	overflow-x: auto;
+}
+
+.pas-report table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.pas-report th,
+.pas-report td {
+	padding: 6px 8px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	text-align: start;
+}

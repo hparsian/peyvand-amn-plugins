@@ -142,6 +142,10 @@ def main():
         "includes/class-dashboard-notifications.php",
         "includes/class-dashboard-audit-log.php",
         "includes/class-dashboard-export.php",
+        "includes/class-dashboard-actions.php",
+        "includes/class-dashboard-flash.php",
+        "includes/adapters/class-adapter-quiz.php",
+        "includes/adapters/class-adapter-portal.php",
         "includes/class-dashboard-validation.php",
         "includes/class-dashboard-database.php",
         "includes/class-dashboard-core-bridge.php",
@@ -295,10 +299,13 @@ def main():
             continue
         src = open(os.path.join(module_dir, name), encoding="utf-8").read()
         posts = re.findall(r"<form[^>]*method=\"post\"", src, re.I)
+        # فرمهای Action Bus با PAS_Dashboard_Actions::fields() ساخته میشوند که
+        # خودش PAS_Dashboard_Security::nonce_field() را در فرم قرار میدهد.
+        has_nonce = "nonce_field(" in src or "PAS_Dashboard_Actions::fields(" in src
         for _ in posts:
-            if "nonce_field(" not in src:
+            if not has_nonce:
                 fail("form nonce", name + " posts without nonce_field")
-        if posts and "nonce_field(" in src:
+        if posts and has_nonce:
             ok("form nonce: " + name)
 
     # ── 8. input sanitization ──────────────────────────────────────────
@@ -401,7 +408,11 @@ def main():
         ok("audit: no clinical/secret fields")
 
     # ── 15. package check ──────────────────────────────────────────────
-    zip_path = os.path.join(ROOT, "dist", "peyvand-amn-unified-dashboard.zip")
+    # dist/ دقیقاً یک بستهٔ نصب برای هر افزونه نگه می‌دارد و نام آن با نسخهٔ هدر همسو است.
+    header = open(os.path.join(PLUGIN, "peyvand-amn-unified-dashboard.php"), encoding="utf-8").read()
+    zip_version = re.search(r"Version:\s*([0-9.]+)", header)
+    zip_name = "peyvand-amn-unified-dashboard-" + (zip_version.group(1) if zip_version else "?") + ".zip"
+    zip_path = os.path.join(ROOT, "dist", zip_name)
     if os.path.isfile(zip_path):
         with zipfile.ZipFile(zip_path) as zf:
             bad = zf.testzip()
@@ -417,7 +428,47 @@ def main():
     else:
         fail("zip", "dist package not built")
 
-    # ── 16. version consistency ────────────────────────────────────────
+    # ── 16. phase-2 object guards ──────────────────────────────────────
+    # قیدهای امنیتی فاز ۲ باید در سرور باشند، نه فقط در رابط کاربری.
+    quiz = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-quiz.php"), encoding="utf-8").read()
+    at = quiz.find("function notify(")
+    notify_body = quiz[at : at + 2500] if at >= 0 else ""
+    if (
+        "array( 'unused', 'processing' )" in notify_body
+        and "pas_dashboard_quiz_expired" in notify_body
+        and "can_view_phone" in notify_body
+    ):
+        ok("quiz: notify guards state, expiry and scope")
+    else:
+        fail("quiz", "notify does not guard state/expiry/scope")
+
+    assess = open(os.path.join(PLUGIN, "includes/modules/assessments-module.php"), encoding="utf-8").read()
+    i_scope = assess.find("'خارج از دامنهٔ شما'")
+    i_link = assess.find("'نتیجه و روند'")
+    if 0 <= i_scope < i_link:
+        ok("assessments: scope checked before the result link")
+    else:
+        fail("assessments", "out-of-scope row may still offer the result link")
+
+    portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
+    at = portal.find("function reply_message(")
+    reply_body = portal[at : at + 2000] if at >= 0 else ""
+    if "self::can_view_phone(" in reply_body and "pas_dashboard_message_scope" in reply_body:
+        ok("messages: reply checks case scope")
+    else:
+        fail("messages", "reply_message has no case-scope check")
+
+    owner_path = os.path.join(ROOT, "plugins/pivand-amn-client-portal/includes/class-messages.php")
+    if os.path.isfile(owner_path):
+        owner = open(owner_path, encoding="utf-8").read()
+        if re.search(r"public function get_message\(\s*int \$msg_id\s*\)", owner):
+            ok("messages: owner get_message() contract present")
+        else:
+            fail("messages", "owner get_message() missing")
+    else:
+        fail("messages", "client portal source not found")
+
+    # ── 17. version consistency ────────────────────────────────────────
     main_src = open(os.path.join(PLUGIN, "peyvand-amn-unified-dashboard.php"), encoding="utf-8").read()
     readme = open(os.path.join(PLUGIN, "readme.txt"), encoding="utf-8").read()
     v_main = re.search(r"Version:\s*([0-9.]+)", main_src)

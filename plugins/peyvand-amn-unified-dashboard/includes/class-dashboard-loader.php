@@ -37,6 +37,11 @@ final class PAS_Dashboard_Plugin {
 			'includes/class-dashboard-security.php',
 			'includes/class-dashboard-permissions.php',
 			'includes/class-dashboard-notifications.php',
+			'includes/class-dashboard-flash.php',
+			'includes/adapters/class-adapter-case-file.php',
+			'includes/adapters/class-adapter-portal.php',
+			'includes/adapters/class-adapter-quiz.php',
+			'includes/class-dashboard-actions.php',
 			'includes/class-dashboard-export.php',
 			'includes/class-dashboard-ajax.php',
 			'includes/class-dashboard-rest.php',
@@ -85,6 +90,12 @@ final class PAS_Dashboard_Plugin {
 
 		PAS_Dashboard_Database::maybe_upgrade();
 
+		if ( get_option( 'pas_dashboard_version' ) !== PAS_DASHBOARD_VERSION ) {
+			PAS_Dashboard_Permissions::grant_default_caps();
+			update_option( 'pas_dashboard_version', PAS_DASHBOARD_VERSION );
+		}
+
+		PAS_Dashboard_Actions::init();
 		PAS_Dashboard_Router::init();
 		PAS_Dashboard_Assets::init();
 		PAS_Dashboard_Ajax::init();

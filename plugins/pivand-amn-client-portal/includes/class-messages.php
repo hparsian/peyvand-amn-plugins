@@ -75,23 +75,54 @@ final class Messages
 
         $reply = isset($_POST['admin_reply_text']) ? sanitize_textarea_field(wp_unslash($_POST['admin_reply_text'])) : '';
 
-        if ($msg_id > 0 && !empty($reply)) {
-            global $wpdb;
-            $wpdb->update(
-                Installer::table('messages'),
-                ['admin_reply' => $reply, 'status' => 'پاسخ داده شده'],
-                ['id' => $msg_id],
-                ['%s', '%s'],
-                ['%d']
-            );
-            audit_log('message_replied', ['msg_id' => $msg_id]);
-        }
+		$this->reply($msg_id, $reply);
 
-        wp_safe_redirect(add_query_arg('zdp_notice', 'reply_sent', wp_get_referer() ?: admin_url('admin.php?page=zdp-admin')));
+		wp_safe_redirect(add_query_arg('zdp_notice', 'reply_sent', wp_get_referer() ?: admin_url('admin.php?page=zdp-admin')));
         exit;
     }
 
-    public function get_messages_for_user(int $user_id): array
+    /**
+	 * پاسخ به پیام مراجع — قرارداد عمومی برای داشبورد یکپارچه.
+	 * همان منطق قبلی handler، بدون redirect و بدون بررسی nonce (که در لایهٔ
+	 * فراخواننده انجام می‌شود). صفر ردیف یعنی پیام وجود ندارد.
+	 */
+	public function reply(int $msg_id, string $reply): bool
+	{
+		$reply = trim(sanitize_textarea_field($reply));
+
+		if ($msg_id <= 0 || $reply === '') {
+			return false;
+		}
+
+		global $wpdb;
+		$updated = $wpdb->update(
+			Installer::table('messages'),
+			['admin_reply' => $reply, 'status' => 'پاسخ داده شده'],
+			['id' => $msg_id],
+			['%s', '%s'],
+			['%d']
+		);
+
+		if ((int) $updated > 0) {
+			audit_log('message_replied', ['msg_id' => $msg_id]);
+			return true;
+		}
+
+		/* پاسخ یکسان، affected rows صفر می‌دهد؛ وجود پیام کافی است. */
+		$exists = (int) $wpdb->get_var($wpdb->prepare(
+			'SELECT id FROM ' . Installer::table('messages') . ' WHERE id = %d',
+			$msg_id
+		));
+
+		if ($exists > 0) {
+			audit_log('message_replied', ['msg_id' => $msg_id]);
+			return true;
+		}
+
+		return false;
+	}
+
+	public function get_messages_for_user(int $user_id): array
     {
         global $wpdb;
 
@@ -99,6 +130,32 @@ final class Messages
             'SELECT * FROM ' . Installer::table('messages') . ' WHERE user_id = %d ORDER BY created_at DESC',
             $user_id
         ));
+    }
+
+    /**
+     * یک پیام به‌همراه شمارهٔ موبایل صاحبش — قرارداد عمومی برای داشبورد
+     * یکپارچه تا پیش از ثبت پاسخ، دامنهٔ پروندهٔ مراجع را بررسی کند.
+     */
+    public function get_message(int $msg_id): ?object
+    {
+        if ($msg_id <= 0) {
+            return null;
+        }
+
+        global $wpdb;
+        $table = Installer::table('messages');
+        $usermeta = $wpdb->usermeta;
+
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT m.*, COALESCE(um_c.meta_value, um_z.meta_value) AS mobile
+             FROM $table m
+             LEFT JOIN $usermeta um_c ON um_c.user_id = m.user_id AND um_c.meta_key = 'cellphone'
+             LEFT JOIN $usermeta um_z ON um_z.user_id = m.user_id AND um_z.meta_key = 'zdp_mobile'
+             WHERE m.id = %d",
+            $msg_id
+        ));
+
+        return $row ?: null;
     }
 
     public function get_all_messages(int $limit = 100): array

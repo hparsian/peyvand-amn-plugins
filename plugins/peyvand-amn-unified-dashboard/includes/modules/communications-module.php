@@ -15,13 +15,14 @@ final class PAS_Dashboard_Module_Communications extends PAS_Dashboard_Module {
 	public function __construct() {
 		$this->id          = 'communications';
 		$this->title       = __( 'ارتباطات', 'peyvand-amn-dashboard' );
-		$this->description = __( 'وضعیت پل پیامک، آخرین تلاش‌های ارسال و آمادگی یادآور جلسه.', 'peyvand-amn-dashboard' );
+		$this->description = __( 'صندوق پیام مراجعان و پاسخ‌دهی، وضعیت پل پیامک و آمادگی یادآور جلسه.', 'peyvand-amn-dashboard' );
 	}
 
 	public function render() {
 		$available = PAS_Dashboard_Core_Bridge::sms_available();
 
-		$html  = $this->card_open( __( 'پل پیامک', 'peyvand-amn-dashboard' ) );
+		$html  = $this->render_messages();
+		$html .= $this->card_open( __( 'پل پیامک', 'peyvand-amn-dashboard' ) );
 		$html .= '<p>' . esc_html__( 'وضعیت:', 'peyvand-amn-dashboard' ) . ' ';
 		$html .= $available
 			? '<span class="pas-badge pas-badge-good">' . esc_html__( 'فیلتر pas_send_sms ثبت شده است', 'peyvand-amn-dashboard' ) . '</span>'
@@ -110,7 +111,79 @@ final class PAS_Dashboard_Module_Communications extends PAS_Dashboard_Module {
 			$html .= $this->card_close();
 		}
 
-		$html .= $this->notice( 'info', __( 'ارسال پیامک از داشبورد غیرفعال است: قرارداد تأییدشده به شناسه‌ی متن از پیش تعریف‌شده نیاز دارد و ارسال واقعی باید از مسیر افزونه‌ی sms-bridge انجام شود. در محیط توسعه هیچ پیامک واقعی ارسال نمی‌شود.', 'peyvand-amn-dashboard' ) );
+		$html .= $this->notice( 'info', __( 'ارسال پیامک فقط با الگوهای تأییدشده انجام می‌شود: یادآور جلسه از الگوی پرونده و یادآور نوبت از الگوی پنل استفاده می‌کند. ارسال متن آزاد عمداً وجود ندارد. در محیط توسعه هیچ پیامک واقعی ارسال نمی‌شود.', 'peyvand-amn-dashboard' ) );
+
+		return $html;
+	}
+
+	/** صندوق پیام مراجعان (پنل) و پاسخ ادمین/درمانگر. */
+	private function render_messages() {
+		if ( ! PAS_Dashboard_Adapter_Portal::messages_available() ) {
+			return $this->notice( 'info', __( 'صندوق پیام در دسترس نیست (افزونهٔ پنل مراجعان فعال نیست یا نسخهٔ آن قرارداد پیام را ندارد).', 'peyvand-amn-dashboard' ) );
+		}
+
+		$messages = PAS_Dashboard_Adapter_Portal::messages( 100 );
+		$unread   = 0;
+
+		foreach ( $messages as $message ) {
+			if ( 'خوانده نشده' === (string) ( $message->status ?? '' ) ) {
+				$unread++;
+			}
+		}
+
+		$html  = $this->card_open( __( 'صندوق پیام مراجعان', 'peyvand-amn-dashboard' ) );
+		$html .= '<p class="pas-muted">';
+		$html .= esc_html( sprintf(
+			/* translators: 1: total, 2: unread */
+			__( '%1$d پیام، %2$d خوانده‌نشده.', 'peyvand-amn-dashboard' ),
+			count( $messages ),
+			$unread
+		) );
+		$html .= '</p>';
+
+		if ( empty( $messages ) ) {
+			$html .= '<p class="pas-empty">' . esc_html__( 'پیامی از مراجعان ثبت نشده است.', 'peyvand-amn-dashboard' ) . '</p>';
+			$html .= $this->card_close();
+			return $html;
+		}
+
+		foreach ( array_slice( $messages, 0, 50 ) as $message ) {
+			$msg_id   = (int) ( $message->id ?? 0 );
+			$status   = (string) ( $message->status ?? '' );
+			$is_new   = 'خوانده نشده' === $status;
+			$in_scope = PAS_Dashboard_Adapter_Portal::can_view_phone( (string) ( $message->mobile ?? '' ) );
+
+			$html .= '<article class="pas-message-card' . ( $is_new ? ' is-unread' : '' ) . '">';
+			$html .= '<header class="pas-message-head">';
+			$html .= '<strong dir="ltr">' . esc_html( PAS_Dashboard_Core_Bridge::mask_mobile( (string) ( $message->mobile ?? '' ) ) ) . '</strong>';
+			$html .= '<span class="pas-badge ' . ( $is_new ? 'pas-badge-warn' : 'pas-badge-good' ) . '">' . esc_html( $status !== '' ? $status : '—' ) . '</span>';
+			$html .= '<span class="pas-muted">' . esc_html( PAS_Dashboard_Core_Bridge::jalali_datetime( (string) ( $message->created_at ?? '' ) ) ) . '</span>';
+			$html .= '</header>';
+			$html .= '<div class="pas-message-body">' . nl2br( esc_html( (string) ( $message->message_text ?? '' ) ) ) . '</div>';
+
+			if ( ! empty( $message->admin_reply ) ) {
+				$html .= '<div class="pas-message-reply"><strong>' . esc_html__( 'پاسخ فعلی:', 'peyvand-amn-dashboard' ) . '</strong> ' . nl2br( esc_html( (string) $message->admin_reply ) ) . '</div>';
+			}
+
+			if ( ! $in_scope ) {
+				$html .= '<p class="pas-muted">' . esc_html__( 'خارج از دامنهٔ شما — پاسخ فقط برای مراجعان پرونده‌های شما ثبت می‌شود.', 'peyvand-amn-dashboard' ) . '</p>';
+			} else {
+				$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="pas-message-form">';
+				$html .= PAS_Dashboard_Actions::fields( 'message.reply', $this->url() );
+				$html .= '<input type="hidden" name="message_id" value="' . esc_attr( (string) $msg_id ) . '" />';
+				$html .= '<label class="screen-reader-text" for="pas-reply-' . esc_attr( (string) $msg_id ) . '">' . esc_html__( 'متن پاسخ', 'peyvand-amn-dashboard' ) . '</label>';
+				$html .= '<textarea class="pas-textarea" id="pas-reply-' . esc_attr( (string) $msg_id ) . '" name="reply_text" rows="2" required>' . esc_textarea( (string) ( $message->admin_reply ?? '' ) ) . '</textarea>';
+				$html .= '<button class="pas-btn pas-btn-primary pas-btn-sm" type="submit">' . esc_html__( 'ثبت پاسخ', 'peyvand-amn-dashboard' ) . '</button>';
+				$html .= '</form>';
+			}
+			$html .= '</article>';
+		}
+
+		if ( count( $messages ) > 50 ) {
+			$html .= '<p class="pas-muted">' . esc_html__( 'فقط ۵۰ پیام آخر نمایش داده شده است.', 'peyvand-amn-dashboard' ) . '</p>';
+		}
+
+		$html .= $this->card_close();
 
 		return $html;
 	}

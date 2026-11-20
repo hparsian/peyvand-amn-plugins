@@ -234,6 +234,152 @@ class Psy_Quiz_Invitation_Manager {
     }
 
     /**
+     * قرارداد داشبورد یکپارچه: فهرست دعوت‌نامه‌ها بدون افشای توکن.
+     * فقط شناسه‌های لازم برای نمایش و اقدام (ابطال/ارسال دوباره) برمی‌گردد.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function dashboard_list( int $limit = 200, string $status = '' ): array {
+        global $wpdb;
+
+        $limit  = max( 1, min( 500, $limit ) );
+        $status = sanitize_key( $status );
+        $where  = '';
+        $args   = array();
+
+        if ( in_array( $status, array( 'unused', 'completed', 'revoked', 'processing' ), true ) ) {
+            $where  = 'WHERE status = %s';
+            $args[] = $status;
+        }
+
+        $sql = "SELECT id, quiz_id, client_name, client_phone, client_email, status,
+                       attempt_id, created_at, started_at, expires_at
+                FROM {$wpdb->prefix}psy_invitations
+                $where
+                ORDER BY id DESC LIMIT %d";
+        $args[] = $limit;
+
+        $rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ) );
+        $out  = array();
+
+        foreach ( (array) $rows as $row ) {
+            $test = \PsychAssessments\Core\Registry::get( (string) $row->quiz_id );
+            $out[] = array(
+                'id'           => (int) $row->id,
+                'quiz_id'      => (string) $row->quiz_id,
+                'quiz_name'    => $test ? (string) $test->get_name() : (string) $row->quiz_id,
+                'client_name'  => (string) $row->client_name,
+                'client_phone' => (string) $row->client_phone,
+                'client_email' => (string) $row->client_email,
+                'status'       => (string) $row->status,
+                'attempt_id'   => (int) ( $row->attempt_id ?? 0 ),
+                'created_at'   => (string) $row->created_at,
+                'expires_at'   => (string) ( $row->expires_at ?? '' ),
+                'is_expired'   => $row->status === 'unused'
+                    && ! empty( $row->expires_at )
+                    && $row->expires_at <= gmdate( 'Y-m-d H:i:s' ),
+            );
+        }
+
+        return $out;
+    }
+
+    /** یک دعوت‌نامه برای بررسی دامنه (بدون توکن). */
+    public static function dashboard_get( int $id ): ?object {
+        global $wpdb;
+
+        if ( $id <= 0 ) {
+            return null;
+        }
+
+        $row = $wpdb->get_row( $wpdb->prepare(
+            "SELECT id, quiz_id, client_name, client_phone, client_email, status,
+                    attempt_id, created_at, started_at, expires_at
+             FROM {$wpdb->prefix}psy_invitations WHERE id = %d",
+            $id
+        ) );
+
+        return $row ?: null;
+    }
+
+    /** ابطال دعوت‌نامه‌ی استفاده‌نشده — داده حذف نمی‌شود. */
+    public static function dashboard_revoke( int $id ): bool {
+        global $wpdb;
+
+        if ( $id <= 0 ) {
+            return false;
+        }
+
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'psy_invitations',
+            array( 'status' => 'revoked' ),
+            array( 'id' => $id, 'status' => 'unused' ),
+            array( '%s' ),
+            array( '%d', '%s' )
+        );
+
+        return (int) $updated > 0;
+    }
+
+    /**
+     * گزارش یک تلاش برای نمایش داخل داشبورد — فقط اگر همان شماره‌ی
+     * دعوت‌نامه با پرونده/مراجع تطبیق داشته باشد. HTML خروجی همان
+     * render_report مالک آزمون است.
+     *
+     * @return array{ok:bool,html:string,error:string,client_name:string,quiz_name:string,completed_at:string}
+     */
+    public static function dashboard_report( int $attempt_id, string $phone ): array {
+        global $wpdb;
+
+        $empty = array( 'ok' => false, 'html' => '', 'error' => '', 'client_name' => '', 'quiz_name' => '', 'completed_at' => '' );
+        $local = self::to_local_format( $phone );
+
+        if ( $attempt_id <= 0 || $local === '' ) {
+            $empty['error'] = 'شناسهٔ گزارش یا شمارهٔ مراجع نامعتبر است.';
+            return $empty;
+        }
+
+        $attempt = $wpdb->get_row( $wpdb->prepare(
+            "SELECT a.*, i.client_name, i.client_name AS patient_name,
+                    i.client_phone, i.client_phone AS patient_phone, i.access_token
+             FROM {$wpdb->prefix}psy_attempts a
+             INNER JOIN {$wpdb->prefix}psy_invitations i ON a.invitation_id = i.id
+             WHERE a.id = %d AND i.client_phone = %s",
+            $attempt_id,
+            $local
+        ) );
+
+        if ( ! $attempt ) {
+            $empty['error'] = 'گزارشی برای این مراجع یافت نشد.';
+            return $empty;
+        }
+
+        $test = \PsychAssessments\Core\Registry::get( (string) $attempt->quiz_id );
+        if ( ! $test ) {
+            $empty['error'] = 'آزمون این گزارش در دسترس نیست.';
+            return $empty;
+        }
+
+        $data = function_exists( 'pa_decrypt_json' )
+            ? pa_decrypt_json( (string) $attempt->result_data )
+            : json_decode( (string) $attempt->result_data, true );
+
+        if ( ! is_array( $data ) ) {
+            $empty['error'] = 'دادهٔ نتیجه قابل خواندن نیست (کلید رمزنگاری را بررسی کنید).';
+            return $empty;
+        }
+
+        return array(
+            'ok'           => true,
+            'html'         => (string) $test->render_report( $data, $attempt ),
+            'error'        => '',
+            'client_name'  => (string) $attempt->client_name,
+            'quiz_name'    => (string) $test->get_name(),
+            'completed_at' => (string) $attempt->completed_at,
+        );
+    }
+
+    /**
      * رزرو atomic توکن — جلوگیری از race condition
      * با یک UPDATE شرطی، توکن را از 'unused' به 'processing' تغییر می‌دهد
      * اگر دو request همزمان بیایند، فقط یکی موفق می‌شود

@@ -52,6 +52,21 @@ final class Plugin
         return self::$instance;
     }
 
+    /**
+     * دسترسی‌دهندهٔ عمومی برای داشبورد یکپارچه — بدون دسترسی مستقیم به
+     * جدول‌ها و بدون افشای سایر سرویس‌های داخلی کانتینر.
+     */
+    public function booking(): Booking
+    {
+        return $this->booking;
+    }
+
+    /** دسترسی‌دهندهٔ عمومی پیام‌ها برای داشبورد یکپارچه. */
+    public function messages(): Messages
+    {
+        return $this->messages;
+    }
+
     public static function activate(): void
     {
         Installer::create_or_upgrade_tables();

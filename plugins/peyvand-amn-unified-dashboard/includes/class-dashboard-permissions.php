@@ -7,9 +7,12 @@ defined( 'ABSPATH' ) || exit;
 
 final class PAS_Dashboard_Permissions {
 
-	const ACCESS_DASHBOARD = 'dashboard';
-	const ACCESS_CLINICAL  = 'clinical';
-	const ACCESS_MANAGE    = 'manage';
+	const ACCESS_DASHBOARD    = 'dashboard';
+	const ACCESS_CLINICAL     = 'clinical';
+	const ACCESS_MANAGE       = 'manage';
+	const ACCESS_APPOINTMENTS = 'appointments';
+	const ACCESS_ASSESSMENTS  = 'assessments';
+	const ACCESS_MESSAGES     = 'messages';
 
 	/** تنظیمات پیش‌فرض داشبورد — هیچ تنظیم افزونه‌ی دیگری را بازنویسی نمی‌کند. */
 	public static function default_settings() {
@@ -75,13 +78,13 @@ final class PAS_Dashboard_Permissions {
 			),
 			'assessments'   => array(
 				'label'   => __( 'آزمون‌ها', 'peyvand-amn-dashboard' ),
-				'access'  => self::ACCESS_DASHBOARD,
+				'access'  => self::ACCESS_ASSESSMENTS,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Assessments',
 			),
 			'appointments'  => array(
 				'label'   => __( 'نوبت‌ها', 'peyvand-amn-dashboard' ),
-				'access'  => self::ACCESS_DASHBOARD,
+				'access'  => self::ACCESS_APPOINTMENTS,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Appointments',
 			),
@@ -93,7 +96,7 @@ final class PAS_Dashboard_Permissions {
 			),
 			'communications' => array(
 				'label'   => __( 'ارتباطات', 'peyvand-amn-dashboard' ),
-				'access'  => self::ACCESS_DASHBOARD,
+				'access'  => self::ACCESS_MESSAGES,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Communications',
 			),
@@ -130,6 +133,21 @@ final class PAS_Dashboard_Permissions {
 				return PAS_Dashboard_Security::can_view_clinical();
 			case self::ACCESS_MANAGE:
 				return PAS_Dashboard_Security::can_manage();
+			case self::ACCESS_APPOINTMENTS:
+				return is_user_logged_in() && (
+					current_user_can( 'manage_options' )
+					|| current_user_can( defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) ? PAS_DASHBOARD_CAP_APPOINTMENTS : 'manage_options' )
+				);
+			case self::ACCESS_ASSESSMENTS:
+				return is_user_logged_in() && (
+					current_user_can( 'manage_options' )
+					|| current_user_can( defined( 'PAS_DASHBOARD_CAP_ASSESSMENTS' ) ? PAS_DASHBOARD_CAP_ASSESSMENTS : 'manage_options' )
+				);
+			case self::ACCESS_MESSAGES:
+				return is_user_logged_in() && (
+					current_user_can( 'manage_options' )
+					|| current_user_can( defined( 'PAS_DASHBOARD_CAP_MESSAGES' ) ? PAS_DASHBOARD_CAP_MESSAGES : 'manage_options' )
+				);
 			case self::ACCESS_DASHBOARD:
 			default:
 				return PAS_Dashboard_Security::can_access_dashboard();
@@ -188,6 +206,16 @@ final class PAS_Dashboard_Permissions {
 			$admin->add_cap( PAS_DASHBOARD_CAP );
 		}
 
+		if ( $admin && defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) && ! $admin->has_cap( PAS_DASHBOARD_CAP_APPOINTMENTS ) ) {
+			$admin->add_cap( PAS_DASHBOARD_CAP_APPOINTMENTS );
+		}
+
+		foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES' ) as $const ) {
+			if ( $admin && defined( $const ) && ! $admin->has_cap( constant( $const ) ) ) {
+				$admin->add_cap( constant( $const ) );
+			}
+		}
+
 		// نقش‌هایی که از قبل دسترسی پرونده‌های بالینی دارند، بدون گرفتن
 		// manage_options، باید بتوانند وارد داشبورد شوند.
 		if ( ! defined( 'PAS_CF_CAP' ) || ! function_exists( 'wp_roles' ) ) {
@@ -203,6 +231,16 @@ final class PAS_Dashboard_Permissions {
 			$role = get_role( $role_name );
 			if ( $role && $role->has_cap( PAS_CF_CAP ) && ! $role->has_cap( PAS_DASHBOARD_CAP ) ) {
 				$role->add_cap( PAS_DASHBOARD_CAP );
+			}
+
+			if ( $role && $role->has_cap( PAS_CF_CAP ) && defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) && ! $role->has_cap( PAS_DASHBOARD_CAP_APPOINTMENTS ) ) {
+				$role->add_cap( PAS_DASHBOARD_CAP_APPOINTMENTS );
+			}
+
+			foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES' ) as $const ) {
+				if ( $role && $role->has_cap( PAS_CF_CAP ) && defined( $const ) && ! $role->has_cap( constant( $const ) ) ) {
+					$role->add_cap( constant( $const ) );
+				}
 			}
 		}
 	}
