@@ -193,6 +193,60 @@ final class Pas_Melipayamak
         return hash_equals(self::LEAKED_PASSWORD_SHA256, hash('sha256', $password));
     }
 
+    /**
+     * تنظیمات غیرحساس اتصال برای فرم داشبورد یکپارچه (1.1.10).
+     *
+     * فقط نام‌کاربری و «رمز تنظیم شده/نشده» برمی‌گردد؛ رمز هرگز از این متد
+     * بیرون نمی‌آید.
+     *
+     * @return array{username:string,has_password:bool,source:string}
+     */
+    public static function dashboard_settings(): array
+    {
+        return [
+            'username'     => (string) get_option('pas_sms_username', ''),
+            'has_password' => (string) get_option('pas_sms_password', '') !== '',
+            'source'       => self::credentials_source(),
+        ];
+    }
+
+    /**
+     * ذخیرهٔ اعتبارنامهٔ ملی پیامک از داشبورد یکپارچه (1.1.10).
+     *
+     * کپابیلیتی، nonce، ممیزی و ریدایرکت کار Action Bus داشبورد است. فیلد رمز
+     * تهی یعنی «رمز فعلی را حفظ کن» (همان قاعده‌ی صفحهٔ خود پل پیامک). اگر
+     * اعتبارنامه از ثابت‌های wp-config.php بیاید، ثابت‌ها اولویت دارند و ذخیرهٔ
+     * آپشن بی‌اثر است — پس صریحاً رد می‌شود تا کاربر گمراه نشود.
+     *
+     * @param array<string,mixed> $input
+     * @return array{ok:bool,message:string}
+     */
+    public static function dashboard_save_settings(array $input): array
+    {
+        if (self::credentials_source() === 'constants') {
+            return [
+                'ok'      => false,
+                'message' => 'اعتبارنامهٔ پیامک از ثابت‌های PAS_SMS_USERNAME/PAS_SMS_PASSWORD در wp-config.php خوانده می‌شود؛ تا وقتی آن‌ها تعریف شده‌اند، ذخیره از داشبورد اثری ندارد.',
+            ];
+        }
+
+        if (array_key_exists('username', $input)) {
+            update_option('pas_sms_username', sanitize_text_field((string) $input['username']));
+        }
+
+        $new_password = trim((string) ($input['password'] ?? ''));
+
+        if ($new_password !== '') {
+            if (class_exists('Pas_Core_Crypto') && Pas_Core_Crypto::is_configured()) {
+                $new_password = Pas_Core_Crypto::wrap_encrypted($new_password);
+            }
+
+            update_option('pas_sms_password', $new_password);
+        }
+
+        return ['ok' => true, 'message' => 'تنظیمات اتصال پیامک ذخیره شد.'];
+    }
+
     private static function normalize_mobile(string $mobile): string
     {
         if (class_exists('Pas_Core_Helpers')) {

@@ -333,6 +333,203 @@ final class PAS_Dashboard_Adapter_Ecosystem {
 		return defined( $constant ) ? (string) constant( $constant ) : '';
 	}
 
+	/** آدرس صفحهٔ یکپارچگی‌ها — مقصد POST/Redirect/GET. */
+	public static function module_url() {
+		return add_query_arg(
+			array(
+				'page'   => PAS_DASHBOARD_SLUG,
+				'module' => 'ecosystem',
+			),
+			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
+	 * تنظیمات غیرحساس اتصال سرویس‌های کانالی برای فرم داشبورد.
+	 *
+	 * مقادیر فقط از متد عمومی مالک (`dashboard_settings`) می‌آیند؛ رمز و کلید
+	 * فقط به‌صورت «تنظیم شده/نشده» گزارش می‌شوند.
+	 *
+	 * @return array{sms:array<string,mixed>,smtp:array<string,mixed>}
+	 */
+	public static function settings_model() {
+		return array(
+			'sms'  => self::sms_settings(),
+			'smtp' => self::smtp_settings(),
+		);
+	}
+
+	/** @return array<string,mixed> */
+	private static function sms_settings() {
+		$empty = array(
+			'available'    => false,
+			'username'     => '',
+			'has_password' => false,
+			'source'       => '',
+		);
+
+		if ( ! class_exists( 'Pas_Melipayamak' ) || ! method_exists( 'Pas_Melipayamak', 'dashboard_settings' ) ) {
+			return $empty;
+		}
+
+		try {
+			$data = \Pas_Melipayamak::dashboard_settings();
+		} catch ( Throwable $e ) {
+			return $empty;
+		}
+
+		return array(
+			'available'    => true,
+			'username'     => (string) ( $data['username'] ?? '' ),
+			'has_password' => ! empty( $data['has_password'] ),
+			'source'       => (string) ( $data['source'] ?? '' ),
+		);
+	}
+
+	/** @return array<string,mixed> */
+	private static function smtp_settings() {
+		$empty = array(
+			'available'     => false,
+			'send_method'   => 'smtp',
+			'host'          => '',
+			'port'          => '587',
+			'encryption'    => 'tls',
+			'username'      => '',
+			'from_email'    => '',
+			'from_name'     => '',
+			'has_password'  => false,
+			'has_brevo_key' => false,
+		);
+
+		if ( ! PAS_Dashboard_Adapter_Smtp::available() || ! method_exists( 'ZSM_Smtp_Mailer', 'dashboard_settings' ) ) {
+			return $empty;
+		}
+
+		try {
+			$data = \ZSM_Smtp_Mailer::dashboard_settings();
+		} catch ( Throwable $e ) {
+			return $empty;
+		}
+
+		return array(
+			'available'     => true,
+			'send_method'   => 'brevo' === (string) ( $data['send_method'] ?? 'smtp' ) ? 'brevo' : 'smtp',
+			'host'          => (string) ( $data['host'] ?? '' ),
+			'port'          => (string) ( $data['port'] ?? '587' ),
+			'encryption'    => 'ssl' === (string) ( $data['encryption'] ?? 'tls' ) ? 'ssl' : 'tls',
+			'username'      => (string) ( $data['username'] ?? '' ),
+			'from_email'    => (string) ( $data['from_email'] ?? '' ),
+			'from_name'     => (string) ( $data['from_name'] ?? '' ),
+			'has_password'  => ! empty( $data['has_password'] ),
+			'has_brevo_key' => ! empty( $data['has_brevo_key'] ),
+		);
+	}
+
+	/**
+	 * ذخیرهٔ تنظیمات اتصال از Action Bus داشبورد.
+	 *
+	 * کپابیلیتی (`manage_options`)، nonce، ممیزی و redirect در لایهٔ عملیات
+	 * انجام می‌شود؛ این‌جا فقط مقادیر به متد عمومی مالک سپرده می‌شوند. فیلد تهی
+	 * یعنی «دست نزن»، پس ذخیره‌کردن فرم هرگز رمز یا کلید فعلی را پاک نمی‌کند.
+	 *
+	 * @return array{ok:bool,message:string,id:int,redirect:string}
+	 */
+	public static function save_settings( array $post ) {
+		$saved  = array();
+		$errors = array();
+
+		if ( PAS_Dashboard_Adapter_Smtp::available() && method_exists( 'ZSM_Smtp_Mailer', 'dashboard_save_settings' ) ) {
+			try {
+				$result = \ZSM_Smtp_Mailer::dashboard_save_settings(
+					array(
+						'send_method'   => self::posted( $post, 'smtp_send_method' ),
+						'host'          => self::posted( $post, 'smtp_host' ),
+						'port'          => self::posted( $post, 'smtp_port' ),
+						'encryption'    => self::posted( $post, 'smtp_encryption' ),
+						'username'      => self::posted( $post, 'smtp_username' ),
+						'password'      => self::posted( $post, 'smtp_password' ),
+						'from_email'    => self::posted( $post, 'smtp_from_email' ),
+						'from_name'     => self::posted( $post, 'smtp_from_name' ),
+						'brevo_api_key' => self::posted( $post, 'smtp_brevo_api_key' ),
+					)
+				);
+			} catch ( Throwable $e ) {
+				$result = new WP_Error( 'pas_dashboard_smtp_save', __( 'ذخیرهٔ تنظیمات ایمیل ناموفق بود.', 'peyvand-amn-dashboard' ) );
+			}
+
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result->get_error_message();
+			} elseif ( is_array( $result ) && ! empty( $result['ok'] ) ) {
+				$saved[] = __( 'ایمیل', 'peyvand-amn-dashboard' );
+			} else {
+				$errors[] = is_array( $result ) && ! empty( $result['message'] )
+					? (string) $result['message']
+					: __( 'ذخیرهٔ تنظیمات ایمیل ناموفق بود.', 'peyvand-amn-dashboard' );
+			}
+		}
+
+		if ( class_exists( 'Pas_Melipayamak' ) && method_exists( 'Pas_Melipayamak', 'dashboard_save_settings' ) ) {
+			try {
+				$result = \Pas_Melipayamak::dashboard_save_settings(
+					array(
+						'username' => self::posted( $post, 'sms_username' ),
+						'password' => self::posted( $post, 'sms_password' ),
+					)
+				);
+			} catch ( Throwable $e ) {
+				$result = new WP_Error( 'pas_dashboard_sms_save', __( 'ذخیرهٔ تنظیمات پیامک ناموفق بود.', 'peyvand-amn-dashboard' ) );
+			}
+
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result->get_error_message();
+			} elseif ( is_array( $result ) && ! empty( $result['ok'] ) ) {
+				$saved[] = __( 'پیامک', 'peyvand-amn-dashboard' );
+			} else {
+				$errors[] = is_array( $result ) && ! empty( $result['message'] )
+					? (string) $result['message']
+					: __( 'ذخیرهٔ تنظیمات پیامک ناموفق بود.', 'peyvand-amn-dashboard' );
+			}
+		}
+
+		if ( empty( $saved ) && empty( $errors ) ) {
+			return array(
+				'ok'       => false,
+				'message'  => __( 'هیچ‌کدام از افزونه‌های پیامک و ایمیل در دسترس نیستند؛ چیزی ذخیره نشد.', 'peyvand-amn-dashboard' ),
+				'id'       => 0,
+				'redirect' => self::module_url(),
+			);
+		}
+
+		if ( ! empty( $errors ) ) {
+			return array(
+				'ok'       => false,
+				'message'  => implode( ' ', $errors ),
+				'id'       => 0,
+				'redirect' => self::module_url(),
+			);
+		}
+
+		return array(
+			'ok'       => true,
+			'message'  => sprintf(
+				/* translators: %s: saved services */
+				__( 'تنظیمات اتصال %s ذخیره شد.', 'peyvand-amn-dashboard' ),
+				implode( ' و ', $saved )
+			),
+			'id'       => 0,
+			'redirect' => self::module_url(),
+		);
+	}
+
+	/** مقدار POST به‌صورت رشته؛ نبودِ فیلد یعنی «دست نزن» (null). */
+	private static function posted( array $post, $key ) {
+		if ( ! array_key_exists( $key, $post ) ) {
+			return null;
+		}
+
+		return is_scalar( $post[ $key ] ) ? trim( (string) $post[ $key ] ) : '';
+	}
+
 	public static function status_label( $status ) {
 		$labels = array(
 			'ok'     => __( 'متصل', 'peyvand-amn-dashboard' ),

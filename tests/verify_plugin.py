@@ -550,6 +550,49 @@ def main():
     else:
         fail("ecosystem", "loader does not require the new files")
 
+    # 18b. فرم ذخیرهٔ تنظیمات اتصال: nonce + manage_options + ممیزی + POST/Redirect/GET.
+    eco_save_at = eco.find("function save_settings(")
+    eco_save = eco[eco_save_at : eco_save_at + 4000] if eco_save_at >= 0 else ""
+    if "dashboard_save_settings" in eco_save and "is_wp_error" in eco_save and "posted(" in eco_save:
+        ok("ecosystem: settings save delegates to owner contracts")
+    else:
+        fail("ecosystem", "settings save does not call the owner dashboard_save_settings()")
+
+    action_at = actions_src.find("'ecosystem.save'")
+    action_block = actions_src[action_at : action_at + 700] if action_at >= 0 else ""
+    if (
+        "'cap'     => 'manage_options'" in action_block
+        and "'nonce'   => 'ecosystem_save'" in action_block
+        and "'audit'   => 'ecosystem.save'" in action_block
+        and "PAS_Dashboard_Adapter_Ecosystem', 'save_settings'" in action_block
+    ):
+        ok("ecosystem: save action gated by manage_options, nonce and audit")
+    else:
+        fail("ecosystem", "save action is not nonce + manage_options + audited")
+
+    eco_module = open(os.path.join(PLUGIN, "includes/modules/ecosystem-module.php"), encoding="utf-8").read()
+    if (
+        "PAS_Dashboard_Actions::fields( 'ecosystem.save'" in eco_module
+        and "can_manage()" in eco_module
+        and "type=\"password\"" in eco_module
+        and "admin-post.php" in eco_module
+    ):
+        ok("ecosystem: settings form is POST, admin-only and never prints stored secrets")
+    else:
+        fail("ecosystem", "settings form is not admin-only POST or echoes a secret value")
+
+    smtp_owner_src = open(os.path.join(ROOT, "plugins", "pivand-amn-smtp-mailer", "pivand-amn-smtp-mailer.php"), encoding="utf-8").read()
+    sms_owner_src = open(os.path.join(ROOT, "plugins", "pivand-amn-sms-bridge", "includes", "class-pas-melipayamak.php"), encoding="utf-8").read()
+    if "function dashboard_save_settings" in smtp_owner_src and "function dashboard_settings(" in smtp_owner_src:
+        ok("smtp-mailer: settings contracts published")
+    else:
+        fail("smtp-mailer", "missing dashboard_settings()/dashboard_save_settings()")
+
+    if "function dashboard_save_settings" in sms_owner_src and "function dashboard_settings(" in sms_owner_src:
+        ok("sms-bridge: settings contracts published")
+    else:
+        fail("sms-bridge", "missing dashboard_settings()/dashboard_save_settings()")
+
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")
     reply_body = portal[at : at + 2000] if at >= 0 else ""

@@ -2,9 +2,11 @@
 /**
  * ماژول یکپارچگی‌ها — وضعیت اتصال سرویس‌های اکوسیستم و قراردادهای کلیدی.
  *
- * فقط‌خواندنی است: هیچ تنظیمی ذخیره نمی‌شود، هیچ درخواستی به سرویس بیرونی
- * زده نمی‌شود و هیچ کلید، رمز یا توکنی نمایش داده نمی‌شود. وضعیت هر سرویس از
- * شناسایی کلاس/تابع عمومی خودش و هدر نسخهٔ افزونهٔ نصب‌شده می‌آید.
+ * وضعیت هر سرویس از شناسایی کلاس/تابع عمومی خودش و هدر نسخهٔ افزونهٔ نصب‌شده
+ * می‌آید و هیچ درخواستی به سرویس بیرونی زده نمی‌شود. تنها نوشتن این صفحه
+ * فرم «تنظیمات اتصال» است که از Action Bus، با nonce و کپابیلیتی
+ * manage_options و ممیزی، فقط به متد عمومی افزونهٔ مالک سپرده می‌شود؛ هیچ
+ * کلید یا رمزی نمایش داده نمی‌شود.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -35,6 +37,10 @@ final class PAS_Dashboard_Module_Ecosystem extends PAS_Dashboard_Module {
 			PAS_DASHBOARD_VERSION
 		) ) . '</p>';
 		$html .= $this->card_close();
+
+		if ( PAS_Dashboard_Security::can_manage() ) {
+			$html .= $this->render_settings_form();
+		}
 
 		foreach ( $groups as $group_id => $group_label ) {
 			$rows = array_values( array_filter( $services, static function ( $service ) use ( $group_id ) {
@@ -92,6 +98,93 @@ final class PAS_Dashboard_Module_Ecosystem extends PAS_Dashboard_Module {
 		$html .= $this->card_close();
 
 		$html .= $this->notice( 'info', __( 'این صفحه هیچ کلید، رمز، توکن یا متن پیامی را نمایش نمی‌دهد و هیچ درخواستی به سرویس‌های بیرونی نمی‌فرستد. «متصل» یعنی افزونهٔ مالک و قرارداد عمومی آن در دسترس است، نه اثبات کارکرد وب‌سرویس؛ وضعیت واقعی هر ارسال در لاگ همان افزونه دیده می‌شود.', 'peyvand-amn-dashboard' ) );
+
+		return $html;
+	}
+
+	/**
+	 * فرم تنظیمات اتصال کانال‌ها — فقط برای مدیر سایت.
+	 *
+	 * همهٔ مقادیر از متد عمومی مالک پیش‌پر می‌شوند؛ فیلد رمز/کلید همیشه خالی
+	 * است تا مقدار ذخیره‌شده هرگز در HTML نیاید. خالی‌ماندن آن‌ها یعنی «حفظ
+	 * مقدار فعلی».
+	 */
+	private function render_settings_form() {
+		$model = PAS_Dashboard_Adapter_Ecosystem::settings_model();
+		$sms   = $model['sms'];
+		$smtp  = $model['smtp'];
+
+		$html  = $this->card_open( __( 'تنظیمات اتصال سرویس‌ها', 'peyvand-amn-dashboard' ) );
+		$html .= '<p class="pas-muted">' . esc_html__( 'فقط مدیر سایت این مقادیر را تغییر می‌دهد. مقادیر حساس هیچ‌گاه نمایش داده نمی‌شوند؛ اگر فیلد رمز یا کلید را خالی بگذارید، مقدار فعلی دست‌نخورده می‌ماند.', 'peyvand-amn-dashboard' ) . '</p>';
+
+		$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		$html .= PAS_Dashboard_Actions::fields( 'ecosystem.save', $this->url() );
+
+		$html .= '<h3 class="pas-card-title">' . esc_html__( 'پل پیامک (ملی پیامک)', 'peyvand-amn-dashboard' ) . '</h3>';
+
+		if ( empty( $sms['available'] ) ) {
+			$html .= $this->notice( 'warning', __( 'افزونهٔ پل پیامک در دسترس نیست یا نسخهٔ آن قرارداد داشبورد را ندارد (۱.۱.۱۰+).', 'peyvand-amn-dashboard' ) );
+		} else {
+			if ( 'constants' === $sms['source'] ) {
+				$html .= $this->notice( 'warning', __( 'اعتبارنامهٔ پیامک از ثابت‌های wp-config.php خوانده می‌شود؛ تا وقتی آن‌ها تعریف شده‌اند، ذخیره از این فرم اثری ندارد.', 'peyvand-amn-dashboard' ) );
+			}
+
+			$html .= $this->text_row( 'sms_username', __( 'نام‌کاربری ملی پیامک', 'peyvand-amn-dashboard' ), (string) $sms['username'], 'text' );
+			$html .= $this->password_row( 'sms_password', __( 'رمز ملی پیامک', 'peyvand-amn-dashboard' ), ! empty( $sms['has_password'] ), empty( $sms['has_password'] ) ? __( 'هنوز رمزی ذخیره نشده است.', 'peyvand-amn-dashboard' ) : __( 'رمز ذخیره شده است؛ برای تغییر، مقدار جدید وارد کنید.', 'peyvand-amn-dashboard' ) );
+		}
+
+		$html .= '<h3 class="pas-card-title">' . esc_html__( 'ارسال ایمیل (SMTP / Brevo)', 'peyvand-amn-dashboard' ) . '</h3>';
+
+		if ( empty( $smtp['available'] ) ) {
+			$html .= $this->notice( 'warning', __( 'افزونهٔ ارسال ایمیل در دسترس نیست یا نسخهٔ آن قرارداد داشبورد را ندارد (۱.۵.۷+).', 'peyvand-amn-dashboard' ) );
+		} else {
+			$html .= '<div class="pas-form-row"><label for="pas-smtp-method">' . esc_html__( 'روش ارسال', 'peyvand-amn-dashboard' ) . '</label>';
+			$html .= '<select class="pas-input" id="pas-smtp-method" name="smtp_send_method">';
+			$html .= '<option value="smtp"' . selected( $smtp['send_method'], 'smtp', false ) . '>' . esc_html__( 'SMTP (پورت ۵۸۷/۴۶۵)', 'peyvand-amn-dashboard' ) . '</option>';
+			$html .= '<option value="brevo"' . selected( $smtp['send_method'], 'brevo', false ) . '>' . esc_html__( 'Brevo API (فقط HTTPS)', 'peyvand-amn-dashboard' ) . '</option>';
+			$html .= '</select></div>';
+
+			$html .= $this->text_row( 'smtp_host', __( 'میزبان SMTP', 'peyvand-amn-dashboard' ), (string) $smtp['host'], 'text', 'smtp.example.com' );
+			$html .= $this->text_row( 'smtp_port', __( 'پورت SMTP', 'peyvand-amn-dashboard' ), (string) $smtp['port'], 'text', '587' );
+
+			$html .= '<div class="pas-form-row"><label for="pas-smtp-encryption">' . esc_html__( 'رمزنگاری', 'peyvand-amn-dashboard' ) . '</label>';
+			$html .= '<select class="pas-input" id="pas-smtp-encryption" name="smtp_encryption">';
+			$html .= '<option value="tls"' . selected( $smtp['encryption'], 'tls', false ) . '>TLS</option>';
+			$html .= '<option value="ssl"' . selected( $smtp['encryption'], 'ssl', false ) . '>SSL</option>';
+			$html .= '</select></div>';
+
+			$html .= $this->text_row( 'smtp_username', __( 'نام‌کاربری SMTP', 'peyvand-amn-dashboard' ), (string) $smtp['username'], 'text' );
+			$html .= $this->password_row( 'smtp_password', __( 'رمز SMTP / App Password', 'peyvand-amn-dashboard' ), ! empty( $smtp['has_password'] ), empty( $smtp['has_password'] ) ? __( 'هنوز رمزی ذخیره نشده است.', 'peyvand-amn-dashboard' ) : __( 'رمز ذخیره شده است؛ برای تغییر، مقدار جدید وارد کنید.', 'peyvand-amn-dashboard' ) );
+			$html .= $this->text_row( 'smtp_from_email', __( 'آدرس فرستنده', 'peyvand-amn-dashboard' ), (string) $smtp['from_email'], 'email', 'you@example.com' );
+			$html .= $this->text_row( 'smtp_from_name', __( 'نام فرستنده', 'peyvand-amn-dashboard' ), (string) $smtp['from_name'], 'text', __( 'پیوند امن', 'peyvand-amn-dashboard' ) );
+			$html .= $this->password_row( 'smtp_brevo_api_key', __( 'کلید API بریو (Brevo)', 'peyvand-amn-dashboard' ), ! empty( $smtp['has_brevo_key'] ), empty( $smtp['has_brevo_key'] ) ? __( 'فقط برای روش Brevo لازم است.', 'peyvand-amn-dashboard' ) : __( 'کلید ذخیره شده است؛ برای تغییر، مقدار جدید وارد کنید.', 'peyvand-amn-dashboard' ) );
+		}
+
+		if ( ! empty( $sms['available'] ) || ! empty( $smtp['available'] ) ) {
+			$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'ذخیرهٔ تنظیمات اتصال', 'peyvand-amn-dashboard' ) . '</button>';
+		}
+
+		$html .= '</form>';
+		$html .= $this->card_close();
+
+		return $html;
+	}
+
+	/** یک ردیف ورودی متنی با برچسب و توضیح اختیاری. */
+	private function text_row( $name, $label, $value, $type = 'text', $placeholder = '' ) {
+		$html  = '<div class="pas-form-row"><label for="pas-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
+		$html .= '<input class="pas-input" type="' . esc_attr( $type ) . '" id="pas-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '" dir="ltr"';
+		$html .= $placeholder !== '' ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
+		$html .= ' /></div>';
+
+		return $html;
+	}
+
+	/** ردیف رمز/کلید — مقدار هرگز در HTML نوشته نمی‌شود. */
+	private function password_row( $name, $label, $has_value, $hint ) {
+		$html  = '<div class="pas-form-row"><label for="pas-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
+		$html .= '<input class="pas-input" type="password" id="pas-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="" autocomplete="new-password" dir="ltr" placeholder="' . esc_attr( $has_value ? '••••••••' : '' ) . '" />';
+		$html .= '<p class="pas-muted">' . esc_html( $hint ) . '</p></div>';
 
 		return $html;
 	}

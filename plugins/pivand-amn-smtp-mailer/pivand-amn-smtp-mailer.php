@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — ارسال ایمیل SMTP
  * Description: تمام ایمیل‌های خروجی وردپرس (wp_mail) را به‌جای mail() پیش‌فرض هاست، از طریق SMTP واقعی یا Brevo API ارسال می‌کند تا در اسپم گیر نکنند.
- * Version: 1.5.6
+ * Version: 1.5.7
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZSM_VERSION', '1.5.6');
+define('ZSM_VERSION', '1.5.7');
 define('ZSM_DIR', plugin_dir_path(__FILE__));
 define('ZSM_URL', plugin_dir_url(__FILE__));
 
@@ -791,6 +791,122 @@ final class ZSM_Smtp_Mailer
             'configured'  => $configured,
             'queue_table' => ZSM_Mail_Queue::table_exists(),
         ];
+    }
+
+    /**
+     * تنظیمات غیرحساس اتصال برای فرم داشبورد یکپارچه (1.5.7).
+     *
+     * فقط مقادیر قابل‌نمایش برمی‌گردند؛ رمز و کلید API فقط به‌صورت
+     * «تنظیم شده / نشده» گزارش می‌شوند و هیچ مقدار حساسی از این متد بیرون نمی‌آید.
+     *
+     * @return array{send_method:string,host:string,port:string,encryption:string,username:string,from_email:string,from_name:string,has_password:bool,has_brevo_key:bool}
+     */
+    public static function dashboard_settings(): array
+    {
+        $raw   = self::get_raw_settings();
+        $plain = self::get_settings();
+
+        return [
+            'send_method'   => in_array($raw['send_method'] ?? 'smtp', ['smtp', 'brevo'], true) ? (string) $raw['send_method'] : 'smtp',
+            'host'          => (string) ($raw['host'] ?? ''),
+            'port'          => (string) ($raw['port'] ?? '587'),
+            'encryption'    => in_array($raw['encryption'] ?? 'tls', ['tls', 'ssl'], true) ? (string) $raw['encryption'] : 'tls',
+            'username'      => (string) ($raw['username'] ?? ''),
+            'from_email'    => (string) ($raw['from_email'] ?? ''),
+            'from_name'     => (string) ($raw['from_name'] ?? ''),
+            'has_password'  => (string) ($plain['password'] ?? '') !== '',
+            'has_brevo_key' => (string) ($plain['brevo_api_key'] ?? '') !== '',
+        ];
+    }
+
+    /**
+     * ذخیرهٔ تنظیمات اتصال از داشبورد یکپارچه (1.5.7).
+     *
+     * کپابیلیتی، nonce، ممیزی و ریدایرکت کار Action Bus داشبورد است؛ این متد
+     * خودش هیچ مجوزی صادر نمی‌کند. فیلد تهی یعنی «دست نزن»: رمز و کلید API
+     * هرگز با خالی‌شدن فیلد پاک نمی‌شوند و سایر کلیدهای تنظیمات حفظ می‌شوند.
+     *
+     * @param array<string,mixed> $input
+     * @return array{ok:bool,message:string}
+     */
+    public static function dashboard_save_settings(array $input): array
+    {
+        $settings = self::get_raw_settings();
+
+        if (array_key_exists('send_method', $input)) {
+            $method = sanitize_key((string) $input['send_method']);
+
+            if (!in_array($method, ['smtp', 'brevo'], true)) {
+                return ['ok' => false, 'message' => 'روش ارسال انتخاب‌شده معتبر نیست.'];
+            }
+
+            $settings['send_method'] = $method;
+        }
+
+        if (array_key_exists('host', $input)) {
+            $settings['host'] = sanitize_text_field((string) $input['host']);
+        }
+
+        if (array_key_exists('port', $input)) {
+            $port = preg_replace('/\D+/', '', (string) $input['port']);
+
+            if ($port === '') {
+                return ['ok' => false, 'message' => 'شمارهٔ پورت SMTP معتبر نیست.'];
+            }
+
+            $settings['port'] = $port;
+        }
+
+        if (array_key_exists('encryption', $input)) {
+            $encryption = sanitize_key((string) $input['encryption']);
+
+            if (!in_array($encryption, ['tls', 'ssl'], true)) {
+                return ['ok' => false, 'message' => 'نوع رمزنگاری SMTP معتبر نیست.'];
+            }
+
+            $settings['encryption'] = $encryption;
+        }
+
+        if (array_key_exists('username', $input)) {
+            $settings['username'] = sanitize_text_field((string) $input['username']);
+        }
+
+        if (array_key_exists('from_name', $input)) {
+            $settings['from_name'] = sanitize_text_field((string) $input['from_name']);
+        }
+
+        if (array_key_exists('from_email', $input)) {
+            $email = trim((string) $input['from_email']);
+
+            if ($email !== '') {
+                $email = sanitize_email($email);
+
+                if (!$email || !is_email($email)) {
+                    return ['ok' => false, 'message' => 'آدرس فرستندهٔ ایمیل معتبر نیست.'];
+                }
+            }
+
+            $settings['from_email'] = $email;
+        }
+
+        // رمز/کلید فقط وقتی جایگزین می‌شوند که مقدار جدیدی وارد شده باشد.
+        $password = trim((string) ($input['password'] ?? ''));
+        if ($password !== '') {
+            $settings['password'] = (class_exists('Pas_Core_Crypto') && \Pas_Core_Crypto::is_configured())
+                ? \Pas_Core_Crypto::wrap_encrypted($password)
+                : $password;
+        }
+
+        $brevo_key = trim((string) ($input['brevo_api_key'] ?? ''));
+        if ($brevo_key !== '') {
+            $settings['brevo_api_key'] = (class_exists('Pas_Core_Crypto') && \Pas_Core_Crypto::is_configured())
+                ? \Pas_Core_Crypto::wrap_encrypted($brevo_key)
+                : $brevo_key;
+        }
+
+        update_option('zsm_settings', $settings);
+
+        return ['ok' => true, 'message' => 'تنظیمات اتصال ایمیل ذخیره شد.'];
     }
 }
 

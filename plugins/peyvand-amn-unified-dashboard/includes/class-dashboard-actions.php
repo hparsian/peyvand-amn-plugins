@@ -346,6 +346,20 @@ final class PAS_Dashboard_Actions {
 		);
 
 		self::register(
+			'ecosystem.save',
+			array(
+				'label'   => __( 'ذخیرهٔ تنظیمات اتصال سرویس‌ها', 'peyvand-amn-dashboard' ),
+				// تغییر اعتبارنامهٔ پیامک و تنظیمات SMTP کار مدیر سایت است؛
+				// نه کپابیلیتی مدیریت اکوسیستم که فقط تست و صف را باز می‌کند.
+				'cap'     => 'manage_options',
+				'nonce'   => 'ecosystem_save',
+				'handler' => array( 'PAS_Dashboard_Adapter_Ecosystem', 'save_settings' ),
+				'audit'   => 'ecosystem.save',
+				'object'  => 'settings',
+			)
+		);
+
+		self::register(
 			'message.reply',
 			array(
 				'label'   => __( 'پاسخ به پیام مراجع', 'peyvand-amn-dashboard' ),
