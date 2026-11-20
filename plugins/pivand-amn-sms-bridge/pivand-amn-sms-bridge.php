@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — پل پیامک (ملی پیامک)
  * Description: تنها نقطه‌ی اتصال واقعی به وب‌سرویس ملی پیامک برای کل اکوسیستم پلاگین‌های زوج‌درمان. هیچ پلاگین دیگری (زوج‌درمان، آزمون‌ها، ...) مستقیماً به ملی پیامک وصل نمی‌شود؛ همه از طریق فیلتر مشترک pas_send_sms درخواست ارسال می‌دهند.
- * Version: 1.1.8
+ * Version: 1.1.9
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -34,11 +34,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAS_BRIDGE_VERSION', '1.1.8');
+define('PAS_BRIDGE_VERSION', '1.1.9');
 define('PAS_BRIDGE_DIR', plugin_dir_path(__FILE__));
 define('PAS_BRIDGE_URL', plugin_dir_url(__FILE__));
 
 require_once PAS_BRIDGE_DIR . 'includes/class-pas-melipayamak.php';
+require_once PAS_BRIDGE_DIR . 'includes/class-pas-patterns.php';
 require_once PAS_BRIDGE_DIR . 'includes/class-pas-log.php';
 require_once PAS_BRIDGE_DIR . 'includes/class-pas-admin.php';
 
@@ -57,6 +58,15 @@ add_action('plugins_loaded', function (): void {
      *   caller ها (OTP، رزرو نوبت، فالوآپ لید) بتوانند ساده if(!$sent) بزنند.
      */
     add_filter('pas_send_sms', ['Pas_Melipayamak', 'handle_send_sms_filter'], 10, 4);
+
+    /**
+     * قرارداد الگوها (1.1.9):
+     *   Pas_Patterns::dashboard_patterns() → الگوهای مجاز برای داشبورد
+     *   Pas_Patterns::send($slug, $mobile, $params) → bool
+     *   apply_filters('pas_sms_patterns', $patterns) → افزودن الگوی تازه
+     * bodyId همیشه از همین رجیستری خوانده می‌شود؛ مصرف‌کننده هرگز شناسه
+     * الگو را از ورودی کاربر به وب‌سرویس نمی‌فرستد. متن آزاد همچنان ممنوع است.
+     */
 });
 
 register_activation_hook(__FILE__, ['Pas_Log', 'maybe_create_table']);

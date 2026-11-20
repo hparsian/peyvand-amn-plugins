@@ -139,6 +139,7 @@ final class PAS_Dashboard_Actions {
 		$quiz_cap  = defined( 'PAS_DASHBOARD_CAP_ASSESSMENTS' ) ? PAS_DASHBOARD_CAP_ASSESSMENTS : 'manage_options';
 		$msg_cap   = defined( 'PAS_DASHBOARD_CAP_MESSAGES' ) ? PAS_DASHBOARD_CAP_MESSAGES : 'manage_options';
 		$flow_cap  = defined( 'PAS_DASHBOARD_CAP_FOLLOWUP' ) ? PAS_DASHBOARD_CAP_FOLLOWUP : 'manage_options';
+		$eco_cap   = defined( 'PAS_DASHBOARD_CAP_ECOSYSTEM' ) ? PAS_DASHBOARD_CAP_ECOSYSTEM : 'manage_options';
 
 		self::register(
 			'case.save',
@@ -305,6 +306,42 @@ final class PAS_Dashboard_Actions {
 				'handler' => array( 'PAS_Dashboard_Adapter_Followup', 'delete_survey' ),
 				'audit'   => 'survey.delete',
 				'object'  => 'survey',
+			)
+		);
+
+		self::register(
+			'sms.send',
+			array(
+				'label'   => __( 'ارسال پیامک الگومحور', 'peyvand-amn-dashboard' ),
+				'cap'     => $msg_cap,
+				'nonce'   => 'sms_send',
+				'handler' => array( 'PAS_Dashboard_Adapter_Sms', 'send' ),
+				'audit'   => 'sms.send',
+				'object'  => 'sms',
+			)
+		);
+
+		self::register(
+			'email.test',
+			array(
+				'label'   => __( 'تست ارسال ایمیل', 'peyvand-amn-dashboard' ),
+				'cap'     => $eco_cap,
+				'nonce'   => 'email_test',
+				'handler' => array( 'PAS_Dashboard_Adapter_Smtp', 'send_test' ),
+				'audit'   => 'email.test',
+				'object'  => 'email',
+			)
+		);
+
+		self::register(
+			'email.queue.retry',
+			array(
+				'label'   => __( 'تلاش دوبارهٔ ارسال ایمیل', 'peyvand-amn-dashboard' ),
+				'cap'     => $eco_cap,
+				'nonce'   => 'email_queue_retry',
+				'handler' => array( 'PAS_Dashboard_Adapter_Smtp', 'retry' ),
+				'audit'   => 'email.queue.retry',
+				'object'  => 'email',
 			)
 		);
 

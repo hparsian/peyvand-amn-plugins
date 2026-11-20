@@ -228,6 +228,11 @@ final class PAS_Dashboard_Permissions {
 			}
 		}
 
+		// یکپارچگی‌ها (تست ایمیل، صف SMTP) فقط برای مدیر است، نه درمانگر.
+		if ( $admin && defined( 'PAS_DASHBOARD_CAP_ECOSYSTEM' ) && ! $admin->has_cap( PAS_DASHBOARD_CAP_ECOSYSTEM ) ) {
+			$admin->add_cap( PAS_DASHBOARD_CAP_ECOSYSTEM );
+		}
+
 		// نقش‌هایی که از قبل دسترسی پرونده‌های بالینی دارند، بدون گرفتن
 		// manage_options، باید بتوانند وارد داشبورد شوند.
 		if ( ! defined( 'PAS_CF_CAP' ) || ! function_exists( 'wp_roles' ) ) {

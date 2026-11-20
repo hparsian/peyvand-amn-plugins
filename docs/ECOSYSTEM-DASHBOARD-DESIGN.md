@@ -1,7 +1,7 @@
 # طرح داشبورد یکپارچه اکوسیستم پیوند امن
 
-نسخهٔ سند: ۱.۲ — تاریخ: ۲۹ آبان ۱۴۰۵ (2026-11-20)
-وضعیت: **فاز ۱ و فاز ۲ پیاده‌سازی شد** — داشبورد نسخهٔ ۲.۷.۰ (پرونده، فرم ارزیابی، یادآور، نوبت، دعوت/نتیجه/گزارش آزمون، صندوق پیام، پیگیری لید و نظرسنجی/توصیه‌نامه). باقی‌ماندهٔ فاز ۲ (پیامک الگومحور و صف ایمیل) و فازهای ۳ و ۴ باز است.
+نسخهٔ سند: ۱.۳ — تاریخ: ۲۹ آبان ۱۴۰۵ (2026-11-20)
+وضعیت: **فاز ۱ و فاز ۲ کامل پیاده‌سازی شد** — داشبورد نسخهٔ ۲.۸.۰ (پرونده، فرم ارزیابی، یادآور، نوبت، دعوت/نتیجه/گزارش آزمون، صندوق پیام، پیگیری لید و نظرسنجی/توصیه‌نامه، پیامک الگومحور و صف ایمیل). فازهای ۳ و ۴ باز است.
 
 مرتبط: [معماری مادر اکوسیستم](ECOSYSTEM-MASTER-ARCHITECTURE.md) ·
 [پنل درمانگر — فاز ۱۲ گام ۴](phase12-step4-therapist-panel.md) ·
@@ -306,10 +306,10 @@ PAS_Dashboard_Actions::register( 'case.create', array(
 |---|---|---|
 | `message.reply` | `Messages::handle_admin_reply()` (منطق پاسخ) | nonce اختصاصی هر پیام |
 | `message.list` | `Messages::get_all_messages()` | آداپتر نمونه |
-| `sms.send` | `apply_filters( 'pas_send_sms', null, $mobile, $body_id, $params )` | فقط الگو؛ متن آزاد ممنوع |
-| `sms.log` | `Pas_Log::recent()` | موجود |
-| `email.test` | `ZSM_Smtp_Mailer::handle_send_test()` | تنظیمات SMTP از مالک |
-| `email.queue.retry` | `ZSM_Mail_Queue::handle_retry_now()` | نیاز به خواندن صف |
+| `sms.send` | `Pas_Patterns::dashboard_patterns()` + `Pas_Patterns::send()` (پل پیامک ۱.۱.۹+) | فقط الگو؛ bodyId از رجیستری مالک، دامنهٔ موبایل و سقف ۳۰/ساعت |
+| `sms.log` | `Pas_Log::recent()` | موجود؛ برچسب الگو با `label_for_body_id()` |
+| `email.test` | `ZSM_Smtp_Mailer::dashboard_send_test()` | SMTP ۱.۵.۶+؛ کپابیلیتی `pas_dashboard_manage_ecosystem` و سقف ۱۰/ساعت |
+| `email.queue.retry` | `ZSM_Mail_Queue::dashboard_retry()` | SMTP ۱.۵.۶+؛ فقط ردیف `pending`/`given_up`
 | `lead.followup` | `Leads::mark_followed_up()` | لیست از `get_all()`؛ فقط مراحل `followed_up_24h`/`followed_up_72h`؛ دامنهٔ موبایل پرونده |
 | `survey.moderate` | `Survey::set_approved()` | تأیید/لغو نمایش عمومی؛ کش صفحات مالک پاک می‌شود |
 | `survey.delete` | `Survey::delete_survey()` | برگشت‌ناپذیر، با تأیید دوجانبه و ممیزی |
@@ -356,13 +356,17 @@ apply_filters( 'psy_dashboard_invitations', array(), $args );
 apply_filters( 'psy_revoke_invitation', false, $invitation_id );
 apply_filters( 'psy_dashboard_results', array(), $phone );
 
-// پل پیامک
-apply_filters( 'pas_sms_patterns', array() );                   // slug => bodyId
-apply_filters( 'pas_sms_send_pattern', null, $body_id, $mobile, $params );
+// پل پیامک (۱.۱.۹+)
+apply_filters( 'pas_sms_patterns', $patterns );                 // slug => [label, body_id, dashboard]
+Pas_Patterns::dashboard_patterns();                             // فقط الگوهای مجاز داشبورد
+Pas_Patterns::send( $slug, $mobile, $params );                  // bodyId از رجیستری، نه از ورودی
 
-// SMTP
-apply_filters( 'zsm_dashboard_queue', array(), $limit );
-do_action( 'zsm_dashboard_retry', $queue_id );
+// SMTP (۱.۵.۶+)
+ZSM_Smtp_Mailer::dashboard_status();                            // روش ارسال/فرستنده/آمادگی
+ZSM_Smtp_Mailer::dashboard_send_test( $to );
+ZSM_Mail_Queue::dashboard_summary();
+apply_filters( 'zsm_dashboard_queue', $rows, $limit );
+ZSM_Mail_Queue::dashboard_retry( $queue_id );                   // نتیجهٔ ساختاریافته
 
 // 2FA
 apply_filters( 'pas_2fa_user_status', array(), $user_id );
@@ -452,12 +456,11 @@ do_action( 'pwdf_generate_now' );
 
 ### فاز ۲ — آزمون و ارتباطات
 
-**پیاده‌شده تا ۲.۷.۰:** دعوت/ابطال/نتیجه/روند/گزارش آزمون، صندوق پیام/پاسخ، پیگیری لیدهای کوییز و مدیریت نظرسنجی/توصیه‌نامه.
-**باقی‌مانده:** پیامک الگومحور و صف ایمیل.
+**پیاده‌شده تا ۲.۸.۰ (فاز ۲ کامل):** دعوت/ابطال/نتیجه/روند/گزارش آزمون، صندوق پیام/پاسخ، پیگیری لیدهای کوییز، مدیریت نظرسنجی/توصیه‌نامه، پیامک الگومحور با لاگ، و تست/صف/تلاش دوبارهٔ ایمیل.
 
-- دعوت/ابطال/نتیجه/روند/گزارش آزمون.
+- دعوت/ابطال/نتیجه/روند/گزارش آزمون. ✅
 - صندوق پیام و پاسخ، لیدها و پیگیری، نظرسنجی/توصیه‌نامه. ✅
-- پیامک الگومحور + لاگ، تست SMTP + صف + تلاش دوباره.
+- پیامک الگومحور + لاگ، تست SMTP + صف + تلاش دوباره. ✅ (پل پیامک ۱.۱.۹ و SMTP ۱.۵.۶)
 - تست: توکن دعوت یک‌بارمصرف؛ عدم ارسال بدون رضایت/کانال.
 
 ### فاز ۳ — مدیریت اکوسیستم

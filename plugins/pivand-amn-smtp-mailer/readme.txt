@@ -4,7 +4,7 @@ Tags: smtp, email, wp_mail, security, encryption
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.5.2
+Stable tag: 1.5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
   گزینه‌ی قابل‌اتکاتر است.
 
 == Changelog ==
+
+= 1.5.6 =
+* قرارداد داشبورد یکپارچه: `dashboard_status()`، `dashboard_send_test()`، `dashboard_summary()`، `dashboard_queue()` و `dashboard_retry()`
+* خواندن صف بدون ستون `payload` (متن کامل ایمیل) و تلاش دوبارهٔ دستی با نتیجهٔ ساختاریافته؛ بدون تغییر اسکیمای دیتابیس
 
 = 1.5.0 =
 * حذف روش‌های Mailgun و SendGrid (دلیل در بخش «چرا فقط SMTP و Brevo؟» بالا توضیح داده شده).

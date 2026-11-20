@@ -147,6 +147,8 @@ def main():
         "includes/adapters/class-adapter-quiz.php",
         "includes/adapters/class-adapter-portal.php",
         "includes/adapters/class-adapter-followup.php",
+        "includes/adapters/class-adapter-sms.php",
+        "includes/adapters/class-adapter-smtp.php",
         "includes/modules/followup-module.php",
         "includes/class-dashboard-validation.php",
         "includes/class-dashboard-database.php",
@@ -464,6 +466,55 @@ def main():
             ok("followup: action " + needle)
         else:
             fail("followup", "action not registered: " + needle)
+
+    # ── 17. phase-2 messaging contracts ─────────────────────────────────
+    # پیامک فقط از رجیستری الگوی مالک و ایمیل فقط از متدهای عمومی SMTP.
+    sms = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-sms.php"), encoding="utf-8").read()
+    if "Pas_Patterns::dashboard_patterns" in sms and "Pas_Patterns::send" in sms:
+        ok("sms: sends only through the owner pattern registry")
+    else:
+        fail("sms", "adapter does not use the owner pattern registry")
+
+    if "can_view_phone" in sms and "pas_dashboard_sms_scope" in sms:
+        ok("sms: recipient checked against case scope")
+    else:
+        fail("sms", "adapter has no case-scope check for the recipient")
+
+    if "rate_limited" in sms and "HOUR_IN_SECONDS" in sms and "'pas_dashboard_sms_pattern'" in sms:
+        ok("sms: unknown/denied patterns rejected and sends rate-limited")
+    else:
+        fail("sms", "pattern allowlist or rate limit missing")
+
+    smtp = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-smtp.php"), encoding="utf-8").read()
+    for needle in ["dashboard_queue", "dashboard_retry", "dashboard_send_test", "dashboard_status"]:
+        if needle in smtp:
+            ok("smtp: owner method " + needle)
+        else:
+            fail("smtp", "adapter does not call " + needle)
+
+    # آداپتر داشبورد نباید هیچ SQL یا ستون payload بخواند؛ همه‌چیز از متد عمومی مالک.
+    if "SELECT" not in smtp and "email.queue.retry" in actions_src and "email.test" in actions_src and "sms.send" in actions_src:
+        ok("smtp: no SQL or full email payload in the dashboard; messaging actions registered")
+    else:
+        fail("smtp", "adapter runs SQL / payload exposure / missing messaging actions")
+
+    comms = open(os.path.join(PLUGIN, "includes/modules/communications-module.php"), encoding="utf-8").read()
+    if "PAS_DASHBOARD_CAP_ECOSYSTEM" in comms and "mask_email" in comms and "email.queue.retry" in comms:
+        ok("communications: email card gated to managers with masked recipients")
+    else:
+        fail("communications", "email card is not gated or leaks recipients")
+
+    bridge = os.path.join(ROOT, "plugins", "pivand-amn-sms-bridge", "includes", "class-pas-patterns.php")
+    if os.path.isfile(bridge) and "apply_filters('pas_sms_patterns'" in open(bridge, encoding="utf-8").read():
+        ok("sms-bridge: pas_sms_patterns contract published")
+    else:
+        fail("sms-bridge", "missing pattern registry contract")
+
+    smtp_owner = open(os.path.join(ROOT, "plugins", "pivand-amn-smtp-mailer", "pivand-amn-smtp-mailer.php"), encoding="utf-8").read()
+    if "function dashboard_retry(" in smtp_owner and "function dashboard_send_test(" in smtp_owner:
+        ok("smtp-mailer: dashboard contracts published")
+    else:
+        fail("smtp-mailer", "missing dashboard contracts")
 
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")

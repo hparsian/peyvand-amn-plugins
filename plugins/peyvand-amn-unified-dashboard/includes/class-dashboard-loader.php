@@ -42,6 +42,8 @@ final class PAS_Dashboard_Plugin {
 			'includes/adapters/class-adapter-portal.php',
 			'includes/adapters/class-adapter-quiz.php',
 			'includes/adapters/class-adapter-followup.php',
+			'includes/adapters/class-adapter-sms.php',
+			'includes/adapters/class-adapter-smtp.php',
 			'includes/class-dashboard-actions.php',
 			'includes/class-dashboard-export.php',
 			'includes/class-dashboard-ajax.php',

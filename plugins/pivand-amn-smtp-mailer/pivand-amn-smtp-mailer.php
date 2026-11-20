@@ -2,7 +2,7 @@
 /**
  * Plugin Name: پیوند امن — ارسال ایمیل SMTP
  * Description: تمام ایمیل‌های خروجی وردپرس (wp_mail) را به‌جای mail() پیش‌فرض هاست، از طریق SMTP واقعی یا Brevo API ارسال می‌کند تا در اسپم گیر نکنند.
- * Version: 1.5.5
+ * Version: 1.5.6
  * Requires at least: 6.6
  * Tested up to: 7.1
  * Author: Hadi.parsaeian
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZSM_VERSION', '1.5.5');
+define('ZSM_VERSION', '1.5.6');
 define('ZSM_DIR', plugin_dir_path(__FILE__));
 define('ZSM_URL', plugin_dir_url(__FILE__));
 
@@ -739,6 +739,59 @@ final class ZSM_Smtp_Mailer
         wp_safe_redirect(admin_url('options-general.php?page=zsm-smtp-mailer&zsm_notice=' . ($sent ? 'test_ok' : 'test_fail')));
         exit;
     }
+
+    /**
+     * تست ارسال از داشبورد یکپارچه (1.5.6) — همان مسیر wp_mail، بدون nonce و
+     * ریدایرکت صفحهٔ ادمین. کپابیلیتی، rate-limit و ممیزی در Action Bus داشبورد
+     * انجام می‌شود؛ این متد خودش هیچ مجوزی صادر نمی‌کند.
+     *
+     * @return true|\WP_Error
+     */
+    public static function dashboard_send_test(string $to)
+    {
+        $to = sanitize_email($to);
+
+        if (!$to || !is_email($to)) {
+            return new \WP_Error('zsm_dashboard_test_email', 'ایمیل واردشده معتبر نیست.');
+        }
+
+        $error   = null;
+        $catcher = static function (\WP_Error $err) use (&$error): void {
+            $error = $err->get_error_message();
+        };
+
+        add_action('wp_mail_failed', $catcher);
+        $sent = wp_mail($to, 'ایمیل تست از پیوند امن', 'اگر این ایمیل را می‌بینید، ارسال درست کار می‌کند.');
+        remove_action('wp_mail_failed', $catcher);
+
+        if (!$sent) {
+            return new \WP_Error('zsm_dashboard_test_failed', $error ?: 'ارسال ایمیل تست ناموفق بود.');
+        }
+
+        return true;
+    }
+
+    /**
+     * وضعیت غیرحساس برای نمایش در داشبورد: روش ارسال، فرستنده و آمادگی تنظیمات.
+     * هیچ رمز یا کلید API برنمی‌گرداند.
+     *
+     * @return array{send_method:string,from_email:string,configured:bool,queue_table:bool}
+     */
+    public static function dashboard_status(): array
+    {
+        $settings   = self::get_settings();
+        $method     = ($settings['send_method'] ?? 'smtp') === 'brevo' ? 'brevo' : 'smtp';
+        $configured = $method === 'brevo'
+            ? ($settings['brevo_api_key'] ?? '') !== ''
+            : (($settings['host'] ?? '') !== '' && ($settings['username'] ?? '') !== '' && ($settings['password'] ?? '') !== '');
+
+        return [
+            'send_method' => $method,
+            'from_email'  => ($settings['from_email'] ?? '') !== '' ? (string) $settings['from_email'] : (string) get_bloginfo('admin_email'),
+            'configured'  => $configured,
+            'queue_table' => ZSM_Mail_Queue::table_exists(),
+        ];
+    }
 }
 
 /**
@@ -947,6 +1000,121 @@ final class ZSM_Mail_Queue
             'next_retry_at' => self::next_retry_time($attempts),
             'last_error'    => $error,
         ], ['id' => $row->id]);
+    }
+
+    /** آیا جدول صف/لاگ ساخته شده است؟ (برای نمایش وضعیت در داشبورد) */
+    public static function table_exists(): bool
+    {
+        global $wpdb;
+
+        return (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', self::table()));
+    }
+
+    /**
+     * خلاصهٔ شمارشی صف برای داشبورد — بدون متن ایمیل و بدون آدرس کامل.
+     *
+     * @return array{pending:int,sent:int,given_up:int}
+     */
+    public static function dashboard_summary(): array
+    {
+        global $wpdb;
+
+        $summary = ['pending' => 0, 'sent' => 0, 'given_up' => 0];
+
+        if (!self::table_exists()) {
+            return $summary;
+        }
+
+        $rows = $wpdb->get_results('SELECT status, COUNT(*) AS total FROM ' . self::table() . ' GROUP BY status', ARRAY_A);
+
+        foreach ((array) $rows as $row) {
+            $status = (string) ($row['status'] ?? '');
+
+            if (isset($summary[$status])) {
+                $summary[$status] = (int) ($row['total'] ?? 0);
+            }
+        }
+
+        return $summary;
+    }
+
+    /**
+     * ردیف‌های صف/لاگ برای داشبورد. فقط ستون‌های لازم؛ ستون payload (متن کامل
+     * ایمیل) عمداً خوانده نمی‌شود تا داده‌ی شخصی به رابط داشبورد نرسد.
+     *
+     * @return array<int,object>
+     */
+    public static function dashboard_queue(int $limit = 30): array
+    {
+        global $wpdb;
+
+        if (!self::table_exists()) {
+            return [];
+        }
+
+        $limit = max(1, min(100, $limit));
+
+        $rows = $wpdb->get_results($wpdb->prepare(
+            'SELECT id, created_at, next_retry_at, status, attempts, last_method, last_error, to_address, subject'
+            . ' FROM ' . self::table() . ' ORDER BY id DESC LIMIT %d',
+            $limit
+        ));
+
+        $rows = apply_filters('zsm_dashboard_queue', is_array($rows) ? $rows : [], $limit);
+
+        return is_array($rows) ? $rows : [];
+    }
+
+    /**
+     * تلاش دوبارهٔ دستی یک ردیف صف — همان مسیر retry خودکار.
+     *
+     * @return array{ok:bool,status:string,message:string,attempts:int}
+     */
+    public static function dashboard_retry(int $id): array
+    {
+        global $wpdb;
+
+        $id = absint($id);
+
+        if ($id <= 0 || !self::table_exists()) {
+            return ['ok' => false, 'status' => 'missing', 'message' => 'ردیف صف یافت نشد.', 'attempts' => 0];
+        }
+
+        $row = $wpdb->get_row($wpdb->prepare('SELECT * FROM ' . self::table() . ' WHERE id = %d', $id));
+
+        if (!$row) {
+            return ['ok' => false, 'status' => 'missing', 'message' => 'ردیف صف یافت نشد.', 'attempts' => 0];
+        }
+
+        $status = (string) $row->status;
+
+        if (!in_array($status, ['pending', 'given_up'], true)) {
+            return [
+                'ok'      => false,
+                'status'  => $status,
+                'message' => 'این ایمیل قبلاً ارسال شده است و تلاش دوباره لازم ندارد.',
+                'attempts' => (int) $row->attempts,
+            ];
+        }
+
+        self::retry_row($row);
+
+        $fresh    = $wpdb->get_row($wpdb->prepare('SELECT status, attempts, last_error FROM ' . self::table() . ' WHERE id = %d', $id));
+        $fresh_status = $fresh ? (string) $fresh->status : $status;
+        $attempts     = $fresh ? (int) $fresh->attempts : (int) $row->attempts;
+
+        if ('sent' === $fresh_status) {
+            return ['ok' => true, 'status' => 'sent', 'message' => 'ایمیل با موفقیت ارسال شد.', 'attempts' => $attempts];
+        }
+
+        $reason = $fresh && (string) $fresh->last_error !== '' ? (string) $fresh->last_error : 'خطای نامشخص';
+
+        return [
+            'ok'       => false,
+            'status'   => $fresh_status,
+            'message'  => 'تلاش دوباره ناموفق بود: ' . $reason,
+            'attempts' => $attempts,
+        ];
     }
 
     /** دکمه‌ی «امتحان دوباره الان» توی صفحه‌ی گزارش. */
