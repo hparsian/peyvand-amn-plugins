@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ZDP_VERSION', '1.13.2.5');
+define('ZDP_VERSION', '1.13.2.7');
 define('ZDP_PLUGIN_FILE', __FILE__);
 define('ZDP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZDP_PLUGIN_URL', plugin_dir_url(__FILE__));
