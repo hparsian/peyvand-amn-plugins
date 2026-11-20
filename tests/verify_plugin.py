@@ -149,7 +149,9 @@ def main():
         "includes/adapters/class-adapter-followup.php",
         "includes/adapters/class-adapter-sms.php",
         "includes/adapters/class-adapter-smtp.php",
+        "includes/adapters/class-adapter-ecosystem.php",
         "includes/modules/followup-module.php",
+        "includes/modules/ecosystem-module.php",
         "includes/class-dashboard-validation.php",
         "includes/class-dashboard-database.php",
         "includes/class-dashboard-core-bridge.php",
@@ -515,6 +517,38 @@ def main():
         ok("smtp-mailer: dashboard contracts published")
     else:
         fail("smtp-mailer", "missing dashboard contracts")
+
+    # ── 18. phase-3 integrations page ───────────────────────────────────
+    # صفحهٔ وضعیت فقط‌خواندنی: بدون SQL، بدون خواندن آپشن و بدون خروجی حساس.
+    eco = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-ecosystem.php"), encoding="utf-8").read()
+    if "$wpdb" not in eco and "get_option(" not in eco and "SELECT" not in eco:
+        ok("ecosystem: no SQL, no option read, owner contracts only")
+    else:
+        fail("ecosystem", "adapter touches the database or another plugin's options")
+
+    if "get_file_data" in eco and "credentials_source" in eco and "PAS_SMS_PASSWORD" not in eco:
+        ok("ecosystem: versions from plugin headers, credentials reported without values")
+    else:
+        fail("ecosystem", "version lookup or secret-safe credential status missing")
+
+    matrix_src = open(os.path.join(PLUGIN, "includes/class-dashboard-permissions.php"), encoding="utf-8").read()
+    sidebar = open(os.path.join(PLUGIN, "templates/sidebar.php"), encoding="utf-8").read()
+    loader = open(os.path.join(PLUGIN, "includes/class-dashboard-loader.php"), encoding="utf-8").read()
+
+    if "'ecosystem'" in matrix_src and "PAS_Dashboard_Module_Ecosystem" in matrix_src and "ACCESS_MANAGE" in matrix_src:
+        ok("ecosystem: module registered behind the management access level")
+    else:
+        fail("ecosystem", "module not registered in the permission matrix")
+
+    if "'followup'" in sidebar and "'ecosystem'" in sidebar:
+        ok("nav: followup and ecosystem modules are reachable from the sidebar")
+    else:
+        fail("nav", "sidebar omits followup or ecosystem")
+
+    if "class-adapter-ecosystem.php" in loader and "ecosystem-module.php" in loader:
+        ok("ecosystem: adapter and module loaded")
+    else:
+        fail("ecosystem", "loader does not require the new files")
 
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")

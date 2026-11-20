@@ -113,6 +113,12 @@ final class PAS_Dashboard_Permissions {
 				'feature' => 'enable_notifications',
 				'class'   => 'PAS_Dashboard_Module_Notifications',
 			),
+			'ecosystem'     => array(
+				'label'   => __( 'یکپارچگی‌ها', 'peyvand-amn-dashboard' ),
+				'access'  => self::ACCESS_MANAGE,
+				'feature' => '',
+				'class'   => 'PAS_Dashboard_Module_Ecosystem',
+			),
 			'system_health' => array(
 				'label'   => __( 'سلامت سیستم', 'peyvand-amn-dashboard' ),
 				'access'  => self::ACCESS_MANAGE,

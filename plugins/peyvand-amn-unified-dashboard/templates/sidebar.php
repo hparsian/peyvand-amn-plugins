@@ -15,8 +15,8 @@ $pas_crypto = PAS_Dashboard_Core_Bridge::crypto_ready();
  */
 $pas_groups = array(
 	__( 'کار بالینی', 'peyvand-amn-dashboard' ) => array( 'overview', 'patients', 'case_files', 'assessments', 'appointments' ),
-	__( 'پیگیری', 'peyvand-amn-dashboard' )     => array( 'reports', 'communications', 'notifications' ),
-	__( 'مدیریت', 'peyvand-amn-dashboard' )     => array( 'system_health', 'settings', 'audit' ),
+	__( 'پیگیری', 'peyvand-amn-dashboard' )     => array( 'reports', 'communications', 'followup', 'notifications' ),
+	__( 'مدیریت', 'peyvand-amn-dashboard' )     => array( 'ecosystem', 'system_health', 'settings', 'audit' ),
 );
 ?>
 <nav class="pvn-nav pas-sidebar" id="pas-sidebar" aria-label="<?php esc_attr_e( 'ناوبری داشبورد', 'peyvand-amn-dashboard' ); ?>">
