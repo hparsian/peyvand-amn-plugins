@@ -378,6 +378,12 @@ final class PAS_Dashboard_Adapter_Portal {
 			return false;
 		}
 
+		// نقش پذیرش دامنهٔ تماس نوبت و پیام را در سطح کلینیک می‌بیند، بدون آنکه
+		// به دادهٔ بالینی دسترسی پیدا کند؛ این خط فقط دامنهٔ شماره را باز می‌کند.
+		if ( PAS_Dashboard_Permissions::is_frontdesk() ) {
+			return true;
+		}
+
 		if ( PAS_Dashboard_Core_Bridge::viewer_can_see_all_cases() ) {
 			return true;
 		}

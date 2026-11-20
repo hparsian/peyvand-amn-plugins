@@ -640,6 +640,79 @@ def main():
     else:
         fail("menus", "menu hiding form is not wired to the action bus")
 
+    # 18d. نقش پذیرش: کپابیلیتی محدود، نقش محدود نگه‌داشته‌شده، ماژول‌های مجاز و ثبت در ماتریس.
+    if (
+        "const ROLE_RECEPTION = 'pas_dashboard_reception'" in perms_src
+        and "function reception_caps(" in perms_src
+        and "function ensure_reception_role(" in perms_src
+        and "function role_matrix(" in perms_src
+        and "function is_frontdesk(" in perms_src
+    ):
+        ok("reception: role, caps, matrix entry and front-desk helper present")
+    else:
+        fail("reception", "reception role helpers are incomplete")
+
+    reception_caps_at = perms_src.find("function reception_caps(")
+    reception_caps_end = perms_src.find("return $caps;", reception_caps_at) if reception_caps_at >= 0 else -1
+    reception_caps_block = (
+        perms_src[reception_caps_at:reception_caps_end]
+        if reception_caps_at >= 0 and reception_caps_end > reception_caps_at
+        else ""
+    )
+    if (
+        "'PAS_DASHBOARD_CAP'" in reception_caps_block
+        and "'PAS_DASHBOARD_CAP_APPOINTMENTS'" in reception_caps_block
+        and "'PAS_DASHBOARD_CAP_MESSAGES'" in reception_caps_block
+        and "'PAS_DASHBOARD_CAP_FRONTDESK'" in reception_caps_block
+        and "manage_options" not in reception_caps_block
+        and "PAS_CF_CAP" not in reception_caps_block
+    ):
+        ok("reception: only dashboard, appointments, messages and front-desk caps")
+    else:
+        fail("reception", "reception caps include clinical or admin capabilities")
+
+    ensure_at = perms_src.find("function ensure_reception_role(")
+    ensure_block = perms_src[ensure_at : ensure_at + 1400] if ensure_at >= 0 else ""
+    if (
+        "add_role( self::ROLE_RECEPTION" in ensure_block
+        and "$role->remove_cap( $cap )" in ensure_block
+        and "self::ensure_reception_role();" in perms_src
+    ):
+        ok("reception: role created on activation/upgrade and stripped of extra caps")
+    else:
+        fail("reception", "reception role is not rebuilt or extra caps are not removed")
+
+    role_matrix_at = perms_src.find("function role_matrix(")
+    role_matrix_block = perms_src[role_matrix_at : role_matrix_at + 1400] if role_matrix_at >= 0 else ""
+    if (
+        "self::ROLE_RECEPTION => array(" in role_matrix_block
+        and "array( 'appointments', 'communications', 'notifications' )" in role_matrix_block
+        and "'case_files'" not in role_matrix_block.split("self::ROLE_RECEPTION => array(")[1][:400]
+    ):
+        ok("reception: matrix entry limited to appointments, communications and notifications")
+    else:
+        fail("reception", "role matrix does not limit reception to the front-desk modules")
+
+    main_src_caps = open(os.path.join(PLUGIN, "peyvand-amn-unified-dashboard.php"), encoding="utf-8").read()
+    if "'PAS_DASHBOARD_CAP_FRONTDESK', 'pas_dashboard_frontdesk'" in main_src_caps:
+        ok("reception: front-desk capability defined")
+    else:
+        fail("reception", "PAS_DASHBOARD_CAP_FRONTDESK is not defined")
+
+    portal_frontdesk = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
+    phone_at = portal_frontdesk.find("function can_view_phone(")
+    phone_block = portal_frontdesk[phone_at : phone_at + 700] if phone_at >= 0 else ""
+    if "PAS_Dashboard_Permissions::is_frontdesk()" in phone_block:
+        ok("reception: front desk widens booking/message phone scope only")
+    else:
+        fail("reception", "can_view_phone() ignores the front-desk capability")
+
+    settings_module_src = open(os.path.join(PLUGIN, "includes/modules/settings-module.php"), encoding="utf-8").read()
+    if "render_role_matrix()" in settings_module_src and "role_matrix()" in settings_module_src:
+        ok("reception: access matrix rendered in the settings module")
+    else:
+        fail("reception", "role matrix is not rendered for the administrator")
+
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")
     reply_body = portal[at : at + 2000] if at >= 0 else ""

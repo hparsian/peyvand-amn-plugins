@@ -104,6 +104,49 @@ final class PAS_Dashboard_Module_Settings extends PAS_Dashboard_Module {
 		$html .= '<p class="pas-muted">' . esc_html__( 'این صفحه فقط تنظیمات متعلق به داشبورد را ذخیره می‌کند. تنظیمات پرونده‌ها، آزمون‌ها، پیامک و پنل مراجعان در افزونه‌های خودشان مدیریت می‌شود و اینجا بازنویسی نمی‌شود.', 'peyvand-amn-dashboard' ) . '</p>';
 		$html .= $this->card_close();
 
+		$html .= $this->render_role_matrix();
+
+		return $html;
+	}
+
+	/**
+	 * ماتریس دسترسی نقش‌ها — فقط برای مدیر.
+	 *
+	 * این جدول از `PAS_Dashboard_Permissions::role_matrix()` خوانده می‌شود و
+	 * هیچ کپابیلیتی را تغییر نمی‌دهد؛ نقش پذیرش هنگام فعال‌سازی/آپدیت ساخته
+	 * می‌شود و کاربرانش فقط نوبت، پیام و اعلان را می‌بینند.
+	 */
+	private function render_role_matrix() {
+		$matrix = PAS_Dashboard_Permissions::matrix();
+		$roles  = PAS_Dashboard_Permissions::role_matrix();
+
+		$html  = $this->card_open( __( 'ماتریس دسترسی نقش‌ها', 'peyvand-amn-dashboard' ) );
+		$html .= '<p class="pas-muted">' . esc_html__( 'برای افزودن کاربر پذیرش، در کاربر وردپرس نقش «پذیرش (داشبورد)» را انتخاب کنید. این نقش هیچ دادهٔ بالینی نمی‌بیند و فقط نوبت، پیام و اعلان دارد؛ نقش «درمانگر» و مدیر سایت مثل قبل کار می‌کنند.', 'peyvand-amn-dashboard' ) . '</p>';
+		$html .= '<div class="pas-table-wrap"><table class="pas-table"><thead><tr>';
+		$html .= '<th>' . esc_html__( 'نقش', 'peyvand-amn-dashboard' ) . '</th>';
+		$html .= '<th>' . esc_html__( 'دامنهٔ دسترسی', 'peyvand-amn-dashboard' ) . '</th>';
+		$html .= '<th>' . esc_html__( 'ماژول‌های قابل مشاهده', 'peyvand-amn-dashboard' ) . '</th>';
+		$html .= '</tr></thead><tbody>';
+
+		foreach ( $roles as $slug => $role ) {
+			$labels = array();
+
+			foreach ( $role['modules'] as $module_id ) {
+				if ( isset( $matrix[ $module_id ] ) ) {
+					$labels[] = (string) $matrix[ $module_id ]['label'];
+				}
+			}
+
+			$html .= '<tr>';
+			$html .= '<td data-label="' . esc_attr__( 'نقش', 'peyvand-amn-dashboard' ) . '"><strong>' . esc_html( (string) $role['label'] ) . '</strong><br /><code dir="ltr">' . esc_html( (string) $slug ) . '</code></td>';
+			$html .= '<td data-label="' . esc_attr__( 'دامنهٔ دسترسی', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $role['access'] ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'ماژول‌ها', 'peyvand-amn-dashboard' ) . '">' . esc_html( implode( '، ', $labels ) ) . '</td>';
+			$html .= '</tr>';
+		}
+
+		$html .= '</tbody></table></div>';
+		$html .= $this->card_close();
+
 		return $html;
 	}
 }

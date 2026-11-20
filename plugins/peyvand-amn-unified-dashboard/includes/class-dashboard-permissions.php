@@ -15,6 +15,9 @@ final class PAS_Dashboard_Permissions {
 	const ACCESS_MESSAGES     = 'messages';
 	const ACCESS_FOLLOWUP     = 'followup';
 
+	/** نقش «پذیرش» (پیشخوان) — بدون دادهٔ بالینی. */
+	const ROLE_RECEPTION = 'pas_dashboard_reception';
+
 	/** تنظیمات پیش‌فرض داشبورد — هیچ تنظیم افزونه‌ی دیگری را بازنویسی نمی‌کند. */
 	public static function default_settings() {
 		return array(
@@ -181,6 +184,92 @@ final class PAS_Dashboard_Permissions {
 				remove_menu_page( $slug );
 			}
 		}
+	}
+
+	/**
+	 * کپابیلیتی‌های نقش پذیرش — همان‌قدر که برای نوبت، پیام و اعلان لازم است
+	 * و نه یک مورد بیشتر. `manage_options`، دسترسی بالینی پرونده‌ها و
+	 * کپابیلیتی‌های آزمون/پیگیری/یکپارچگی‌ها در این فهرست نیستند.
+	 *
+	 * @return array<string,bool>
+	 */
+	public static function reception_caps() {
+		$caps = array( 'read' => true );
+
+		foreach ( array( 'PAS_DASHBOARD_CAP', 'PAS_DASHBOARD_CAP_APPOINTMENTS', 'PAS_DASHBOARD_CAP_MESSAGES', 'PAS_DASHBOARD_CAP_FRONTDESK' ) as $const ) {
+			if ( defined( $const ) ) {
+				$caps[ constant( $const ) ] = true;
+			}
+		}
+
+		return $caps;
+	}
+
+	/**
+	 * ساخت یا محدود نگه‌داشتن نقش «پذیرش».
+	 *
+	 * کپابیلیتی‌های مجاز افزوده و هر کپابیلیتی خارج از فهرست (به‌ویژه
+	 * `manage_options`، `PAS_CF_CAP` و `PAS_CF_CAP_ALL`) برداشته می‌شود تا
+	 * نقش، حتی پس از ویرایش دستی یا آپدیت، محدود بماند. کاربران این نقش
+	 * دادهٔ بالینی نمی‌بینند؛ فقط نوبت، پیام و اعلان.
+	 */
+	public static function ensure_reception_role() {
+		$allowed = self::reception_caps();
+		$role    = get_role( self::ROLE_RECEPTION );
+
+		if ( ! $role ) {
+			add_role( self::ROLE_RECEPTION, __( 'پذیرش (داشبورد)', 'peyvand-amn-dashboard' ), $allowed );
+
+			return;
+		}
+
+		foreach ( $allowed as $cap => $grant ) {
+			if ( $grant && ! $role->has_cap( $cap ) ) {
+				$role->add_cap( $cap );
+			}
+		}
+
+		foreach ( array_keys( $role->capabilities ) as $cap ) {
+			if ( ! isset( $allowed[ $cap ] ) ) {
+				$role->remove_cap( $cap );
+			}
+		}
+	}
+
+	/** آیا کاربر جاری نقش پذیرش/پیشخوان دارد؟ (بدون هیچ دسترسی بالینی) */
+	public static function is_frontdesk() {
+		return is_user_logged_in()
+			&& defined( 'PAS_DASHBOARD_CAP_FRONTDESK' )
+			&& current_user_can( PAS_DASHBOARD_CAP_FRONTDESK );
+	}
+
+	/**
+	 * ماتریس نقش → دسترسی داشبورد (برای نمایش در تنظیمات و مستندات).
+	 *
+	 * فهرست ماژول‌ها همان شناسه‌های `matrix()` است؛ نقش پذیرش فقط نوبت،
+	 * ارتباطات و اعلان‌ها را می‌بیند و هرگز پرونده، آزمون، گزارش، پیگیری،
+	 * یکپارچگی‌ها، سلامت، تنظیمات و ممیزی را نمی‌بیند.
+	 *
+	 * @return array<string,array{label:string,access:string,modules:array<int,string>}>
+	 */
+	public static function role_matrix() {
+		return array(
+			'administrator'       => array(
+				'label'   => __( 'مدیر سایت', 'peyvand-amn-dashboard' ),
+				'access'  => __( 'همهٔ ماژول‌ها، تنظیمات اکوسیستم، سلامت و ممیزی', 'peyvand-amn-dashboard' ),
+				'modules' => array_keys( self::matrix() ),
+			),
+			'pas_cf_therapist'    => array(
+				'label'   => __( 'درمانگر (پرونده‌های خودش)', 'peyvand-amn-dashboard' ),
+				'access'  => __( 'دادهٔ بالینی، نوبت، آزمون، پیام و پیگیری', 'peyvand-amn-dashboard' ),
+				'modules' => array( 'overview', 'patients', 'case_files', 'assessments', 'appointments', 'reports', 'communications', 'followup', 'notifications' ),
+			),
+			self::ROLE_RECEPTION => array(
+				'label'   => __( 'پذیرش (بدون دادهٔ بالینی)', 'peyvand-amn-dashboard' ),
+				'access'  => __( 'نوبت، پیام و اعلان؛ بدون پرونده، آزمون، گزارش و تنظیمات', 'peyvand-amn-dashboard' ),
+				'modules' => array( 'appointments', 'communications', 'notifications' ),
+			),
+		);
 	}
 
 	public static function settings() {
@@ -395,6 +484,10 @@ final class PAS_Dashboard_Permissions {
 		if ( $admin && defined( 'PAS_DASHBOARD_CAP_ECOSYSTEM' ) && ! $admin->has_cap( PAS_DASHBOARD_CAP_ECOSYSTEM ) ) {
 			$admin->add_cap( PAS_DASHBOARD_CAP_ECOSYSTEM );
 		}
+
+		// نقش پذیرش همیشه ساخته و محدود نگه داشته می‌شود؛ حتی اگر پرونده‌های
+		// بالینی نصب نباشند، چون فقط به نوبت و پیام وابسته است.
+		self::ensure_reception_role();
 
 		// نقش‌هایی که از قبل دسترسی پرونده‌های بالینی دارند، بدون گرفتن
 		// manage_options، باید بتوانند وارد داشبورد شوند.
