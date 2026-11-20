@@ -593,6 +593,53 @@ def main():
     else:
         fail("sms-bridge", "missing dashboard_settings()/dashboard_save_settings()")
 
+    # 18c. پنهان‌سازی اختیاری منوها: فهرست سفید + ذخیره از Action Bus + مدیر مستثنا.
+    perms_src = matrix_src
+    perms_tail_at = perms_src.find("function menu_choices(")
+    perms_tail = perms_src[perms_tail_at : perms_tail_at + 6000] if perms_tail_at >= 0 else ""
+    if (
+        "function menu_choices(" in perms_src
+        and "function hidden_menus(" in perms_src
+        and "function save_hidden_menus(" in perms_src
+        and "function hide_menus(" in perms_src
+    ):
+        ok("menus: whitelist, hidden list, save handler and hiding hook present")
+    else:
+        fail("menus", "menu hiding helpers are incomplete")
+
+    if (
+        "in_array( $slug, $allowed, true )" in perms_tail
+        and "current_user_can( 'manage_options' )" in perms_tail
+        and "remove_menu_page( $slug )" in perms_tail
+        and "remove_submenu_page(" in perms_tail
+        and "'hidden_menus'          => array()" in perms_src
+    ):
+        ok("menus: only whitelisted slugs, admins never hidden, dashboard option defaulted")
+    else:
+        fail("menus", "menu hiding is not whitelisted or does not exempt administrators")
+
+    menus_at = actions_src.find("'menus.save'")
+    menus_block = actions_src[menus_at : menus_at + 700] if menus_at >= 0 else ""
+    if (
+        "'cap'     => 'manage_options'" in menus_block
+        and "'nonce'   => 'menus_save'" in menus_block
+        and "'audit'   => 'menus.save'" in menus_block
+        and "PAS_Dashboard_Permissions', 'save_hidden_menus'" in menus_block
+    ):
+        ok("menus: save action gated by manage_options, nonce and audit")
+    else:
+        fail("menus", "menus.save action is not nonce + manage_options + audited")
+
+    if "'PAS_Dashboard_Permissions', 'hide_menus'" in loader and "'admin_menu'" in loader:
+        ok("menus: hiding hooked on admin_menu")
+    else:
+        fail("menus", "admin_menu hook for hide_menus missing")
+
+    if "PAS_Dashboard_Actions::fields( 'menus.save'" in eco_module and "hidden_menus[]" in eco_module:
+        ok("menus: settings form posts hidden_menus through the action bus")
+    else:
+        fail("menus", "menu hiding form is not wired to the action bus")
+
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")
     reply_body = portal[at : at + 2000] if at >= 0 else ""

@@ -360,6 +360,18 @@ final class PAS_Dashboard_Actions {
 		);
 
 		self::register(
+			'menus.save',
+			array(
+				'label'   => __( 'ذخیرهٔ پنهان‌سازی منوها', 'peyvand-amn-dashboard' ),
+				'cap'     => 'manage_options',
+				'nonce'   => 'menus_save',
+				'handler' => array( 'PAS_Dashboard_Permissions', 'save_hidden_menus' ),
+				'audit'   => 'menus.save',
+				'object'  => 'settings',
+			)
+		);
+
+		self::register(
 			'message.reply',
 			array(
 				'label'   => __( 'پاسخ به پیام مراجع', 'peyvand-amn-dashboard' ),

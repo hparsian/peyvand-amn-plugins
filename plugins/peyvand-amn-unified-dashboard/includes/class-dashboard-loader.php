@@ -107,6 +107,10 @@ final class PAS_Dashboard_Plugin {
 		PAS_Dashboard_Ajax::init();
 		PAS_Dashboard_Rest::init();
 
+		// پنهان‌سازی اختیاری منوها؛ پس از همهٔ افزونه‌ها ثبت می‌شود تا منوهایی
+		// که دیرتر ساخته می‌شوند هم پنهان شوند. مدیر سایت از این قاعده مستثناست.
+		add_action( 'admin_menu', array( 'PAS_Dashboard_Permissions', 'hide_menus' ), 999 );
+
 		add_action( 'admin_notices', array( $this, 'dependency_notices' ) );
 	}
 

@@ -40,6 +40,7 @@ final class PAS_Dashboard_Module_Ecosystem extends PAS_Dashboard_Module {
 
 		if ( PAS_Dashboard_Security::can_manage() ) {
 			$html .= $this->render_settings_form();
+			$html .= $this->render_menu_form();
 		}
 
 		foreach ( $groups as $group_id => $group_label ) {
@@ -164,6 +165,35 @@ final class PAS_Dashboard_Module_Ecosystem extends PAS_Dashboard_Module {
 			$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'ذخیرهٔ تنظیمات اتصال', 'peyvand-amn-dashboard' ) . '</button>';
 		}
 
+		$html .= '</form>';
+		$html .= $this->card_close();
+
+		return $html;
+	}
+
+	/**
+	 * فرم پنهان‌سازی اختیاری منوهای افزونه‌های دیگر — فقط برای مدیر.
+	 *
+	 * پنهان‌سازی فقط نمایش منو را برای کاربران بدون `manage_options` عوض
+	 * می‌کند؛ هیچ کپابیلیتی لغو نمی‌شود. مدیر همیشه همهٔ منوها را می‌بیند.
+	 */
+	private function render_menu_form() {
+		$choices = PAS_Dashboard_Permissions::menu_choices();
+		$hidden  = PAS_Dashboard_Permissions::hidden_menus();
+
+		$html  = $this->card_open( __( 'پنهان‌سازی منوهای افزونه‌ها', 'peyvand-amn-dashboard' ) );
+		$html .= '<p class="pas-muted">' . esc_html__( 'هر منویی را که علامت بزنید، از نوار مدیریت کاربران بدون سطح مدیریت (درمانگر و کارشناس) پنهان می‌شود تا کار روزانه فقط از همین داشبورد انجام شود. مدیر سایت همیشه همهٔ منوها را می‌بیند تا راه بازگشت به تنظیمات افزونه‌ها بسته نشود. این گزینه فقط نمایش منو را تغییر می‌دهد و هیچ دسترسی را لغو نمی‌کند.', 'peyvand-amn-dashboard' ) . '</p>';
+
+		$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		$html .= PAS_Dashboard_Actions::fields( 'menus.save', $this->url() );
+
+		foreach ( $choices as $slug => $choice ) {
+			$html .= '<div class="pas-form-row"><label><input type="checkbox" name="hidden_menus[]" value="' . esc_attr( (string) $slug ) . '"' . checked( in_array( (string) $slug, $hidden, true ), true, false ) . ' /> ';
+			$html .= esc_html( (string) $choice['label'] ) . ' <code dir="ltr">' . esc_html( (string) $slug ) . '</code>';
+			$html .= '</label></div>';
+		}
+
+		$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'ذخیرهٔ پنهان‌سازی منوها', 'peyvand-amn-dashboard' ) . '</button>';
 		$html .= '</form>';
 		$html .= $this->card_close();
 
