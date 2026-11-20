@@ -67,6 +67,18 @@ final class Plugin
         return $this->messages;
     }
 
+    /** دسترسی‌دهندهٔ عمومی لیدهای فرم/کوییز برای داشبورد یکپارچه. */
+    public function leads(): Leads
+    {
+        return $this->leads;
+    }
+
+    /** دسترسی‌دهندهٔ عمومی نظرسنجی/توصیه‌نامه برای داشبورد یکپارچه. */
+    public function survey(): Survey
+    {
+        return $this->survey;
+    }
+
     public static function activate(): void
     {
         Installer::create_or_upgrade_tables();

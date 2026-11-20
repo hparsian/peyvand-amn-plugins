@@ -13,6 +13,7 @@ final class PAS_Dashboard_Permissions {
 	const ACCESS_APPOINTMENTS = 'appointments';
 	const ACCESS_ASSESSMENTS  = 'assessments';
 	const ACCESS_MESSAGES     = 'messages';
+	const ACCESS_FOLLOWUP     = 'followup';
 
 	/** تنظیمات پیش‌فرض داشبورد — هیچ تنظیم افزونه‌ی دیگری را بازنویسی نمی‌کند. */
 	public static function default_settings() {
@@ -100,6 +101,12 @@ final class PAS_Dashboard_Permissions {
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Communications',
 			),
+			'followup'      => array(
+				'label'   => __( 'پیگیری و نظرسنجی', 'peyvand-amn-dashboard' ),
+				'access'  => self::ACCESS_FOLLOWUP,
+				'feature' => '',
+				'class'   => 'PAS_Dashboard_Module_Followup',
+			),
 			'notifications' => array(
 				'label'   => __( 'اعلان‌ها', 'peyvand-amn-dashboard' ),
 				'access'  => self::ACCESS_DASHBOARD,
@@ -147,6 +154,11 @@ final class PAS_Dashboard_Permissions {
 				return is_user_logged_in() && (
 					current_user_can( 'manage_options' )
 					|| current_user_can( defined( 'PAS_DASHBOARD_CAP_MESSAGES' ) ? PAS_DASHBOARD_CAP_MESSAGES : 'manage_options' )
+				);
+			case self::ACCESS_FOLLOWUP:
+				return is_user_logged_in() && (
+					current_user_can( 'manage_options' )
+					|| current_user_can( defined( 'PAS_DASHBOARD_CAP_FOLLOWUP' ) ? PAS_DASHBOARD_CAP_FOLLOWUP : 'manage_options' )
 				);
 			case self::ACCESS_DASHBOARD:
 			default:
@@ -210,7 +222,7 @@ final class PAS_Dashboard_Permissions {
 			$admin->add_cap( PAS_DASHBOARD_CAP_APPOINTMENTS );
 		}
 
-		foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES' ) as $const ) {
+		foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES', 'PAS_DASHBOARD_CAP_FOLLOWUP' ) as $const ) {
 			if ( $admin && defined( $const ) && ! $admin->has_cap( constant( $const ) ) ) {
 				$admin->add_cap( constant( $const ) );
 			}
@@ -237,7 +249,7 @@ final class PAS_Dashboard_Permissions {
 				$role->add_cap( PAS_DASHBOARD_CAP_APPOINTMENTS );
 			}
 
-			foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES' ) as $const ) {
+			foreach ( array( 'PAS_DASHBOARD_CAP_ASSESSMENTS', 'PAS_DASHBOARD_CAP_MESSAGES', 'PAS_DASHBOARD_CAP_FOLLOWUP' ) as $const ) {
 				if ( $role && $role->has_cap( PAS_CF_CAP ) && defined( $const ) && ! $role->has_cap( constant( $const ) ) ) {
 					$role->add_cap( constant( $const ) );
 				}

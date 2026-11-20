@@ -146,6 +146,8 @@ def main():
         "includes/class-dashboard-flash.php",
         "includes/adapters/class-adapter-quiz.php",
         "includes/adapters/class-adapter-portal.php",
+        "includes/adapters/class-adapter-followup.php",
+        "includes/modules/followup-module.php",
         "includes/class-dashboard-validation.php",
         "includes/class-dashboard-database.php",
         "includes/class-dashboard-core-bridge.php",
@@ -449,6 +451,19 @@ def main():
         ok("assessments: scope checked before the result link")
     else:
         fail("assessments", "out-of-scope row may still offer the result link")
+
+    follow = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-followup.php"), encoding="utf-8").read()
+    if "can_view_phone" in follow and "pas_dashboard_lead_scope" in follow:
+        ok("followup: lead actions check case scope")
+    else:
+        fail("followup", "mark_followup has no case-scope check")
+
+    actions_src = open(os.path.join(PLUGIN, "includes/class-dashboard-actions.php"), encoding="utf-8").read()
+    for needle in ["'lead.followup'", "'survey.moderate'", "'survey.delete'"]:
+        if needle in actions_src:
+            ok("followup: action " + needle)
+        else:
+            fail("followup", "action not registered: " + needle)
 
     portal = open(os.path.join(PLUGIN, "includes/adapters/class-adapter-portal.php"), encoding="utf-8").read()
     at = portal.find("function reply_message(")

@@ -138,6 +138,7 @@ final class PAS_Dashboard_Actions {
 		$appt_cap  = defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) ? PAS_DASHBOARD_CAP_APPOINTMENTS : 'manage_options';
 		$quiz_cap  = defined( 'PAS_DASHBOARD_CAP_ASSESSMENTS' ) ? PAS_DASHBOARD_CAP_ASSESSMENTS : 'manage_options';
 		$msg_cap   = defined( 'PAS_DASHBOARD_CAP_MESSAGES' ) ? PAS_DASHBOARD_CAP_MESSAGES : 'manage_options';
+		$flow_cap  = defined( 'PAS_DASHBOARD_CAP_FOLLOWUP' ) ? PAS_DASHBOARD_CAP_FOLLOWUP : 'manage_options';
 
 		self::register(
 			'case.save',
@@ -268,6 +269,42 @@ final class PAS_Dashboard_Actions {
 				'handler' => array( 'PAS_Dashboard_Adapter_Quiz', 'revoke' ),
 				'audit'   => 'assessment.revoke',
 				'object'  => 'assessment',
+			)
+		);
+
+		self::register(
+			'lead.followup',
+			array(
+				'label'   => __( 'ثبت پیگیری لید', 'peyvand-amn-dashboard' ),
+				'cap'     => $flow_cap,
+				'nonce'   => 'lead_followup',
+				'handler' => array( 'PAS_Dashboard_Adapter_Followup', 'mark_followup' ),
+				'audit'   => 'lead.followup',
+				'object'  => 'lead',
+			)
+		);
+
+		self::register(
+			'survey.moderate',
+			array(
+				'label'   => __( 'تأیید/لغو نظرسنجی', 'peyvand-amn-dashboard' ),
+				'cap'     => $flow_cap,
+				'nonce'   => 'survey_moderate',
+				'handler' => array( 'PAS_Dashboard_Adapter_Followup', 'moderate_survey' ),
+				'audit'   => 'survey.moderate',
+				'object'  => 'survey',
+			)
+		);
+
+		self::register(
+			'survey.delete',
+			array(
+				'label'   => __( 'حذف نظرسنجی', 'peyvand-amn-dashboard' ),
+				'cap'     => $flow_cap,
+				'nonce'   => 'survey_delete',
+				'handler' => array( 'PAS_Dashboard_Adapter_Followup', 'delete_survey' ),
+				'audit'   => 'survey.delete',
+				'object'  => 'survey',
 			)
 		);
 

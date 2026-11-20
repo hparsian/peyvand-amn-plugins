@@ -88,6 +88,23 @@ final class Leads
         $wpdb->update(Installer::table('leads'), [$column => 1], ['id' => $lead_id], ['%d'], ['%d']);
     }
 
+    /** یک لید مشخص — برای بررسی مالکیت/دامنه پیش از عملیات داشبورد. */
+    public function get(int $lead_id): ?object
+    {
+        if ($lead_id <= 0) {
+            return null;
+        }
+
+        global $wpdb;
+
+        $row = $wpdb->get_row($wpdb->prepare(
+            'SELECT * FROM ' . Installer::table('leads') . ' WHERE id = %d',
+            $lead_id
+        ));
+
+        return $row ?: null;
+    }
+
     public function get_all(int $limit = 200): array
     {
         global $wpdb;

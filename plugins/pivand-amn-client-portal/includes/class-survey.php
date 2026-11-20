@@ -597,6 +597,23 @@ final class Survey
         ));
     }
 
+    /** یک نظرسنجی مشخص — برای بررسی وجود پیش از تأیید/حذف از داشبورد. */
+    public function get_survey(int $survey_id): ?object
+    {
+        if ($survey_id <= 0) {
+            return null;
+        }
+
+        global $wpdb;
+
+        $row = $wpdb->get_row($wpdb->prepare(
+            'SELECT * FROM ' . Installer::table('surveys') . ' WHERE id = %d',
+            $survey_id
+        ));
+
+        return $row ?: null;
+    }
+
     public function set_approved(int $survey_id, bool $approved): void
     {
         global $wpdb;
