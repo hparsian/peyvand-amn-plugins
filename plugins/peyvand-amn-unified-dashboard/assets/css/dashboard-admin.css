@@ -426,6 +426,22 @@
 	margin-top: 6px;
 }
 
+/* توضیح شاخص: روی دسکتاپ فقط tooltip، روی صفحهٔ لمسی متن خوانا */
+.pas-stat-hint {
+	display: none;
+	margin-top: 6px;
+	color: var(--pas-muted);
+	font-size: 11.5px;
+	line-height: 1.7;
+}
+
+/* هشت شاخص در دسکتاپ دو ردیف منظم چهارتایی می‌سازند، نه ۶+۲. */
+@media (min-width: 900px) {
+	.pas-kpi-grid {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
 /* ── نمودار روند و نوار سهم ─────────────────────────────────────────── */
 
 .pas-chart-legend {
@@ -509,6 +525,9 @@
 	font-size: 11.5px;
 	color: var(--pas-muted);
 	white-space: nowrap;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .pas-chart-table {
@@ -518,6 +537,7 @@
 .pas-meter {
 	display: inline-flex;
 	width: 84px;
+	max-width: 100%;
 	height: 8px;
 	border-radius: 999px;
 	background: var(--pas-bg-soft);
@@ -534,16 +554,54 @@
 }
 
 @media (max-width: 600px) {
+	/* شاخص‌ها در موبایل یک‌ستونی می‌شوند تا توضیح هر شاخص جا باز کند. */
+	.pas-kpi-grid {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.pas-kpi-grid .pas-stat {
+		padding: 13px 14px;
+	}
+
+	.pas-stat-hint {
+		display: block;
+	}
+
+	.pas-chart-legend {
+		gap: 6px 12px;
+		font-size: 11.5px;
+		margin-bottom: 10px;
+	}
+
 	.pas-chart-bars {
-		height: 110px;
+		height: 104px;
+		gap: 3px;
 	}
 
 	.pas-chart-plot {
-		gap: 6px;
+		gap: 4px;
+		min-height: 0;
+		padding: 6px 0 0;
+	}
+
+	.pas-chart-bar {
+		max-width: 12px;
 	}
 
 	.pas-chart-month {
-		font-size: 10.5px;
+		font-size: 10px;
+	}
+}
+
+/* در عرض‌های خیلی کم (۳۲۰ پیکسل) نام ماه‌ها نباید بریده شوند. */
+@media (max-width: 360px) {
+	.pas-chart-plot {
+		gap: 3px;
+	}
+
+	.pas-chart-month {
+		font-size: 9px;
 	}
 }
 
@@ -566,7 +624,7 @@
 
 .pas-table th,
 .pas-table td {
-	text-align: right;
+	text-align: start;
 	padding: 11px 14px;
 	border-bottom: 1px solid var(--pas-line);
 	vertical-align: middle;

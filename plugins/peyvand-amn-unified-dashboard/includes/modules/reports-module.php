@@ -221,12 +221,13 @@ final class PAS_Dashboard_Module_Reports extends PAS_Dashboard_Module {
 
 	private function render_kpis( array $metrics ) {
 		$html  = $this->card_open( __( 'شاخص‌های کلیدی', 'peyvand-amn-dashboard' ) );
-		$html .= '<div class="pas-grid">';
+		$html .= '<div class="pas-grid pas-kpi-grid">';
 
 		foreach ( $metrics as $metric ) {
 			$html .= '<div class="pas-stat" title="' . esc_attr( (string) $metric['hint'] ) . '">';
 			$html .= '<span class="pas-stat-value">' . esc_html( (string) $metric['value'] ) . '</span>';
 			$html .= '<span class="pas-stat-label">' . esc_html( (string) $metric['label'] ) . '</span>';
+			$html .= '<span class="pas-stat-hint">' . esc_html( (string) $metric['hint'] ) . '</span>';
 			$html .= '</div>';
 		}
 
@@ -303,33 +304,38 @@ final class PAS_Dashboard_Module_Reports extends PAS_Dashboard_Module {
 
 		$html .= '</div>';
 
-		$html .= '<div class="pas-chart-plot">';
+		if ( $max === 0 ) {
+			$html .= '<p class="pas-empty">' . esc_html__( 'در ۶ ماه گذشته پرونده، نوبت یا دعوت آزمونی ثبت نشده است؛ جدول زیر صفرها را نشان می‌دهد.', 'peyvand-amn-dashboard' ) . '</p>';
+		} else {
+			$html .= '<div class="pas-chart-plot">';
 
-		foreach ( $rows as $row ) {
-			$summary = sprintf(
-				/* translators: 1: month, 2: cases, 3: bookings, 4: invitations */
-				__( '%1$s: %2$s پرونده، %3$s نوبت، %4$s دعوت آزمون', 'peyvand-amn-dashboard' ),
-				$row['label'],
-				number_format_i18n( $row['cases'] ),
-				number_format_i18n( $row['bookings'] ),
-				number_format_i18n( $row['invites'] )
-			);
+			foreach ( $rows as $row ) {
+				$summary = sprintf(
+					/* translators: 1: month, 2: cases, 3: bookings, 4: invitations */
+					__( '%1$s: %2$s پرونده، %3$s نوبت، %4$s دعوت آزمون', 'peyvand-amn-dashboard' ),
+					$row['label'],
+					number_format_i18n( $row['cases'] ),
+					number_format_i18n( $row['bookings'] ),
+					number_format_i18n( $row['invites'] )
+				);
 
-			$html .= '<div class="pas-chart-col" role="img" aria-label="' . esc_attr( $summary ) . '" title="' . esc_attr( $summary ) . '">';
-			$html .= '<div class="pas-chart-bars">';
+				$html .= '<div class="pas-chart-col" role="img" aria-label="' . esc_attr( $summary ) . '" title="' . esc_attr( $summary ) . '">';
+				$html .= '<div class="pas-chart-bars">';
 
-			foreach ( $series as $field => $item ) {
-				$height = $max > 0 ? (int) round( ( $row[ $field ] / $max ) * 100 ) : 0;
+				foreach ( $series as $field => $item ) {
+					$height = (int) round( ( $row[ $field ] / $max ) * 100 );
+					$height = $height > 0 ? max( 2, $height ) : 0;
 
-				$html .= '<span class="pas-chart-bar ' . esc_attr( $item['bar'] ) . '" style="--pas-h:' . esc_attr( (string) max( 2, $height ) ) . '%" aria-hidden="true"></span>';
+					$html .= '<span class="pas-chart-bar ' . esc_attr( $item['bar'] ) . '" style="--pas-h:' . esc_attr( (string) $height ) . '%" aria-hidden="true"></span>';
+				}
+
+				$html .= '</div>';
+				$html .= '<span class="pas-chart-month">' . esc_html( (string) $row['short'] ) . '</span>';
+				$html .= '</div>';
 			}
 
 			$html .= '</div>';
-			$html .= '<span class="pas-chart-month">' . esc_html( (string) $row['short'] ) . '</span>';
-			$html .= '</div>';
 		}
-
-		$html .= '</div>';
 
 		$html .= '<div class="pas-table-wrap pas-chart-table"><table class="pas-table"><thead><tr>';
 		$html .= '<th>' . esc_html__( 'ماه', 'peyvand-amn-dashboard' ) . '</th>';
