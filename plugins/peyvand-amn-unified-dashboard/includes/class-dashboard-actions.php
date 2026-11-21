@@ -371,6 +371,45 @@ final class PAS_Dashboard_Actions {
 			)
 		);
 
+		// به‌روزرسانی افزونه‌ها از مخزن گیت‌هاب — فقط مدیر سایت.
+		self::register(
+			'updates.refresh',
+			array(
+				'label'   => __( 'بررسی دوبارهٔ مخزن گیت‌هاب', 'peyvand-amn-dashboard' ),
+				'cap'     => 'manage_options',
+				'nonce'   => 'updates_refresh',
+				'handler' => array( 'PAS_Dashboard_Updater', 'refresh' ),
+				'audit'   => 'updates.refresh',
+				'object'  => 'updates',
+			)
+		);
+
+		self::register(
+			'updates.save',
+			array(
+				'label'   => __( 'ذخیرهٔ تنظیمات به‌روزرسانی', 'peyvand-amn-dashboard' ),
+				'cap'     => 'manage_options',
+				'nonce'   => 'updates_save',
+				'handler' => array( 'PAS_Dashboard_Updater', 'save_settings' ),
+				'audit'   => 'updates.save',
+				'object'  => 'settings',
+			)
+		);
+
+		self::register(
+			'updates.run',
+			array(
+				'label'   => __( 'به‌روزرسانی افزونه از مخزن', 'peyvand-amn-dashboard' ),
+				// علاوه بر این کپابیلیتی، هندلر خودش `update_plugins` را هم می‌سنجد.
+				'cap'     => 'manage_options',
+				'nonce'   => 'updates_run',
+				'handler' => array( 'PAS_Dashboard_Updater', 'run' ),
+				'audit'   => 'updates.run',
+				'object'  => 'plugin',
+				'confirm' => true,
+			)
+		);
+
 		self::register(
 			'message.reply',
 			array(

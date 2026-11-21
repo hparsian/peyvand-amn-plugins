@@ -45,6 +45,7 @@ final class PAS_Dashboard_Plugin {
 			'includes/adapters/class-adapter-sms.php',
 			'includes/adapters/class-adapter-smtp.php',
 			'includes/adapters/class-adapter-ecosystem.php',
+			'includes/class-dashboard-updater.php',
 			'includes/class-dashboard-actions.php',
 			'includes/class-dashboard-export.php',
 			'includes/class-dashboard-ajax.php',
@@ -72,6 +73,7 @@ final class PAS_Dashboard_Plugin {
 			'communications-module.php',
 			'followup-module.php',
 			'ecosystem-module.php',
+			'updates-module.php',
 			'notifications-module.php',
 			'system-health-module.php',
 			'settings-module.php',
@@ -102,6 +104,7 @@ final class PAS_Dashboard_Plugin {
 		}
 
 		PAS_Dashboard_Actions::init();
+		PAS_Dashboard_Updater::init();
 		PAS_Dashboard_Router::init();
 		PAS_Dashboard_Assets::init();
 		PAS_Dashboard_Ajax::init();

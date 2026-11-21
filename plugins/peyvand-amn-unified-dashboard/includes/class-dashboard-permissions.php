@@ -27,6 +27,11 @@ final class PAS_Dashboard_Permissions {
 			'default_range_days'    => 30,
 			'delete_data_on_uninstall' => false,
 			'hidden_menus'          => array(),
+			// به‌روزرسانی از مخزن گیت‌هاب (مخزن عمومی، بدون توکن هم کار می‌کند).
+			'updates_repo'          => 'hparsian/peyvand-amn-plugins',
+			'updates_branch'        => 'main',
+			'github_token'          => '',
+			'enable_auto_updates'   => false,
 		);
 	}
 
@@ -364,6 +369,13 @@ final class PAS_Dashboard_Permissions {
 				'access'  => self::ACCESS_MANAGE,
 				'feature' => '',
 				'class'   => 'PAS_Dashboard_Module_Ecosystem',
+			),
+			'updates'       => array(
+				'label'   => __( 'به‌روزرسانی‌ها', 'peyvand-amn-dashboard' ),
+				// فقط مدیر سایت: مخزن، توکن و اجرای آپدیت در سطح کل سایت است.
+				'access'  => self::ACCESS_MANAGE,
+				'feature' => '',
+				'class'   => 'PAS_Dashboard_Module_Updates',
 			),
 			'system_health' => array(
 				'label'   => __( 'سلامت سیستم', 'peyvand-amn-dashboard' ),

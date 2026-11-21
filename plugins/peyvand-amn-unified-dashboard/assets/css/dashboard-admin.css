@@ -799,6 +799,11 @@
 	color: var(--pas-danger);
 }
 
+.pas-badge-muted {
+	background: var(--pas-bg-soft);
+	color: var(--pas-muted);
+}
+
 .pas-notice {
 	position: relative;
 	border-radius: var(--pas-radius-sm);

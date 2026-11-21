@@ -143,6 +143,7 @@ def main():
         "includes/class-dashboard-audit-log.php",
         "includes/class-dashboard-export.php",
         "includes/class-dashboard-actions.php",
+        "includes/class-dashboard-updater.php",
         "includes/class-dashboard-flash.php",
         "includes/adapters/class-adapter-quiz.php",
         "includes/adapters/class-adapter-portal.php",
@@ -152,6 +153,7 @@ def main():
         "includes/adapters/class-adapter-ecosystem.php",
         "includes/modules/followup-module.php",
         "includes/modules/ecosystem-module.php",
+        "includes/modules/updates-module.php",
         "includes/class-dashboard-validation.php",
         "includes/class-dashboard-database.php",
         "includes/class-dashboard-core-bridge.php",
@@ -765,6 +767,116 @@ def main():
         ok("reports: chart and meter styles, including the mobile breakpoint")
     else:
         fail("reports", "chart/meter styles are missing from the dashboard stylesheet")
+
+    # 19. به‌روزرسانی از مخزن گیت‌هاب: هوک‌ها، فهرست سفید، HTTPS و مسیر نوشتن.
+    updater_src = open(os.path.join(PLUGIN, "includes/class-dashboard-updater.php"), encoding="utf-8").read()
+    if all(
+        hook in updater_src
+        for hook in [
+            "pre_set_site_transient_update_plugins",
+            "plugins_api",
+            "auto_update_plugin",
+            "http_request_args",
+            "upgrader_process_complete",
+        ]
+    ):
+        ok("updates: WordPress update filters and upgrade hook wired")
+    else:
+        fail("updates", "one of the WordPress update filters is missing")
+
+    if "REPO_DEFAULT   = 'hparsian/peyvand-amn-plugins'" in updater_src and "'dist'" in updater_src:
+        ok("updates: repository and dist path are configured")
+    else:
+        fail("updates", "repository/dist defaults are missing")
+
+    allowlist = [
+        "peyvand-amn-unified-dashboard",
+        "pivand-amn-core",
+        "pivand-amn-case-file",
+        "pivand-amn-client-portal",
+        "pivand-amn-quiz-enterprise",
+        "pivand-amn-sms-bridge",
+        "pivand-amn-smtp-mailer",
+        "pivand-amn-2fa",
+        "pivand-amn-content-writer",
+        "piwand-daily-feed",
+        "payvand-contact",
+        "payvand-amn-ui-kit",
+    ]
+    missing_slugs = [slug for slug in allowlist if "'" + slug + "'" not in updater_src]
+    if missing_slugs:
+        fail("updates", "allowlist missing: " + ", ".join(missing_slugs))
+    else:
+        ok("updates: closed allowlist covers the twelve ecosystem plugins")
+
+    if (
+        "'https' !== strtolower" in updater_src
+        and "raw.githubusercontent.com" in updater_src
+        and "is_allowed_package_url" in updater_src
+    ):
+        ok("updates: packages restricted to HTTPS and GitHub hosts")
+    else:
+        fail("updates", "package URL allowlist is missing")
+
+    if "$wpdb" not in updater_src and "get_option( PAS_DASHBOARD_OPTION" in updater_src:
+        ok("updates: no foreign SQL and only the dashboard option is read")
+    else:
+        fail("updates", "updater touches the database or foreign options")
+
+    if "current_user_can( 'update_plugins' )" in updater_src and "DISALLOW_FILE_MODS" in updater_src:
+        ok("updates: upgrade run checks update_plugins and file-mod restrictions")
+    else:
+        fail("updates", "upgrade run lacks capability or file-mod guards")
+
+    token_at = updater_src.find("public static function token(")
+    token_block = updater_src[token_at : token_at + 900] if token_at >= 0 else ""
+    if "PAS_DASHBOARD_GITHUB_TOKEN" in token_block and "github_token" in token_block:
+        ok("updates: GitHub token comes from a constant or the dashboard option")
+    else:
+        fail("updates", "token lookup is incomplete")
+
+    updates_module = open(os.path.join(PLUGIN, "includes/modules/updates-module.php"), encoding="utf-8").read()
+    if 'type="password"' in updates_module and 'value=""' in updates_module and "self::token()" not in updates_module:
+        ok("updates: token input is write-only and never rendered")
+    else:
+        fail("updates", "the token value could be rendered back into HTML")
+
+    for action_id, nonce, handler, audit in [
+        ("'updates.refresh'", "'updates_refresh'", "'refresh'", "'updates.refresh'"),
+        ("'updates.save'", "'updates_save'", "'save_settings'", "'updates.save'"),
+        ("'updates.run'", "'updates_run'", "'run'", "'updates.run'"),
+    ]:
+        at = actions_src.find(action_id)
+        block = actions_src[at : at + 700] if at >= 0 else ""
+        if (
+            "'cap'     => 'manage_options'" in block
+            and nonce in block
+            and "'audit'   => " + audit in block
+            and "PAS_Dashboard_Updater', " + handler in block
+        ):
+            ok("updates: " + action_id.strip("'") + " gated by manage_options, nonce and audit")
+        else:
+            fail("updates", "action " + action_id + " is not nonce + manage_options + audited")
+
+    if "class-dashboard-updater.php" in loader and "updates-module.php" in loader and "PAS_Dashboard_Updater::init()" in loader:
+        ok("updates: updater and module loaded and initialized")
+    else:
+        fail("updates", "loader does not require or initialize the updater")
+
+    if "'updates'" in matrix_src and "PAS_Dashboard_Module_Updates" in matrix_src and "'updates'" in sidebar:
+        ok("updates: module registered behind management access and reachable from the sidebar")
+    else:
+        fail("updates", "module is not registered or not reachable")
+
+    for key in ["updates_repo", "updates_branch", "github_token", "enable_auto_updates"]:
+        if "'" + key + "'" not in perms_src:
+            fail("updates", "default setting missing: " + key)
+    ok("updates: repository, branch, token and auto-update defaults present")
+
+    if "PAS_Dashboard_Actions::fields( 'updates.save'" in updates_module and "PAS_Dashboard_Actions::fields( 'updates.run'" in updates_module:
+        ok("updates: module forms post through the action bus")
+    else:
+        fail("updates", "module forms are not wired to the action bus")
 
     # ── 17. version consistency ────────────────────────────────────────
     main_src = open(os.path.join(PLUGIN, "peyvand-amn-unified-dashboard.php"), encoding="utf-8").read()
