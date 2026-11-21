@@ -731,6 +731,41 @@ def main():
     else:
         fail("messages", "client portal source not found")
 
+    # 18e. گزارش‌های فاز ۴: شاخص‌ها، نمودار روند، دامنه و بدون کتابخانهٔ بیرونی.
+    reports_src = open(os.path.join(PLUGIN, "includes/modules/reports-module.php"), encoding="utf-8").read()
+    if (
+        "function render_kpis(" in reports_src
+        and "function render_trend(" in reports_src
+        and "function render_booking_status(" in reports_src
+        and "function render_workload(" in reports_src
+        and "function render_case_status(" in reports_src
+        and "const TREND_MONTHS = 6" in reports_src
+    ):
+        ok("reports: KPI, trend, booking status, workload and case status sections present")
+    else:
+        fail("reports", "reports module is missing one of the phase 4 sections")
+
+    if "can_view_clinical()" in reports_src and "viewer_can_see_all_cases()" in reports_src:
+        ok("reports: clinical gate plus workload limited to full-case viewers")
+    else:
+        fail("reports", "reports module is not gated clinically or leaks clinic-wide workload")
+
+    if "$wpdb" not in reports_src and "get_option(" not in reports_src and "<script" not in reports_src and "wp_remote_" not in reports_src:
+        ok("reports: owner APIs only, no SQL, options, scripts or remote calls")
+    else:
+        fail("reports", "reports module reaches outside the public owner contracts")
+
+    if "pas-chart-plot" in reports_src and "pas-chart-bar" in reports_src and "pas-meter-fill" in reports_src:
+        ok("reports: trend chart and share meters rendered with dashboard CSS")
+    else:
+        fail("reports", "chart markup is missing its dashboard classes")
+
+    css_src = open(os.path.join(PLUGIN, "assets/css/dashboard-admin.css"), encoding="utf-8").read()
+    if ".pas-chart-plot" in css_src and ".pas-meter-fill" in css_src and "@media (max-width: 600px)" in css_src:
+        ok("reports: chart and meter styles, including the mobile breakpoint")
+    else:
+        fail("reports", "chart/meter styles are missing from the dashboard stylesheet")
+
     # ── 17. version consistency ────────────────────────────────────────
     main_src = open(os.path.join(PLUGIN, "peyvand-amn-unified-dashboard.php"), encoding="utf-8").read()
     readme = open(os.path.join(PLUGIN, "readme.txt"), encoding="utf-8").read()
