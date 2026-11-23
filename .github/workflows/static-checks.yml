@@ -1,0 +1,53 @@
+name: Static checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-verification:
+    name: verify_plugin.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run static and integration checks
+        run: python3 tests/verify_plugin.py
+
+  php-lint:
+    name: php -l (PHP 8.1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: none
+      - name: Lint every PHP file
+        run: |
+          set -o pipefail
+          fail=0
+          count=0
+          while IFS= read -r -d '' file; do
+            count=$((count + 1))
+            if ! output=$(php -l "$file" 2>&1); then
+              echo "::error file=$file::$output"
+              printf '%s\n' "$output"
+              fail=1
+            fi
+          done < <(find plugins tests/php -name '*.php' -print0)
+          echo "Linted ${count} PHP files."
+          if [ "$fail" -ne 0 ]; then
+            echo "PHP syntax errors found."
+            exit 1
+          fi
