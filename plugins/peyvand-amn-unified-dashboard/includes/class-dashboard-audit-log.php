@@ -24,7 +24,7 @@ final class PAS_Dashboard_Audit_Log {
 		}
 
 		$user_id = get_current_user_id();
-		$ip      = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+		$ip      = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 
 		$wpdb->insert(
 			PAS_Dashboard_Database::audit_table(),
@@ -57,7 +57,8 @@ final class PAS_Dashboard_Audit_Log {
 
 		return (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, user_id, action, object_type, object_id, result, created_at FROM $table ORDER BY id DESC LIMIT %d OFFSET %d",
+				'SELECT id, user_id, action, object_type, object_id, result, created_at FROM %i ORDER BY id DESC LIMIT %d OFFSET %d',
+				$table,
 				$limit,
 				$offset
 			)
@@ -72,7 +73,7 @@ final class PAS_Dashboard_Audit_Log {
 			return 0;
 		}
 
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table" );
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
 	}
 
 	/** رخدادهای یک کاربر مشخص — برای بررسی سوءاستفاده. */
@@ -86,7 +87,8 @@ final class PAS_Dashboard_Audit_Log {
 
 		return (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, action, object_type, object_id, result, created_at FROM $table WHERE user_id = %d ORDER BY id DESC LIMIT %d",
+				'SELECT id, action, object_type, object_id, result, created_at FROM %i WHERE user_id = %d ORDER BY id DESC LIMIT %d',
+				$table,
 				(int) $user_id,
 				max( 1, min( 200, (int) $limit ) )
 			)

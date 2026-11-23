@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<ruleset name="Peyvand Amn">
+	<description>WordPress Coding Standards for the Peyvand Amn plugin ecosystem, limited to rules that catch real defects.</description>
+
+	<file>plugins</file>
+	<file>tests/php</file>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="p"/>
+
+	<rule ref="WordPress">
+		<!--
+			Formatting and docblock sniffs are excluded on purpose. The code base is
+			consistently two-space indented and uses short arrays, and re-formatting
+			200+ legacy files would produce an unreviewable diff without changing
+			behaviour. What remains are the sniffs that catch security, database,
+			internationalisation and deprecated-API defects.
+		-->
+		<exclude name="Generic.Commenting.DocComment"/>
+		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent"/>
+		<exclude name="Generic.WhiteSpace.ScopeIndent"/>
+		<exclude name="Generic.WhiteSpace.ArbitraryParenthesesSpacing"/>
+		<exclude name="Generic.Formatting.MultipleStatementAlignment"/>
+		<exclude name="Generic.Formatting.SpaceAfterCast"/>
+		<exclude name="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+		<exclude name="Generic.Functions.FunctionCallArgumentSpacing"/>
+		<exclude name="Generic.ControlStructures.InlineControlStructure"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature"/>
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="Universal.WhiteSpace.CommaSpacing"/>
+		<exclude name="Universal.WhiteSpace.PrecisionAlignment"/>
+		<exclude name="NormalizedArrays.Arrays.ArrayBraceSpacing"/>
+		<exclude name="Squiz.Commenting"/>
+		<exclude name="Squiz.Functions"/>
+		<exclude name="WordPress.Arrays"/>
+		<exclude name="WordPress.WhiteSpace"/>
+		<exclude name="WordPress.PHP.YodaConditions"/>
+		<exclude name="WordPress.Files.FileName"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
+		<exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+		<exclude name="WordPress.NamingConventions.ValidHookName"/>
+		<exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
+		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
+		<exclude name="WordPress.WP.AlternativeFunctions"/>
+		<exclude name="WordPress.DateTime.CurrentTimeTimestamp"/>
+	</rule>
+
+	<!--
+		The project funnels every request value through its own validators, so the
+		sniffer has to be told that these functions sanitize: otherwise every call
+		that is already sanitized is reported as raw input.
+	-->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<properties>
+			<property name="customSanitizingFunctions" type="array">
+				<element value="pas_dashboard_validation::text"/>
+				<element value="pas_dashboard_validation::key"/>
+				<element value="pas_dashboard_validation::id"/>
+				<element value="pas_dashboard_validation::choice"/>
+				<element value="pas_dashboard_validation::mobile"/>
+				<element value="pas_dashboard_validation::status"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

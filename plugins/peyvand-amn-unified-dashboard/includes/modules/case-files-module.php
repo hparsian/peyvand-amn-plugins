@@ -25,7 +25,7 @@ final class PAS_Dashboard_Module_Case_Files extends PAS_Dashboard_Module {
 			return $this->render_detail( 0 );
 		}
 
-		$case_id = isset( $_GET['case_id'] ) ? PAS_Dashboard_Validation::id( wp_unslash( $_GET['case_id'] ) ) : 0;
+		$case_id = isset( $_GET['case_id'] ) ? PAS_Dashboard_Validation::id( absint( wp_unslash( $_GET['case_id'] ) ) ) : 0;
 
 		if ( $case_id > 0 ) {
 			return $this->render_detail( $case_id );

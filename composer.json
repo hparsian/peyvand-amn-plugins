@@ -1,0 +1,16 @@
+{
+  "name": "hparsian/peyvand-amn-plugins",
+  "description": "Static checks and WordPress Coding Standards for the Peyvand Amn plugin ecosystem.",
+  "type": "project",
+  "license": "proprietary",
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.11",
+    "wp-coding-standards/wpcs": "^3.1",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

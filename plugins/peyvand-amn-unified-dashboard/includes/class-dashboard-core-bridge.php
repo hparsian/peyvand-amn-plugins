@@ -411,6 +411,7 @@ final class PAS_Dashboard_Core_Bridge {
 				}
 			} catch ( Throwable $e ) {
 				// به تاریخ میلادی برمی‌گردیم
+				$jalali = '';
 			}
 		}
 
@@ -432,6 +433,7 @@ final class PAS_Dashboard_Core_Bridge {
 				}
 			} catch ( Throwable $e ) {
 				// به مقدار خام برمی‌گردیم
+				$out = '';
 			}
 		}
 
@@ -462,6 +464,7 @@ final class PAS_Dashboard_Core_Bridge {
 					}
 				} catch ( Throwable $e ) {
 					// کلاس بعدی
+					$gregorian = null;
 				}
 			}
 		}

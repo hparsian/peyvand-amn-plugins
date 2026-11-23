@@ -150,7 +150,7 @@ final class PAS_Dashboard_Plugin {
 	/* ── چرخه‌ی عمر ─────────────────────────────────────────────────────── */
 
 	public static function activate() {
-		PAS_Dashboard_Plugin::instance();
+		self::instance();
 
 		PAS_Dashboard_Database::install();
 		PAS_Dashboard_Permissions::grant_default_caps();

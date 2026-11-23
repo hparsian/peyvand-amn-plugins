@@ -32,7 +32,9 @@ final class PAS_Dashboard_Module_Settings extends PAS_Dashboard_Module {
 		$current = is_array( $current ) ? $current : array();
 		$current = array_merge( PAS_Dashboard_Permissions::default_settings(), $current );
 
+		// phpcs:ignore WordPress.Security.NonceVerification -- Reached only through the settings.save action, which verifies the nonce in PAS_Dashboard_Actions::dispatch().
 		$per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 20;
+		// phpcs:ignore WordPress.Security.NonceVerification -- Reached only through the settings.save action, which verifies the nonce in PAS_Dashboard_Actions::dispatch().
 		$range    = isset( $_POST['default_range_days'] ) ? absint( $_POST['default_range_days'] ) : 30;
 
 		$new = array(

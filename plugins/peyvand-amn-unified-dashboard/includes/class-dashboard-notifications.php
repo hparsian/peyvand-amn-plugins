@@ -54,9 +54,10 @@ final class PAS_Dashboard_Notifications {
 
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO $table (user_id, dedupe_key, type, title, ref, created_at, read_at)
+					'INSERT INTO %i (user_id, dedupe_key, type, title, ref, created_at, read_at)
 					 VALUES (%d, %s, %s, %s, %s, %s, NULL)
-					 ON DUPLICATE KEY UPDATE title = VALUES(title)",
+					 ON DUPLICATE KEY UPDATE title = VALUES(title)',
+					$table,
 					$user_id,
 					$key,
 					'upcoming_session',
@@ -81,7 +82,7 @@ final class PAS_Dashboard_Notifications {
 		}
 
 		return (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM $table WHERE user_id = %d AND read_at IS NULL", (int) $user_id )
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE user_id = %d AND read_at IS NULL', $table, (int) $user_id )
 		);
 	}
 
@@ -96,7 +97,8 @@ final class PAS_Dashboard_Notifications {
 
 		return (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, type, title, ref, created_at, read_at FROM $table WHERE user_id = %d ORDER BY id DESC LIMIT %d",
+				'SELECT id, type, title, ref, created_at, read_at FROM %i WHERE user_id = %d ORDER BY id DESC LIMIT %d',
+				$table,
 				(int) $user_id,
 				max( 1, min( 100, (int) $limit ) )
 			)
@@ -120,7 +122,7 @@ final class PAS_Dashboard_Notifications {
 		}
 
 		$owner = (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT user_id FROM $table WHERE id = %d", $notification_id )
+			$wpdb->prepare( 'SELECT user_id FROM %i WHERE id = %d', $table, $notification_id )
 		);
 
 		if ( $owner !== $user_id ) {
@@ -142,7 +144,7 @@ final class PAS_Dashboard_Notifications {
 		}
 
 		return (int) $wpdb->query(
-			$wpdb->prepare( "UPDATE $table SET read_at = %s WHERE user_id = %d AND read_at IS NULL", current_time( 'mysql', true ), (int) $user_id )
+			$wpdb->prepare( 'UPDATE %i SET read_at = %s WHERE user_id = %d AND read_at IS NULL', $table, current_time( 'mysql', true ), (int) $user_id )
 		);
 	}
 }

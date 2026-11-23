@@ -77,10 +77,11 @@ final class PAS_Dashboard_Actions {
 	}
 
 	public static function dispatch() {
-		if ( 'POST' !== strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) ) {
+		if ( 'POST' !== strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) ) ) {
 			wp_die( esc_html__( 'این عملیات فقط با POST مجاز است.', 'peyvand-amn-dashboard' ), '', array( 'response' => 405 ) );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification -- The nonce for this action id is verified a few lines below.
 		$id     = isset( $_POST['pas_action'] ) ? sanitize_key( wp_unslash( $_POST['pas_action'] ) ) : '';
 		$config = self::get( $id );
 
@@ -103,6 +104,7 @@ final class PAS_Dashboard_Actions {
 			wp_die( esc_html__( 'دسترسی به داشبورد مجاز نیست.', 'peyvand-amn-dashboard' ), '', array( 'response' => 403 ) );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification -- Nonce, capability and dashboard access were verified above.
 		$post   = wp_unslash( $_POST );
 		$result = call_user_func( $config['handler'], is_array( $post ) ? $post : array() );
 

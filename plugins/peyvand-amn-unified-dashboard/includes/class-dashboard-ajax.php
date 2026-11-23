@@ -37,6 +37,7 @@ final class PAS_Dashboard_Ajax {
 	}
 
 	private static function post( $key, $default = '' ) {
+		// phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput -- guard() verifies the nonce before any handler runs and every handler sends this value through PAS_Dashboard_Validation.
 		return isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : $default;
 	}
 

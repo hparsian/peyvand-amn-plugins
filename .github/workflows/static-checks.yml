@@ -51,3 +51,69 @@ jobs:
             echo "PHP syntax errors found."
             exit 1
           fi
+
+  php-tests:
+    name: Standalone PHP tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: none
+      # These three suites do not load WordPress, so they can run on every push.
+      - name: tests/php/test-jalali.php
+        run: php tests/php/test-jalali.php
+      - name: tests/php/test-validation.php
+        run: php tests/php/test-validation.php
+      - name: tests/php/test-load.php
+        run: php tests/php/test-load.php
+
+  wpcs:
+    name: WPCS (errors)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The changed-file gate compares against the previous commit of the
+          # same ref, so the parent commit has to be present in the clone.
+          fetch-depth: 2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer
+      - name: Install phpcs and WPCS
+        run: composer install --no-interaction --no-progress
+      - name: Install the coding standards
+        run: vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra
+      # The legacy plugins still carry a large backlog of formatting and
+      # security-sniff findings (tracked as RW-34 in docs/REMAINING-WORK.md),
+      # so the blocking gate covers the PHP files this push actually changes.
+      - name: Collect changed PHP files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="origin/${{ github.base_ref }}"
+            git fetch --no-tags --depth=2 origin "${{ github.base_ref }}"
+          else
+            base="${{ github.event.before }}"
+            case "$base" in
+              ''|0000000000000000000000000000000000000000) base="HEAD^" ;;
+            esac
+          fi
+          git diff --name-only --diff-filter=ACMR "$base" HEAD -- '*.php' > changed-php.txt || true
+          echo "Changed PHP files:"
+          cat changed-php.txt
+          if [ -s changed-php.txt ]; then
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: WPCS on changed files
+        if: steps.changed.outputs.any == 'true'
+        run: vendor/bin/phpcs --file-list=changed-php.txt --warning-severity=0
+      - name: WPCS backlog report (whole repository, not blocking)
+        continue-on-error: true
+        run: vendor/bin/phpcs --report=summary --warning-severity=0 plugins tests/php

@@ -18,7 +18,7 @@ final class PAS_Dashboard_Module_Patients extends PAS_Dashboard_Module {
 			return $this->unavailable( __( 'افزونه‌ی هسته‌ی مشترک فعال نیست؛ رجیستری هویت در دسترس نیست.', 'peyvand-amn-dashboard' ) );
 		}
 
-		$client_id = isset( $_GET['client_id'] ) ? PAS_Dashboard_Validation::text( wp_unslash( $_GET['client_id'] ), 64 ) : '';
+		$client_id = isset( $_GET['client_id'] ) ? PAS_Dashboard_Validation::text( sanitize_text_field( wp_unslash( $_GET['client_id'] ) ), 64 ) : '';
 
 		if ( $client_id !== '' ) {
 			return $this->render_detail( $client_id );
@@ -28,8 +28,8 @@ final class PAS_Dashboard_Module_Patients extends PAS_Dashboard_Module {
 	}
 
 	private function render_search() {
-		$query = isset( $_GET['q'] ) ? PAS_Dashboard_Validation::text( wp_unslash( $_GET['q'] ), 190 ) : '';
-		$type  = isset( $_GET['type'] ) ? PAS_Dashboard_Validation::choice( wp_unslash( $_GET['type'] ), array( 'client_id', 'mobile', 'email' ), 'client_id' ) : 'client_id';
+		$query = isset( $_GET['q'] ) ? PAS_Dashboard_Validation::text( sanitize_text_field( wp_unslash( $_GET['q'] ) ), 190 ) : '';
+		$type  = isset( $_GET['type'] ) ? PAS_Dashboard_Validation::choice( sanitize_key( wp_unslash( $_GET['type'] ) ), array( 'client_id', 'mobile', 'email' ), 'client_id' ) : 'client_id';
 
 		$html  = $this->card_open( __( 'جست‌وجوی مراجع', 'peyvand-amn-dashboard' ) );
 		$html .= '<form method="get" class="pas-filter-form">';

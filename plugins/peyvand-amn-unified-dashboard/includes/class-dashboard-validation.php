@@ -89,15 +89,18 @@ final class PAS_Dashboard_Validation {
 
 	/** چک‌باکس POST — فقط مقدار «۱» پذیرفته می‌شود. */
 	public static function checkbox( $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Single-field sanitizer; the calling action verifies the nonce.
 		if ( ! isset( $_POST[ $key ] ) ) {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Single-field sanitizer; the calling action verifies the nonce.
 		return '1' === sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 	}
 
 	/** پرچم GET — فقط برای نمایش پیام «ذخیره شد»؛ مقدار مهم نیست. */
 	public static function flag( $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flag; the calling page verifies the nonce.
 		return isset( $_GET[ $key ] ) && '1' === sanitize_text_field( wp_unslash( $_GET[ $key ] ) );
 	}
 

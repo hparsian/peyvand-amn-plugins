@@ -25,8 +25,8 @@ final class PAS_Dashboard_Module_Assessments extends PAS_Dashboard_Module {
 			return $this->unavailable( __( 'قرارداد دعوت/گزارش آزمون در افزونهٔ مالک در دسترس نیست.', 'peyvand-amn-dashboard' ) );
 		}
 
-		$invitation_id = isset( $_GET['invitation_id'] ) ? PAS_Dashboard_Validation::id( wp_unslash( $_GET['invitation_id'] ) ) : 0;
-		$attempt_id    = isset( $_GET['attempt_id'] ) ? PAS_Dashboard_Validation::id( wp_unslash( $_GET['attempt_id'] ) ) : 0;
+		$invitation_id = isset( $_GET['invitation_id'] ) ? PAS_Dashboard_Validation::id( absint( wp_unslash( $_GET['invitation_id'] ) ) ) : 0;
+		$attempt_id    = isset( $_GET['attempt_id'] ) ? PAS_Dashboard_Validation::id( absint( wp_unslash( $_GET['attempt_id'] ) ) ) : 0;
 
 		if ( $invitation_id > 0 && $attempt_id > 0 ) {
 			return $this->render_report( $invitation_id, $attempt_id );
@@ -41,7 +41,7 @@ final class PAS_Dashboard_Module_Assessments extends PAS_Dashboard_Module {
 
 	private function render_home() {
 		$tests       = PAS_Dashboard_Core_Bridge::assessments();
-		$status      = isset( $_GET['status'] ) ? PAS_Dashboard_Validation::key( wp_unslash( $_GET['status'] ) ) : '';
+		$status      = isset( $_GET['status'] ) ? PAS_Dashboard_Validation::key( sanitize_key( wp_unslash( $_GET['status'] ) ) ) : '';
 		$invitations = PAS_Dashboard_Adapter_Quiz::invitations( 200, $status );
 		$link        = PAS_Dashboard_Adapter_Quiz::take_invite_link();
 

@@ -19,7 +19,7 @@ final class PAS_Dashboard_Module_Appointments extends PAS_Dashboard_Module {
 	public function render() {
 		$can_manage = current_user_can( defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) ? PAS_DASHBOARD_CAP_APPOINTMENTS : 'manage_options' );
 		$portal     = PAS_Dashboard_Adapter_Portal::available();
-		$search     = isset( $_GET['s'] ) ? PAS_Dashboard_Validation::text( wp_unslash( $_GET['s'] ), 60 ) : '';
+		$search     = isset( $_GET['s'] ) ? PAS_Dashboard_Validation::text( sanitize_text_field( wp_unslash( $_GET['s'] ) ), 60 ) : '';
 
 		$html = '';
 

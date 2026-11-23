@@ -28,7 +28,7 @@ final class PAS_Dashboard_Router {
 	}
 
 	public static function current_module() {
-		$requested = isset( $_GET['module'] ) ? PAS_Dashboard_Validation::key( wp_unslash( $_GET['module'] ) ) : '';
+		$requested = isset( $_GET['module'] ) ? PAS_Dashboard_Validation::key( sanitize_key( wp_unslash( $_GET['module'] ) ) ) : '';
 		$visible   = PAS_Dashboard_Permissions::visible_modules();
 
 		if ( $requested !== '' && isset( $visible[ $requested ] ) ) {

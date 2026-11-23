@@ -7,3 +7,7 @@ _analysis/
 # فایل‌های موقت/سیستمی
 .DS_Store
 *.log
+
+# ابزارهای توسعه (نصب با composer، بازتولیدپذیر از composer.lock)
+vendor/
+changed-php.txt
