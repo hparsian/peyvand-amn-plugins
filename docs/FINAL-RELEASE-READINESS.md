@@ -1,5 +1,8 @@
 # FINAL RELEASE READINESS (PHASE TWO)
 
+> **Remaining conditions below are tracked as RW-19 to RW-23 in
+> [`REMAINING-WORK.md`](REMAINING-WORK.md)**, which is the single list of open work.
+
 **Version:** 2.0.0
 **Package:** `dist/peyvand-amn-unified-dashboard-2.4.0.zip`
 **Decision:** **CONDITIONAL GO** — staging deployment approved; production
