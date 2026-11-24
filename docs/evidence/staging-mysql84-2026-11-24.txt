@@ -173,7 +173,9 @@ WordPress.org. ...) in /tmp/wp-mysql84/wp-includes/functions.php on line 6260
 - اسکریپت‌های HTTP فاز ۱۱ (`tests/phase11/*.php`) چون وب‌سرور محلی بالا نیامد؛
   `migration-verify` افزون بر آن به نصب نسخهٔ قدیمی داشبورد نیاز دارد.
   **بعداً بسته شد:** همین سه اسکریپت (idor-roles، plugin-isolation، sms-otp) روی
-  همین بدل و با وب‌سرور محلی اجرا و در `phase11-http-2026-11-24.txt` ثبت شدند.
+  همین بدل و با وب‌سرور محلی اجرا و در `phase11-http-2026-11-24.txt` ثبت شدند؛
+  سه اسکریپت باقی‌مانده (encryption، backup-restore، migration-verify) هم در
+  `phase11-remaining-2026-11-24.txt` ثبت شدند.
 - به‌روزرسانی واقعی از گیت‌هاب (نیازمند توکن و ترافیک به مخزن).
 
 ## برای اجرا روی میزبان استیجینگ واقعی چه چیزی لازم است

@@ -11,7 +11,10 @@ Server 8.4.11 / InnoDB** (`docs/evidence/staging-mysql84-2026-11-24.txt` plus
 `staging-mysql84-2026-11-24-raw.txt`) with the same per-suite counts. The three
 HTTP phase-11 scripts (IDOR/roles, plugin isolation, SMS/OTP) were then run on
 that same MySQL 8.4 replica behind a local PHP web server — 19 PASS + 1
-ACCEPTED, 19/19 and 13/13 (`docs/evidence/phase11-http-2026-11-24.txt`).
+ACCEPTED, 19/19 and 13/13 (`docs/evidence/phase11-http-2026-11-24.txt`). The
+remaining phase-11 scripts also ran there: encryption 9/9, backup/restore with
+39/39 tables and 0 mismatches, and a real 1.9.0 → 2.10.2 upgrade at 15/15
+(`docs/evidence/phase11-remaining-2026-11-24.txt`).
 
 | Suite | Command | Result |
 |---|---|---|
