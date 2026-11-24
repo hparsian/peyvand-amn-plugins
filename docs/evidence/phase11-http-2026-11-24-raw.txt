@@ -1,0 +1,117 @@
+===== PHASE 11 HTTP: idor-roles.php (site http://127.0.0.1:8090) =====
+setup: caseA=14 caseB=15 noteB=10 therapist=21 other=22 client=23
+--------------------------------------------------------------------------------------------------------------
+PASS     | regression: add_note returns the note id       | noteB=10 present_in_notes=yes
+PASS     | http: missing case yields 4xx not 500          | http=404
+PASS     | IDOR: case page of another therapist           | http=200 leak=no denied_msg=yes
+PASS     | control: own case page opens                   | http=200 own_name=yes
+PASS     | scope: case list hides other cases             | http=403 leak=no
+PASS     | IDOR: print other case                         | http=403 leak=no msg=denied
+PASS     | IDOR: delete note of other case                | http=403 note_survived=yes
+PASS     | IDOR: save other case                          | http=403 name_now=پرونده-ب-محرمانه
+PASS     | scope: CSV export                              | http=200 bytes=283 leak=no
+PASS     | escalation: therapist -> health dashboard      | http=403
+PASS     | escalation: therapist -> sms settings          | http=403
+PASS     | escalation: therapist -> client portal admin   | http=403
+PASS     | control: admin sees any case                   | http=200
+PASS     | client cannot open case files                  | case_http=403 list_http=403
+PASS     | client cannot delete notes                     | http=403 note_survived=yes
+PASS     | client cannot save case                        | http=403
+PASS     | IDOR: quiz report without token                | http=401 attempt=1 body={"code":"rest_forbidden","message":"Sorr
+ACCEPTED | lookup: therapist sees name of any client      | http=200 name_returned=no body={"success":true,"data":{"name":"\u067e\u0631\u0648\u0646\u06
+PASS     | lookup: without nonce rejected                 | http=403 body=-1
+PASS     | anonymous: case page blocked                   | http=302 redirect_to_login=no
+--------------------------------------------------------------------------------------------------------------
+TOTALS: {"PASS":19,"FAIL":0,"FINDING":0,"BLOCKED":0,"ACCEPTED":1}
+wpdb last_error: none
+----- EXIT: idor-roles = 0
+
+===== PHASE 11 HTTP: plugin-isolation.php (site http://127.0.0.1:8090) =====
+--------------------------------------------------------------------------------------------------------------------
+PASS  | pivand-amn-core OFF          | page=case-file   http=200 fatal=no notice=yes
+PASS  | pivand-amn-core OFF          | page=core-health http=403 fatal=no notice=no
+PASS  | pivand-amn-core OFF          | page=quiz        http=200 fatal=no notice=yes
+PASS  | pivand-amn-core OFF          | page=portal      http=200 fatal=no notice=yes
+PASS  | pivand-amn-core ON           | page=case-file   http=200 fatal=no (restored)
+PASS  | pivand-amn-sms-bridge OFF    | page=sms         http=403 fatal=no notice=no
+PASS  | pivand-amn-sms-bridge OFF    | page=case-file   http=200 fatal=no notice=yes
+PASS  | pivand-amn-sms-bridge ON     | page=sms         http=200 fatal=no (restored)
+PASS  | pivand-amn-quiz-enterprise OFF | page=quiz        http=403 fatal=no notice=no
+PASS  | pivand-amn-quiz-enterprise OFF | page=case-file   http=200 fatal=no notice=yes
+PASS  | pivand-amn-quiz-enterprise ON | page=quiz        http=200 fatal=no (restored)
+PASS  | pivand-amn-client-portal OFF | page=portal      http=403 fatal=no notice=no
+PASS  | pivand-amn-client-portal OFF | page=case-file   http=200 fatal=no notice=yes
+PASS  | pivand-amn-client-portal ON  | page=portal      http=200 fatal=no (restored)
+PASS  | pivand-amn-case-file OFF     | page=case-file   http=403 fatal=no notice=no
+PASS  | pivand-amn-case-file OFF     | page=portal      http=200 fatal=no notice=no
+PASS  | pivand-amn-case-file OFF     | page=quiz        http=200 fatal=no notice=yes
+PASS  | pivand-amn-case-file ON      | page=case-file   http=200 fatal=no (restored)
+--------------------------------------------------------------------------------------------------------------------
+PASS  | data intact across deactivations | cases 6→6 notes 4→4
+TOTALS: PASS=19 FAIL=0
+wpdb last_error: none
+----- EXIT: plugin-isolation = 0
+=== active plugins after run ===
+name,version
+peyvand-amn-unified-dashboard,2.10.2
+pivand-amn-quiz-enterprise,3.8.19
+pivand-amn-2fa,1.3.5
+pivand-amn-smtp-mailer,1.5.7
+pivand-amn-content-writer,2.9.21
+payvand-contact,1.4.5
+piwand-daily-feed,1.1.6
+pivand-amn-core,1.9.1
+pivand-amn-case-file,1.17.0
+pivand-amn-sms-bridge,1.1.10
+pivand-amn-client-portal,1.13.2.7
+payvand-amn-ui-kit,2.0.0
+
+===== PHASE 11 HTTP: sms-otp.sh (site http://127.0.0.1:8090) =====
+== ۱) ارسال کد با ترنسپورت شبیه‌سازی‌شده ==
+FAIL  | send-otp returns success                       | http=400 msg=ارسال پیامک ناموفق بود. لطفاً با ایمیل وارد شوید یا کمی بعد دوباره تلاش کنید.
+payload=
+FAIL  | provider request targets the mobile            | 
+FAIL  | provider request carries the pattern id        | 
+FAIL  | code stored only after successful send         | empty
+FAIL  | sent text is the same code                     | 
+== ۲) کد اشتباه و سپس کد درست ==
+PASS  | wrong code rejected                            | http=400 msg=کد منقضی شده یا قبلاً استفاده شده است. لطفاً دوباره درخواست کد کنید.
+FAIL  | correct code logs the client in                | http=400 msg=کد منقضی شده یا قبلاً استفاده شده است. لطفاً دوباره درخواست کد کنید.
+== ۳) محدودیت نرخ ارسال مجدد ==
+PASS  | resend within 60s is throttled                 | http=400
+== ۴) کد منقضی‌شده (بعد از ۶۵ ثانیه) ==
+PASS  | expired code rejected                          | http=400 msg=کد منقضی شده یا قبلاً استفاده شده است. لطفاً دوباره درخواست کد کنید.
+== ۵) قفل پس از ۵ تلاش ناموفق ==
+PASS  | code invalidated after 5 failed attempts       | http=400 msg=کد منقضی شده یا قبلاً استفاده شده است. لطفاً دوباره درخواست کد کنید.
+PASS  | code removed from storage after lock           | len=0
+== ۶) شکست ارسال: کد ذخیره نمی‌شود ==
+PASS  | send failure surfaces as an error              | http=400 msg=ارسال پیامک ناموفق بود. لطفاً با ایمیل وارد شوید یا کمی بعد دوباره تلاش کنید.
+PASS  | no orphan code when the provider fails         | len=0
+TOTALS: PASS=7 FAIL=6
+نکته: ارسال واقعی به گوشی در این محیط قابل اثبات نیست (اعتبارنامه‌ی ملی‌پیامک موجود نیست) — BLOCKED.
+----- EXIT: sms-otp = 0
+
+===== PHASE 11 HTTP: sms-otp.sh — RETRY after configuring simulated credentials (pas_sms_username/password) and zdp_sms_body_id=123456 =====
+== ۱) ارسال کد با ترنسپورت شبیه‌سازی‌شده ==
+PASS  | send-otp returns success                       | http=200 msg=کد تایید ارسال شد.
+payload={"username": "p11_sim_user", "password": "p11_sim_pass", "text": "69895", "to": "09121120027", "bodyId": 123456}
+PASS  | provider request targets the mobile            | to=09121120027
+PASS  | provider request carries the pattern id        | bodyId=123456
+PASS  | code stored only after successful send         | len=5
+PASS  | sent text is the same code                     | text=69895
+== ۲) کد اشتباه و سپس کد درست ==
+PASS  | wrong code rejected                            | http=400 msg=کد وارد شده صحیح نیست. 4 تلاش دیگر باقی مانده است.
+PASS  | correct code logs the client in                | http=200
+== ۳) محدودیت نرخ ارسال مجدد ==
+PASS  | resend within 60s is throttled                 | http=400
+== ۴) کد منقضی‌شده (بعد از ۶۵ ثانیه) ==
+PASS  | expired code rejected                          | http=400 msg=کد منقضی شده یا قبلاً استفاده شده است. لطفاً دوباره درخواست کد کنید.
+== ۵) قفل پس از ۵ تلاش ناموفق ==
+PASS  | code invalidated after 5 failed attempts       | http=400 msg=تعداد تلاش‌های ناموفق شما بیش از حد مجاز بود. لطفاً مجدداً درخواست کد کنید.
+PASS  | code removed from storage after lock           | len=0
+== ۶) شکست ارسال: کد ذخیره نمی‌شود ==
+PASS  | send failure surfaces as an error              | http=400 msg=ارسال پیامک ناموفق بود. لطفاً با ایمیل وارد شوید یا کمی بعد دوباره تلاش کنید.
+PASS  | no orphan code when the provider fails         | len=0
+TOTALS: PASS=13 FAIL=0
+نکته: ارسال واقعی به گوشی در این محیط قابل اثبات نیست (اعتبارنامه‌ی ملی‌پیامک موجود نیست) — BLOCKED.
+----- EXIT: sms-otp(retry) = 0

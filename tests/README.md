@@ -8,7 +8,10 @@ on a real **MariaDB 11.4.5 / InnoDB** server with identical counts
 (`docs/evidence/staging-mysql-2026-11-24.txt` plus the raw
 `staging-mysql-2026-11-24-raw.txt`), and again on **Oracle MySQL Community
 Server 8.4.11 / InnoDB** (`docs/evidence/staging-mysql84-2026-11-24.txt` plus
-`staging-mysql84-2026-11-24-raw.txt`) with the same per-suite counts.
+`staging-mysql84-2026-11-24-raw.txt`) with the same per-suite counts. The three
+HTTP phase-11 scripts (IDOR/roles, plugin isolation, SMS/OTP) were then run on
+that same MySQL 8.4 replica behind a local PHP web server — 19 PASS + 1
+ACCEPTED, 19/19 and 13/13 (`docs/evidence/phase11-http-2026-11-24.txt`).
 
 | Suite | Command | Result |
 |---|---|---|
