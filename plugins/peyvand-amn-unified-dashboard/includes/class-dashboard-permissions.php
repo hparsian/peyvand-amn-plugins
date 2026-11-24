@@ -31,7 +31,10 @@ final class PAS_Dashboard_Permissions {
 			'updates_repo'          => 'hparsian/peyvand-amn-plugins',
 			'updates_branch'        => 'main',
 			'github_token'          => '',
-			'enable_auto_updates'   => false,
+			// پیش‌فرض روشن است تا نسخه‌های تازه بدون نصب دستی روی سایت بنشینند؛
+			// مدیر می‌تواند از ماژول «به‌روزرسانی‌ها» خاموشش کند و خاموش‌بودنش
+			// با نشانگر `updates_auto_defaulted` حفظ می‌شود.
+			'enable_auto_updates'   => true,
 		);
 	}
 

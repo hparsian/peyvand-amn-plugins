@@ -107,6 +107,31 @@ final class PAS_Dashboard_Updater {
 		return (bool) PAS_Dashboard_Permissions::feature( 'enable_auto_updates' );
 	}
 
+	/**
+	 * یک‌بار روشن‌کردن به‌روزرسانی خودکار برای سایت‌هایی که از نسخهٔ پیشین
+	 * ارتقا می‌یابند.
+	 *
+	 * پیش‌فرض نسخهٔ ۲.۱۰.۰ خاموش بود؛ تا مدیر تیکش نمی‌زد، نسخهٔ تازه فقط
+	 * پیشنهاد می‌شد و نصب دستی لازم داشت. این مهاجرت یک‌بار اجرا می‌شود و
+	 * نشانگر `updates_auto_defaulted` می‌گذارد؛ بنابراین اگر مدیر بعداً
+	 * خاموشش کند، در آپدیت‌های بعدی دوباره روشن نمی‌شود.
+	 */
+	public static function maybe_enable_auto_updates() {
+		$saved = get_option( PAS_DASHBOARD_OPTION, array() );
+		$saved = is_array( $saved ) ? $saved : array();
+
+		if ( ! empty( $saved['updates_auto_defaulted'] ) ) {
+			return;
+		}
+
+		$saved = array_merge( PAS_Dashboard_Permissions::default_settings(), $saved );
+		$saved['enable_auto_updates']    = true;
+		$saved['updates_auto_defaulted'] = '1';
+
+		update_option( PAS_DASHBOARD_OPTION, $saved );
+		self::clear_cache();
+	}
+
 	/* ── فهرست مخزن ────────────────────────────────────────────────────── */
 
 	/**

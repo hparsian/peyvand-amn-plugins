@@ -100,6 +100,9 @@ final class PAS_Dashboard_Plugin {
 
 		if ( get_option( 'pas_dashboard_version' ) !== PAS_DASHBOARD_VERSION ) {
 			PAS_Dashboard_Permissions::grant_default_caps();
+			// از ۲.۱۰.۱ به بعد آپدیت خودکار پیش‌فرض روشن است تا نسخه‌های تازه
+			// بدون نصب دستی برسند؛ این فراخوانی فقط یک‌بار اثر دارد.
+			PAS_Dashboard_Updater::maybe_enable_auto_updates();
 			update_option( 'pas_dashboard_version', PAS_DASHBOARD_VERSION );
 		}
 
