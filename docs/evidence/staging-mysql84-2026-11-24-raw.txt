@@ -1,0 +1,441 @@
+===== ENVIRONMENT =====
+WP: 7.1.5
+version	comment	engine	ok
+8.4.11	MySQL Community Server - GPL	InnoDB	2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881
+
+name,version
+peyvand-amn-unified-dashboard,2.10.2
+pivand-amn-quiz-enterprise,3.8.19
+pivand-amn-2fa,1.3.5
+pivand-amn-smtp-mailer,1.5.7
+pivand-amn-content-writer,2.9.21
+payvand-contact,1.4.5
+piwand-daily-feed,1.1.6
+pivand-amn-core,1.9.1
+pivand-amn-case-file,1.17.0
+pivand-amn-sms-bridge,1.1.10
+pivand-amn-client-portal,1.13.2.7
+payvand-amn-ui-kit,2.0.0
+
+===== SUITE: smoke  (wp eval-file tests/wp/smoke.php) =====
+--- activation & schema ---
+PASS  plugin class loaded
+PASS  plugin is active
+PASS  audit table created by dbDelta
+PASS  notifications table created by dbDelta
+PASS  db version option stored
+--- capabilities ---
+PASS  administrator holds dashboard cap
+PASS  administrator keeps manage_options
+--- fail-closed without upstream plugins or crypto key ---
+PASS  Core detection matches class reality
+PASS  Case File detection matches class reality
+PASS  crypto readiness matches configuration
+PASS  note writing is never allowed without crypto
+PASS  anonymous case access returns WP_Error
+PASS  dashboard denied to anonymous
+PASS  missing case is not leaked to admin
+PASS  settings option is an array
+PASS  module matrix exposes the shipped module set
+PASS  every matrix module declares a class
+PASS  notifications feature defaults on
+PASS  assessments module reachable for admin
+PASS  export allowed for admin
+--- hooks, menu, REST ---
+PASS  ajax hook registered: save_note
+PASS  no unauthenticated ajax: save_note
+PASS  ajax hook registered: delete_note
+PASS  no unauthenticated ajax: delete_note
+PASS  ajax hook registered: restore_note
+PASS  no unauthenticated ajax: restore_note
+PASS  ajax hook registered: mark_notifications_read
+PASS  no unauthenticated ajax: mark_notifications_read
+PASS  dashboard menu registered
+PASS  all shipped modules visible to admin
+PASS  no stray submenus under dashboard
+PASS  3 dashboard REST routes registered
+PASS  REST summary denies anonymous
+PASS  REST notes denies anonymous
+PASS  REST health answers admin
+--- own-table writes ---
+PASS  audit write and read
+PASS  audit stores no raw IP
+PASS  notification insert succeeds
+PASS  unread count reflects insert
+PASS  mark_read rejects a foreign notification
+PASS  foreign mark_read leaves it unread
+PASS  mark_read works for the owner
+PASS  unread count drops after read
+--- CSV cell hardening ---
+PASS  formula cell is neutralised
+PASS  plus-prefixed cell neutralised
+PASS  at-prefixed cell neutralised
+PASS  plain value untouched
+PASS  numeric id untouched
+PASS  empty value untouched
+
+PASSED: 49  FAILED: 0
+----- EXIT: smoke = 0
+
+===== SUITE: integration  (wp eval-file tests/wp/integration.php) =====
+--- dependencies ---
+PASS  Core detected
+PASS  Case File detected
+PASS  crypto configured
+PASS  therapist role exists
+--- fixtures ---
+PASS  two therapists created
+PASS  therapist holds case-file cap
+PASS  therapist lacks view-all cap
+PASS  two cases created
+--- dashboard authorization ---
+PASS  therapist can open dashboard
+PASS  therapist has clinical access
+PASS  therapist cannot manage settings
+PASS  own case authorized
+PASS  other therapist case denied
+PASS  denial is "forbidden"
+PASS  case list contains own case
+PASS  case list excludes foreign case
+PASS  admin can open any case
+PASS  admin list includes the other therapist case
+PASS  admin list includes both fixtures
+--- encrypted note lifecycle (as owning therapist) ---
+PASS  notes are writable with key + cap
+PASS  note created
+PASS  note stored encrypted at rest
+PASS  note listed for own case
+PASS  note decrypts for authorized therapist
+PASS  note update succeeds
+PASS  note history recorded
+PASS  update with wrong case id refused
+PASS  note delete succeeds
+PASS  deleted note gone from list
+--- REST surface on real cases ---
+PASS  REST own notes 200
+PASS  REST foreign notes denied
+PASS  REST summary 200 for therapist
+--- honest cleanup ---
+
+PASSED: 32  FAILED: 0
+----- EXIT: integration = 0
+
+===== SUITE: render  (wp eval-file tests/wp/render.php) =====
+--- administrator (all modules) ---
+PASS  admin: renders overview
+PASS  admin: renders patients
+PASS  admin: renders case_files
+PASS  admin: renders assessments
+PASS  admin: renders appointments
+PASS  admin: renders reports
+PASS  admin: renders communications
+PASS  admin: renders followup
+PASS  admin: renders notifications
+PASS  admin: renders ecosystem
+PASS  admin: renders updates
+PASS  admin: renders system_health
+PASS  admin: renders settings
+PASS  admin: renders audit
+PASS  admin rendered all modules
+--- therapist (restricted modules) ---
+PASS  therapist sees fewer modules than admin
+PASS  therapist cannot see settings
+PASS  therapist cannot see audit
+PASS  therapist can see case files
+PASS  therapist: renders overview
+PASS  therapist: renders patients
+PASS  therapist: renders case_files
+PASS  therapist: renders assessments
+PASS  therapist: renders appointments
+PASS  therapist: renders reports
+PASS  therapist: renders communications
+PASS  therapist: renders followup
+PASS  therapist: renders notifications
+PASS  therapist rendered every visible module
+--- PHP notices during rendering ---
+PASS  no plugin warnings/notices while rendering
+
+PASSED: 30  FAILED: 0
+----- EXIT: render = 0
+
+===== SUITE: ajax-permissions  (wp eval-file tests/wp/ajax-permissions.php) =====
+--- fixtures ---
+PASS  fixtures created
+--- unauthenticated / nonce / capability ---
+PASS  anonymous AJAX denied
+PASS  invalid nonce denied
+PASS  logged-in user without dashboard cap denied
+--- live note authorization ---
+PASS  own case note created via AJAX
+PASS  foreign case note refused via AJAX
+PASS  foreign note delete refused via AJAX
+PASS  own note delete allowed via AJAX
+PASS  malformed input refused via AJAX
+--- cleanup ---
+
+PASSED: 9  FAILED: 0
+----- EXIT: ajax-permissions = 0
+
+===== SUITE: note-crud  (wp eval-file tests/wp/note-crud.php) =====
+--- fixtures ---
+PASS  fixtures created
+--- create ---
+PASS  note created through the AJAX handler
+PASS  note stored as ciphertext
+PASS  audit records note.create with the contract name
+PASS  no dot-stripped audit action remains
+--- update ---
+PASS  note updated through the AJAX handler
+PASS  audit records note.update
+PASS  update leaves a version snapshot
+PASS  edited text is not stored in plaintext
+--- foreign therapist denied and audited ---
+PASS  foreign save refused
+PASS  foreign save is audited as denied
+PASS  foreign delete refused
+PASS  foreign delete is audited as denied
+PASS  foreign restore refused
+PASS  foreign restore is audited as denied
+PASS  foreign attempts left the note untouched
+--- delete ---
+PASS  note deleted through the AJAX handler
+PASS  audit records note.delete as ok
+PASS  deleted note is gone from the notes table
+PASS  deleted note is offered for restore
+--- restore ---
+PASS  note restored through the AJAX handler
+PASS  audit records note.restore as ok
+PASS  restored note is present and encrypted
+PASS  all four note operations are audited
+--- cleanup ---
+
+PASSED: 24  FAILED: 0
+----- EXIT: note-crud = 0
+
+===== SUITE: partner  (wp eval-file tests/wp/partner.php) =====
+--- dependencies ---
+PASS  Case File detected
+PASS  crypto configured
+PASS  therapist role exists
+--- fixtures ---
+PASS  three cases created
+--- link is bidirectional ---
+PASS  case A points to partner B
+PASS  case B points back to case A
+--- notes on both sides ---
+PASS  note on own case created
+PASS  note on partner case created
+--- therapist A: partner case is out of scope ---
+PASS  A can open own case
+PASS  A cannot open partner case
+PASS  partner case denial is forbidden
+PASS  A cannot access partner case directly
+PASS  bridge knows a partner exists
+PASS  A is not authorized to view partner
+PASS  bridge withholds partner object from A
+PASS  security helper agrees: no partner view
+PASS  A sees only own sessions
+PASS  A sees own session count = 1
+PASS  couple payload has no note text
+PASS  couple payload has no partner phone
+PASS  couple payload has no partner name
+PASS  session projection has no content key
+--- dashboard render as therapist A ---
+PASS  render is a string
+PASS  render shows partner-access notice
+PASS  render never prints partner name
+PASS  render never prints partner phone
+PASS  render never prints partner note
+PASS  render shows own note
+--- REST boundary on partner case ---
+PASS  REST own notes 200
+PASS  REST partner notes denied
+PASS  REST denial carries no note text
+--- therapist B: own case, partner still denied ---
+PASS  B can open own case
+PASS  B cannot open partner case
+PASS  B is not authorized to view partner
+PASS  B sees no partner session
+--- administrator: full couple view, still metadata only ---
+PASS  admin sees partner authorized
+PASS  admin receives partner object
+PASS  admin sees both sides
+PASS  couple view never carries note text (even for admin)
+PASS  couple view never carries own note text
+PASS  admin render shows partner heading
+PASS  admin render shows partner case id
+--- relink, unlink, guards ---
+PASS  relink points A to C
+PASS  relink links C back to A
+PASS  relink clears old partner B
+PASS  self-link is ignored
+PASS  unknown phone leaves link untouched
+PASS  unlink clears A
+PASS  unlink clears C
+PASS  unlinked case reports no partner
+--- static guard: dashboard never calls get_partner() ---
+PASS  no direct get_partner() in dashboard code
+PASS  couple access goes through bridge
+--- honest cleanup ---
+
+PASSED: 52  FAILED: 0
+----- EXIT: partner = 0
+
+===== SUITE: jalali-timezone  (wp eval-file tests/wp/jalali-timezone.php) =====
+PASS  wp_date با current_time هم‌زمان است (اختلاف < ۳ ثانیه)
+PASS  date() روی سرور UTC ساعت را جابه‌جا می‌کند (تفاوت با wp_date)
+PASS  اختلاف date()/wp_date برابر آفست سایت است (۳:۳۰)
+PASS  pas_jalali_datetime روی زمان سایت، تاریخ شمسی درست می‌دهد
+PASS  زمان‌بندی شمسی: 1405/08/29 14:30 → 2026-11-20 14:30:00
+PASS  زمان‌بندی با ارقام فارسی پذیرفته می‌شود
+PASS  قالب قدیمی datetime-local هنوز کار می‌کند
+PASS  تاریخ شمسی نامعتبر رد می‌شود
+PASS  ساعت نامعتبر رد می‌شود
+PASS  ورودی خالی → null
+
+PASSED: 10  FAILED: 0
+----- EXIT: jalali-timezone = 0
+
+===== SUITE: intake-validation  (wp eval-file tests/wp/intake-validation.php) =====
+PASS  تاریخ تولد آینده رد می‌شود
+PASS  تاریخ تولد یک سال آینده هم رد می‌شود
+PASS  تاریخ تولد امروز (سن ۰) پذیرفته می‌شود
+PASS  سن بیش از ۱۲۰ سال رد می‌شود
+PASS  تاریخ نامعتبر (ماه ۱۳) رد می‌شود
+PASS  ارقام فارسی در تاریخ تولد پذیرفته می‌شود
+PASS  سن برای تاریخ معتبر محاسبه می‌شود
+PASS  رد: نام کوتاه
+PASS  رد: جنسیت نامعتبر
+PASS  رد: وضعیت تاهل نامعتبر
+PASS  رد: فرزندان غیرعددی
+PASS  رد: فرزندان بیش از ۲۰
+PASS  رد: تحصیلات نامعتبر
+PASS  رد: موبایل نامعتبر
+PASS  رد: آدرس خالی
+PASS  رد: بدون تأیید
+PASS  رد: گزینهٔ سلامت نامعتبر
+PASS  توضیح سلامت با انتخاب «بله» نگه داشته می‌شود
+PASS  توضیح سلامت با انتخاب «خیر» پاک می‌شود
+PASS  موبایل با ارقام فارسی و ۰ ابتدایی ذخیره می‌شود
+PASS  تاریخ فرم شمسی و امروزِ سایت است
+
+PASSED: 21  FAILED: 0
+----- EXIT: intake-validation = 0
+
+===== SUITE: otp-login-entry  (wp eval-file tests/wp/otp-login-entry.php) =====
+PASS  صفحهٔ پنل ثبت شده است
+PASS  zdp_panel_url() همان permalink واقعی صفحهٔ پنل است
+PASS  zdp_panel_url() به مسیر ثابت /panel/ وابسته نیست
+PASS  درخواست کد برای ایمیل با حروف بزرگ پذیرفته شد
+PASS  کد در ایمیل ارسال‌شده موجود است
+PASS  کد با کلید حروف‌کوچک ذخیره شده است
+PASS  تایید کد با ایمیل حروف‌کوچک موفق است
+PASS  ریدایرکت ورود به صفحهٔ واقعی پنل اشاره می‌کند
+
+8/8 PASS
+----- EXIT: otp-login-entry = 0
+
+===== SUITE: reminder-channels  (wp eval-file tests/wp/reminder-channels.php) =====
+PASS  چهار کاربر آزمون ساخته شدند
+PASS  چهار نوبت آزمون ثبت شدند
+PASS  شمارهٔ ایرانی + ایمیل واقعی: هر دو کانال
+PASS  شمارهٔ خارجی: فقط ایمیل، بدون پیامک
+PASS  شمارهٔ خالی: فقط ایمیل
+PASS  بدون هیچ کانال: ارسالی انجام نشد
+PASS  همهٔ نوبت‌ها پس از ارسال علامت خورده‌اند
+
+7/7 PASS
+----- EXIT: reminder-channels = 0
+
+===== SUITE: uninstall  (wp eval-file tests/wp/uninstall.php) =====
+--- scenario A: default uninstall keeps data ---
+PASS  tables exist before uninstall
+PASS  audit table survives
+PASS  notifications table survives
+PASS  settings survive
+PASS  db version survives
+PASS  plugin version option survives
+PASS  dashboard cap removed from admin
+--- scenario B: opt-in uninstall removes own tables only ---
+PASS  audit table dropped
+PASS  notifications table dropped
+PASS  settings option deleted
+PASS  db version option deleted
+PASS  plugin version option deleted
+PASS  core WordPress tables untouched
+
+PASSED: 13  FAILED: 0
+----- EXIT: uninstall = 0
+
+===== SUITE: export  (wp eval-file tests/wp/export.php > /tmp/out84.csv) =====
+----- EXIT: export = 0
+FIXTURE case_id=10 phone=09121990376 therapist=18
+csv_bytes=155
+bom= ef bb bf
+--- csv head ---
+﻿"شناسه پرونده",وضعیت,درمانگر,"آخرین جلسه","آخرین به‌روزرسانی"
+10,فعال,'=2+2,,"2026-11-24 18:37:13"
+
+===== SUITE: ecosystem-scenario =====
+SCENARIO RUN 45435 — client phone 09129818761
+--------------------------------------------------------------------------------------------------------------
+PASS    | 1. intake form (public)        |    2ms | table ok, existing rows=0 (HTTP submit verified separately)
+PASS    | 2. core identity registry      |   34ms | rebuild ok, clients=1 keys=installed,clients,identifiers,review
+PASS    | 3. client user + intake row    |   85ms | user_id=19 encrypted=yes filter_read=yes login=zdp_09129818761 keys=file_number,submitted_at,updated_at,data got_name=مراجع آزمون 45435 is_admin=true
+PASS    | 4. booking (client portal)     |   18ms | booking id=5 status=در انتظار تایید واریز slot=2026-12-08 18:00
+PASS    | 5. case creation               |    4ms | case_id=11 owner=1 therapist=1
+PASS    | 6. intake → case mapping     |   23ms | preview_rows=15 fill=13 updated=13 age=32 marital=متاهل provenance=13 intake_at=set
+PASS    | 7. session note (encrypted)    |    3ms | note_id=7 decrypted=yes len=32
+PASS    | 8. case timeline               |    2ms | events=4 types=session,intake_received,intake_mapped,case_created
+PASS    | 9. quiz invite → submit → case |   30ms | q=16 http=200 scores=1 keys=0
+PASS    | 10. couple view                |    6ms | case2=12 partner_linked=yes joint_sessions=3
+PASS    | 11. reminder → sms bridge log |    3ms | blocker=ok sms_log 2->3 sent_at=set
+PASS    | 12. access boundary (therapist) |   86ms | own=true other=false list=1 therapist_cases=1 admin_cases=4
+PASS    | 13. reports summary            |    1ms | keys=days,since,can_view_all,cases_total,cases_active,cases_by_status statuses=0
+PASS    | 14. 2FA totp + backup code     |    2ms | totp=true backup=true reuse_blocked=true remaining=9
+PASS    | 15. ecosystem health + compliance |   33ms | plugins=4 issues=0 compliance_checks=7 summary={"ok":5,"warn":2,"fail":0}
+PASS    | 16. content queue (ACO)        |    4ms | queued_id=1 counts={"pending":1,"processing":0,"done":0,"failed":0}
+PASS    | 17. daily feed shortcode       |    9ms | card=5 html_bytes=1253 cards_rendered=5 empty_state=no
+--------------------------------------------------------------------------------------------------------------
+TOTALS: {"PASS":17}
+wpdb last_error: none
+----- EXIT: ecosystem-scenario = 0
+
+===== SUITE: verify_plugin.py (static) =====
+PASS: 194
+FAIL: 0
+
+All static and integration checks passed.
+----- EXIT: verify_plugin = 0
+
+===== SUITE: php -l =====
+lint_exit=0
+lint_files=219
+
+===== SUITE: test-validation.php =====
+
+PASSED: 18
+FAILED: 0
+----- EXIT: test-validation = 0
+
+===== SUITE: test-load.php =====
+
+PASSED: 71
+FAILED: 0
+----- EXIT: test-load = 0
+
+===== SUITE: test-jalali.php =====
+
+PASSED: 21
+FAILED: 0
+----- EXIT: test-jalali = 0
+
+===== DEBUG LOG =====
+debug_log_bytes=458
+[24-Nov-2026 18:36:20 UTC] PHP Warning:  wp_update_themes(): An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="https://wordpress.org/support/forums/">support forums</a>. (WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.) in /tmp/wp-mysql84/wp-includes/functions.php on line 6260
+
+===== SERVER ERROR LOG (errors/warnings only) =====
+2026-11-24T18:31:51.349241Z 0 [Warning] [MY-010097] [Server] Insecure configuration for --secure-file-priv: Current value does not restrict location of generated files. Consider setting it to a valid, non-empty path.
+2026-11-24T18:31:52.175679Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-11-24T18:31:52.179083Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+DONE

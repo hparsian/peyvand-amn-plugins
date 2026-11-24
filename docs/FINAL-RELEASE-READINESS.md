@@ -6,7 +6,9 @@
 **Version:** 2.0.0
 **Package:** `dist/peyvand-amn-unified-dashboard-2.4.0.zip`
 **Decision:** **CONDITIONAL GO** — staging deployment approved; production
-pending the couple/partner path, multisite and Oracle MySQL 8.0, if used.
+pending the couple/partner path, multisite and Oracle MySQL 8.0, if used
+(Oracle MySQL 8.4.11/InnoDB is exercised —
+`docs/evidence/staging-mysql84-2026-11-24.txt`; 8.0 itself is not).
 
 Tested stacks, identical runtime results on both:
 
@@ -80,8 +82,9 @@ inspected in a real browser after the UI upgrade.
 ## Remaining conditions before production
 
 1. Multisite, if the deployment is multisite.
-2. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (only
-   MariaDB 11.8 was exercised).
+2. MySQL 5.7/8.0 if the host runs Oracle MySQL rather than MariaDB (MariaDB
+   11.4.5/11.8 and Oracle MySQL 8.4.11 are exercised; Oracle MySQL 5.7/8.0 are
+   not).
 3. CSV download and the note-form keyboard flow at 360 px, if those flows are
    used on phones (layout itself is verified at 360/768 px).
 4. **Host PHP must be ≥ 8.1** to use the clinical modules at all — Core 1.8.1
@@ -96,8 +99,8 @@ What remains is coverage, not a known defect: the layout is verified at
 1024/768/360 px with zero overflow, MySQL/MariaDB DDL is proven, PHP 7.4 is
 verified for the standalone surface, and the partner/couple path is verified
 end-to-end in both directions with a linked fixture — but multisite and Oracle
-MySQL 8.0 are unexercised. These are cheap to close on staging, so a conditional
-approval is both honest and useful.
+MySQL 8.0 (as distinct from the tested 8.4) are unexercised. These are cheap
+to close on staging, so a conditional approval is both honest and useful.
 
 ## Why not NO-GO
 

@@ -6,7 +6,9 @@ the dashboard at 2.10.2. The raw run on the SQLite drop-in 3.1.3 is recorded in
 `docs/evidence/staging-replica-2026-11-24.txt`; the whole set was then repeated
 on a real **MariaDB 11.4.5 / InnoDB** server with identical counts
 (`docs/evidence/staging-mysql-2026-11-24.txt` plus the raw
-`staging-mysql-2026-11-24-raw.txt`).
+`staging-mysql-2026-11-24-raw.txt`), and again on **Oracle MySQL Community
+Server 8.4.11 / InnoDB** (`docs/evidence/staging-mysql84-2026-11-24.txt` plus
+`staging-mysql84-2026-11-24-raw.txt`) with the same per-suite counts.
 
 | Suite | Command | Result |
 |---|---|---|
@@ -120,5 +122,7 @@ runs are all executed; the partner/couple path is covered by `partner.php`, and
 note restore is covered by `note-crud.php` (create → update → delete → restore).
 MariaDB was confirmed again end-to-end on 2026-11-24 with MariaDB 11.4.5 and a
 real `mysqli` build (see `docs/evidence/staging-mysql-2026-11-24.txt`).
-What is still untested: multisite, Oracle MySQL 8.0 (only MariaDB was
-exercised), and the real project staging host.
+What is still untested: multisite, Oracle MySQL 8.0 (MariaDB 11.4.5 and MySQL
+8.4.11 are both exercised; MySQL 8.4 is covered in
+`docs/evidence/staging-mysql84-2026-11-24.txt`), and the real project staging
+host.

@@ -226,4 +226,5 @@ Defect found and fixed in this pass:
 
 With Round 5 the partner/couple condition is **closed**; the remaining
 conditions in `FINAL-RELEASE-READINESS.md` are multisite, Oracle MySQL 8.0 and
-the two 360 px interaction flows (CSV download, note form).
+the two 360 px interaction flows (CSV download, note form). Oracle MySQL 8.4.11
+was exercised afterwards (`docs/evidence/staging-mysql84-2026-11-24.txt`).

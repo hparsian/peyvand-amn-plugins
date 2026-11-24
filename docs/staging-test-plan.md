@@ -5,8 +5,10 @@
 
 این سند برای اجرای دستی در یک **کلون staging** از سایت واقعی نوشته شده است.
 مجموعهٔ آزمون‌های خودکار روی یک بدل تازه با WordPress 7.1.5 اجرا شده است: یک‌بار
-روی SQLite (`docs/evidence/staging-replica-2026-11-24.txt`) و یک‌بار روی سرور
-واقعی MariaDB 11.4.5/InnoDB (`docs/evidence/staging-mysql-2026-11-24.txt`).
+روی SQLite (`docs/evidence/staging-replica-2026-11-24.txt`) و دو بار روی دو
+سرور واقعی MySQL — MariaDB 11.4.5/InnoDB
+(`docs/evidence/staging-mysql-2026-11-24.txt`) و Oracle MySQL 8.4.11/InnoDB
+(`docs/evidence/staging-mysql84-2026-11-24.txt`) — با شمارش یکسان در هر suite.
 هیچ‌کدام از فازهای دستی این سند روی میزبان واقعی اجرا نشده‌اند؛ بنابراین این
 چک‌لیست همچنان اولین تأیید روی داده و افزونه‌های همان میزبان است.
 
