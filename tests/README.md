@@ -1,9 +1,12 @@
 # Test evidence — Peyvand Amn Unified Dashboard
 
 All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
-7.1.5, SQLite drop-in 3.1.3, real Core/Case File/Quiz/SMS plugins) against the
-`dist/` packages, with the dashboard at 2.10.2. The raw run is recorded in
-`docs/evidence/staging-replica-2026-11-24.txt`.
+7.1.5, real Core/Case File/Quiz/SMS plugins) against the `dist/` packages, with
+the dashboard at 2.10.2. The raw run on the SQLite drop-in 3.1.3 is recorded in
+`docs/evidence/staging-replica-2026-11-24.txt`; the whole set was then repeated
+on a real **MariaDB 11.4.5 / InnoDB** server with identical counts
+(`docs/evidence/staging-mysql-2026-11-24.txt` plus the raw
+`staging-mysql-2026-11-24-raw.txt`).
 
 | Suite | Command | Result |
 |---|---|---|
@@ -113,6 +116,9 @@ wp plugin activate peyvand-amn-unified-dashboard
 
 Superseded by the later passes documented in `docs/FINAL-FUNCTIONAL-TEST-REPORT.md`:
 MariaDB 11.8 (PHP 8.5), the 360/768 px browser matrix and PHP 7.4 standalone
-runs are all executed; the partner/couple path is covered by `partner.php`.
-What is still untested: note restore (only history creation is exercised),
-multisite, and Oracle MySQL 8.0 (only MariaDB was exercised).
+runs are all executed; the partner/couple path is covered by `partner.php`, and
+note restore is covered by `note-crud.php` (create → update → delete → restore).
+MariaDB was confirmed again end-to-end on 2026-11-24 with MariaDB 11.4.5 and a
+real `mysqli` build (see `docs/evidence/staging-mysql-2026-11-24.txt`).
+What is still untested: multisite, Oracle MySQL 8.0 (only MariaDB was
+exercised), and the real project staging host.
