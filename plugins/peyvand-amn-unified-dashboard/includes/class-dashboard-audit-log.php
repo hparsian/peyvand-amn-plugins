@@ -30,7 +30,7 @@ final class PAS_Dashboard_Audit_Log {
 			PAS_Dashboard_Database::audit_table(),
 			array(
 				'user_id'     => (int) $user_id,
-				'action'      => substr( sanitize_key( (string) $action ), 0, 64 ),
+				'action'      => substr( self::action_key( (string) $action ), 0, 64 ),
 				'object_type' => substr( sanitize_key( (string) $object_type ), 0, 32 ),
 				'object_id'   => absint( $object_id ),
 				'result'      => substr( sanitize_key( (string) $result ), 0, 20 ),
@@ -39,6 +39,15 @@ final class PAS_Dashboard_Audit_Log {
 			),
 			array( '%d', '%s', '%s', '%d', '%s', '%s', '%s' )
 		);
+	}
+
+	/**
+	 * نام رخداد قراردادی است (مثل `note.create`) و باید نقطه و خط تیره را
+	 * نگه دارد؛ `sanitize_key()` نقطه را حذف می‌کند و ممیزی را با نام‌های
+	 * قرارداد ناهم‌خوان می‌کند (`notecreate`).
+	 */
+	private static function action_key( $action ) {
+		return (string) preg_replace( '/[^a-z0-9._-]/', '', strtolower( (string) $action ) );
 	}
 
 	/**

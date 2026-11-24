@@ -41,15 +41,15 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | ۱ | `pivand-amn-core-1.9.1.zip` | 1.9.1 |
 | ۲ | `payvand-amn-ui-kit-2.0.0.zip` | 2.0.0 |
 | ۳ | `pivand-amn-case-file-1.17.0.zip` | 1.17.0 |
-| ۴ | `pivand-amn-smtp-mailer-1.5.5.zip` | 1.5.5 |
-| ۵ | `pivand-amn-sms-bridge-1.1.8.zip` | 1.1.8 |
+| ۴ | `pivand-amn-smtp-mailer-1.5.7.zip` | 1.5.7 |
+| ۵ | `pivand-amn-sms-bridge-1.1.10.zip` | 1.1.10 |
 | ۶ | `pivand-amn-2fa-1.3.5.zip` | 1.3.5 |
 | ۷ | `payvand-contact-1.4.5.zip` | 1.4.5 |
 | ۸ | `piwand-daily-feed-1.1.6.zip` | 1.1.6 |
 | ۹ | `pivand-amn-content-writer-2.9.21.zip` | 2.9.21 |
 | ۱۰ | `pivand-amn-quiz-enterprise-3.8.19.zip` | 3.8.19 |
-| ۱۱ | `pivand-amn-client-portal-1.13.2.5.zip` | 1.13.2.5 |
-| ۱۲ | `peyvand-amn-unified-dashboard-2.4.0.zip` | 2.4.0 |
+| ۱۱ | `pivand-amn-client-portal-1.13.2.7.zip` | 1.13.2.7 |
+| ۱۲ | `peyvand-amn-unified-dashboard-2.10.2.zip` | 2.10.2 |
 
 هش SHA-256 بسته‌های همین نسخه (قبل از نصب روی staging مقایسه کن):
 
@@ -58,15 +58,15 @@ SHOW COLUMNS FROM wp_pas_cf_notes;
 | `pivand-amn-core-1.9.1.zip` | `d1de14dcb07ad6b31f2fdaf799c2a83772fc434ab47dc3032c70f546bdd433ee` |
 | `payvand-amn-ui-kit-2.0.0.zip` | `a2399541580ca6672029da285cbdb5c78987c663858ee80f053c4c3855eecc21` |
 | `pivand-amn-case-file-1.17.0.zip` | `4958a680b7f286b1530c22a53e1db48917fea70c5be36c094ba9dadd1dd4e9e4` |
-| `pivand-amn-smtp-mailer-1.5.5.zip` | `c9fd0ffbb6a09a6538c1a476a7fb2808d6c32cd0d95ba2f1d88ef324637e6a1a` |
-| `pivand-amn-sms-bridge-1.1.8.zip` | `bf89ef39cbfde0b90649d7254d3c70f847f8fb2a9dc03f68eb0441ea6f0e5198` |
+| `pivand-amn-smtp-mailer-1.5.7.zip` | `ed90f41ddd1fde2ba29137e1d26039783063713494d69aff53ffad97a6872661` |
+| `pivand-amn-sms-bridge-1.1.10.zip` | `b32b159ab8076c2ba97db6d5f86ff207357c7381a9aeedf8d874b707d1ba346d` |
 | `pivand-amn-2fa-1.3.5.zip` | `0e2c4e21fe6b7276137d7307f6d7284fe42569f73fccb9503fdbd8cd0d7413d8` |
 | `payvand-contact-1.4.5.zip` | `be85d8d0eb5eabc0b5db05c817aad493c9281dcc4cfcf76ead81eab25f7e3600` |
 | `piwand-daily-feed-1.1.6.zip` | `64df3d4864a277e7fa34e91a67a1f63464fc5ca0c4da32abca4b8e0fc1696793` |
 | `pivand-amn-content-writer-2.9.21.zip` | `2b8f0de27119e0cc33e50eedfd750bdf850dc4bcf708e5c40c117d3f998af0a1` |
 | `pivand-amn-quiz-enterprise-3.8.19.zip` | `6f6afb333d16b6df9c2723fd8c4ab47c3b534f916ec6b926119bc139e8c0f5a3` |
-| `pivand-amn-client-portal-1.13.2.5.zip` | `1f98b34d62456a3403d04a21b71eeae4c25505c1b4342b28265537c49b22ae0b` |
-| `peyvand-amn-unified-dashboard-2.4.0.zip` | `471daa504eb8fc5ad2ea7c5ab297bea11c321d49577ac444d2f6883b29972efa` |
+| `pivand-amn-client-portal-1.13.2.7.zip` | `405a82c256eb3f61ff654119f5b6878424ad3511084cac5bdd073044e485aff4` |
+| `peyvand-amn-unified-dashboard-2.10.2.zip` | `ae6fb5a8688f66bc0826582569f3c32f993ed0a218fca85e0e5cd3a9164be65d` |
 
 - [ ] هر بسته با «افزودن افزونه → بارگذاری» نصب شد (نه جایگزینی دستی پوشه، تا
       رفتار آپدیت واقعی دیده شود).

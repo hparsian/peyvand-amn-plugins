@@ -69,6 +69,7 @@ final class PAS_Dashboard_Ajax {
 
 		$case = PAS_Dashboard_Security::authorized_case( $case_id );
 		if ( is_wp_error( $case ) ) {
+			PAS_Dashboard_Security::record_denied( 'note.write', 'note', $note_id );
 			wp_send_json_error( array( 'message' => $case->get_error_message() ), 403 );
 		}
 
@@ -113,6 +114,7 @@ final class PAS_Dashboard_Ajax {
 
 		$case = PAS_Dashboard_Security::authorized_case( $case_id );
 		if ( is_wp_error( $case ) ) {
+			PAS_Dashboard_Security::record_denied( 'note.delete', 'note', $note_id );
 			wp_send_json_error( array( 'message' => $case->get_error_message() ), 403 );
 		}
 
@@ -146,6 +148,7 @@ final class PAS_Dashboard_Ajax {
 
 		$case = PAS_Dashboard_Security::authorized_case( $case_id );
 		if ( is_wp_error( $case ) ) {
+			PAS_Dashboard_Security::record_denied( 'note.restore', 'note', $history_id );
 			wp_send_json_error( array( 'message' => $case->get_error_message() ), 403 );
 		}
 

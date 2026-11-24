@@ -78,7 +78,17 @@ smoke( 'missing case is not leaked to admin', is_wp_error( $admin_case ) && 'pas
 
 $settings = PAS_Dashboard_Permissions::settings();
 smoke( 'settings option is an array', is_array( $settings ) );
-smoke( 'module matrix exposes 11 modules', 11 === count( PAS_Dashboard_Permissions::matrix() ), (string) count( PAS_Dashboard_Permissions::matrix() ) );
+$module_matrix = PAS_Dashboard_Permissions::matrix();
+$module_count  = count( $module_matrix );
+$module_classes = array_map( static function ( $module ) {
+	return (string) ( $module['class'] ?? '' );
+}, $module_matrix );
+// تعداد ماژول‌ها از ماتریس همین بسته خوانده می‌شود تا افزودن ماژول تازه
+// آزمون را نشکند؛ چیزی که سنجیده می‌شود پوشش کلاس برای هر ماژول است.
+smoke( 'module matrix exposes the shipped module set', $module_count >= 14, (string) $module_count );
+smoke( 'every matrix module declares a class', ! in_array( '', $module_classes, true ), implode( ',', array_keys( array_filter( $module_classes, static function ( $class ) {
+	return '' === $class;
+} ) ) ) );
 smoke( 'notifications feature defaults on', (bool) PAS_Dashboard_Permissions::feature( 'enable_notifications' ) );
 smoke( 'assessments module reachable for admin', PAS_Dashboard_Permissions::can( 'assessments' ) );
 smoke( 'export allowed for admin', PAS_Dashboard_Export::can_export() );
@@ -98,7 +108,7 @@ $sub_slugs   = isset( $submenu[ PAS_DASHBOARD_SLUG ] ) ? wp_list_pluck( $submenu
 
 smoke( 'dashboard menu registered', in_array( PAS_DASHBOARD_SLUG, $slugs, true ) );
 // طراحی: یک منوی واحد و ناوبری ماژول‌ها درون صفحه (module=...)، نه زیرمنو.
-smoke( '11 modules visible to admin', 11 === count( PAS_Dashboard_Permissions::visible_modules() ), (string) count( PAS_Dashboard_Permissions::visible_modules() ) );
+smoke( 'all shipped modules visible to admin', $module_count === count( PAS_Dashboard_Permissions::visible_modules() ), count( PAS_Dashboard_Permissions::visible_modules() ) . '/' . $module_count );
 smoke( 'no stray submenus under dashboard', 0 === count( $sub_slugs ), (string) count( $sub_slugs ) );
 
 $rest_server     = rest_get_server();

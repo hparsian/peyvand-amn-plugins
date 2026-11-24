@@ -66,7 +66,10 @@ $render_all = function ( $label ) {
 WP_CLI::log( '--- administrator (all modules) ---' );
 wp_set_current_user( 1 );
 $admin_rendered = $render_all( 'admin' );
-rcheck( 'admin rendered all 11 modules', 11 === $admin_rendered, (string) $admin_rendered );
+// تعداد مورد انتظار از ماتریس همین بسته می‌آید، نه عدد ثابت؛ وگرنه افزودن
+// ماژول تازه آزمون رندر را می‌شکند.
+$module_total = count( PAS_Dashboard_Permissions::matrix() );
+rcheck( 'admin rendered all modules', $module_total === $admin_rendered, $admin_rendered . '/' . $module_total );
 
 WP_CLI::log( '--- therapist (restricted modules) ---' );
 
@@ -85,7 +88,7 @@ if ( is_wp_error( $therapist ) ) {
 } else {
 	wp_set_current_user( (int) $therapist );
 	$visible = PAS_Dashboard_Permissions::visible_modules();
-	rcheck( 'therapist sees fewer modules than admin', count( $visible ) < 11, (string) count( $visible ) );
+	rcheck( 'therapist sees fewer modules than admin', count( $visible ) < $module_total, (string) count( $visible ) );
 	rcheck( 'therapist cannot see settings', ! isset( $visible['settings'] ) );
 	rcheck( 'therapist cannot see audit', ! isset( $visible['audit'] ) );
 	if ( PAS_Dashboard_Core_Bridge::has_case_file() ) {

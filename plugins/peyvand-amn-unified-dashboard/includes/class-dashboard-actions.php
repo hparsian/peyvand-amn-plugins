@@ -14,7 +14,11 @@ final class PAS_Dashboard_Actions {
 	private static $actions = array();
 
 	public static function init() {
-		self::register_defaults();
+		// برچسب عمل‌ها با __() ساخته می‌شوند؛ ثبت روی init انجام می‌شود تا
+		// وردپرس ۶.۷+ هشدار «Translation loading … too early» در debug.log ندهد.
+		// init پیش از admin_post و پیش از رندر ماژول‌ها اجرا می‌شود، پس هیچ
+		// عمل نوشتنی بی‌ثبت نمی‌ماند.
+		add_action( 'init', array( __CLASS__, 'register_defaults' ), 5 );
 
 		add_action( 'admin_post_pas_dash_action', array( __CLASS__, 'dispatch' ) );
 	}
@@ -135,7 +139,7 @@ final class PAS_Dashboard_Actions {
 		exit;
 	}
 
-	private static function register_defaults() {
+	public static function register_defaults() {
 		$case_cap  = defined( 'PAS_CF_CAP' ) ? PAS_CF_CAP : 'manage_options';
 		$appt_cap  = defined( 'PAS_DASHBOARD_CAP_APPOINTMENTS' ) ? PAS_DASHBOARD_CAP_APPOINTMENTS : 'manage_options';
 		$quiz_cap  = defined( 'PAS_DASHBOARD_CAP_ASSESSMENTS' ) ? PAS_DASHBOARD_CAP_ASSESSMENTS : 'manage_options';

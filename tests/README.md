@@ -1,18 +1,21 @@
 # Test evidence — Peyvand Amn Unified Dashboard
 
 All suites below were executed in the delivery sandbox (PHP 8.3.32, WordPress
-7.1.4, SQLite drop-in 1.8.0, real Core/Case File/Quiz/SMS plugins).
+7.1.5, SQLite drop-in 3.1.3, real Core/Case File/Quiz/SMS plugins) against the
+`dist/` packages, with the dashboard at 2.10.2. The raw run is recorded in
+`docs/evidence/staging-replica-2026-11-24.txt`.
 
 | Suite | Command | Result |
 |---|---|---|
-| Static + integration | `python3 tests/verify_plugin.py` | 100/100 |
-| PHP syntax | `php -l` on every file | 32/32 |
+| Static + integration | `python3 tests/verify_plugin.py` | 194/194 |
+| PHP syntax | `php -l` on every file | 219/219 |
 | Validation unit | `php tests/php/test-validation.php` | 18/18 |
 | Class loading | `php tests/php/test-load.php` | 59/59 |
-| Activation + surface | `wp eval-file tests/wp/smoke.php` | 48/48 |
+| Activation + surface | `wp eval-file tests/wp/smoke.php` | 49/49 |
 | Clinical integration | `wp eval-file tests/wp/integration.php` | 32/32 |
 | Live AJAX authorization | `wp eval-file tests/wp/ajax-permissions.php` | 9/9 |
-| Module rendering | `wp eval-file tests/wp/render.php` | 26/26 |
+| Note CRUD + audit names | `wp eval-file tests/wp/note-crud.php` | 24/24 |
+| Module rendering | `wp eval-file tests/wp/render.php` | 30/30 |
 | Partner/couple path | `wp eval-file tests/wp/partner.php` | 52/52 |
 | Uninstall | `wp eval-file tests/wp/uninstall.php` | 13/13 |
 | CSV export | `wp eval-file tests/wp/export.php > out.csv` | 5/5 shell assertions |
@@ -30,6 +33,12 @@ pinned `dist/` packages and the newer source.
 
 ## Notes on the trickier suites
 
+- **`note-crud.php`** drives the real AJAX handlers through create → update →
+  delete → restore, asserts ciphertext in the notes table and the version
+  snapshot, checks that the audit rows carry the contract names
+  (`note.create`, `note.update`, `note.delete`, `note.restore`) instead of the
+  dot-stripped `notecreate`, and that a foreign therapist's attempts in all
+  three write paths are refused *and* audited with `result = denied`.
 - **`ajax-permissions.php`** defines `DOING_AJAX` and replaces every `wp_die`
   handler with one that throws, so `wp_send_json` does not kill the process.
   It exercises anonymous access, invalid nonce, missing capability, own-case
