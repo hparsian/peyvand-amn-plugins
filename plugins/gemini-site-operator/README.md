@@ -25,6 +25,7 @@ gemini-site-operator/
 │   ├── class-gso-fixer.php           هندلرهای اصلاح + پیش‌نمایش/Diff
 │   ├── class-gso-queue.php           صف پس‌زمینه: بچ، بودجه زمانی، Pause/Resume/Cancel/Retry
 │   ├── class-gso-watcher.php         هوک‌های رویدادمحور + صف کوتاه + اسکن دوره‌ای
+│   ├── class-gso-updater.php         به‌روزرسانی خودکار از مخزن GitHub (نسخه + بستهٔ dist)
 │   ├── class-gso-admin.php           منو، assets، register_setting، admin-post
 │   ├── trait-gso-admin-pages.php     داشبورد، صف، ابزارها، تنظیمات، گزارش‌ها
 │   └── trait-gso-admin-ajax.php      هندلرهای AJAX
@@ -132,6 +133,15 @@ gemini-site-operator/
 - خطای ۴۲۹ مربوط به سهمیه روزانه، صف را به `paused_quota` می‌برد تا درخواست بی‌نتیجه ارسال نشود.
 - **سوئیچ خودکار مدل:** اسکن و اصلاح سریع با `bulk_model`، تولید/بازنویسی با `deep_model`؛ در صورت در دسترس نبودن مدل (۴۰۴/۴۰۰) یک‌بار مدل دیگر امتحان می‌شود (قابل خاموش‌کردن با `auto_model_switch`).
 - `timeout` هر درخواست بین ۲۰ تا ۱۲۰ ثانیه (پیشنهاد ۴۵–۶۰) و هرگز بیشتر از بودجه زمانی دسته نیست.
+
+## به‌روزرسانی از GitHub
+
+- منبع: شاخهٔ `main` مخزن `hparsian/peyvand-amn-plugins` (هدر `Update URI` در فایل اصلی، بدون وابستگی به wordpress.org).
+- نسخهٔ تازه از `plugins/gemini-site-operator/gemini-site-operator.php` (خط `Version:`) خوانده می‌شود و بسته از `dist/gemini-site-operator-<version>.zip` همان شاخه نصب می‌گردد.
+- نتیجه شش ساعت کش می‌شود (`gso_github_release`)؛ اگر نسخهٔ ریموت بزرگ‌تر باشد و بسته در دسترس باشد، در فهرست به‌روزرسانی‌ها و برای **به‌روزرسانی خودکار** قرار می‌گیرد. اگر بسته پیدا نشود، چیزی پیشنهاد نمی‌شود و دلیل در گزارش عملیات ثبت می‌شود.
+- هنگام فعال‌سازی، این افزونه به گزینهٔ `auto_update_plugins` اضافه می‌شود؛ برای خاموش‌کردن خودکار: فیلتر `gso_github_auto_update` را `false` کنید.
+- برای فورک: در `wp-config.php` مقدار `GSO_GITHUB_REPO` (به شکل `owner/repo`) و در صورت نیاز `GSO_GITHUB_BRANCH` را تعریف کنید.
+- انتشار نسخهٔ تازه: `Version` و `GSO_VERSION` را بالا ببرید، `dist/gemini-site-operator-<version>.zip` را بازسازی و کامیت کنید و به `main` پوش کنید. تا زمانی که zip هم‌نام نسخه نباشد، آپدیت پیشنهاد نمی‌شود.
 
 ## AJAX tasks
 

@@ -2,10 +2,11 @@
 /**
  * Plugin Name: Gemini Site Operator — اپراتور هوشمند کل سایت
  * Description: اپراتور هوشمند و ناظر دائمی وردپرس: ممیزی کل سایت، صف اولویت‌بندی، اصلاح گام‌به‌گام یا دسته‌ای با پیش‌نمایش، Snapshot و بازگشت، تولید محتوا/متا/Alt/CSS و پایش رویدادمحور و دوره‌ای — متصل مستقیم و امن به Gemini API با کلید شخصی.
- * Version: 1.2.1
+ * Version: 1.3.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Tested up to: 7.1
+ * Update URI: https://github.com/hparsian/peyvand-amn-plugins
  * Author: Hadi.parsaeian
  * Text Domain: gemini-site-operator
  * Domain Path: /languages
@@ -26,6 +27,7 @@
  *   includes/class-gso-fixer.php       اعمال اصلاح‌ها (هندلرها)
  *   includes/class-gso-queue.php       صف پس‌زمینه WP-Cron
  *   includes/class-gso-watcher.php     پایش رویدادمحور و زمان‌بندی‌شده
+ *   includes/class-gso-updater.php     به‌روزرسانی خودکار از مخزن GitHub
  *   includes/class-gso-admin.php       منو، دارایی‌ها، فرم‌های admin-post
  *   includes/trait-gso-admin-pages.php صفحات پیشخوان
  *   includes/trait-gso-admin-ajax.php  هندلرهای AJAX
@@ -35,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSO_VERSION', '1.2.1' );
+define( 'GSO_VERSION', '1.3.0' );
 define( 'GSO_FILE', __FILE__ );
 define( 'GSO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSO_URL', plugin_dir_url( __FILE__ ) );
@@ -64,6 +66,7 @@ require_once GSO_DIR . 'includes/class-gso-generator.php';
 require_once GSO_DIR . 'includes/class-gso-fixer.php';
 require_once GSO_DIR . 'includes/class-gso-queue.php';
 require_once GSO_DIR . 'includes/class-gso-watcher.php';
+require_once GSO_DIR . 'includes/class-gso-updater.php';
 require_once GSO_DIR . 'includes/trait-gso-admin-pages.php';
 require_once GSO_DIR . 'includes/trait-gso-admin-ajax.php';
 require_once GSO_DIR . 'includes/class-gso-admin.php';
@@ -81,6 +84,7 @@ function gso_bootstrap(): void {
 	GSO_Admin::init();
 	GSO_Queue::init();
 	GSO_Watcher::init();
+	GSO_Updater::init();
 }
 add_action( 'plugins_loaded', 'gso_bootstrap', 5 );
 

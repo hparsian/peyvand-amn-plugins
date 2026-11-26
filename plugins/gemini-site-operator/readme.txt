@@ -4,7 +4,7 @@ Tags: seo, gemini, ai, audit, content
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,11 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 قیمت هرگز حدس زده نمی‌شود و فقط به‌صورت «نیازمند اقدام دستی» گزارش می‌شود. تغییرات محتوایی در حالت «پیشنهاد + تأیید» فقط پس از تأیید اپراتور اعمال می‌شوند.
 
 == Changelog ==
+
+= 1.3.0 =
+* به‌روزرسانی خودکار از مخزن GitHub: نسخهٔ تازه از هدر فایل اصلی روی شاخهٔ `main` خوانده می‌شود و بستهٔ `dist/gemini-site-operator-<version>.zip` همان شاخه نصب می‌شود؛ بدون نیاز به انتشار در wordpress.org.
+* به‌روزرسانی خودکار وردپرس برای این افزونه هنگام فعال‌سازی روشن می‌شود و پس از هر به‌روزرسانی هم روشن می‌ماند؛ نتیجهٔ بررسی شش ساعت کش می‌شود و بستهٔ ناموجود پیشنهاد نمی‌شود.
+* اضافه شدن هدر `Update URI` تا وردپرس به‌جای مخزن wordpress.org از همین مخزن به‌روزرسانی بگیرد؛ برای فورک می‌توانید `GSO_GITHUB_REPO` و `GSO_GITHUB_BRANCH` را تعریف کنید.
 
 = 1.2.1 =
 * رفع ریسک اجرایی: حذف فراخوانی‌های بی‌محافظ `mb_strtolower` و `mb_strpos` که روی هاست بدون mbstring باعث Fatal می‌شدند (وردپرس فقط `mb_substr` و `mb_strlen` را جایگزین می‌کند).

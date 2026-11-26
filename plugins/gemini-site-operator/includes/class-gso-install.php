@@ -31,6 +31,7 @@ class GSO_Install {
 		}
 
 		self::schedule_events();
+		GSO_Updater::enable_auto_update();
 		GSO_Logger::log( 'info', 'plugin.activate', 'افزونه فعال شد.', array( 'version' => GSO_VERSION ) );
 	}
 
