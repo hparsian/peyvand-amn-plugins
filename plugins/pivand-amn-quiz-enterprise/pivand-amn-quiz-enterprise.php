@@ -7,7 +7,8 @@
  * Tested up to: 7.1
  * Requires PHP: 8.1
  * Domain Path: /languages
- * Author: Hadi.parsaeian
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Text Domain: pivand-amn-quiz-enterprise
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

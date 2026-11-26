@@ -4,7 +4,8 @@
  * Plugin URI:  https://example.com/payvand-amn
  * Description: سیستم طراحی مشترک اکوسیستم پیوند امن: توکن‌های برند (شنی/کرم/قهوه‌ای/طلایی)، فونت وزیرمتن سلف‌هاست، کامپوننت‌های RTL و حالت تاریک اختیاری. هیچ استایلی به‌صورت سراسری بارگذاری نمی‌شود.
  * Version:     2.0.0
- * Author:      Payvand Amn
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Text Domain: payvand-amn-ui-kit
  * Requires PHP: 7.4
  * Requires at least: 6.0

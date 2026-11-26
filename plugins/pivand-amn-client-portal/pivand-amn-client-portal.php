@@ -5,7 +5,8 @@
  * Version: 1.13.2.7
  * Requires at least: 6.6
  * Tested up to: 7.1
- * Author: Hadi.parsaeian
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Requires PHP: 8.1
  * Domain Path: /languages
  * Text Domain: pivand-amn-client-portal

@@ -6,7 +6,8 @@
  * Version: 2.10.2
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Author: Peyvand Amn
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Text Domain: peyvand-amn-dashboard
  * Domain Path: /languages
  * License: GPLv2 or later

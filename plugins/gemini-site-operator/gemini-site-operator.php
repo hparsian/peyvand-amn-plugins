@@ -7,7 +7,8 @@
  * Requires PHP: 8.1
  * Tested up to: 7.1
  * Update URI: https://github.com/hparsian/peyvand-amn-plugins
- * Author: Hadi.parsaeian
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Text Domain: gemini-site-operator
  * Domain Path: /languages
  * License: GPLv2 or later

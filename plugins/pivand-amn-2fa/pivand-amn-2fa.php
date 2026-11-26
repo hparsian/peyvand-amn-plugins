@@ -5,7 +5,8 @@
  * Version: 1.3.5
  * Requires at least: 6.6
  * Tested up to: 7.1
- * Author: Hadi.parsaeian
+ * Author: Hadi Parsaeian
+ * Author URI: mailto:h.parsian1986@gmail.com
  * Text Domain: pivand-amn-2fa
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
