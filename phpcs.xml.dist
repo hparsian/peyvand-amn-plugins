@@ -46,6 +46,16 @@
 		<exclude name="WordPress.DateTime.CurrentTimeTimestamp"/>
 	</rule>
 
+	<!-- payvand_icon() emits a hardcoded SVG whitelist built from a fixed
+	     lookup table, with the name escaped and the size cast to int. -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<properties>
+			<property name="customEscapingFunctions" type="array">
+				<element value="payvand_icon"/>
+			</property>
+		</properties>
+	</rule>
+
 	<!--
 		The project funnels every request value through its own validators, so the
 		sniffer has to be told that these functions sanitize: otherwise every call
@@ -60,6 +70,7 @@
 				<element value="pas_dashboard_validation::choice"/>
 				<element value="pas_dashboard_validation::mobile"/>
 				<element value="pas_dashboard_validation::status"/>
+				<element value="zsm_sanitize_secret"/>
 			</property>
 		</properties>
 	</rule>

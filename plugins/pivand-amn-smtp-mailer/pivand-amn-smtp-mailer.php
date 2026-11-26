@@ -57,8 +57,10 @@ define('ZSM_VERSION', '1.5.7');
 define('ZSM_DIR', plugin_dir_path(__FILE__));
 define('ZSM_URL', plugin_dir_url(__FILE__));
 
-final class ZSM_Smtp_Mailer
-{
+require_once ZSM_DIR . 'includes/sanitize.php';
+
+final class ZSM_Smtp_Mailer {
+
     /** @var string هوک صفحه‌ی تنظیمات (خروجی add_options_page). */
     private static string $page_hook = '';
 
@@ -158,7 +160,7 @@ final class ZSM_Smtp_Mailer
         $phpmailer->SMTPSecure = $settings['encryption']; // 'tls' یا 'ssl'
 
         if (!empty($settings['from_email'])) {
-            $phpmailer->setFrom($settings['from_email'], $settings['from_name'] ?: get_bloginfo('name'));
+            $phpmailer->setFrom($settings['from_email'], $settings['from_name'] !== '' ? $settings['from_name'] : get_bloginfo('name'));
         }
     }
 
@@ -260,7 +262,7 @@ final class ZSM_Smtp_Mailer
                 break;
             }
 
-            $error = $captured_error ?: ('خطای نامشخص در تلاش ' . $attempt['label']);
+            $error = $captured_error !== '' ? $captured_error : ('خطای نامشخص در تلاش ' . $attempt['label']);
         }
 
         self::$override_smtp    = null;
@@ -513,7 +515,7 @@ final class ZSM_Smtp_Mailer
             <?php elseif ($notice === 'test_ok') : ?>
                 <div class="notice notice-success is-dismissible"><p>ایمیل تست ارسال شد — اینباکس (و پوشه اسپم) را چک کن.</p></div>
             <?php elseif ($notice === 'test_fail') : ?>
-                <div class="notice notice-error is-dismissible"><p>ارسال تست شکست خورد: <?php echo esc_html(get_transient('zsm_last_error') ?: 'خطای نامشخص'); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p>ارسال تست شکست خورد: <?php echo esc_html(get_transient('zsm_last_error') !== false ? (string) get_transient('zsm_last_error') : 'خطای نامشخص'); ?></p></div>
             <?php endif; ?>
 
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -663,7 +665,7 @@ final class ZSM_Smtp_Mailer
         // امنیت (رفع نشتی رمز): فیلد رمز دیگر مقدار قبلی را echo نمی‌کند، پس
         // اگر خالی فرستاده شود یعنی ادمین نمی‌خواسته تغییرش بدهد — رمز قبلی
         // باید دست‌نخورده بماند.
-        $submitted_password = trim(wp_unslash($_POST['password'] ?? ''));
+        $submitted_password = zsm_sanitize_secret(wp_unslash($_POST['password'] ?? ''));
         $existing            = self::get_raw_settings();
 
         $password_to_store = $existing['password'];
@@ -673,7 +675,7 @@ final class ZSM_Smtp_Mailer
                 : $submitted_password;
         }
 
-        $submitted_brevo_key = trim(wp_unslash($_POST['brevo_api_key'] ?? ''));
+        $submitted_brevo_key = zsm_sanitize_secret(wp_unslash($_POST['brevo_api_key'] ?? ''));
         $brevo_key_to_store  = $existing['brevo_api_key'];
         if ($submitted_brevo_key !== '') {
             $brevo_key_to_store = (class_exists('Pas_Core_Crypto') && \Pas_Core_Crypto::is_configured())
@@ -681,7 +683,7 @@ final class ZSM_Smtp_Mailer
                 : $submitted_brevo_key;
         }
 
-        $submitted_backup_password = trim(wp_unslash($_POST['backup_password'] ?? ''));
+        $submitted_backup_password = zsm_sanitize_secret(wp_unslash($_POST['backup_password'] ?? ''));
         $backup_password_to_store  = $existing['backup_password'];
         if ($submitted_backup_password !== '') {
             $backup_password_to_store = (class_exists('Pas_Core_Crypto') && \Pas_Core_Crypto::is_configured())
@@ -692,7 +694,7 @@ final class ZSM_Smtp_Mailer
         update_option('zsm_settings', [
             'send_method'      => in_array(sanitize_key(wp_unslash($_POST['send_method'] ?? '')), ['smtp', 'brevo'], true) ? sanitize_key(wp_unslash($_POST['send_method'])) : 'smtp',
             'host'             => sanitize_text_field(wp_unslash($_POST['host'] ?? '')),
-            'port'             => preg_replace('/\D+/', '', wp_unslash($_POST['port'] ?? '587')),
+            'port'             => absint(wp_unslash($_POST['port'] ?? 587)),
             'encryption'       => in_array(sanitize_key(wp_unslash($_POST['encryption'] ?? '')), ['tls', 'ssl'], true) ? sanitize_key(wp_unslash($_POST['encryption'])) : 'tls',
             'username'         => sanitize_text_field(wp_unslash($_POST['username'] ?? '')),
             'password'         => $password_to_store, // sanitize_text_field فاصله‌های داخلی رمز را می‌تواند به‌هم بزند
@@ -701,7 +703,7 @@ final class ZSM_Smtp_Mailer
             'brevo_api_key'    => $brevo_key_to_store,
             'backup_enabled'   => isset($_POST['backup_enabled']) ? true : false,
             'backup_host'      => sanitize_text_field(wp_unslash($_POST['backup_host'] ?? '')),
-            'backup_port'      => preg_replace('/\D+/', '', wp_unslash($_POST['backup_port'] ?? '587')),
+            'backup_port'      => absint(wp_unslash($_POST['backup_port'] ?? 587)),
             'backup_encryption' => in_array(sanitize_key(wp_unslash($_POST['backup_encryption'] ?? '')), ['tls', 'ssl'], true) ? sanitize_key(wp_unslash($_POST['backup_encryption'])) : 'tls',
             'backup_username'  => sanitize_text_field(wp_unslash($_POST['backup_username'] ?? '')),
             'backup_password'  => $backup_password_to_store,
@@ -766,7 +768,7 @@ final class ZSM_Smtp_Mailer
         remove_action('wp_mail_failed', $catcher);
 
         if (!$sent) {
-            return new \WP_Error('zsm_dashboard_test_failed', $error ?: 'ارسال ایمیل تست ناموفق بود.');
+            return new \WP_Error('zsm_dashboard_test_failed', $error !== null && $error !== '' ? $error : 'ارسال ایمیل تست ناموفق بود.');
         }
 
         return true;
@@ -911,14 +913,10 @@ final class ZSM_Smtp_Mailer
     }
 }
 
-/**
- * صف retry + جدول لاگ ارسال + صفحه‌ی گزارش ادمین.
- * هدف: وقتی همه‌ی روش‌های ارسال (اصلی/پشتیبان/native) شکست خوردند، ایمیل
- * گم نشود؛ ذخیره شود و با فاصله‌ی افزایشی دوباره امتحان شود، و کل ماجرا
- * بدون نیاز به داشبورد یک سرویس خارجی، از داخل خودِ وردپرس دیده شود.
- */
-final class ZSM_Mail_Queue
-{
+
+// phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound -- صف retry همراهِ همین افزونه در یک فایل منتشر می‌شود.
+final class ZSM_Mail_Queue {
+
     public const CRON_HOOK = 'zsm_process_mail_queue';
 
     /** فاصله‌ی هر تلاش مجدد بر حسب دقیقه، به ترتیب شماره‌ی تلاش (index 0 = بعد از اولین شکست). */
@@ -940,10 +938,10 @@ final class ZSM_Mail_Queue
         global $wpdb;
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-        $table           = self::table();
+        $table           = $wpdb->prefix . 'zsm_mail_queue';
         $charset_collate = $wpdb->get_charset_collate();
 
-        $sql = "CREATE TABLE {$table} (
+        $sql = "CREATE TABLE {$wpdb->prefix}zsm_mail_queue (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             created_at DATETIME NOT NULL,
             next_retry_at DATETIME NULL,
@@ -989,7 +987,7 @@ final class ZSM_Mail_Queue
     {
         global $wpdb;
 
-        $wpdb->insert(self::table(), [
+        $wpdb->insert($wpdb->prefix . 'zsm_mail_queue', [
             'created_at'  => current_time('mysql'),
             'status'      => $sent ? 'sent' : 'given_up',
             'attempts'    => 1,
@@ -1006,7 +1004,7 @@ final class ZSM_Mail_Queue
     {
         global $wpdb;
 
-        $wpdb->insert(self::table(), [
+        $wpdb->insert($wpdb->prefix . 'zsm_mail_queue', [
             'created_at'    => current_time('mysql'),
             'next_retry_at' => self::next_retry_time(0),
             'status'        => 'pending',
@@ -1038,10 +1036,10 @@ final class ZSM_Mail_Queue
         self::prune_old_rows();
 
         global $wpdb;
-        $table = self::table();
+        $table = $wpdb->prefix . 'zsm_mail_queue';
 
         $rows = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM {$table} WHERE status = 'pending' AND next_retry_at <= %s ORDER BY id ASC LIMIT 20",
+            "SELECT * FROM {$wpdb->prefix}zsm_mail_queue WHERE status = 'pending' AND next_retry_at <= %s ORDER BY id ASC LIMIT 20",
             current_time('mysql')
         ));
 
@@ -1073,7 +1071,7 @@ final class ZSM_Mail_Queue
         $cutoff = wp_date('Y-m-d H:i:s', time() - (self::RETENTION_DAYS * DAY_IN_SECONDS));
 
         $wpdb->query($wpdb->prepare(
-            'DELETE FROM ' . self::table() . " WHERE status IN ('sent','given_up') AND created_at < %s",
+            "DELETE FROM {$wpdb->prefix}zsm_mail_queue WHERE status IN ('sent','given_up') AND created_at < %s",
             $cutoff
         ));
     }
@@ -1084,7 +1082,7 @@ final class ZSM_Mail_Queue
 
         $atts = json_decode((string) $row->payload, true);
         if (!is_array($atts)) {
-            $wpdb->update(self::table(), ['status' => 'given_up', 'last_error' => 'payload خراب بود'], ['id' => $row->id]);
+            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', ['status' => 'given_up', 'last_error' => 'payload خراب بود'], ['id' => $row->id]);
             return;
         }
 
@@ -1094,7 +1092,7 @@ final class ZSM_Mail_Queue
         $attempts = (int) $row->attempts + 1;
 
         if ($sent) {
-            $wpdb->update(self::table(), [
+            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
                 'status'      => 'sent',
                 'attempts'    => $attempts,
                 'last_method' => $used_method,
@@ -1104,7 +1102,7 @@ final class ZSM_Mail_Queue
         }
 
         if ($attempts >= self::MAX_ATTEMPTS) {
-            $wpdb->update(self::table(), [
+            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
                 'status'     => 'given_up',
                 'attempts'   => $attempts,
                 'last_error' => $error,
@@ -1112,7 +1110,7 @@ final class ZSM_Mail_Queue
             return;
         }
 
-        $wpdb->update(self::table(), [
+        $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
             'attempts'      => $attempts,
             'next_retry_at' => self::next_retry_time($attempts),
             'last_error'    => $error,
@@ -1124,7 +1122,7 @@ final class ZSM_Mail_Queue
     {
         global $wpdb;
 
-        return (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', self::table()));
+        return (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->prefix . 'zsm_mail_queue'));
     }
 
     /**
@@ -1142,7 +1140,7 @@ final class ZSM_Mail_Queue
             return $summary;
         }
 
-        $rows = $wpdb->get_results('SELECT status, COUNT(*) AS total FROM ' . self::table() . ' GROUP BY status', ARRAY_A);
+        $rows = $wpdb->get_results("SELECT status, COUNT(*) AS total FROM {$wpdb->prefix}zsm_mail_queue GROUP BY status", ARRAY_A);
 
         foreach ((array) $rows as $row) {
             $status = (string) ($row['status'] ?? '');
@@ -1172,8 +1170,7 @@ final class ZSM_Mail_Queue
         $limit = max(1, min(100, $limit));
 
         $rows = $wpdb->get_results($wpdb->prepare(
-            'SELECT id, created_at, next_retry_at, status, attempts, last_method, last_error, to_address, subject'
-            . ' FROM ' . self::table() . ' ORDER BY id DESC LIMIT %d',
+            "SELECT id, created_at, next_retry_at, status, attempts, last_method, last_error, to_address, subject FROM {$wpdb->prefix}zsm_mail_queue ORDER BY id DESC LIMIT %d",
             $limit
         ));
 
@@ -1197,7 +1194,7 @@ final class ZSM_Mail_Queue
             return ['ok' => false, 'status' => 'missing', 'message' => 'ردیف صف یافت نشد.', 'attempts' => 0];
         }
 
-        $row = $wpdb->get_row($wpdb->prepare('SELECT * FROM ' . self::table() . ' WHERE id = %d', $id));
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}zsm_mail_queue WHERE id = %d", $id));
 
         if (!$row) {
             return ['ok' => false, 'status' => 'missing', 'message' => 'ردیف صف یافت نشد.', 'attempts' => 0];
@@ -1216,7 +1213,7 @@ final class ZSM_Mail_Queue
 
         self::retry_row($row);
 
-        $fresh    = $wpdb->get_row($wpdb->prepare('SELECT status, attempts, last_error FROM ' . self::table() . ' WHERE id = %d', $id));
+        $fresh    = $wpdb->get_row($wpdb->prepare("SELECT status, attempts, last_error FROM {$wpdb->prefix}zsm_mail_queue WHERE id = %d", $id));
         $fresh_status = $fresh ? (string) $fresh->status : $status;
         $attempts     = $fresh ? (int) $fresh->attempts : (int) $row->attempts;
 
@@ -1243,8 +1240,8 @@ final class ZSM_Mail_Queue
         check_admin_referer('zsm_retry_now');
 
         global $wpdb;
-        $id  = (int) ($_GET['id'] ?? 0);
-        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . self::table() . " WHERE id = %d", $id));
+        $id  = absint(wp_unslash($_GET['id'] ?? 0));
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}zsm_mail_queue WHERE id = %d", $id));
 
         if ($row) {
             self::retry_row($row);
@@ -1261,7 +1258,7 @@ final class ZSM_Mail_Queue
         }
 
         global $wpdb;
-        $rows   = $wpdb->get_results('SELECT * FROM ' . self::table() . ' ORDER BY id DESC LIMIT 100');
+        $rows   = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}zsm_mail_queue ORDER BY id DESC LIMIT 100");
         $notice = isset($_GET['zsm_notice']) ? sanitize_key($_GET['zsm_notice']) : '';
         ?>
         <div class="wrap zsm-admin">
@@ -1302,7 +1299,7 @@ final class ZSM_Mail_Queue
                                 <span style="color:#a30000;font-weight:600;">نهایتاً شکست خورد</span>
                             <?php endif; ?>
                         </td>
-                        <td><?php echo esc_html($row->last_method ?: ($row->last_error ?: '—')); ?></td>
+                        <td><?php echo esc_html($row->last_method !== null && $row->last_method !== '' ? $row->last_method : ($row->last_error !== null && $row->last_error !== '' ? $row->last_error : '—')); ?></td>
                         <td><?php echo esc_html((string) $row->attempts); ?></td>
                         <td>
                             <?php if ($row->status !== 'sent') : ?>
@@ -1317,6 +1314,7 @@ final class ZSM_Mail_Queue
         <?php
     }
 }
+
 
 // این فیلتر عمداً بدون قید plugins_loaded و در سطح فایل ثبت می‌شود: در لحظه‌ی
 // فعال‌سازی پلاگین، activate_plugin() این فایل را مستقیم include می‌کند، در

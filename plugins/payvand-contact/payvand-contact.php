@@ -65,8 +65,8 @@ function payvand_get_theme_colors() {
     if ( ! $secondary ) $secondary = payvand_darken_hex($primary, 20);
 
     return [
-        'primary'   => sanitize_hex_color($primary)   ?: '#2d6a8f',
-        'secondary' => sanitize_hex_color($secondary) ?: '#1a4f70',
+        'primary'   => $primary,
+        'secondary' => $secondary,
         'light'     => payvand_hex_to_rgba($primary, 0.10),
         'medium'    => payvand_hex_to_rgba($primary, 0.18),
         'shadow'    => payvand_hex_to_rgba($primary, 0.12),
@@ -77,7 +77,7 @@ function payvand_get_theme_colors() {
 function payvand_darken_hex( $hex, $amount = 30 ) {
     $hex = ltrim($hex, '#');
     if ( strlen($hex) === 3 ) {
-        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
     }
     $r = max(0, hexdec(substr($hex,0,2)) - $amount);
     $g = max(0, hexdec(substr($hex,2,2)) - $amount);
@@ -89,7 +89,7 @@ function payvand_darken_hex( $hex, $amount = 30 ) {
 function payvand_hex_to_rgba( $hex, $alpha = 1.0 ) {
     $hex = ltrim($hex, '#');
     if ( strlen($hex) === 3 ) {
-        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
     }
     $r = hexdec(substr($hex,0,2));
     $g = hexdec(substr($hex,2,2));
@@ -362,18 +362,24 @@ function payvand_dynamic_css() {
     // BUG-01 fix: validate every CSS value before output.
     // sanitize_hex_color ensures primary/secondary are safe hex strings.
     // payvand_safe_rgba() ensures rgba() values contain only digits, dots, and commas.
-    $primary   = sanitize_hex_color( $c['primary'] )   ?: '#2d6a8f';
-    $secondary = sanitize_hex_color( $c['secondary'] ) ?: '#1a4f70';
+    $primary   = sanitize_hex_color( $c['primary'] );
+    if ( ! $primary ) {
+        $primary = '#2d6a8f';
+    }
+    $secondary = sanitize_hex_color( $c['secondary'] );
+    if ( ! $secondary ) {
+        $secondary = '#1a4f70';
+    }
     $light     = payvand_safe_rgba( $c['light'],  'rgba(45,106,143,0.10)' );
     $medium    = payvand_safe_rgba( $c['medium'], 'rgba(45,106,143,0.18)' );
     $shadow    = payvand_safe_rgba( $c['shadow'], 'rgba(45,106,143,0.12)' );
 
     echo "<style id='payvand-theme-colors'>\n    :root {\n"
-        . "        --pv-primary:   " . esc_html( $primary )   . ";\n"
-        . "        --pv-secondary: " . esc_html( $secondary ) . ";\n"
-        . "        --pv-light:     " . esc_html( $light )     . ";\n"
-        . "        --pv-medium:    " . esc_html( $medium )    . ";\n"
-        . "        --pv-shadow:    " . esc_html( $shadow )    . ";\n"
+        . '        --pv-primary:   ' . esc_html( $primary ) . ";\n"
+        . '        --pv-secondary: ' . esc_html( $secondary ) . ";\n"
+        . '        --pv-light:     ' . esc_html( $light ) . ";\n"
+        . '        --pv-medium:    ' . esc_html( $medium ) . ";\n"
+        . '        --pv-shadow:    ' . esc_html( $shadow ) . ";\n"
         . "    }\n    </style>\n";
 }
 
@@ -471,7 +477,7 @@ function payvand_render_form() {
                 <div class="payvand-field full payvand-privacy">
                     <label class="checkbox-label">
                         <input type="checkbox" id="pv-privacy" name="privacy" required>
-                        <span>با <a href="<?php echo esc_url( get_privacy_policy_url() ?: home_url( '/privacy-policy' ) ); ?>" target="_blank" rel="noopener">قوانین حریم خصوصی</a> پیوند امن موافقم و اطلاعاتم در اختیار تیم مشاوره قرار می‌گیرد.</span>
+                        <span>با <a href="<?php echo esc_url( get_privacy_policy_url() ? get_privacy_policy_url() : home_url( '/privacy-policy' ) ); ?>" target="_blank" rel="noopener">قوانین حریم خصوصی</a> پیوند امن موافقم و اطلاعاتم در اختیار تیم مشاوره قرار می‌گیرد.</span>
                     </label>
                 </div>
             </div>
@@ -520,7 +526,7 @@ function payvand_handle_submit() {
     } else {
         $ip = '';
         foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $header ) {
-            $val = $_SERVER[ $header ] ?? '';
+            $val = isset( $_SERVER[ $header ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) : '';
             if ( $val ) {
                 // X-Forwarded-For may contain a comma-separated list; take the first entry.
                 $ip = trim( explode( ',', $val )[0] );
@@ -751,7 +757,7 @@ function payvand_messages_page() {
 
     // BUG-15: whitelist status filter
     $allowed_statuses = [ 'new', 'reviewing', 'answered' ];
-    $raw_filter       = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+    $raw_filter       = isset($_GET['status']) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
     $status_filter    = in_array( $raw_filter, $allowed_statuses, true ) ? $raw_filter : '';
 
     // BUG-01: use fully prepared queries – never interpolate $where into a raw string
@@ -759,17 +765,17 @@ function payvand_messages_page() {
     $paged    = max( 1, absint( $_GET['paged'] ?? 1 ) );
     $offset   = ( $paged - 1 ) * $per_page;
     if ( $status_filter ) {
-        $total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE status = %s", $status_filter ) );
+        $total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$wpdb->prefix}payvand_messages` WHERE status = %s", $status_filter ) );
         $rows  = $wpdb->get_results(
-            $wpdb->prepare( "SELECT * FROM `{$table}` WHERE status = %s ORDER BY created_at DESC, id DESC LIMIT %d OFFSET %d", $status_filter, $per_page, $offset )
+            $wpdb->prepare( "SELECT * FROM `{$wpdb->prefix}payvand_messages` WHERE status = %s ORDER BY created_at DESC, id DESC LIMIT %d OFFSET %d", $status_filter, $per_page, $offset )
         );
     } else {
-        $total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+        $total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$wpdb->prefix}payvand_messages`" );
         $rows  = $wpdb->get_results(
-            $wpdb->prepare( "SELECT * FROM `{$table}` ORDER BY created_at DESC, id DESC LIMIT %d OFFSET %d", $per_page, $offset )
+            $wpdb->prepare( "SELECT * FROM `{$wpdb->prefix}payvand_messages` ORDER BY created_at DESC, id DESC LIMIT %d OFFSET %d", $per_page, $offset )
         );
     }
-    $counts = $wpdb->get_results( "SELECT status, COUNT(*) as cnt FROM `{$table}` GROUP BY status" );
+    $counts = $wpdb->get_results( "SELECT status, COUNT(*) as cnt FROM `{$wpdb->prefix}payvand_messages` GROUP BY status" );
     $cnt   = array_column($counts, 'cnt', 'status');
 
     $status_labels  = ['new'=>'جدید','reviewing'=>'در بررسی','answered'=>'پاسخ داده شده'];
@@ -795,18 +801,18 @@ function payvand_messages_page() {
             );
             $cancel_url  = esc_url( admin_url('admin.php?page=payvand-messages') );
             echo '<div class="notice notice-warning" style="padding:14px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
-                . '<span>' . payvand_icon('alert', 18) . ' آیا از حذف پیام شماره <strong>' . $confirm_id . '</strong> مطمئن هستید؟ این عمل غیرقابل بازگشت است.</span>'
+                . '<span>' . payvand_icon('alert', 18) . ' آیا از حذف پیام شماره <strong>' . (int) $confirm_id . '</strong> مطمئن هستید؟ این عمل غیرقابل بازگشت است.</span>'
                 . '<a href="' . esc_url( $confirm_url ) . '" class="button button-primary" style="background:#d63638;border-color:#d63638">بله، حذف کن</a>'
-                . '<a href="' . $cancel_url . '" class="button">انصراف</a>'
+                . '<a href="' . esc_url( $cancel_url ) . '" class="button">انصراف</a>'
                 . '</div>';
             } // end if $confirm_id > 0
         }
         ?>
 
         <ul class="subsubsub" style="margin-bottom:12px">
-            <li><a href="?page=payvand-messages" <?php if(!$status_filter) echo 'class="current"'; ?>>همه (<?php echo (int) array_sum( array_map( 'intval', $cnt ) ); ?>)</a> |</li>
-            <?php foreach($status_labels as $s=>$l): ?>
-            <li><a href="?page=payvand-messages&status=<?php echo esc_attr( $s ); ?>" <?php if($status_filter===$s) echo 'class="current"'; ?>><?php echo esc_html( $l ); ?> (<?php echo (int)($cnt[$s]??0); ?>)</a><?php echo $s!=='answered'?' |':''; ?></li>
+            <li><a href="?page=payvand-messages" <?php if (!$status_filter) echo 'class="current"'; ?>>همه (<?php echo (int) array_sum( array_map( 'intval', $cnt ) ); ?>)</a> |</li>
+            <?php foreach ($status_labels as $s=>$l) : ?>
+            <li><a href="?page=payvand-messages&status=<?php echo esc_attr( $s ); ?>" <?php if ($status_filter===$s) echo 'class="current"'; ?>><?php echo esc_html( $l ); ?> (<?php echo (int)($cnt[$s]??0); ?>)</a><?php echo $s!=='answered'?' |':''; ?></li>
             <?php endforeach; ?>
         </ul>
 
@@ -825,11 +831,12 @@ function payvand_messages_page() {
                 </tr>
             </thead>
             <tbody>
-            <?php if ( empty($rows) ): ?>
+            <?php if ( empty($rows) ) : ?>
                 <tr><td colspan="9" style="text-align:center;padding:30px;color:#888">پیامی یافت نشد.</td></tr>
-            <?php else:
+            <?php
+            else :
                 $nonce_url = wp_nonce_url(admin_url('admin.php?page=payvand-messages'), 'payvand_action');
-                foreach ( $rows as $row ):
+                foreach ( $rows as $row ) :
                 $row_style = $row->status === 'new' ? 'background:#fff8e1;font-weight:bold' : '';
             ?>
                 <tr style="<?php echo esc_attr( $row_style ); ?>">
@@ -843,7 +850,7 @@ function payvand_messages_page() {
                     </td>
                     <td>
                         <select onchange="payvandChangeStatus(<?php echo (int)$row->id; ?>,this.value)" style="font-family:Tahoma;font-size:12px">
-                            <?php foreach($status_labels as $s=>$l): ?>
+                            <?php foreach ($status_labels as $s=>$l) : ?>
                             <option value="<?php echo esc_attr( $s ); ?>" <?php selected($row->status,$s); ?>><?php echo esc_html( $l ); ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -854,7 +861,10 @@ function payvand_messages_page() {
                            style="color:red">حذف</a>
                     </td>
                 </tr>
-            <?php endforeach; endif; ?>
+            <?php
+            endforeach;
+endif;
+?>
             </tbody>
         </table>
         <?php
@@ -875,8 +885,8 @@ function payvand_messages_page() {
 
     <script>
     function payvandChangeStatus(id,status){
-        const base='<?php echo esc_js( admin_url("admin.php?page=payvand-messages") ); ?>';
-        const nonce='<?php echo esc_js( wp_create_nonce("payvand_action") ); ?>';
+        const base='<?php echo esc_js( admin_url('admin.php?page=payvand-messages') ); ?>';
+        const nonce='<?php echo esc_js( wp_create_nonce('payvand_action') ); ?>';
         window.location=base+'&action='+status+'&id='+id+'&_wpnonce='+nonce;
     }
     </script>
@@ -974,7 +984,7 @@ function payvand_settings_page() {
                     <th><label for="color_override">رنگ دستی (اختیاری)</label></th>
                     <td>
                         <div style="display:flex;align-items:center;gap:10px">
-                            <input type="color" id="color_override_picker" value="<?php echo esc_attr($override ?: $detected['primary']); ?>"
+                            <input type="color" id="color_override_picker" value="<?php echo esc_attr( $override ? $override : $detected['primary'] ); ?>"
                                    oninput="document.getElementById('color_override').value=this.value"
                                    style="width:44px;height:34px;padding:2px;cursor:pointer;border-radius:6px">
                             <input type="text" id="color_override" name="color_override"
@@ -982,7 +992,7 @@ function payvand_settings_page() {
                                    placeholder="مثلاً #3a7bd5 — خالی بگذارید برای خودکار"
                                    style="width:180px"
                                    oninput="this.previousElementSibling.value=this.value">
-                            <?php if($override): ?>
+                            <?php if ($override) : ?>
                             <a href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=payvand-settings&reset_color=1'), 'payvand_reset_color' ) ); ?>" style="color:#c62828;font-size:12px">× بازنشانی</a>
                             <?php endif; ?>
                         </div>
@@ -1015,15 +1025,15 @@ function payvand_settings_page() {
         <h2><?php echo payvand_icon('mail', 20); ?> تست ارسال ایمیل</h2>
         <p>با این دکمه یک ایمیل آزمایشی به آدرس تنظیم‌شده ارسال می‌شود تا مطمئن شوید ارسال ایمیل کار می‌کند.</p>
 
-        <?php if ( $mail_test_result !== null ): ?>
-            <?php if ( $mail_test_result['success'] ): ?>
+        <?php if ( $mail_test_result !== null ) : ?>
+            <?php if ( $mail_test_result['success'] ) : ?>
                 <div class="notice notice-success inline" style="margin:12px 0">
                     <p><?php echo payvand_icon('check', 16); ?> ایمیل تست با موفقیت به <strong><?php echo esc_html($mail_test_result['to']); ?></strong> ارسال شد. صندوق ورودی را بررسی کنید.</p>
                 </div>
-            <?php else: ?>
+            <?php else : ?>
                 <div class="notice notice-error inline" style="margin:12px 0">
                     <p><?php echo payvand_icon('x', 16); ?> ارسال ایمیل ناموفق بود.</p>
-                    <?php if ( ! empty($mail_test_result['error']) ): ?>
+                    <?php if ( ! empty($mail_test_result['error']) ) : ?>
                         <p><strong>جزئیات خطا:</strong><br>
                         <code style="display:block;background:#f8f8f8;padding:8px;border-radius:4px;direction:ltr;text-align:left;margin-top:6px"><?php echo esc_html($mail_test_result['error']); ?></code></p>
                     <?php endif; ?>
