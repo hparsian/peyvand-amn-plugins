@@ -275,20 +275,14 @@ class GSO_Auditor {
 		if ( empty( $state['active'] ) ) {
 			return;
 		}
-		if ( wp_next_scheduled( 'gso_scan_followup' ) ) {
-			return;
-		}
-		wp_schedule_single_event( time() + max( 5, $delay ), 'gso_scan_followup' );
+		GSO_Queue::schedule_event( 'gso_scan_followup', $delay );
 	}
 
 	/**
 	 * حذف تیک زمان‌بندی‌شده‌ی اسکن.
 	 */
 	public static function unschedule_followup(): void {
-		$timestamp = wp_next_scheduled( 'gso_scan_followup' );
-		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'gso_scan_followup' );
-		}
+		GSO_Queue::unschedule_event( 'gso_scan_followup' );
 	}
 
 	/**

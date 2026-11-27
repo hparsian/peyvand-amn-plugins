@@ -54,7 +54,7 @@ class GSO_Snapshot {
 		global $wpdb;
 		$table = GSO_Install::table( 'snapshots' );
 		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE issue_id = %d ORDER BY id DESC", $issue_id )
+			$wpdb->prepare( 'SELECT * FROM %i WHERE issue_id = %d ORDER BY id DESC', $table, $issue_id )
 		);
 	}
 
@@ -70,12 +70,13 @@ class GSO_Snapshot {
 		$table = GSO_Install::table( 'snapshots' );
 		$row   = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE object_type = %s AND object_id = %d ORDER BY id DESC LIMIT 1",
+				'SELECT * FROM %i WHERE object_type = %s AND object_id = %d ORDER BY id DESC LIMIT 1',
+				$table,
 				sanitize_key( $object_type ),
 				$object_id
 			)
 		);
-		return $row ?: null;
+		return $row ? $row : null;
 	}
 
 	/**
@@ -88,7 +89,7 @@ class GSO_Snapshot {
 		global $wpdb;
 		$table = GSO_Install::table( 'snapshots' );
 		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( "SELECT * FROM {$table} ORDER BY id DESC LIMIT %d", max( 1, min( 200, $limit ) ) )
+			$wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT %d', $table, max( 1, min( 200, $limit ) ) )
 		);
 	}
 
@@ -101,8 +102,8 @@ class GSO_Snapshot {
 	public static function get( int $id ): ?object {
 		global $wpdb;
 		$table = GSO_Install::table( 'snapshots' );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $row ?: null;
+		$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return $row ? $row : null;
 	}
 
 	/**
@@ -294,6 +295,6 @@ class GSO_Snapshot {
 		global $wpdb;
 		$table  = GSO_Install::table( 'snapshots' );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( max( 1, $days ) * DAY_IN_SECONDS ) );
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE created_at < %s", $cutoff ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE created_at < %s', $table, $cutoff ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 }

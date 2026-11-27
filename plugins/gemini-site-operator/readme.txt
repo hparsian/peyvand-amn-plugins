@@ -4,7 +4,7 @@ Tags: seo, gemini, ai, audit, content
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,12 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 قیمت هرگز حدس زده نمی‌شود و فقط به‌صورت «نیازمند اقدام دستی» گزارش می‌شود. تغییرات محتوایی در حالت «پیشنهاد + تأیید» فقط پس از تأیید اپراتور اعمال می‌شوند.
 
 == Changelog ==
+
+= 1.5.0 =
+* کنترل پیش از نوشتن: وجود شیء، تطبیق نوع ایراد با نوع واقعی، خارج نبودن از سطل زباله، تصویر بودن پیوست و دسترسی `edit_post` / `edit_term` / `manage_options` پیش از ثبت Snapshot بررسی می‌شود.
+* معنای دقیق سه سطح خودکارسازی: «فقط گزارش»، «اصلاح خودکار موارد کم‌ریسک» و «اصلاح با تاییدیه»؛ در حالت تاییدیه صف هیچ نوشتنی انجام نمی‌دهد و فقط پیشنهاد می‌سازد.
+* پایش رویدادمحور با همان قواعد سطح خودکارسازی هم‌راستا شد.
+* پشتیبانی Action Scheduler برای رویدادهای تک‌بارهٔ صف، اسکن و پایش، با بازگشت خودکار به WP-Cron.
 
 = 1.4.0 =
 * قرارداد یکپارچهٔ JSON خروجی Gemini با پاکت استاندارد (`schema_version`، `mode`، `target`، `health_score`، `summary`، `issues`، `proposed_changes`، `warnings`) و اسکیمای پاسخ.

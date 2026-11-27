@@ -251,6 +251,13 @@ class GSO_Fixer {
 			$handler = (string) ( $payload['handler'] ?? $handler );
 		}
 
+		$target = self::validate_target( $issue );
+		if ( is_wp_error( $target ) ) {
+			GSO_Issues::set_status( $issue_id, 'failed' );
+			GSO_Logger::log( 'error', 'fixer.target', sprintf( 'اصلاح #%d رد شد: %s', $issue_id, $target->get_error_message() ), array( 'issue_id' => $issue_id ) );
+			return $target;
+		}
+
 		$state = GSO_Snapshot::collect_state( (string) $issue->object_type, (int) $issue->object_id, $handler );
 		if ( 'clear_debug_log' === $handler ) {
 			$log = trailingslashit( WP_CONTENT_DIR ) . 'debug.log';
@@ -302,12 +309,6 @@ class GSO_Fixer {
 	}
 
 	/**
-	 * آیا این اصلاح کم‌ریسک است؟
-	 *
-	 * @param int $issue_id شناسه.
-	 * @return bool
-	 */
-	/**
 	 * آیا payload برای اعمال، داده لازم را دارد؟
 	 *
 	 * منبع واحد این قاعده است تا صف و اعمال، هر دو یک تعریف داشته باشند.
@@ -349,6 +350,12 @@ class GSO_Fixer {
 		return in_array( $handler, array( 'normalize_h1', 'dedupe_ids', 'inject_schema', 'remove_broken_link', 'clear_debug_log' ), true );
 	}
 
+	/**
+	 * آیا این اصلاح کم‌ریسک است؟
+	 *
+	 * @param int $issue_id شناسه.
+	 * @return bool
+	 */
 	public static function is_safe( int $issue_id ): bool {
 		$issue = GSO_Issues::get( $issue_id );
 		if ( ! $issue ) {
@@ -356,6 +363,60 @@ class GSO_Fixer {
 		}
 		$payload = GSO_Issues::payload( $issue );
 		return ! empty( $payload['safe'] );
+	}
+
+	/**
+	 * کنترل نهایی هدف پیش از نوشتن: وجود شیء، تطبیق نوع و سطح دسترسی.
+	 *
+	 * در اجرای کران/CLI کاربری وارد نشده است؛ در آن حالت فقط وجود و نوع شیء
+	 * بررسی می‌شود و دسترسی از قبل با manage_options در نقطه ورود کنترل شده است.
+	 *
+	 * @param object $issue ایراد ذخیره‌شده.
+	 * @return true|WP_Error
+	 */
+	private static function validate_target( object $issue ) {
+		$type = sanitize_key( (string) $issue->object_type );
+		$id   = (int) $issue->object_id;
+
+		if ( 'site' === $type ) {
+			if ( is_user_logged_in() && ! current_user_can( 'manage_options' ) ) {
+				return new WP_Error( 'gso_no_access', 'دسترسی لازم برای تغییر تنظیمات سایت وجود ندارد.' );
+			}
+			return true;
+		}
+
+		if ( 'term' === $type ) {
+			$term = $id > 0 ? get_term( $id ) : null;
+			if ( ! $term || is_wp_error( $term ) ) {
+				return new WP_Error( 'gso_target_missing', 'دسته/برچسب هدف پیدا نشد؛ اصلاح انجام نشد.' );
+			}
+			if ( is_user_logged_in() && ! current_user_can( 'edit_term', $id ) ) {
+				return new WP_Error( 'gso_no_access', 'دسترسی لازم برای ویرایش این دسته/برچسب وجود ندارد.' );
+			}
+			return true;
+		}
+
+		$post = $id > 0 ? get_post( $id ) : null;
+		if ( ! $post ) {
+			return new WP_Error( 'gso_target_missing', 'محتوا/محصول هدف پیدا نشد؛ ممکن است حذف شده باشد.' );
+		}
+		if ( 'post' === $type && ! in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
+			return new WP_Error( 'gso_target_type', 'نوع محتوای هدف با نوع ثبت‌شده در ایراد هم‌خوان نیست.' );
+		}
+		if ( in_array( $type, array( 'page', 'product', 'product_variation', 'attachment' ), true ) && $post->post_type !== $type ) {
+			return new WP_Error( 'gso_target_type', 'نوع محتوای هدف با نوع ثبت‌شده در ایراد هم‌خوان نیست.' );
+		}
+		if ( 'trash' === $post->post_status ) {
+			return new WP_Error( 'gso_target_trash', 'هدف در سطل زباله است؛ ابتدا آن را بازیابی کنید.' );
+		}
+		if ( 'attachment' === $type && ! wp_attachment_is_image( $id ) ) {
+			return new WP_Error( 'gso_target_type', 'پیوست هدف تصویر نیست.' );
+		}
+		if ( is_user_logged_in() && ! current_user_can( 'edit_post', $id ) ) {
+			return new WP_Error( 'gso_no_access', 'دسترسی لازم برای ویرایش این محتوا وجود ندارد.' );
+		}
+
+		return true;
 	}
 
 	/**
@@ -877,7 +938,7 @@ class GSO_Fixer {
 			'@type'         => $type,
 			'headline'      => wp_strip_all_tags( get_the_title( $post_id ) ),
 			'name'          => wp_strip_all_tags( get_the_title( $post_id ) ),
-			'description'   => wp_strip_all_tags( GSO_SEO::get_description( $post_id ) ?: $post->post_excerpt ),
+			'description'   => wp_strip_all_tags( '' !== GSO_SEO::get_description( $post_id ) ? GSO_SEO::get_description( $post_id ) : (string) $post->post_excerpt ),
 			'url'           => get_permalink( $post_id ),
 			'datePublished' => get_post_time( 'c', true, $post_id ),
 			'dateModified'  => get_post_modified_time( 'c', true, $post_id ),

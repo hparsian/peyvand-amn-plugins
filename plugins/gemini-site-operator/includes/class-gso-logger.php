@@ -65,11 +65,11 @@ class GSO_Logger {
 
 		if ( '' !== $level ) {
 			return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				$wpdb->prepare( "SELECT * FROM {$table} WHERE level = %s ORDER BY id DESC LIMIT %d", $level, $limit )
+				$wpdb->prepare( 'SELECT * FROM %i WHERE level = %s ORDER BY id DESC LIMIT %d', $table, $level, $limit )
 			);
 		}
 		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( "SELECT * FROM {$table} ORDER BY id DESC LIMIT %d", $limit )
+			$wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT %d', $table, $limit )
 		);
 	}
 
@@ -81,7 +81,7 @@ class GSO_Logger {
 	public static function count(): int {
 		global $wpdb;
 		$table = GSO_Install::table( 'logs' );
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 
 	/**
@@ -90,6 +90,6 @@ class GSO_Logger {
 	public static function clear(): void {
 		global $wpdb;
 		$table = GSO_Install::table( 'logs' );
-		$wpdb->query( "TRUNCATE TABLE {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 }

@@ -126,7 +126,13 @@ class GSO_Queue {
 
 		if ( $was_cancelled ) {
 			$table = GSO_Install::table( 'queue' );
-			$wpdb->query( "UPDATE {$table} SET status = 'pending' WHERE status = 'skipped' AND message LIKE '%لغو%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->prepare(
+					"UPDATE %i SET status = 'pending' WHERE status = 'skipped' AND message LIKE %s",
+					$table,
+					'%' . $wpdb->esc_like( 'لغو' ) . '%'
+				)
+			);
 		}
 
 		GSO_Logger::log( 'info', 'queue.resume', 'صف از سر گرفته شد.', array( 'reopened' => $was_cancelled ) );
@@ -150,7 +156,8 @@ class GSO_Queue {
 		$table = GSO_Install::table( 'queue' );
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				"UPDATE {$table} SET status = 'skipped', message = %s, finished_at = %s WHERE status IN ('pending','running')",
+				"UPDATE %i SET status = 'skipped', message = %s, finished_at = %s WHERE status IN ('pending','running')",
+				$table,
 				'صف به‌دست اپراتور لغو شد.',
 				current_time( 'mysql' )
 			)
@@ -207,15 +214,57 @@ class GSO_Queue {
 	}
 
 	/**
+	 * زمان‌بندی یک رویداد تک‌باره؛ در صورت وجود Action Scheduler از آن استفاده می‌شود.
+	 *
+	 * @param string $hook  نام هوک.
+	 * @param int    $delay ثانیه.
+	 */
+	public static function schedule_event( string $hook, int $delay = 30 ): void {
+		$hook = sanitize_key( $hook );
+		if ( '' === $hook ) {
+			return;
+		}
+		$when = time() + max( 5, $delay );
+
+		if ( function_exists( 'as_schedule_single_action' ) && function_exists( 'as_next_scheduled_action' ) ) {
+			if ( false === as_next_scheduled_action( $hook, array(), 'gemini-site-operator' ) ) {
+				as_schedule_single_action( $when, $hook, array(), 'gemini-site-operator' );
+			}
+			return;
+		}
+
+		if ( ! wp_next_scheduled( $hook ) ) {
+			wp_schedule_single_event( $when, $hook );
+		}
+	}
+
+	/**
+	 * حذف رویداد زمان‌بندی‌شده (از هر دو مسیر Action Scheduler و WP-Cron).
+	 *
+	 * @param string $hook نام هوک.
+	 */
+	public static function unschedule_event( string $hook ): void {
+		$hook = sanitize_key( $hook );
+		if ( '' === $hook ) {
+			return;
+		}
+		if ( function_exists( 'as_unschedule_action' ) ) {
+			as_unschedule_action( $hook, array(), 'gemini-site-operator' );
+		}
+		$timestamp = wp_next_scheduled( $hook );
+		while ( $timestamp ) {
+			wp_unschedule_event( $timestamp, $hook );
+			$timestamp = wp_next_scheduled( $hook );
+		}
+	}
+
+	/**
 	 * اجرای پی‌درپی صف پس از پایان دسته (به‌جای انتظار تا تیک پنج‌دقیقه‌ای).
 	 *
 	 * @param int $delay ثانیه.
 	 */
 	public static function schedule_followup( int $delay = 30 ): void {
-		if ( wp_next_scheduled( 'gso_queue_followup' ) ) {
-			return;
-		}
-		wp_schedule_single_event( time() + max( 5, $delay ), 'gso_queue_followup' );
+		self::schedule_event( 'gso_queue_followup', $delay );
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -238,7 +287,7 @@ class GSO_Queue {
 		}
 
 		$existing = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE issue_id = %d AND status IN ('pending','running')", $issue_id )
+			$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE issue_id = %d AND status IN ('pending','running')", $table, $issue_id )
 		);
 		if ( $existing > 0 ) {
 			return false;
@@ -293,7 +342,7 @@ class GSO_Queue {
 	public static function counts(): array {
 		global $wpdb;
 		$table = GSO_Install::table( 'queue' );
-		$rows  = (array) $wpdb->get_results( "SELECT status, COUNT(*) AS c FROM {$table} GROUP BY status" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$rows  = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT status, COUNT(*) AS c FROM %i GROUP BY status', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$out   = array( 'pending' => 0, 'running' => 0, 'done' => 0, 'failed' => 0, 'skipped' => 0, 'total' => 0 );
 		foreach ( $rows as $row ) {
 			$out[ $row->status ] = (int) $row->c;
@@ -315,9 +364,11 @@ class GSO_Queue {
 		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
 				"SELECT q.*, i.title AS issue_title, i.issue_type, i.severity
-				 FROM {$queue} q LEFT JOIN {$issues} i ON i.id = q.issue_id
+				 FROM %i q LEFT JOIN %i i ON i.id = q.issue_id
 				 ORDER BY CASE q.status WHEN 'running' THEN 0 WHEN 'pending' THEN 1 WHEN 'failed' THEN 2 WHEN 'skipped' THEN 3 ELSE 4 END, CASE q.priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, q.id DESC
 				 LIMIT %d",
+				$queue,
+				$issues,
 				max( 1, min( 200, $limit ) )
 			)
 		);
@@ -394,7 +445,7 @@ class GSO_Queue {
 			// آزادسازی اقلام «running» جا‌مانده از اجرای ناموفق قبلی.
 			$stale = gmdate( 'Y-m-d H:i:s', time() - ( self::LOCK_TTL * 5 ) );
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				$wpdb->prepare( "UPDATE {$table} SET status = 'pending' WHERE status = 'running' AND started_at IS NOT NULL AND started_at < %s", $stale )
+				$wpdb->prepare( "UPDATE %i SET status = 'pending' WHERE status = 'running' AND started_at IS NOT NULL AND started_at < %s", $table, $stale )
 			);
 
 			$limit = $max > 0 ? $max : (int) GSO_Settings::get( 'queue_batch_size', 3 );
@@ -407,7 +458,8 @@ class GSO_Queue {
 
 			$items = (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$wpdb->prepare(
-					"SELECT * FROM {$table} WHERE status = 'pending' ORDER BY CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, id ASC LIMIT %d",
+					"SELECT * FROM %i WHERE status = 'pending' ORDER BY CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, id ASC LIMIT %d",
+					$table,
 					$limit
 				)
 			);
@@ -470,8 +522,9 @@ class GSO_Queue {
 				}
 
 				if ( $auto ) {
-					$safe = GSO_Fixer::is_safe( (int) $issue->id );
-					if ( in_array( $level, array( 'safe_auto', 'review_required' ), true ) && ! $safe ) {
+					// safe_auto فقط موارد کم‌ریسک را می‌نویسد؛ review_required هرگز خودکار اعمال نمی‌کند.
+					$needs_approval = 'review_required' === $level || ! GSO_Fixer::is_safe( (int) $issue->id );
+					if ( $needs_approval ) {
 						self::finish( (int) $item->id, 'done', 'پیشنهاد آماده شد و در انتظار تایید اپراتور ماند.' );
 						++$report['proposed'];
 						continue;
@@ -495,7 +548,7 @@ class GSO_Queue {
 				++$report['processed'];
 			}
 
-			$report['remaining'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE status = 'pending'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$report['remaining'] = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table, 'pending' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		} catch ( \Throwable $e ) {
 			++$report['failed'];
 			GSO_Logger::log( 'error', 'queue.fatal', 'خطای غیرمنتظره در اجرای صف: ' . $e->getMessage() );
@@ -606,7 +659,7 @@ class GSO_Queue {
 	public static function retry_failed(): int {
 		global $wpdb;
 		$table = GSO_Install::table( 'queue' );
-		$count = (int) $wpdb->query( "UPDATE {$table} SET status = 'pending', attempts = 0 WHERE status = 'failed'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$count = (int) $wpdb->query( $wpdb->prepare( "UPDATE %i SET status = 'pending', attempts = 0 WHERE status = %s", $table, 'failed' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		if ( $count > 0 ) {
 			self::schedule_followup( 10 );
 		}
@@ -648,6 +701,6 @@ class GSO_Queue {
 		global $wpdb;
 		$table  = GSO_Install::table( 'queue' );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( max( 1, $days ) * DAY_IN_SECONDS ) );
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE status IN ('done','failed','skipped') AND created_at < %s", $cutoff ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE status IN ('done','failed','skipped') AND created_at < %s", $table, $cutoff ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 }

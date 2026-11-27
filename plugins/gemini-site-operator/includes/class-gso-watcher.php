@@ -46,9 +46,7 @@ class GSO_Watcher {
 		}
 		update_option( self::DIRTY_OPTION, $queue, false );
 
-		if ( ! wp_next_scheduled( 'gso_watch_tick' ) ) {
-			wp_schedule_single_event( time() + 60, 'gso_watch_tick' );
-		}
+		GSO_Queue::schedule_event( 'gso_watch_tick', 60 );
 	}
 
 	/**
@@ -219,9 +217,18 @@ class GSO_Watcher {
 				break;
 			}
 			$issue = GSO_Issues::get( (int) $issue_id );
-			if ( ! $issue || 'low' === $issue->severity ) {
+			if ( ! $issue ) {
 				continue;
 			}
+
+			// safe_auto: فقط موارد کم‌خطر و کم‌ریسک. review_required: فقط پیشنهاد برای تایید.
+			if ( 'safe_auto' === $level && ( 'low' !== $issue->severity || ! GSO_Fixer::is_safe( (int) $issue_id ) ) ) {
+				continue;
+			}
+			if ( 'review_required' === $level && 'low' === $issue->severity && GSO_Fixer::is_safe( (int) $issue_id ) ) {
+				continue;
+			}
+
 			if ( GSO_Queue::enqueue( (int) $issue_id, 'auto' ) ) {
 				++$count;
 			}

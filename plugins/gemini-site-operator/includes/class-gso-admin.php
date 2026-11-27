@@ -192,6 +192,8 @@ class GSO_Admin {
 		}
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- همهٔ این هندلرها فقط از handle_admin_post فراخوانی می‌شوند که nonce و manage_options را بررسی می‌کند.
+
 	private static function handle_tool_generate(): void {
 		$result = GSO_Generator::generate_content(
 			array(
@@ -359,4 +361,6 @@ class GSO_Admin {
 		GSO_Logger::clear();
 		self::redirect_notice( 'gso-logs', 'گزارش عملیات پاک شد.' );
 	}
+
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 }
