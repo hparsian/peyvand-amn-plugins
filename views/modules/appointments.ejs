@@ -1,0 +1,122 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">نمای کلی نوبت‌ها</h2>
+  <div class="pas-grid">
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.stats.total) %></span><span class="pas-stat-label">کل نوبت‌ها</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.stats.today) %></span><span class="pas-stat-label">امروز</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.stats.upcoming) %></span><span class="pas-stat-label">پیش‌رو</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.stats.pending) %></span><span class="pas-stat-label">در انتظار تأیید</span></div>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">ثبت نوبت جدید (خارج از سایت)</h2>
+  <form method="post" action="/api/bookings" class="pas-form">
+    <div class="pas-form-grid">
+      <div class="pas-form-row"><label for="pas-b-name">نام و نام خانوادگی *</label><input class="pas-input" type="text" id="pas-b-name" name="full_name" required /></div>
+      <div class="pas-form-row"><label for="pas-b-mobile">موبایل *</label><input class="pas-input" type="text" id="pas-b-mobile" name="mobile" dir="ltr" placeholder="09123456789" required /></div>
+      <div class="pas-form-row"><label for="pas-b-date">تاریخ (شمسی) *</label><input class="pas-input" type="text" id="pas-b-date" name="booking_date_jalali" dir="ltr" inputmode="numeric" value="<%= h.todayJalaliAscii %>" placeholder="<%= h.todayJalaliAscii %>" required /></div>
+      <div class="pas-form-row"><label for="pas-b-time">ساعت *</label><input class="pas-input" type="text" id="pas-b-time" name="booking_time" dir="ltr" value="10:00" placeholder="09:00" required /></div>
+      <div class="pas-form-row">
+        <label for="pas-session_type">نوع جلسه</label>
+        <select class="pas-select" id="pas-session_type" name="session_type">
+          <% Object.keys(data.sessionTypes).forEach(function(k) { %>
+            <option value="<%= k %>"><%= data.sessionTypes[k] %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="pas-form-row">
+        <label for="pas-booking_source">نحوهٔ رزرو</label>
+        <select class="pas-select" id="pas-booking_source" name="booking_source">
+          <% Object.keys(data.sources).forEach(function(k) { %>
+            <option value="<%= k %>"><%= data.sources[k] %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="pas-form-row pas-form-row--full"><label for="pas-b-note">یادداشت درمانگر</label><textarea class="pas-textarea" id="pas-b-note" name="therapist_note" rows="2"></textarea></div>
+    </div>
+    <p class="pas-note-form-actions"><button class="pas-btn pas-btn-primary" type="submit">ثبت نوبت</button></p>
+  </form>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">فهرست نوبت‌ها</h2>
+  <form method="get" action="/dashboard" class="pas-filter-form">
+    <input type="hidden" name="module" value="appointments" />
+    <div class="pas-form-row">
+      <label for="pas-booking-search">جست‌وجو (نام، موبایل، کد پیگیری)</label>
+      <input class="pas-input" type="search" id="pas-booking-search" name="s" value="<%= data.search %>" />
+    </div>
+    <button class="pas-btn" type="submit">جست‌وجو</button>
+  </form>
+
+  <div class="pas-table-wrap">
+    <table class="pas-table pas-table-bookings">
+      <thead><tr><th>تاریخ</th><th>ساعت</th><th>مراجع</th><th>نوع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+      <tbody>
+        <% data.bookings.forEach(function(b) {
+          const badgeCls = ['تایید شده', 'فعال', 'انجام شده'].includes(b.status)
+            ? 'pas-badge-good'
+            : (['لغو شده', 'ناموفق', 'عدم حضور'].includes(b.status) ? 'pas-badge-danger' : 'pas-badge-warn');
+        %>
+          <tr>
+            <td><%= h.jalali(b.booking_date) %></td>
+            <td dir="ltr"><%= h.persianNum(b.booking_time) %></td>
+            <td>
+              <strong><%= b.full_name %></strong><br />
+              <span class="pas-muted" dir="ltr"><%= h.maskMobile(b.mobile) %></span><br />
+              <span class="pas-muted">کد: <%= b.ref_id %></span>
+            </td>
+            <td><%= b.service_name %></td>
+            <td><span class="pas-badge <%= badgeCls %>"><%= b.status %></span></td>
+            <td>
+              <div class="pas-row-actions">
+                <form method="post" action="/api/bookings/<%= b.id %>/status" class="pas-inline-form">
+                  <select class="pas-select pas-select-sm" name="status" aria-label="وضعیت نوبت">
+                    <% data.statuses.forEach(function(st) { %>
+                      <option value="<%= st %>" <%= b.status === st ? 'selected' : '' %>><%= st %></option>
+                    <% }); %>
+                  </select>
+                  <button class="pas-btn pas-btn-sm" type="submit">ثبت وضعیت</button>
+                </form>
+                <form method="post" action="/api/bookings/<%= b.id %>/reminder" class="pas-inline-form">
+                  <button class="pas-btn pas-btn-sm" type="submit" data-pas-confirm="یادآور نوبت ارسال شود؟">یادآور</button>
+                </form>
+                <form method="post" action="/api/bookings/<%= b.id %>/delete" class="pas-inline-form">
+                  <button class="pas-btn pas-btn-sm pas-btn-danger" type="submit" data-pas-confirm="این نوبت حذف شود؟">حذف</button>
+                </form>
+              </div>
+              <details class="pas-row-details">
+                <summary>ویرایش جزئیات</summary>
+                <form method="post" action="/api/bookings/<%= b.id %>/update" class="pas-form pas-inline-form">
+                  <div class="pas-form-row"><label>تاریخ (شمسی)</label><input class="pas-input" type="text" name="booking_date_jalali" dir="ltr" value="<%= h.jalaliAscii(b.booking_date) %>" /></div>
+                  <div class="pas-form-row"><label>ساعت</label><input class="pas-input" type="text" name="booking_time" dir="ltr" value="<%= b.booking_time %>" /></div>
+                  <div class="pas-form-row pas-form-row--full"><label>یادداشت درمانگر</label><textarea class="pas-textarea" name="therapist_note" rows="2"><%= b.therapist_note %></textarea></div>
+                  <button class="pas-btn pas-btn-primary" type="submit">ذخیرهٔ تغییرات</button>
+                </form>
+              </details>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">جلسه‌های پیش‌روی پرونده‌ها</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>پرونده</th><th>تاریخ (شمسی)</th><th>شماره جلسه</th><th>عملیات</th></tr></thead>
+      <tbody>
+        <% data.upcomingCases.forEach(function(uc) { %>
+          <tr>
+            <td>#<%= h.persianNum(uc.id) %> — <%= uc.full_name %></td>
+            <td><%= h.jalali(uc.next_session_date) %></td>
+            <td class="pui-num"><%= h.persianNum(uc.next_session_number) %></td>
+            <td><a class="pas-btn pas-btn-sm" href="/dashboard?module=case_files&case_id=<%= uc.id %>">پرونده</a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>

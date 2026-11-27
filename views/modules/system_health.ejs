@@ -1,0 +1,18 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">نتیجه‌ی بررسی‌های سیستم</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>بررسی</th><th>وضعیت</th><th>جزئیات</th></tr></thead>
+      <tbody>
+        <% data.checks.forEach(function(ch) { %>
+          <tr>
+            <td><%= ch.label %></td>
+            <td><span class="pas-badge <%= ch.ok ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= ch.ok ? 'سالم' : 'نیازمند بررسی' %></span></td>
+            <td><code><%= ch.detail %></code></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <p class="pas-muted">این صفحه هیچ کلید، رمز یا توکن حساسی را نمایش نمی‌دهد.</p>
+</section>

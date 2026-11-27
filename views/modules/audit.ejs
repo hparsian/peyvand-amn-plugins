@@ -1,0 +1,20 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">رویدادهای ممیزی دسترسی</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>زمان</th><th>رویداد</th><th>موجودیت</th><th>کاربر</th><th>نتیجه</th><th>توضیح</th></tr></thead>
+      <tbody>
+        <% data.entries.forEach(function(e) { %>
+          <tr>
+            <td><%= h.jalaliDateTime(e.created_at) %></td>
+            <td><code><%= e.action %></code></td>
+            <td><%= e.entity_type %> #<%= h.persianNum(e.entity_id) %></td>
+            <td><%= e.actor %></td>
+            <td><span class="pas-badge <%= e.status === 'ok' ? 'pas-badge-good' : 'pas-badge-danger' %>"><%= e.status %></span></td>
+            <td><%= e.detail %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>

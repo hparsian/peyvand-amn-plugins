@@ -1,0 +1,100 @@
+<section class="pas-card pvn-rise" style="--pui-i:0">
+  <div class="pas-grid">
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.casesCount) %></span><span class="pas-stat-label">پرونده‌ی مجاز</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.todaySessionsCount) %></span><span class="pas-stat-label">جلسه‌ی امروز</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.registryCount) %></span><span class="pas-stat-label">مراجع در رجیستری</span></div>
+    <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.reviewCount) %></span><span class="pas-stat-label">نیازمند بررسی هویت</span></div>
+  </div>
+</section>
+
+<div class="pvn-deck">
+  <section class="pvn-focus pvn-span-7 pvn-rise" style="--pui-i:1" aria-labelledby="pvn-today-title">
+    <p class="pui-eyebrow" id="pvn-today-title">جلسه‌های پیش‌رو</p>
+    <p class="pvn-focus__figure">
+      <span class="pvn-focus__num pui-num"><%= h.persianNum(data.upcoming.length) %></span>
+      <span class="pvn-focus__unit">جلسه</span>
+    </p>
+    <p class="pvn-focus__caption">
+      <%= data.upcoming.length > 0 ? 'جلسه در پرونده‌های مجاز شما زمان‌بندی شده است.' : 'برای پرونده‌های مجاز شما جلسه‌ی آینده‌ای ثبت نشده است.' %>
+    </p>
+    <% if (data.upcoming.length > 0) { %>
+      <ul class="pvn-focus__list">
+        <% data.upcoming.forEach(function(row) { %>
+          <li>
+            <a href="/dashboard?module=case_files&case_id=<%= row.id %>">
+              <span><%= row.full_name %></span>
+              <time datetime="<%= row.next_session_date %>"><%= h.jalali(row.next_session_date) %></time>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </section>
+
+  <aside class="pvn-attention pvn-span-5 pvn-rise" style="--pui-i:2" aria-labelledby="pvn-attention-title">
+    <h2 class="pvn-attention__title" id="pvn-attention-title">نیازمند توجه</h2>
+    <% let flags = 0; %>
+    <% if (data.reviewCount > 0) { flags++; %>
+      <div class="pvn-attention__item">
+        <span class="pvn-attention__mark" aria-hidden="true"></span>
+        <span><strong><%= h.persianNum(data.reviewCount) %> تعارض هویت</strong>نیازمند بازبینی انسانی در رجیستری مراجع.</span>
+      </div>
+    <% } %>
+    <% if (!data.smsReady) { flags++; %>
+      <div class="pvn-attention__item">
+        <span class="pvn-attention__mark pvn-attention__mark--info" aria-hidden="true"></span>
+        <span><strong>پل پیامک در حالت پیش‌نمایش</strong>برای ارسال واقعی، اطلاعات اتصال در تنظیمات محیطی قرار می‌گیرد.</span>
+      </div>
+    <% } %>
+    <% if (data.casesWithoutNext > 0) { flags++; %>
+      <div class="pvn-attention__item">
+        <span class="pvn-attention__mark" aria-hidden="true"></span>
+        <span><strong><%= h.persianNum(data.casesWithoutNext) %> پرونده بدون جلسه‌ی بعدی</strong>زمان‌بندی جلسه‌ی بعدی ثبت نشده است.</span>
+      </div>
+    <% } %>
+    <% if (flags === 0) { %>
+      <p class="pui-blank__text">همهٔ سرویس‌های لازم فعال‌اند و موردی برای رسیدگی ثبت نشده است.</p>
+    <% } %>
+  </aside>
+
+  <section class="pas-card pvn-span-8 pvn-rise" style="--pui-i:3">
+    <h2 class="pas-card-title">پرونده‌های اخیر</h2>
+    <div class="pas-table-wrap">
+      <table class="pas-table">
+        <thead>
+          <tr>
+            <th>مراجع</th>
+            <th>شناسه</th>
+            <th>وضعیت</th>
+            <th>آخرین به‌روزرسانی</th>
+            <th><span class="screen-reader-text">عملیات</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.recent.forEach(function(c) {
+            const tone = c.status.includes('فعال') ? ' pas-badge-good' : (c.status.includes('توقف') ? ' pas-badge-warn' : '');
+          %>
+            <tr>
+              <td data-label="مراجع"><%= c.full_name %></td>
+              <td data-label="شناسه" class="pui-num">#<%= h.persianNum(c.id) %></td>
+              <td data-label="وضعیت"><span class="pas-badge<%= tone %>"><%= c.status %></span></td>
+              <td data-label="آخرین به‌روزرسانی"><%= h.jalali(c.updated_at) %></td>
+              <td data-label="عملیات"><a class="pas-btn" href="/dashboard?module=case_files&case_id=<%= c.id %>">باز کردن</a></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="pas-card pvn-span-4 pvn-rise" style="--pui-i:4">
+    <h2 class="pas-card-title">وضعیت اکوسیستم</h2>
+    <ul class="pas-list">
+      <li><span>هسته‌ی مشترک</span> <span class="pas-badge pas-badge-good">فعال</span></li>
+      <li><span>پرونده‌های بالینی</span> <span class="pas-badge pas-badge-good">فعال</span></li>
+      <li><span>کلید رمزنگاری</span> <span class="pas-badge <%= cryptoReady ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= cryptoReady ? 'فعال' : 'غیرفعال' %></span></li>
+      <li><span>پنل مراجعان</span> <span class="pas-badge pas-badge-good">فعال</span></li>
+    </ul>
+    <div class="pas-notice pas-notice-info"><p>همهٔ داده‌ها از مخزن همگام‌سازی‌شدهٔ اکوسیستم خوانده می‌شوند.</p></div>
+  </section>
+</div>

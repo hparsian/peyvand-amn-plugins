@@ -1,0 +1,95 @@
+<% if (data.selectedClient) { const cl = data.selectedClient; %>
+  <section class="pas-card">
+    <h2 class="pas-card-title">شناسنامه‌ی مراجع</h2>
+    <p><strong>شناسه‌ی یکتا:</strong> <code><%= cl.client_id %></code></p>
+    <p><strong>نام نمایشی:</strong> <%= cl.display_name %></p>
+    <p><strong>وضعیت:</strong>
+      <span class="pas-badge <%= cl.status === 'review' ? 'pas-badge-warn' : 'pas-badge-good' %>">
+        <%= cl.status === 'review' ? 'نیازمند بررسی' : 'فعال' %>
+      </span>
+    </p>
+    <p><strong>تعداد تعارض:</strong> <%= h.persianNum(cl.conflict_count) %></p>
+    <p><strong>تعداد منبع:</strong> <%= h.persianNum(cl.sources_count) %></p>
+    <p class="pas-muted">این داشبورد هیچ فیلد بالینی از رجیستری نمی‌خواند؛ فقط شناسه، نام نمایشی و وضعیت.</p>
+  </section>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">شناسه‌های ثبت‌شده</h2>
+    <ul class="pas-list">
+      <% cl.identifiers.forEach(function(id) { %>
+        <li><strong><%= id.type %>:</strong> <code dir="ltr"><%= id.type === 'mobile' ? h.maskMobile(id.value) : id.value %></code></li>
+      <% }); %>
+    </ul>
+  </section>
+  <p><a class="pas-btn" href="/dashboard?module=patients">بازگشت به فهرست</a></p>
+<% } else { %>
+  <section class="pas-card">
+    <h2 class="pas-card-title">جست‌وجوی مراجع</h2>
+    <form method="get" action="/dashboard" class="pas-filter-form">
+      <input type="hidden" name="module" value="patients" />
+      <div class="pas-form-row">
+        <label for="pas-q">عبارت جست‌وجو</label>
+        <input class="pas-input" type="search" id="pas-q" name="q" value="<%= data.query %>" placeholder="CL-1042 یا 0912..." />
+      </div>
+      <div class="pas-form-row">
+        <label for="pas-type">نوع شناسه</label>
+        <select class="pas-select" id="pas-type" name="type">
+          <option value="client_id" <%= data.searchType === 'client_id' ? 'selected' : '' %>>شناسه‌ی مراجع</option>
+          <option value="mobile" <%= data.searchType === 'mobile' ? 'selected' : '' %>>موبایل</option>
+          <option value="email" <%= data.searchType === 'email' ? 'selected' : '' %>>ایمیل</option>
+        </select>
+      </div>
+      <button class="pas-btn pas-btn-primary" type="submit">جست‌وجو</button>
+    </form>
+    <p class="pas-muted">جست‌وجو بر پایه‌ی شناسه‌ی یکتا انجام می‌شود؛ شماره‌ی موبایل شناسه‌ی اصلی نیست.</p>
+  </section>
+
+  <% if (data.query) { %>
+    <section class="pas-card">
+      <h2 class="pas-card-title">نتیجه</h2>
+      <% if (!data.searchResult) { %>
+        <p class="pas-empty">مراجعی با این شناسه یافت نشد.</p>
+      <% } else { %>
+        <p>شناسه: <code><%= data.searchResult.client_id %></code></p>
+        <p>نام نمایشی: <%= data.searchResult.display_name %></p>
+        <p><a class="pas-btn" href="/dashboard?module=patients&client_id=<%= encodeURIComponent(data.searchResult.client_id) %>">مشاهده‌ی جزئیات</a></p>
+      <% } %>
+    </section>
+  <% } %>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">آخرین مراجعان ایندکس‌شده</h2>
+    <div class="pas-table-wrap">
+      <table class="pas-table">
+        <thead>
+          <tr>
+            <th>شناسه</th>
+            <th>نام نمایشی</th>
+            <th>وضعیت</th>
+            <th>شناسه‌ها</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.clients.forEach(function(cl) {
+            const idsText = cl.identifiers.map(function(i) {
+              return i.type + ': ' + (i.type === 'mobile' ? h.maskMobile(i.value) : i.value);
+            }).join(' · ');
+          %>
+            <tr>
+              <td data-label="شناسه"><code><%= cl.client_id %></code></td>
+              <td data-label="نام نمایشی"><%= cl.display_name %></td>
+              <td data-label="وضعیت">
+                <span class="pas-badge <%= cl.status === 'review' ? 'pas-badge-warn' : 'pas-badge-good' %>">
+                  <%= cl.status === 'review' ? 'نیازمند بررسی' : 'فعال' %>
+                </span>
+              </td>
+              <td data-label="شناسه‌ها" dir="ltr"><%= idsText %></td>
+              <td data-label="عملیات"><a class="pas-btn" href="/dashboard?module=patients&client_id=<%= encodeURIComponent(cl.client_id) %>">جزئیات</a></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% } %>

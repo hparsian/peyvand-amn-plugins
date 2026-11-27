@@ -1,0 +1,23 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">پرونده‌های نیازمند زمان‌بندی جلسهٔ بعدی</h2>
+  <% if (!data.needsFollowup.length) { %>
+    <p class="pas-empty">برای همهٔ پرونده‌های فعال جلسهٔ بعدی زمان‌بندی شده است.</p>
+  <% } else { %>
+    <div class="pas-table-wrap">
+      <table class="pas-table">
+        <thead><tr><th>شناسه</th><th>مراجع</th><th>وضعیت</th><th>آخرین به‌روزرسانی</th><th>عملیات</th></tr></thead>
+        <tbody>
+          <% data.needsFollowup.forEach(function(c) { %>
+            <tr>
+              <td class="pui-num">#<%= h.persianNum(c.id) %></td>
+              <td><%= c.full_name %></td>
+              <td><span class="pas-badge pas-badge-warn"><%= c.status %></span></td>
+              <td><%= h.jalali(c.updated_at) %></td>
+              <td><a class="pas-btn pas-btn-sm" href="/dashboard?module=case_files&case_id=<%= c.id %>">باز کردن</a></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>

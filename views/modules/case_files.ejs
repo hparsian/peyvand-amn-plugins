@@ -1,0 +1,297 @@
+<% if (data.isNew || data.selectedCase) {
+  const isNew = data.isNew;
+  const c = data.selectedCase || {};
+%>
+  <div class="pas-notice pas-notice-info">
+    <p><%= isNew ? 'پروندهٔ جدید: شمارهٔ موبایل کلید اتصال به حساب مراجع است و بعد از ثبت قابل تغییر نیست.' : 'دسترسی شما به این پرونده در سمت سرور تأیید شد.' %></p>
+  </div>
+
+  <div class="pvn-case">
+    <div class="pvn-case-tabs" role="tablist" aria-label="بخش‌های پرونده">
+      <button type="button" class="pvn-case-tab is-active" role="tab" id="pvn-ctab-summary" aria-controls="pvn-cpanel-summary" aria-selected="true" data-pvn-case-tab="summary">خلاصه و مشخصات</button>
+      <button type="button" class="pvn-case-tab" role="tab" id="pvn-ctab-notes" aria-controls="pvn-cpanel-notes" aria-selected="false" data-pvn-case-tab="notes">یادداشت‌های جلسه</button>
+      <button type="button" class="pvn-case-tab" role="tab" id="pvn-ctab-intake" aria-controls="pvn-cpanel-intake" aria-selected="false" data-pvn-case-tab="intake">فرم ارزیابی</button>
+      <button type="button" class="pvn-case-tab" role="tab" id="pvn-ctab-reminder" aria-controls="pvn-cpanel-reminder" aria-selected="false" data-pvn-case-tab="reminder">یادآور</button>
+    </div>
+
+    <section class="pvn-cpanel" id="pvn-cpanel-summary" role="tabpanel" aria-labelledby="pvn-ctab-summary" data-pvn-case-panel="summary">
+      <% if (!isNew) { %>
+        <section class="pas-card">
+          <h2 class="pas-card-title">مشخصات پرونده</h2>
+          <div class="pas-grid">
+            <div class="pas-stat"><span class="pas-stat-value pui-num">#<%= h.persianNum(c.id) %></span><span class="pas-stat-label">شناسه</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.status %></span><span class="pas-stat-label">وضعیت</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.assigned_therapist_name %></span><span class="pas-stat-label">درمانگر</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= h.jalali(c.updated_at) %></span><span class="pas-stat-label">آخرین به‌روزرسانی</span></div>
+          </div>
+        </section>
+      <% } %>
+
+      <section class="pas-card">
+        <h2 class="pas-card-title"><%= isNew ? 'ثبت پروندهٔ جدید' : 'ویرایش مشخصات' %></h2>
+        <form method="post" action="/api/cases" class="pas-form">
+          <input type="hidden" name="case_id" value="<%= isNew ? 0 : c.id %>" />
+          <div class="pas-form-grid">
+            <div class="pas-form-row">
+              <label for="pas-full_name">نام و نام خانوادگی</label>
+              <input class="pas-input" type="text" id="pas-full_name" name="full_name" value="<%= c.full_name || '' %>" required />
+            </div>
+            <% if (isNew) { %>
+              <div class="pas-form-row">
+                <label for="pas-phone">موبایل *</label>
+                <input class="pas-input" type="text" id="pas-phone" name="phone" dir="ltr" placeholder="09123456789" required />
+              </div>
+            <% } else { %>
+              <div class="pas-form-row">
+                <label>موبایل</label>
+                <p class="pas-readonly" dir="ltr"><%= c.phone %></p>
+                <p class="pas-field-hint">کلید اتصال حساب مراجع؛ قابل تغییر نیست.</p>
+              </div>
+            <% } %>
+            <div class="pas-form-row"><label for="pas-age">سن</label><input class="pas-input" type="text" id="pas-age" name="age" value="<%= c.age || '' %>" /></div>
+            <div class="pas-form-row"><label for="pas-marital_status">وضعیت تأهل</label><input class="pas-input" type="text" id="pas-marital_status" name="marital_status" value="<%= c.marital_status || '' %>" /></div>
+            <div class="pas-form-row"><label for="pas-education">تحصیلات</label><input class="pas-input" type="text" id="pas-education" name="education" value="<%= c.education || '' %>" /></div>
+            <div class="pas-form-row"><label for="pas-occupation">شغل</label><input class="pas-input" type="text" id="pas-occupation" name="occupation" value="<%= c.occupation || '' %>" /></div>
+            <div class="pas-form-row"><label for="pas-residence">محل سکونت</label><input class="pas-input" type="text" id="pas-residence" name="residence" value="<%= c.residence || '' %>" /></div>
+            <div class="pas-form-row"><label for="pas-topic">موضوع کاری</label><input class="pas-input" type="text" id="pas-topic" name="topic" value="<%= c.topic || '' %>" /></div>
+
+            <div class="pas-form-row">
+              <label for="pas-status">وضعیت پرونده</label>
+              <select class="pas-select" id="pas-status" name="status">
+                <% data.statuses.forEach(function(st) { %>
+                  <option value="<%= st %>" <%= (c.status || 'فعال') === st ? 'selected' : '' %>><%= st %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="pas-form-row">
+              <label for="pas-therapist">درمانگر مسئول</label>
+              <select class="pas-select" id="pas-therapist" name="assigned_therapist">
+                <% data.therapists.forEach(function(th) { %>
+                  <option value="<%= th.id %>" <%= Number(c.assigned_therapist || 1) === th.id ? 'selected' : '' %>><%= th.name %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="pas-form-row pas-form-row--full">
+              <label for="pas-main_conflict_topics">موضوعات اصلی تعارض</label>
+              <textarea class="pas-textarea" id="pas-main_conflict_topics" name="main_conflict_topics" rows="2"><%= c.main_conflict_topics || '' %></textarea>
+            </div>
+
+            <div class="pas-form-row">
+              <label for="pas-partner-phone">موبایل پارتنر (اختیاری)</label>
+              <input class="pas-input" type="text" id="pas-partner-phone" name="partner_phone" dir="ltr" value="<%= c.partner_phone || '' %>" placeholder="09123456789" />
+            </div>
+
+            <div class="pas-form-row">
+              <label for="pas-reminder_channel">کانال یادآور</label>
+              <select class="pas-select" id="pas-reminder_channel" name="reminder_channel">
+                <option value="sms" <%= (c.reminder_channel || 'sms') === 'sms' ? 'selected' : '' %>>پیامک</option>
+                <option value="email" <%= c.reminder_channel === 'email' ? 'selected' : '' %>>ایمیل</option>
+              </select>
+            </div>
+
+            <div class="pas-form-row pas-form-row--full">
+              <label class="pas-check">
+                <input type="checkbox" name="reminder_consent" value="1" <%= c.reminder_consent ? 'checked' : '' %> />
+                مراجع با دریافت یادآور جلسه موافق است
+              </label>
+            </div>
+          </div>
+
+          <details class="pas-form-section">
+            <summary>سوابق و علائم بالینی (رمزنگاری‌شده)</summary>
+            <div class="pas-form-grid">
+              <div class="pas-form-row"><label for="pas-medical_history">سابقهٔ بیماری یا مصرف دارو</label><textarea class="pas-textarea" id="pas-medical_history" name="medical_history" rows="2"><%= c.medical_history || '' %></textarea></div>
+              <div class="pas-form-row"><label for="pas-counseling_history">سابقهٔ مشاوره یا روان‌پزشک</label><textarea class="pas-textarea" id="pas-counseling_history" name="counseling_history" rows="2"><%= c.counseling_history || '' %></textarea></div>
+              <div class="pas-form-row"><label for="pas-symptom_mood_depression">خلق و افسردگی</label><textarea class="pas-textarea" id="pas-symptom_mood_depression" name="symptom_mood_depression" rows="2"><%= c.symptom_mood_depression || '' %></textarea></div>
+              <div class="pas-form-row"><label for="pas-symptom_anxiety">اضطراب</label><textarea class="pas-textarea" id="pas-symptom_anxiety" name="symptom_anxiety" rows="2"><%= c.symptom_anxiety || '' %></textarea></div>
+              <div class="pas-form-row pas-form-row--full"><label for="pas-q_schema_attachment">ارزیابی طرحواره و سبک دلبستگی</label><textarea class="pas-textarea" id="pas-q_schema_attachment" name="q_schema_attachment" rows="2"><%= c.q_schema_attachment || '' %></textarea></div>
+            </div>
+          </details>
+
+          <details class="pas-form-section">
+            <summary>سؤالات و اهداف درمان</summary>
+            <div class="pas-form-grid">
+              <div class="pas-form-row pas-form-row--full"><label for="pas-q_main_reason">۱. علت اصلی مراجعه</label><textarea class="pas-textarea" id="pas-q_main_reason" name="q_main_reason" rows="2"><%= c.q_main_reason || '' %></textarea></div>
+              <div class="pas-form-row pas-form-row--full"><label for="pas-q_therapy_goals">۲. اهداف مراجعه</label><textarea class="pas-textarea" id="pas-q_therapy_goals" name="q_therapy_goals" rows="2"><%= c.q_therapy_goals || '' %></textarea></div>
+            </div>
+          </details>
+
+          <p class="pas-note-form-actions">
+            <button class="pas-btn pas-btn-primary" type="submit"><%= isNew ? 'ثبت پرونده' : 'ذخیرهٔ تغییرات' %></button>
+          </p>
+        </form>
+      </section>
+
+      <% if (!isNew) { %>
+        <section class="pas-card">
+          <h2 class="pas-card-title">نمای جلسه‌های زوجی</h2>
+          <% if (!data.partnerCase) { %>
+            <p class="pas-muted">برای این پرونده پارتنر ثبت نشده است.</p>
+          <% } else { %>
+            <p><strong>پارتنر لینک‌شده:</strong> <a href="/dashboard?module=case_files&case_id=<%= data.partnerCase.id %>">#<%= h.persianNum(data.partnerCase.id) %> — <%= data.partnerCase.full_name %></a></p>
+          <% } %>
+        </section>
+      <% } %>
+    </section>
+
+    <section class="pvn-cpanel" id="pvn-cpanel-notes" role="tabpanel" aria-labelledby="pvn-ctab-notes" data-pvn-case-panel="notes" hidden>
+      <section class="pas-card">
+        <h2 class="pas-card-title">یادداشت‌های جلسه</h2>
+        <% if (isNew) { %>
+          <p class="pas-empty">پس از ثبت پرونده می‌توانید یادداشت جلسه اضافه کنید.</p>
+        <% } else { %>
+          <% if (!data.caseNotes.length) { %>
+            <p class="pas-empty">یادداشتی ثبت نشده است.</p>
+          <% } else { %>
+            <div class="pas-note-list">
+              <% data.caseNotes.forEach(function(note) {
+                const history = data.noteHistories[note.id] || [];
+              %>
+                <article class="pas-note">
+                  <h3 class="pas-note-title">جلسه‌ی <%= h.jalali(note.session_date) %> — شماره <%= h.persianNum(note.session_number) %></h3>
+                  <div class="pas-note-body"><%= note.content %></div>
+                  <p class="pas-timeline-meta">نویسنده: <%= note.author_name %> — وضعیت رمزنگاری: AES-256-GCM</p>
+                  <div class="pas-note-actions">
+                    <button type="button" class="pas-btn" data-pas-edit-note="1" data-note-id="<%= note.id %>" data-session-date="<%= h.jalaliAscii(note.session_date) %>" data-session-number="<%= note.session_number %>">ویرایش</button>
+                    <button type="button" class="pas-btn pas-btn-danger" data-pas-delete-note="1" data-case-id="<%= c.id %>" data-note-id="<%= note.id %>">حذف یادداشت</button>
+                  </div>
+                  <% if (history.length) { %>
+                    <details class="pas-note-history">
+                      <summary>تاریخچه‌ی نسخه‌ها (<%= h.persianNum(history.length) %>)</summary>
+                      <ul class="pas-list">
+                        <% history.forEach(function(snap) { %>
+                          <li>
+                            <span><%= snap.action %> — <%= h.jalaliDateTime(snap.changed_at) %></span>
+                            <button type="button" class="pas-btn pas-btn-sm" data-pas-restore-note="1" data-case-id="<%= c.id %>" data-history-id="<%= snap.id %>">بازگردانی</button>
+                          </li>
+                        <% }); %>
+                      </ul>
+                    </details>
+                  <% } %>
+                </article>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <hr />
+          <form id="pas-note-form" class="pas-note-form">
+            <h3 class="pas-note-form-title">افزودن یادداشت جدید</h3>
+            <input type="hidden" name="case_id" value="<%= c.id %>" />
+            <input type="hidden" name="note_id" value="0" />
+            <div class="pas-form-row">
+              <label for="pas-session-date">تاریخ جلسه (شمسی)</label>
+              <input class="pas-input" type="text" id="pas-session-date" name="session_date" dir="ltr" inputmode="numeric" placeholder="<%= h.todayJalaliAscii %>" required value="<%= h.todayJalaliAscii %>" data-default="<%= h.todayJalaliAscii %>" />
+              <p class="pas-muted pas-field-hint">مثال: <%= h.todayJalali %> — ارقام فارسی هم پذیرفته می‌شود.</p>
+            </div>
+            <div class="pas-form-row">
+              <label for="pas-session-number">شماره‌ی جلسه</label>
+              <input class="pas-input" type="number" id="pas-session-number" name="session_number" min="0" max="999" value="<%= (data.caseNotes[0]?.session_number || 0) + 1 %>" />
+            </div>
+            <div class="pas-form-row">
+              <label for="pas-note-content">متن یادداشت</label>
+              <textarea class="pas-textarea" id="pas-note-content" name="content" required></textarea>
+            </div>
+            <div class="pas-note-form-actions">
+              <button class="pas-btn pas-btn-primary" type="submit">ثبت یادداشت</button>
+              <button class="pas-btn" type="button" data-pas-cancel-edit hidden>لغو ویرایش</button>
+            </div>
+          </form>
+        <% } %>
+      </section>
+    </section>
+
+    <section class="pvn-cpanel" id="pvn-cpanel-intake" role="tabpanel" aria-labelledby="pvn-ctab-intake" data-pvn-case-panel="intake" hidden>
+      <section class="pas-card">
+        <h2 class="pas-card-title">فرم ارزیابی مراجع</h2>
+        <% if (isNew || !data.intakeRows.length) { %>
+          <p class="pas-empty">فیلد در انتظار نگاشت از فرم ارزیابی ثبت نشده است.</p>
+        <% } else { %>
+          <p class="pas-muted">پیش‌نمایش نگاشت فرم ارزیابی مراجع روی پرونده؛ فقط فیلدهای خالی پر می‌شوند مگر گزینهٔ بازنویسی را بزنید.</p>
+          <div class="pas-table-wrap">
+            <table class="pas-table">
+              <thead><tr><th>فیلد</th><th>مقدار فعلی</th><th>مقدار جدید</th><th>نتیجه</th></tr></thead>
+              <tbody>
+                <% const labels = { fill: 'پر می‌شود', same: 'یکسان', conflict: 'اختلاف با مقدار فعلی' };
+                   data.intakeRows.forEach(function(r) { %>
+                  <tr>
+                    <td><code><%= r.target %></code></td>
+                    <td><%= r.sensitivity === 'clinical' && r.current !== '—' ? '••••' : r.current %></td>
+                    <td><%= r.sensitivity === 'clinical' ? '••••' : r.value %></td>
+                    <td><span class="pas-badge <%= r.status === 'fill' ? 'pas-badge-good' : (r.status === 'conflict' ? 'pas-badge-warn' : '') %>"><%= labels[r.status] %></span></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          <form method="post" action="/api/cases/<%= c.id %>/intake" class="pas-form pas-inline-form">
+            <label class="pas-check"><input type="checkbox" name="overwrite" value="1" /> مقادیر دارای اختلاف هم بازنویسی شوند</label>
+            <button class="pas-btn pas-btn-primary" type="submit">اعمال روی پرونده</button>
+          </form>
+        <% } %>
+      </section>
+    </section>
+
+    <section class="pvn-cpanel" id="pvn-cpanel-reminder" role="tabpanel" aria-labelledby="pvn-ctab-reminder" data-pvn-case-panel="reminder" hidden>
+      <section class="pas-card">
+        <h2 class="pas-card-title">یادآور جلسه</h2>
+        <% if (isNew) { %>
+          <p class="pas-empty">ابتدا پرونده را ثبت کنید.</p>
+        <% } else { %>
+          <div class="pas-grid">
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.next_session_date ? h.jalali(c.next_session_date) : '—' %></span><span class="pas-stat-label">جلسهٔ بعدی</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_consent ? 'دارد' : 'ندارد' %></span><span class="pas-stat-label">رضایت یادآور</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_channel === 'email' ? 'ایمیل' : 'پیامک' %></span><span class="pas-stat-label">کانال</span></div>
+            <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_consent ? 'آمادهٔ ارسال' : 'نیازمند رضایت' %></span><span class="pas-stat-label">وضعیت</span></div>
+          </div>
+          <% if (c.reminder_last_sent_at) { %>
+            <p class="pas-muted">آخرین یادآور ارسال‌شده: <%= h.jalaliDateTime(c.reminder_last_sent_at) %></p>
+          <% } %>
+          <% if (c.reminder_consent) { %>
+            <form method="post" action="/api/cases/<%= c.id %>/reminder" class="pas-form pas-inline-form">
+              <button class="pas-btn pas-btn-primary" type="submit" data-pas-confirm="یادآور برای مراجع ارسال شود؟">ارسال یادآور</button>
+            </form>
+          <% } %>
+        <% } %>
+      </section>
+    </section>
+  </div>
+
+  <p><a class="pas-btn" href="/dashboard?module=case_files">بازگشت به فهرست پرونده‌ها</a></p>
+<% } else { %>
+  <section class="pas-card">
+    <h2 class="pas-card-title">پرونده‌های شما</h2>
+    <p class="pas-actions"><a class="pas-btn pas-btn-primary" href="/dashboard?module=case_files&new=1">پروندهٔ جدید</a></p>
+    <div class="pas-table-wrap">
+      <table class="pas-table">
+        <thead>
+          <tr>
+            <th>شناسه</th>
+            <th>مراجع</th>
+            <th>وضعیت</th>
+            <th>درمانگر</th>
+            <th>آخرین جلسه</th>
+            <th>به‌روزرسانی</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.cases.forEach(function(c) {
+            const tone = c.status.includes('فعال') ? ' pas-badge-good' : (c.status.includes('توقف') ? ' pas-badge-warn' : '');
+          %>
+            <tr>
+              <td data-label="شناسه" class="pui-num">#<%= h.persianNum(c.id) %></td>
+              <td data-label="مراجع"><%= c.full_name %></td>
+              <td data-label="وضعیت"><span class="pas-badge<%= tone %>"><%= c.status %></span></td>
+              <td data-label="درمانگر"><%= c.assigned_therapist_name %></td>
+              <td data-label="آخرین جلسه"><%= h.jalali(c.last_session_date) %></td>
+              <td data-label="به‌روزرسانی"><%= h.jalali(c.updated_at) %></td>
+              <td data-label="عملیات"><a class="pas-btn" href="/dashboard?module=case_files&case_id=<%= c.id %>">بازکردن</a></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% } %>

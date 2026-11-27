@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>پیوند امن — پنل مراجع</title>
+  <link rel="stylesheet" href="/assets/fonts/vazirmatn/vazirmatn.css">
+  <link rel="stylesheet" href="/assets/fonts/plex-arabic/plex-arabic.css">
+  <link rel="stylesheet" href="/assets/panel.css">
+  <link rel="stylesheet" href="/assets/panel-skin.css">
+  <link rel="stylesheet" href="/assets/panel-v2.css">
+  <style>html,body{margin:0;background:#F4F1EC;}</style>
+</head>
+<body>
+<div class="zdp-panel zdp-panel-shell" dir="rtl">
+  <header class="zdp-shell-topbar">
+    <div class="zdp-shell-brand">
+      <span class="zdp-shell-brand-mark" aria-hidden="true">
+        <span class="zdp-ring zdp-ring-a"></span>
+        <span class="zdp-ring zdp-ring-b"></span>
+      </span>
+      <span class="zdp-shell-brand-name">پیوند امن</span>
+    </div>
+    <div class="zdp-shell-user">
+      <a href="/dashboard" class="zdp-logout" style="margin-inline-end:8px">داشبورد درمانگر</a>
+      <% if (loggedIn) { %>
+        <span class="zdp-shell-user-avatar" aria-hidden="true">م</span>
+        <span class="zdp-shell-user-info">
+          <strong class="zdp-shell-user-name"><%= clientName %></strong>
+          <span class="zdp-shell-user-mobile" dir="ltr"><%= clientMobile %></span>
+        </span>
+        <a href="/portal/logout" class="zdp-logout">
+          <span class="zdp-shell-logout-label">خروج</span>
+        </a>
+      <% } %>
+    </div>
+  </header>
+
+  <% if (!loggedIn) { %>
+    <div class="zdp-shell-main" style="max-width:460px;margin:40px auto">
+      <section class="zdp-tab-panel">
+        <h2 style="margin:0 0 8px;font-size:1.1rem">ورود به پنل مراجع</h2>
+        <p style="margin:0 0 16px;color:#5C615D;font-size:.85rem">نوبت‌ها، آزمون‌ها و پیام‌های شما در یک جای امن و خصوصی.</p>
+        <form method="post" action="/portal/login">
+          <div style="margin-bottom:12px">
+            <label for="zdp-mobile" style="display:block;margin-bottom:6px;font-size:.85rem">شماره موبایل</label>
+            <input id="zdp-mobile" type="text" dir="ltr" value="09121234567" style="width:100%;padding:10px;border:1px solid #DCD5C9;border-radius:10px" />
+          </div>
+          <button type="submit" class="zdp-btn">ورود با کد یک‌بارمصرف</button>
+        </form>
+      </section>
+    </div>
+  <% } else { %>
+    <nav class="zdp-tabs" role="tablist">
+      <a href="/portal?tab=appointments" class="zdp-tab <%= activeTab === 'appointments' ? 'active' : '' %>"><span class="zdp-tab-label">نوبت‌ها</span></a>
+      <a href="/portal?tab=assessments" class="zdp-tab <%= activeTab === 'assessments' ? 'active' : '' %>"><span class="zdp-tab-label">آزمون‌ها</span><% if (pendingAssessments > 0) { %><span class="zdp-tab-badge"><%= h.persianNum(pendingAssessments) %></span><% } %></a>
+      <a href="/portal?tab=messages" class="zdp-tab <%= activeTab === 'messages' ? 'active' : '' %>"><span class="zdp-tab-label">پیام‌ها</span></a>
+      <a href="/portal?tab=intake" class="zdp-tab <%= activeTab === 'intake' ? 'active' : '' %>"><span class="zdp-tab-label">فرم ارزیابی مراجع</span></a>
+      <a href="/portal?tab=survey" class="zdp-tab <%= activeTab === 'survey' ? 'active' : '' %>"><span class="zdp-tab-label">نظرسنجی</span></a>
+    </nav>
+
+    <div class="zdp-shell-main">
+      <div class="zdp-stats-grid">
+        <div class="zdp-stat-card zdp-stat-card-highlight">
+          <span class="zdp-stat-label">نوبت بعدی شما</span>
+          <strong class="zdp-stat-value"><%= nextBooking ? nextBooking.service_name : 'ثبت نشده' %></strong>
+          <span class="zdp-stat-sub"><%= nextBooking ? (h.jalali(nextBooking.booking_date) + ' — ساعت ' + h.persianNum(nextBooking.booking_time)) : '—' %></span>
+          <% if (nextBooking) { %><span class="zdp-status"><%= nextBooking.status %></span><% } %>
+        </div>
+        <div class="zdp-stat-card">
+          <span class="zdp-stat-label">آزمون‌های در انتظار</span>
+          <strong class="zdp-stat-value"><%= h.persianNum(pendingAssessments) %></strong>
+        </div>
+        <div class="zdp-stat-card">
+          <span class="zdp-stat-label">پیام‌های ثبت‌شده</span>
+          <strong class="zdp-stat-value"><%= h.persianNum(messages.length) %></strong>
+        </div>
+      </div>
+
+      <% if (activeTab === 'appointments') { %>
+        <section class="zdp-tab-panel">
+          <h2 style="margin:0 0 10px;font-size:1rem">نوبت‌های شما</h2>
+          <p class="description" style="margin:0 0 16px;color:#5C615D;font-size:.8125rem">برای رزرو وقت جدید از فرم زیر استفاده کنید.</p>
+          <form method="post" action="/portal/book" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px">
+            <div>
+              <label style="display:block;font-size:12px;margin-bottom:4px">تاریخ (شمسی)</label>
+              <input type="text" name="booking_date_jalali" dir="ltr" value="<%= todayJalaliAscii %>" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px" />
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;margin-bottom:4px">ساعت</label>
+              <input type="text" name="booking_time" dir="ltr" value="16:30" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px;width:90px" />
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;margin-bottom:4px">نوع جلسه</label>
+              <select name="session_type" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px">
+                <% Object.keys(sessionTypes).forEach(function(k) { %>
+                  <option value="<%= k %>"><%= sessionTypes[k] %></option>
+                <% }); %>
+              </select>
+            </div>
+            <button type="submit" class="zdp-btn">رزرو نوبت جدید</button>
+          </form>
+
+          <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:.8125rem">
+            <thead>
+              <tr style="color:#7A7F79;font-size:11px">
+                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">تاریخ</th>
+                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">خدمت</th>
+                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">وضعیت</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% bookings.forEach(function(b) { %>
+                <tr>
+                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= h.jalali(b.booking_date) %> — <%= h.persianNum(b.booking_time) %></td>
+                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= b.service_name %></td>
+                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><span class="zdp-status <%= b.status === 'لغو شده' ? 'zdp-status-cancelled' : '' %>"><%= b.status %></span></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </section>
+      <% } else if (activeTab === 'assessments') { %>
+        <section class="zdp-tab-panel">
+          <h2 style="margin:0 0 12px;font-size:1rem">آزمون‌های شما</h2>
+          <% if (!invitations.length) { %>
+            <p style="color:#5C615D">آزمونی برای شما ثبت نشده است.</p>
+          <% } else { %>
+            <table style="width:100%;border-collapse:collapse;font-size:.8125rem">
+              <thead>
+                <tr style="color:#7A7F79;font-size:11px">
+                  <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">عنوان آزمون</th>
+                  <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">وضعیت</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% invitations.forEach(function(inv) { %>
+                  <tr>
+                    <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= inv.quiz_name %></td>
+                    <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><span class="zdp-status"><%= inv.status === 'completed' ? 'تکمیل شده' : 'در انتظار پاسخ' %></span></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          <% } %>
+        </section>
+      <% } else if (activeTab === 'messages') { %>
+        <section class="zdp-tab-panel">
+          <h2 style="margin:0 0 12px;font-size:1rem">پیام‌ها با درمانگر</h2>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+            <% messages.forEach(function(m) { %>
+              <div style="padding:12px 14px;border-radius:12px;background:<%= m.sender === 'client' ? '#E8EFEA' : '#F6F3EC' %>;border:1px solid #E2DDD2">
+                <strong style="font-size:.82rem"><%= m.sender_name %></strong>
+                <p style="margin:6px 0 0;font-size:.875rem"><%= m.body %></p>
+              </div>
+            <% }); %>
+          </div>
+          <form method="post" action="/portal/message" style="display:flex;gap:8px">
+            <input type="text" name="body" placeholder="پیام خود را بنویسید..." required style="flex:1;padding:10px;border:1px solid #DCD5C9;border-radius:10px" />
+            <button type="submit" class="zdp-btn">ارسال پیام</button>
+          </form>
+        </section>
+      <% } else if (activeTab === 'intake') { %>
+        <section class="zdp-tab-panel">
+          <h2 style="margin:0 0 10px;font-size:1rem">فرم ارزیابی مراجع</h2>
+          <p style="color:#5C615D;font-size:.85rem">اطلاعات پایهٔ شما تکمیل شده و به پروندهٔ بالینی متصل است. برای به‌روزرسانی اهداف درمان می‌توانید در جلسه با درمانگر هماهنگ کنید.</p>
+        </section>
+      <% } else { %>
+        <section class="zdp-tab-panel">
+          <h2 style="margin:0 0 10px;font-size:1rem">نظرسنجی کیفیت جلسات</h2>
+          <% if (surveyDone) { %>
+            <p class="zdp-status">سپاسگزاریم؛ بازخورد شما ثبت شد.</p>
+          <% } else { %>
+            <form method="post" action="/portal/survey">
+              <p style="color:#5C615D;font-size:.85rem">میزان رضایت شما از فرآیند نوبت‌دهی و جلسهٔ مشاوره؟</p>
+              <button type="submit" class="zdp-btn">ثبت بازخورد مثبت</button>
+            </form>
+          <% } %>
+        </section>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+</body>
+</html>

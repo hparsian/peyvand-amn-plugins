@@ -1,0 +1,175 @@
+<% if (data.report && data.invitation) { const r = data.report; %>
+  <p><a class="pas-btn" href="/dashboard?module=assessments&invitation_id=<%= data.invitation.id %>">بازگشت به نتیجه و روند</a></p>
+  <section class="pas-card">
+    <h2 class="pas-card-title">گزارش <%= r.label %> — <%= r.client_name %></h2>
+    <div class="pas-grid">
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(r.total) %> از <%= h.persianNum(r.max_score) %></span><span class="pas-stat-label">نمرهٔ کل</span></div>
+      <div class="pas-stat"><span class="pas-stat-value"><%= r.severity %></span><span class="pas-stat-label">شدت بالینی</span></div>
+      <div class="pas-stat"><span class="pas-stat-value"><%= h.jalaliDateTime(r.completed_at) %></span><span class="pas-stat-label">تاریخ تکمیل</span></div>
+    </div>
+    <p style="margin-top:16px"><strong>تفسیر بالینی:</strong> <%= r.interpretation %></p>
+    <% if (r.subscales && r.subscales.length) { %>
+      <div class="pas-table-wrap" style="margin-top:14px">
+        <table class="pas-table">
+          <thead><tr><th>خرده‌مقیاس</th><th>نمره</th><th>سهم</th></tr></thead>
+          <tbody>
+            <% r.subscales.forEach(function(sub) {
+              const pct = Math.max(2, Math.round((sub.score / Math.max(1, sub.max)) * 100));
+            %>
+              <tr>
+                <td><%= sub.name %></td>
+                <td class="pui-num"><%= h.persianNum(sub.score) %> / <%= h.persianNum(sub.max) %></td>
+                <td>
+                  <span class="pas-meter"><span class="pas-meter-fill" style="--pas-w:<%= pct %>%"></span></span>
+                  <span class="pas-muted"><%= h.persianNum(pct) %>٪</span>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+<% } else if (data.invitation) { const inv = data.invitation; %>
+  <p><a class="pas-btn" href="/dashboard?module=assessments">بازگشت به فهرست دعوت‌نامه‌ها</a></p>
+  <section class="pas-card">
+    <h2 class="pas-card-title">مراجع</h2>
+    <div class="pas-grid">
+      <div class="pas-stat"><span class="pas-stat-value"><%= inv.client_name %></span><span class="pas-stat-label">نام</span></div>
+      <div class="pas-stat"><span class="pas-stat-value" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span><span class="pas-stat-label">موبایل</span></div>
+      <div class="pas-stat"><span class="pas-stat-value"><%= inv.status === 'completed' ? 'تکمیل‌شده' : inv.status %></span><span class="pas-stat-label">وضعیت دعوت</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.trendScores.length) %></span><span class="pas-stat-label">نتیجهٔ ثبت‌شده</span></div>
+    </div>
+  </section>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">روند ارزیابی</h2>
+    <% if (!data.trendScores.length) { %>
+      <p class="pas-empty">هنوز نتیجه‌ای برای این مراجع ثبت نشده است.</p>
+    <% } else { %>
+      <div class="pas-table-wrap">
+        <table class="pas-table">
+          <thead><tr><th>آزمون</th><th>نمرهٔ کل</th><th>شدت</th><th>تاریخ</th><th>گزارش</th></tr></thead>
+          <tbody>
+            <% data.trendScores.slice().reverse().forEach(function(sc) { %>
+              <tr>
+                <td><%= sc.label %></td>
+                <td class="pui-num"><%= h.persianNum(sc.total) %> / <%= h.persianNum(sc.max_score) %></td>
+                <td><span class="pas-badge"><%= sc.severity %></span></td>
+                <td><%= h.jalaliDateTime(sc.completed_at) %></td>
+                <td><a class="pas-btn pas-btn-sm" href="/dashboard?module=assessments&invitation_id=<%= inv.id %>&attempt_id=<%= sc.attempt_id %>">مشاهدهٔ گزارش</a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+<% } else { %>
+  <% if (data.newInviteLink) { %>
+    <section class="pas-card">
+      <h2 class="pas-card-title">لینک دعوت تازه</h2>
+      <p>دعوت‌نامه برای <strong><%= data.newInviteLink.name %></strong> ساخته شد.</p>
+      <div class="pas-invite-link">
+        <input class="pas-input" type="text" readonly value="<%= data.newInviteLink.link %>" dir="ltr" aria-label="لینک دعوت" />
+        <button type="button" class="pas-btn" data-pas-copy="<%= data.newInviteLink.link %>">کپی لینک</button>
+      </div>
+    </section>
+  <% } %>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">نمای کلی</h2>
+    <div class="pas-grid">
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.quizzes.length) %></span><span class="pas-stat-label">آزمون فعال</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.totalInvitations) %></span><span class="pas-stat-label">دعوت‌نامه</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.pendingCount) %></span><span class="pas-stat-label">در انتظار پاسخ</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.completedCount) %></span><span class="pas-stat-label">تکمیل‌شده</span></div>
+    </div>
+  </section>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">دعوت به آزمون</h2>
+    <form method="post" action="/api/assessments/invite" class="pas-form">
+      <div class="pas-form-grid">
+        <div class="pas-form-row">
+          <label for="pas-inv-quiz">آزمون *</label>
+          <select class="pas-select" id="pas-inv-quiz" name="quiz_id" required>
+            <% data.quizzes.forEach(function(q) { %>
+              <option value="<%= q.id %>"><%= q.name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="pas-form-row"><label for="pas-inv-name">نام مراجع *</label><input class="pas-input" type="text" id="pas-inv-name" name="client_name" required /></div>
+        <div class="pas-form-row"><label for="pas-inv-phone">موبایل *</label><input class="pas-input" type="text" id="pas-inv-phone" name="client_phone" dir="ltr" placeholder="09123456789" required /></div>
+        <div class="pas-form-row"><label for="pas-inv-email">ایمیل (اختیاری)</label><input class="pas-input" type="email" id="pas-inv-email" name="client_email" dir="ltr" /></div>
+        <div class="pas-form-row"><label for="pas-inv-expiry">اعتبار (روز، ۰ = بدون انقضا)</label><input class="pas-input" type="number" id="pas-inv-expiry" name="expiry_days" min="0" max="90" value="7" /></div>
+        <div class="pas-form-row pas-form-row--full">
+          <label class="pas-check"><input type="checkbox" name="notify" value="1" checked /> ارسال خودکار دعوت‌نامه به مراجع</label>
+        </div>
+      </div>
+      <p class="pas-note-form-actions"><button class="pas-btn pas-btn-primary" type="submit">ساخت دعوت‌نامه</button></p>
+    </form>
+  </section>
+
+  <section class="pas-card">
+    <h2 class="pas-card-title">دعوت‌نامه‌ها</h2>
+    <form method="get" action="/dashboard" class="pas-filter-form">
+      <input type="hidden" name="module" value="assessments" />
+      <div class="pas-form-row">
+        <label for="pas-invite-status">وضعیت</label>
+        <select class="pas-select" id="pas-invite-status" name="status">
+          <option value="" <%= data.statusFilter === '' ? 'selected' : '' %>>همه</option>
+          <option value="unused" <%= data.statusFilter === 'unused' ? 'selected' : '' %>>استفاده‌نشده</option>
+          <option value="processing" <%= data.statusFilter === 'processing' ? 'selected' : '' %>>در حال پاسخ</option>
+          <option value="completed" <%= data.statusFilter === 'completed' ? 'selected' : '' %>>تکمیل‌شده</option>
+          <option value="revoked" <%= data.statusFilter === 'revoked' ? 'selected' : '' %>>باطل‌شده</option>
+        </select>
+      </div>
+      <button class="pas-btn" type="submit">اعمال</button>
+    </form>
+
+    <div class="pas-table-wrap">
+      <table class="pas-table">
+        <thead><tr><th>تاریخ</th><th>مراجع</th><th>آزمون</th><th>وضعیت</th><th>انقضا</th><th>عملیات</th></tr></thead>
+        <tbody>
+          <% const stMap = {
+            unused: { label: 'استفاده‌نشده', cls: 'pas-badge-warn' },
+            processing: { label: 'در حال پاسخ', cls: 'pas-badge-warn' },
+            completed: { label: 'تکمیل‌شده', cls: 'pas-badge-good' },
+            revoked: { label: 'باطل‌شده', cls: 'pas-badge-danger' }
+          };
+          data.invitations.forEach(function(inv) {
+            const st = stMap[inv.status] || { label: inv.status, cls: '' };
+          %>
+            <tr>
+              <td><%= h.jalaliDateTime(inv.created_at) %></td>
+              <td><strong><%= inv.client_name %></strong><br /><span class="pas-muted" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span></td>
+              <td><%= inv.quiz_name %></td>
+              <td><span class="pas-badge <%= st.cls %>"><%= st.label %></span></td>
+              <td><%= inv.expires_at ? h.jalaliDateTime(inv.expires_at) : '—' %></td>
+              <td>
+                <div class="pas-row-actions">
+                  <% if (inv.attempt_id > 0) { %>
+                    <a class="pas-btn pas-btn-sm" href="/dashboard?module=assessments&invitation_id=<%= inv.id %>">نتیجه و روند</a>
+                  <% } else { %>
+                    <span class="pas-muted">در انتظار پاسخ</span>
+                  <% } %>
+                  <% if (inv.status === 'unused' || inv.status === 'processing') { %>
+                    <form method="post" action="/api/assessments/<%= inv.id %>/notify" class="pas-inline-form">
+                      <button class="pas-btn pas-btn-sm" type="submit">ارسال دوباره</button>
+                    </form>
+                  <% } %>
+                  <% if (inv.status === 'unused') { %>
+                    <form method="post" action="/api/assessments/<%= inv.id %>/revoke" class="pas-inline-form">
+                      <button class="pas-btn pas-btn-sm pas-btn-danger" type="submit" data-pas-confirm="این دعوت‌نامه باطل شود؟">ابطال</button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% } %>

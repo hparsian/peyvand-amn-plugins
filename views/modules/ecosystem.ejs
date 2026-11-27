@@ -1,0 +1,19 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">وضعیت ماژول‌های اکوسیستم پیوند امن</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>ماژول</th><th>وضعیت</th><th>نسخه</th><th>جداول</th><th>سلامت</th></tr></thead>
+      <tbody>
+        <% data.plugins.forEach(function(p) { %>
+          <tr>
+            <td><strong><%= p.label %></strong><br /><code><%= p.key %></code></td>
+            <td><%= p.active ? 'فعال' : 'حالت پیش‌نمایش' %></td>
+            <td dir="ltr"><%= p.version %></td>
+            <td><%= p.tables %></td>
+            <td><span class="pas-badge <%= p.status === 'ok' ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= p.status === 'ok' ? 'سالم' : 'نیازمند بررسی' %></span></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>

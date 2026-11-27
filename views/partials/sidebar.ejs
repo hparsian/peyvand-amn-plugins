@@ -1,0 +1,36 @@
+<nav class="pvn-nav pas-sidebar" id="pas-sidebar" aria-label="ناوبری داشبورد">
+  <p class="pvn-nav__now">
+    <span class="pvn-nav__now-icon" aria-hidden="true"><%- h.svg(meta.id, 16) %></span>
+    <span class="pvn-nav__now-text">
+      <small>شما اینجا هستید</small>
+      <b><%= meta.label %></b>
+    </span>
+  </p>
+
+  <% navGroups.forEach(function(group) { %>
+    <div class="pvn-nav__group<%= group.isCurrent ? ' is-current' : '' %>">
+      <p class="pvn-nav__label"><%= group.label %></p>
+      <% group.items.forEach(function(item) { %>
+        <a class="pvn-nav__link" href="<%= item.url %>" <%- item.active ? 'aria-current="page"' : '' %>>
+          <%- item.iconSvg %>
+          <span><%= item.label %></span>
+          <% if (item.id === 'notifications' && unread > 0) { %>
+            <span class="pvn-nav__count"><%= h.persianNum(unread) %></span>
+            <span class="screen-reader-text">اعلان خوانده‌نشده</span>
+          <% } %>
+        </a>
+      <% }); %>
+    </div>
+  <% }); %>
+
+  <div class="pvn-nav__foot">
+    <p class="pvn-status">
+      <span class="pvn-status__dot <%= cryptoReady ? 'pvn-status__dot--ok' : 'pvn-status__dot--bad' %>" aria-hidden="true"></span>
+      <span><%= cryptoReady ? 'رمزنگاری بالینی فعال' : 'کلید رمزنگاری تنظیم نشده' %></span>
+    </p>
+    <p class="pvn-status">
+      <%- h.svg('lock', 13) %>
+      <span>نسخه ۲.۱.۰</span>
+    </p>
+  </div>
+</nav>

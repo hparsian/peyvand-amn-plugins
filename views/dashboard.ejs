@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>پیوند امن — <%= meta.label %></title>
+  <link rel="stylesheet" href="/assets/fonts/vazirmatn/vazirmatn.css">
+  <link rel="stylesheet" href="/assets/fonts/plex-arabic/plex-arabic.css">
+  <link rel="stylesheet" href="/assets/tokens.css">
+  <link rel="stylesheet" href="/assets/components.css">
+  <link rel="stylesheet" href="/assets/calm.css">
+  <link rel="stylesheet" href="/assets/dashboard-admin.css">
+  <link rel="stylesheet" href="/assets/shell-v2.css">
+  <style>
+    html, body { margin: 0; background: #F4F1EC; }
+    [data-pui-theme="dark"] body { background: var(--pui-bg, #171916); }
+    .pvn-topbar { top: 0 !important; }
+    .pvn-nav { top: 64px !important; height: calc(100vh - 64px) !important; }
+    .pvn-shell { margin: 0 !important; min-height: 100vh; }
+    .pvn-frame { min-height: 100vh; }
+    .pvn-avatar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+  </style>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('pui-theme') || 'light';
+        document.documentElement.setAttribute('data-pui-theme', t === 'dark' ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-pui-theme-choice', t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+<div class="pvn-shell pas-dashboard" dir="rtl">
+  <a class="pas-skip-link" href="#pas-main">پرش به محتوا</a>
+
+  <div class="pvn-frame">
+    <%- include('partials/header') %>
+
+    <div class="pvn-body">
+      <%- include('partials/sidebar') %>
+
+      <main class="pvn-main pas-main" id="pas-main" tabindex="-1">
+        <div class="pvn-main-inner">
+          <div class="pvn-pagehead">
+            <div class="pvn-pagehead__text">
+              <nav class="pvn-breadcrumb" aria-label="مسیر صفحه">
+                <a href="/dashboard?module=overview">داشبورد</a>
+                <% if (meta.group) { %>
+                  <span aria-hidden="true">/</span>
+                  <span><%= meta.group %></span>
+                <% } %>
+                <span aria-hidden="true">/</span>
+                <b aria-current="page"><%= meta.label %></b>
+              </nav>
+              <h1 class="pvn-pagehead__title"><%= meta.label %></h1>
+              <% if (meta.description) { %>
+                <p class="pvn-pagehead__sub"><%= meta.description %></p>
+              <% } %>
+            </div>
+            <div class="pvn-pagehead__aside">
+              <span class="pvn-pagehead__chip">
+                <%- h.svg(meta.id, 15) %>
+                <%= meta.group || meta.label %>
+              </span>
+            </div>
+          </div>
+
+          <% if (flash && flash.length) { %>
+            <% flash.forEach(function(item) { %>
+              <div class="pas-notice pas-notice-<%= item.type %>" role="status"><p><%= item.message %></p></div>
+            <% }); %>
+          <% } %>
+
+          <%- include('modules/' + moduleId) %>
+        </div>
+      </main>
+    </div>
+
+    <%- include('partials/footer') %>
+  </div>
+
+  <div class="pvn-scrim" data-pvn-close-nav aria-hidden="true"></div>
+</div>
+
+<script src="/assets/js/ui.js"></script>
+<script src="/assets/js/dashboard.js"></script>
+</body>
+</html>

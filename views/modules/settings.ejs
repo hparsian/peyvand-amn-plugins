@@ -1,0 +1,38 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">تنظیمات داشبورد</h2>
+  <form method="post" action="/api/settings">
+    <div class="pas-form-row">
+      <label for="pas-per-page">تعداد ردیف در هر صفحه</label>
+      <input class="pas-input" type="number" id="pas-per-page" name="per_page" min="5" max="100" value="<%= data.settings.per_page %>" />
+    </div>
+    <div class="pas-form-row">
+      <label for="pas-range">بازه‌ی پیش‌فرض گزارش (روز)</label>
+      <input class="pas-input" type="number" id="pas-range" name="default_range_days" min="1" max="365" value="<%= data.settings.default_range_days %>" />
+    </div>
+    <div class="pas-form-row">
+      <label class="pas-check"><input type="checkbox" name="enable_notes" value="1" <%= data.settings.enable_notes ? 'checked' : '' %> /> فعال‌بودن ثبت یادداشت بالینی</label>
+    </div>
+    <div class="pas-form-row">
+      <label class="pas-check"><input type="checkbox" name="enable_notifications" value="1" <%= data.settings.enable_notifications ? 'checked' : '' %> /> فعال‌بودن اعلان‌ها</label>
+    </div>
+    <button class="pas-btn pas-btn-primary" type="submit">ذخیره‌ی تنظیمات</button>
+  </form>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">ماتریس دسترسی نقش‌ها</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>نقش</th><th>دامنهٔ دسترسی</th><th>ماژول‌های قابل مشاهده</th></tr></thead>
+      <tbody>
+        <% data.roles.forEach(function(r) { %>
+          <tr>
+            <td><strong><%= r.label %></strong><br /><code dir="ltr"><%= r.slug %></code></td>
+            <td><%= r.access %></td>
+            <td><%= r.modules %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>

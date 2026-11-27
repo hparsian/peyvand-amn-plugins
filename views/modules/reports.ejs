@@ -1,0 +1,106 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">شاخص‌های کلیدی</h2>
+  <div class="pas-grid pas-kpi-grid">
+    <% data.kpis.forEach(function(k) { %>
+      <div class="pas-stat" title="<%= k.hint %>">
+        <span class="pas-stat-value pui-num"><%= k.value %></span>
+        <span class="pas-stat-label"><%= k.label %></span>
+        <span class="pas-stat-hint"><%= k.hint %></span>
+      </div>
+    <% }); %>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">روند ۶ ماه گذشته</h2>
+  <div class="pas-chart-legend">
+    <span><span class="pas-chart-dot pas-chart-dot-a" aria-hidden="true"></span>پروندهٔ تازه</span>
+    <span><span class="pas-chart-dot pas-chart-dot-b" aria-hidden="true"></span>نوبت</span>
+    <span><span class="pas-chart-dot pas-chart-dot-c" aria-hidden="true"></span>دعوت آزمون</span>
+  </div>
+  <div class="pas-chart-plot">
+    <% data.months.forEach(function(row) {
+      const hA = row.cases > 0 ? Math.max(4, Math.round((row.cases / data.maxTrend) * 100)) : 0;
+      const hB = row.bookings > 0 ? Math.max(4, Math.round((row.bookings / data.maxTrend) * 100)) : 0;
+      const hC = row.invites > 0 ? Math.max(4, Math.round((row.invites / data.maxTrend) * 100)) : 0;
+    %>
+      <div class="pas-chart-col" title="<%= row.label %>">
+        <div class="pas-chart-bars">
+          <span class="pas-chart-bar pas-chart-bar-a" style="--pas-h:<%= hA %>%" aria-hidden="true"></span>
+          <span class="pas-chart-bar pas-chart-bar-b" style="--pas-h:<%= hB %>%" aria-hidden="true"></span>
+          <span class="pas-chart-bar pas-chart-bar-c" style="--pas-h:<%= hC %>%" aria-hidden="true"></span>
+        </div>
+        <span class="pas-chart-month"><%= row.short %></span>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="pas-table-wrap pas-chart-table">
+    <table class="pas-table">
+      <thead><tr><th>ماه</th><th>پروندهٔ تازه</th><th>نوبت</th><th>دعوت آزمون</th></tr></thead>
+      <tbody>
+        <% data.months.forEach(function(row) { %>
+          <tr>
+            <td><%= row.label %></td>
+            <td class="pui-num"><%= h.persianNum(row.cases) %></td>
+            <td class="pui-num"><%= h.persianNum(row.bookings) %></td>
+            <td class="pui-num"><%= h.persianNum(row.invites) %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">بار کاری درمانگران</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>درمانگر</th><th>پرونده</th><th>نسبت به بیشترین</th></tr></thead>
+      <tbody>
+        <% Object.keys(data.workloadCounts).forEach(function(name) {
+          const count = data.workloadCounts[name];
+          const pct = Math.max(4, Math.round((count / data.maxWorkload) * 100));
+        %>
+          <tr>
+            <td><%= name %></td>
+            <td class="pui-num"><%= h.persianNum(count) %></td>
+            <td><span class="pas-meter"><span class="pas-meter-fill" style="--pas-w:<%= pct %>%"></span></span></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">توزیع وضعیت پرونده‌ها</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>وضعیت</th><th>تعداد</th><th>سهم</th></tr></thead>
+      <tbody>
+        <% Object.keys(data.caseStatusCounts).forEach(function(st) {
+          const count = data.caseStatusCounts[st];
+          const pct = Math.round((count / Math.max(1, data.totalCases)) * 100);
+        %>
+          <tr>
+            <td><span class="pas-badge"><%= st %></span></td>
+            <td class="pui-num"><%= h.persianNum(count) %></td>
+            <td>
+              <span class="pas-meter"><span class="pas-meter-fill" style="--pas-w:<%= Math.max(2, pct) %>%"></span></span>
+              <span class="pas-muted"><%= h.persianNum(pct) %>٪</span>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">خروجی CSV</h2>
+  <p>خروجی شامل شناسه، وضعیت، درمانگر، تعداد یادداشت و تاریخ به‌روزرسانی است. نام و شماره‌ی مراجع در خروجی نیست.</p>
+  <form method="post" action="/api/export/cases">
+    <button class="pas-btn pas-btn-primary" type="submit">دریافت CSV</button>
+  </form>
+</section>

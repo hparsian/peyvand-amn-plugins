@@ -1,0 +1,27 @@
+<section class="pas-card">
+  <h2 class="pas-card-title">کانال‌های ارتباطی</h2>
+  <div class="pas-grid">
+    <div class="pas-stat"><span class="pas-stat-value"><%= data.smsReady ? 'متصل' : 'پیش‌نمایش' %></span><span class="pas-stat-label">پل پیامک (MeliPayamak)</span></div>
+    <div class="pas-stat"><span class="pas-stat-value"><%= data.smtpReady ? 'متصل' : 'پیش‌نمایش' %></span><span class="pas-stat-label">سرویس ایمیل (SMTP)</span></div>
+  </div>
+</section>
+
+<section class="pas-card">
+  <h2 class="pas-card-title">آخرین تلاش‌های ارسال پیامک</h2>
+  <div class="pas-table-wrap">
+    <table class="pas-table">
+      <thead><tr><th>زمان</th><th>شماره (ماسک‌شده)</th><th>الگو</th><th>نتیجه</th><th>توضیح</th></tr></thead>
+      <tbody>
+        <% data.smsLog.forEach(function(log) { %>
+          <tr>
+            <td><%= h.jalaliDateTime(log.created_at) %></td>
+            <td dir="ltr"><%= h.maskMobile(log.mobile) %></td>
+            <td><code><%= log.pattern %></code></td>
+            <td><span class="pas-badge <%= log.success ? 'pas-badge-good' : 'pas-badge-danger' %>"><%= log.success ? 'موفق' : 'ناموفق' %></span></td>
+            <td><%= log.reason %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
