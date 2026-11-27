@@ -1,0 +1,838 @@
+/* ============================================================
+   پیوند امن — کیت رابط کاربری · کامپوننت‌ها (components.css)
+   نسخه 1.0.0
+
+   قواعد سخت این فایل:
+     • همهٔ انتخابگرها با .pui- شروع می‌شوند (هیچ قاعدهٔ سراسری).
+     • همهٔ جهت‌ها با CSS Logical Properties نوشته می‌شوند (RTL خودکار).
+     • هیچ رنگ هاردکدی جز توکن‌های --pui-* وجود ندارد.
+     • هر کامپوننت در light و dark یکسان کار می‌کند.
+   ============================================================ */
+
+@layer pui.tokens, pui.base, pui.components, pui.utilities;
+
+@layer pui.base {
+    .pui-shell,
+    .pui-kit {
+        box-sizing: border-box;
+        font-family: var(--pui-font);
+        font-size: var(--pui-fs-base);
+        line-height: var(--pui-lh);
+        color: var(--pui-text);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    .pui-shell *,
+    .pui-shell *::before,
+    .pui-shell *::after,
+    .pui-kit *,
+    .pui-kit *::before,
+    .pui-kit *::after {
+        box-sizing: inherit;
+    }
+
+    .pui-shell :focus-visible,
+    .pui-kit :focus-visible {
+        outline: 2px solid var(--pui-accent-line);
+        outline-offset: 2px;
+        border-radius: var(--pui-r-sm);
+    }
+
+    .pui-icon {
+        flex: none;
+        vertical-align: -.15em;
+        pointer-events: none;
+    }
+
+    .pui-shell h1, .pui-shell h2, .pui-shell h3, .pui-shell h4,
+    .pui-kit h1, .pui-kit h2, .pui-kit h3, .pui-kit h4 {
+        margin: 0;
+        line-height: 1.45;
+        color: var(--pui-text);
+        font-weight: 700;
+    }
+
+    .pui-shell p, .pui-kit p { margin: 0; }
+
+    .pui-shell a, .pui-kit a {
+        color: var(--pui-primary);
+        text-decoration-color: var(--pui-accent-line);
+        text-underline-offset: 3px;
+    }
+}
+
+@layer pui.components {
+    /* ── دکمه ─────────────────────────────────────────── */
+    .pui-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--pui-s2);
+        min-block-size: 42px;
+        padding-inline: var(--pui-s4);
+        padding-block: var(--pui-s2);
+        border: 1px solid transparent;
+        border-radius: var(--pui-r-md);
+        background: var(--pui-surface);
+        color: var(--pui-text);
+        font: inherit;
+        font-weight: 500;
+        font-size: var(--pui-fs-base);
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color var(--pui-dur) var(--pui-ease),
+                    border-color var(--pui-dur) var(--pui-ease),
+                    transform var(--pui-dur) var(--pui-ease);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .pui-btn:hover { transform: translateY(-1px); }
+    .pui-btn:active { transform: none; }
+    .pui-btn[disabled],
+    .pui-btn[aria-disabled="true"] {
+        opacity: .55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .pui-btn--primary {
+        background: var(--pui-primary);
+        color: var(--pui-on-primary);
+        border-color: var(--pui-primary);
+    }
+    .pui-btn--primary:hover { background: var(--pui-primary-hover); border-color: var(--pui-primary-hover); }
+
+    .pui-btn--ghost {
+        background: transparent;
+        border-color: var(--pui-border);
+        color: var(--pui-text);
+    }
+    .pui-btn--ghost:hover { background: var(--pui-surface-2); }
+
+    .pui-btn--quiet {
+        background: transparent;
+        color: var(--pui-text-muted);
+        padding-inline: var(--pui-s3);
+    }
+    .pui-btn--quiet:hover { background: var(--pui-surface-2); color: var(--pui-text); }
+
+    .pui-btn--danger {
+        background: var(--pui-danger-bg);
+        color: var(--pui-danger);
+        border-color: color-mix(in srgb, var(--pui-danger) 30%, transparent);
+    }
+    .pui-btn--danger:hover { background: color-mix(in srgb, var(--pui-danger) 14%, var(--pui-surface)); }
+
+    .pui-btn--icon {
+        inline-size: 42px;
+        padding-inline: 0;
+        min-block-size: 42px;
+    }
+
+    .pui-btn--sm { min-block-size: 34px; font-size: var(--pui-fs-sm); padding-inline: var(--pui-s3); }
+    .pui-btn--lg { min-block-size: 50px; font-size: var(--pui-fs-md); padding-inline: var(--pui-s6); }
+    .pui-btn--block { inline-size: 100%; }
+
+    .pui-btn[aria-busy="true"] { cursor: progress; opacity: .8; }
+
+    /* ── کارت ─────────────────────────────────────────── */
+    .pui-card {
+        background: var(--pui-surface);
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-lg);
+        box-shadow: var(--pui-shadow-sm);
+        overflow: hidden;
+    }
+
+    .pui-card__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--pui-s4);
+        padding: var(--pui-s4) var(--pui-s5);
+        border-block-end: 1px solid var(--pui-border-soft);
+        background: var(--pui-surface-2);
+    }
+
+    .pui-card__heading { display: flex; align-items: center; gap: var(--pui-s3); min-inline-size: 0; }
+
+    .pui-card__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 36px;
+        block-size: 36px;
+        border-radius: var(--pui-r-md);
+        background: var(--pui-accent-soft);
+        color: var(--pui-text);
+    }
+
+    .pui-card__title { font-size: var(--pui-fs-md); font-weight: 600; }
+    .pui-card__subtitle { margin-block-start: 2px; font-size: var(--pui-fs-sm); color: var(--pui-text-muted); }
+    .pui-card__body { padding: var(--pui-s5); }
+    .pui-card__foot { padding: var(--pui-s4) var(--pui-s5); border-block-start: 1px solid var(--pui-border-soft); background: var(--pui-surface-2); }
+
+    /* ── کارت آماری ───────────────────────────────────── */
+    .pui-stat {
+        position: relative;
+        display: grid;
+        gap: var(--pui-s1);
+        padding: var(--pui-s4);
+        background: var(--pui-surface);
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-lg);
+        box-shadow: var(--pui-shadow-sm);
+    }
+
+    .pui-stat__icon {
+        display: inline-flex;
+        inline-size: 34px;
+        block-size: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--pui-r-sm);
+        background: var(--pui-surface-3);
+        color: var(--pui-text-muted);
+        margin-block-end: var(--pui-s1);
+    }
+
+    .pui-stat__label { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); }
+    .pui-stat__value { font-size: var(--pui-fs-xl); font-weight: 700; letter-spacing: -.01em; }
+    .pui-stat__meta { font-size: var(--pui-fs-xs); color: var(--pui-text-soft); }
+    .pui-stat--accent { border-color: color-mix(in srgb, var(--pui-accent) 55%, transparent); }
+    .pui-stat--accent .pui-stat__icon { background: var(--pui-accent-soft); color: var(--pui-text); }
+
+    /* ── بج ────────────────────────────────────────────── */
+    .pui-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding-inline: var(--pui-s2);
+        padding-block: 3px;
+        border-radius: var(--pui-r-full);
+        border: 1px solid transparent;
+        font-size: var(--pui-fs-xs);
+        font-weight: 500;
+        line-height: 1.7;
+        white-space: nowrap;
+    }
+
+    .pui-badge--neutral { background: var(--pui-surface-3); color: var(--pui-text-muted); }
+    .pui-badge--success { background: var(--pui-success-bg); color: var(--pui-success); }
+    .pui-badge--warning { background: var(--pui-warning-bg); color: var(--pui-warning); }
+    .pui-badge--danger  { background: var(--pui-danger-bg);  color: var(--pui-danger); }
+    .pui-badge--info    { background: var(--pui-info-bg);    color: var(--pui-info); }
+    .pui-badge--accent  { background: var(--pui-accent-soft); color: var(--pui-text); border-color: color-mix(in srgb, var(--pui-accent) 45%, transparent); }
+
+    /* ── هشدار ─────────────────────────────────────────── */
+    .pui-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) var(--pui-s4);
+        border-radius: var(--pui-r-md);
+        border: 1px solid var(--pui-border-soft);
+        border-inline-start-width: 4px;
+        background: var(--pui-surface);
+    }
+
+    .pui-alert__icon { margin-block-start: 2px; }
+    .pui-alert__title { display: block; font-size: var(--pui-fs-base); margin-block-end: 2px; }
+    .pui-alert__text { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); }
+
+    .pui-alert--info    { background: var(--pui-info-bg);    border-inline-start-color: var(--pui-info); }
+    .pui-alert--success { background: var(--pui-success-bg); border-inline-start-color: var(--pui-success); }
+    .pui-alert--warning { background: var(--pui-warning-bg); border-inline-start-color: var(--pui-warning); }
+    .pui-alert--danger  { background: var(--pui-danger-bg);  border-inline-start-color: var(--pui-danger); }
+
+    /* ── فرم ───────────────────────────────────────────── */
+    .pui-field { display: grid; gap: var(--pui-s1); }
+    .pui-field__label { font-size: var(--pui-fs-sm); font-weight: 500; color: var(--pui-text); }
+    .pui-field__req { color: var(--pui-danger); margin-inline-start: 3px; }
+
+    .pui-input,
+    .pui-select,
+    .pui-textarea {
+        inline-size: 100%;
+        min-block-size: 44px;
+        padding-inline: var(--pui-s3);
+        padding-block: var(--pui-s2);
+        border: 1px solid var(--pui-border);
+        border-radius: var(--pui-r-md);
+        background: var(--pui-surface);
+        color: var(--pui-text);
+        font: inherit;
+        font-size: var(--pui-fs-base);
+        transition: border-color var(--pui-dur) var(--pui-ease), box-shadow var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-textarea { min-block-size: 110px; resize: vertical; line-height: var(--pui-lh); }
+
+    .pui-input::placeholder,
+    .pui-textarea::placeholder { color: var(--pui-text-soft); }
+
+    .pui-input:hover, .pui-select:hover, .pui-textarea:hover { border-color: var(--pui-accent-line); }
+
+    .pui-input:focus, .pui-select:focus, .pui-textarea:focus {
+        outline: none;
+        border-color: var(--pui-accent-line);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--pui-accent) 35%, transparent);
+    }
+
+    .pui-field__hint { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+    .pui-field__error { font-size: var(--pui-fs-xs); color: var(--pui-danger); font-weight: 500; }
+    .pui-field--invalid .pui-input,
+    .pui-field--invalid .pui-select,
+    .pui-field--invalid .pui-textarea { border-color: var(--pui-danger); }
+
+    .pui-check {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--pui-s2);
+        font-size: var(--pui-fs-sm);
+        color: var(--pui-text);
+        cursor: pointer;
+    }
+    .pui-check input { inline-size: 18px; block-size: 18px; margin-block-start: 3px; accent-color: var(--pui-accent-line); }
+
+    /* ── جدول ──────────────────────────────────────────── */
+    .pui-table-wrap {
+        inline-size: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-lg);
+        background: var(--pui-surface);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pui-table { inline-size: 100%; border-collapse: collapse; font-size: var(--pui-fs-sm); }
+    .pui-table__caption { caption-side: top; text-align: start; padding: var(--pui-s3) var(--pui-s4); font-weight: 600; color: var(--pui-text-muted); }
+
+    .pui-table thead th {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 1;
+        background: var(--pui-surface-2);
+        color: var(--pui-text-muted);
+        font-size: var(--pui-fs-xs);
+        font-weight: 600;
+        text-align: start;
+        padding: var(--pui-s3) var(--pui-s4);
+        border-block-end: 1px solid var(--pui-border-soft);
+        white-space: nowrap;
+    }
+
+    .pui-table tbody td {
+        padding: var(--pui-s3) var(--pui-s4);
+        border-block-end: 1px solid var(--pui-border-soft);
+        vertical-align: middle;
+        color: var(--pui-text);
+    }
+
+    .pui-table tbody tr:last-child td { border-block-end: 0; }
+    .pui-table tbody tr:hover td { background: var(--pui-surface-2); }
+    .pui-table__num { font-variant-numeric: tabular-nums; }
+    .pui-table__actions { display: flex; gap: var(--pui-s2); justify-content: flex-end; }
+
+    /* ── تب ────────────────────────────────────────────── */
+    .pui-tabs {
+        display: flex;
+        gap: var(--pui-s1);
+        overflow-x: auto;
+        scrollbar-width: thin;
+        border-block-end: 1px solid var(--pui-border-soft);
+    }
+
+    .pui-tab {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        padding: var(--pui-s3) var(--pui-s4);
+        border: 0;
+        background: transparent;
+        color: var(--pui-text-muted);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        border-start-start-radius: var(--pui-r-sm);
+        border-start-end-radius: var(--pui-r-sm);
+    }
+
+    .pui-tab:hover { color: var(--pui-text); background: var(--pui-surface-2); }
+
+    .pui-tab[aria-selected="true"] { color: var(--pui-text); }
+    .pui-tab[aria-selected="true"]::after {
+        content: "";
+        position: absolute;
+        inset-inline: var(--pui-s3);
+        inset-block-end: -1px;
+        block-size: 3px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-accent);
+    }
+
+    .pui-tab__badge {
+        min-inline-size: 20px;
+        padding-inline: 6px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-surface-3);
+        color: var(--pui-text-muted);
+        font-size: var(--pui-fs-xs);
+        text-align: center;
+    }
+
+    .pui-tabpanel[hidden] { display: none; }
+    .pui-tabpanel { padding-block-start: var(--pui-s5); }
+
+    /* ── مراحل ─────────────────────────────────────────── */
+    .pui-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--pui-s3);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: step;
+    }
+
+    .pui-step { display: flex; align-items: center; gap: var(--pui-s2); font-size: var(--pui-fs-sm); color: var(--pui-text-soft); }
+    .pui-step__dot {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 26px;
+        block-size: 26px;
+        border-radius: var(--pui-r-full);
+        border: 1px solid var(--pui-border);
+        font-size: var(--pui-fs-xs);
+        font-weight: 600;
+        background: var(--pui-surface);
+    }
+
+    .pui-step--current { color: var(--pui-text); }
+    .pui-step--current .pui-step__dot { background: var(--pui-primary); color: var(--pui-on-primary); border-color: var(--pui-primary); }
+    .pui-step--done { color: var(--pui-text-muted); }
+    .pui-step--done .pui-step__dot { background: var(--pui-accent-soft); border-color: var(--pui-accent-line); color: var(--pui-text); }
+
+    /* ── تایم‌لاین ──────────────────────────────────────── */
+    .pui-timeline { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--pui-s4); }
+    .pui-timeline__item { position: relative; padding-inline-start: var(--pui-s6); }
+    .pui-timeline__item::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 9px;
+        inset-block: 18px -18px;
+        inline-size: 1px;
+        background: var(--pui-border-soft);
+    }
+    .pui-timeline__item:last-child::before { display: none; }
+    .pui-timeline__dot {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-start: 4px;
+        inline-size: 19px;
+        block-size: 19px;
+        border-radius: var(--pui-r-full);
+        border: 2px solid var(--pui-accent);
+        background: var(--pui-surface);
+    }
+    .pui-timeline__title { font-size: var(--pui-fs-base); font-weight: 600; }
+    .pui-timeline__meta { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+
+    /* ── خالی‌بودن ─────────────────────────────────────── */
+    .pui-empty {
+        display: grid;
+        justify-items: center;
+        gap: var(--pui-s2);
+        padding: var(--pui-s7) var(--pui-s4);
+        text-align: center;
+        border: 1px dashed var(--pui-border);
+        border-radius: var(--pui-r-lg);
+        background: var(--pui-surface-2);
+    }
+
+    .pui-empty__icon {
+        display: inline-flex;
+        inline-size: 48px;
+        block-size: 48px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-accent-soft);
+        color: var(--pui-text-muted);
+    }
+
+    .pui-empty__title { font-size: var(--pui-fs-base); }
+    .pui-empty__text { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); max-inline-size: 46ch; }
+
+    /* ── اسکلتون ───────────────────────────────────────── */
+    .pui-skeleton {
+        border-radius: var(--pui-r-sm);
+        background: linear-gradient(90deg, var(--pui-surface-3) 25%, var(--pui-surface-2) 37%, var(--pui-surface-3) 63%);
+        background-size: 400% 100%;
+        animation: pui-shimmer 1.4s ease infinite;
+        min-block-size: 12px;
+    }
+
+    @keyframes pui-shimmer {
+        0% { background-position: 100% 50%; }
+        100% { background-position: 0 50%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pui-skeleton { animation: none; }
+    }
+
+    /* ── نوار پیشرفت ───────────────────────────────────── */
+    .pui-progress {
+        inline-size: 100%;
+        block-size: 8px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-surface-3);
+        overflow: hidden;
+    }
+
+    .pui-progress__bar {
+        block-size: 100%;
+        border-radius: inherit;
+        background: var(--pui-accent);
+        transition: inline-size var(--pui-dur-slow) var(--pui-ease);
+    }
+
+    /* ── آواتار ────────────────────────────────────────── */
+    .pui-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 38px;
+        block-size: 38px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-accent-soft);
+        color: var(--pui-text);
+        font-weight: 600;
+        font-size: var(--pui-fs-sm);
+        border: 1px solid color-mix(in srgb, var(--pui-accent) 40%, transparent);
+    }
+
+    .pui-avatar--lg { inline-size: 52px; block-size: 52px; font-size: var(--pui-fs-md); }
+
+    /* ── مدال (native dialog) ──────────────────────────── */
+    .pui-modal {
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-lg);
+        padding: 0;
+        inline-size: min(92vw, 520px);
+        background: var(--pui-surface);
+        color: var(--pui-text);
+        box-shadow: var(--pui-shadow-lg);
+    }
+
+    .pui-modal::backdrop { background: rgba(42, 37, 33, .55); backdrop-filter: blur(2px); }
+    .pui-modal__head { display: flex; align-items: center; justify-content: space-between; gap: var(--pui-s3); padding: var(--pui-s4) var(--pui-s5); border-block-end: 1px solid var(--pui-border-soft); }
+    .pui-modal__body { padding: var(--pui-s5); }
+    .pui-modal__foot { display: flex; justify-content: flex-end; gap: var(--pui-s2); padding: var(--pui-s4) var(--pui-s5); border-block-start: 1px solid var(--pui-border-soft); background: var(--pui-surface-2); }
+
+    /* ── توست ──────────────────────────────────────────── */
+    .pui-toasts {
+        position: fixed;
+        inset-block-end: var(--pui-s4);
+        inset-inline-start: var(--pui-s4);
+        display: grid;
+        gap: var(--pui-s2);
+        z-index: var(--pui-z-toast);
+        max-inline-size: min(92vw, 380px);
+    }
+
+    .pui-toast {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        padding: var(--pui-s3) var(--pui-s4);
+        border-radius: var(--pui-r-md);
+        background: var(--pui-text);
+        color: var(--pui-bg);
+        box-shadow: var(--pui-shadow-lg);
+        font-size: var(--pui-fs-sm);
+    }
+
+    /* ── ناوبری ────────────────────────────────────────── */
+    .pui-nav { display: grid; gap: 2px; }
+    .pui-nav__link {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s3);
+        padding: var(--pui-s2) var(--pui-s3);
+        border-radius: var(--pui-r-md);
+        color: var(--pui-text-muted);
+        text-decoration: none;
+        font-size: var(--pui-fs-base);
+        min-block-size: 42px;
+    }
+
+    .pui-nav__link:hover { background: var(--pui-surface-2); color: var(--pui-text); }
+    .pui-nav__link[aria-current="page"] { background: var(--pui-accent-soft); color: var(--pui-text); font-weight: 600; box-shadow: inset 3px 0 0 var(--pui-accent); }
+}
+
+@layer pui.utilities {
+    .pui-sr-only {
+        position: absolute !important;
+        inline-size: 1px;
+        block-size: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .pui-grid { display: grid; gap: var(--pui-s4); }
+    .pui-grid--stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    .pui-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .pui-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    /* عنصری که باید تمام عرض شبکهٔ کارت‌ها را بگیرد (نمونه‌های عریض). */
+    .pui-grid__wide { grid-column: 1 / -1; }
+    .pui-stack { display: grid; gap: var(--pui-s4); }
+    .pui-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pui-s2); }
+    .pui-row--between { justify-content: space-between; }
+    .pui-muted { color: var(--pui-text-muted); }
+    .pui-soft { color: var(--pui-text-soft); font-size: var(--pui-fs-sm); }
+    .pui-divider { block-size: 1px; background: var(--pui-border-soft); border: 0; margin: var(--pui-s4) 0; }
+
+    /* جدول به کارت در موبایل */
+    @media (max-width: 767px) {
+        .pui-table--cards thead { display: none; }
+        .pui-table--cards tbody tr {
+            display: grid;
+            gap: 2px;
+            padding: var(--pui-s3) var(--pui-s4);
+            border-block-end: 1px solid var(--pui-border-soft);
+        }
+        .pui-table--cards tbody td {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--pui-s3);
+            padding: 2px 0;
+            border: 0;
+            font-size: var(--pui-fs-sm);
+        }
+        .pui-table--cards tbody td::before {
+            content: attr(data-label);
+            color: var(--pui-text-muted);
+            font-size: var(--pui-fs-xs);
+            font-weight: 500;
+        }
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   کامپوننت‌های پایه — فاز ۱۴ گام ۳
+   ══════════════════════════════════════════════════════════════════════ */
+@layer pui.components {
+    /* ── کلید روشن/خاموش ────────────────────────────────── */
+    .pui-switch-field { display: grid; gap: var(--pui-s1); }
+
+    .pui-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--pui-s3);
+        cursor: pointer;
+        font-size: var(--pui-fs-base);
+        color: var(--pui-text);
+    }
+
+    .pui-switch input {
+        position: absolute;
+        opacity: 0;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: 0;
+    }
+
+    .pui-switch__track {
+        position: relative;
+        flex: none;
+        inline-size: 44px;
+        block-size: 26px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-disabled);
+        border: 1px solid var(--pui-border);
+        transition: background var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-switch__thumb {
+        position: absolute;
+        inset-block-start: 2px;
+        inset-inline-start: 2px;
+        inline-size: 20px;
+        block-size: 20px;
+        border-radius: var(--pui-r-full);
+        background: var(--pui-surface);
+        box-shadow: var(--pui-shadow-sm);
+        transition: transform var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-switch input:checked + .pui-switch__track {
+        background: var(--pui-primary);
+        border-color: var(--pui-primary);
+    }
+
+    .pui-switch input:checked + .pui-switch__track .pui-switch__thumb {
+        transform: translateX(-18px);
+    }
+
+    [dir="ltr"] .pui-switch input:checked + .pui-switch__track .pui-switch__thumb {
+        transform: translateX(18px);
+    }
+
+    .pui-switch input:focus-visible + .pui-switch__track {
+        outline: 2px solid var(--pui-focus);
+        outline-offset: 2px;
+    }
+
+    .pui-switch input:disabled + .pui-switch__track {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    /* ── انتخاب کارتی (رادیو/گزینه) ─────────────────────── */
+    .pui-radio-cards {
+        display: grid;
+        gap: var(--pui-s2);
+        border: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    @media (min-width: 640px) {
+        .pui-radio-cards { grid-auto-flow: column; grid-auto-columns: 1fr; }
+    }
+
+    .pui-radio-card {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) var(--pui-s4);
+        border: 1px solid var(--pui-border);
+        border-radius: var(--pui-r-md);
+        background: var(--pui-surface);
+        cursor: pointer;
+        transition: border-color var(--pui-dur) var(--pui-ease), background var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-radio-card input {
+        position: absolute;
+        opacity: 0;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: 0;
+    }
+
+    .pui-radio-card__body {
+        display: grid;
+        gap: 2px;
+    }
+
+    .pui-radio-card__icon { color: var(--pui-text-muted); }
+
+    .pui-radio-card__label { font-size: var(--pui-fs-sm); font-weight: 500; }
+
+    .pui-radio-card__desc { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+
+    .pui-radio-card:hover { border-color: var(--pui-accent-line); }
+
+    .pui-radio-card:has(input:checked) {
+        border-color: var(--pui-primary);
+        background: var(--pui-accent-soft);
+    }
+
+    .pui-radio-card:has(input:checked) .pui-radio-card__icon { color: var(--pui-text); }
+
+    .pui-radio-card:has(input:focus-visible) {
+        outline: 2px solid var(--pui-focus);
+        outline-offset: 2px;
+    }
+
+    /* ── نوار ابزار جدول ────────────────────────────────── */
+    .pui-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) 0;
+    }
+
+    .pui-toolbar__search {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        flex: 1 1 320px;
+        margin: 0;
+    }
+
+    .pui-toolbar__icon {
+        display: inline-flex;
+        align-items: center;
+        color: var(--pui-text-muted);
+        margin-inline-end: calc(var(--pui-s2) * -1);
+        margin-inline-start: var(--pui-s3);
+        pointer-events: none;
+    }
+
+    /* استایل‌های عمومی وردپرس/قالب‌ها با padding فیزیکی (padding-right) روی
+       کنترل‌های فرم، بر لایه‌ها غالب می‌شوند؛ این یک قاعدهٔ آگاهانه
+       با !important است تا آیکون جست‌وجو روی متن نیفتد. */
+    .pui-input.pui-toolbar__input {
+        padding-inline-start: 36px !important;
+        min-inline-size: 0;
+    }
+
+    .pui-toolbar__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        flex-wrap: wrap;
+    }
+
+    /* ── اسکلتون (اندازه با کلاس) ───────────────────────── */
+    .pui-skeleton-stack { display: grid; gap: var(--pui-s2); }
+    .pui-skeleton-stack .pui-skeleton { display: block; }
+
+    .pui-skeleton { min-block-size: 14px; }
+    .pui-skeleton--sm { block-size: 8px; min-block-size: 8px; }
+    .pui-skeleton--lg { block-size: 22px; min-block-size: 22px; }
+    .pui-skeleton--title { block-size: 28px; min-block-size: 28px; }
+    .pui-skeleton--w60 { inline-size: 60%; }
+    .pui-skeleton--w70 { inline-size: 70%; }
+    .pui-skeleton--w85 { inline-size: 85%; }
+    .pui-skeleton--whalf { inline-size: 50%; }
+
+    /* ── پیشرفت با برچسب ────────────────────────────────── */
+    .pui-progress-field { display: grid; gap: var(--pui-s1); }
+
+    .pui-progress-field__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--pui-s2);
+        font-size: var(--pui-fs-sm);
+    }
+
+    .pui-progress-field__label { color: var(--pui-text); }
+    .pui-progress-field__value { color: var(--pui-text-muted); font-size: var(--pui-fs-xs); }
+
+    .pui-progress__bar { transition: inline-size var(--pui-dur-slow) var(--pui-ease); }
+    .pui-progress--success .pui-progress__bar { background: var(--pui-success); }
+    .pui-progress--warning .pui-progress__bar { background: var(--pui-warning); }
+    .pui-progress--danger .pui-progress__bar { background: var(--pui-danger); }
+
+    /* ── مدال: اندازه‌ها و عنوان ────────────────────────── */
+    .pui-modal--sm { max-inline-size: 380px; }
+    .pui-modal--lg { max-inline-size: 720px; }
+    .pui-modal__title { font-size: var(--pui-fs-md); }
+}

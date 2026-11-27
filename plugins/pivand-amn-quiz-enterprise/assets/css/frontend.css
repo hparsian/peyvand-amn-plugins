@@ -1,0 +1,1393 @@
+/* ── Psy Quiz Frontend Styles — v3.3.15 ──────────────────────────────── */
+
+/* ── Tokens ──────────────────────────────────────────────────────────── */
+/* از این نسخه: رنگ‌ها از توکن‌های مشترک اکوسیستم (--pivand-*، تعریف‌شده
+   در پیوند امن — هسته مشترک) می‌خوانند تا ظاهر آزمون‌ها با پنل مراجعان و
+   فرم تماس یکپارچه باشد. مقدار بعد از کاما همان fallback قبلی‌ست. */
+:root {
+    --psy-blue:       var(--pivand-accent, #2b6cb0);
+    --psy-blue-light: #3182ce;
+    --psy-blue-bg:    var(--pivand-accent-bg, #ebf8ff);
+    --psy-purple:     #553c9a;
+    --psy-green:      var(--pivand-success, #38a169);
+    --psy-green-dark: #276749;
+    --psy-green-bg:   var(--pivand-success-bg, #f0fff4);
+    --psy-text:       var(--pivand-ink, #1a202c);
+    --psy-text-mid:   var(--pivand-ink-mid, #4a5568);
+    --psy-text-soft:  var(--pivand-ink-soft, #718096);
+    --psy-border:     var(--pivand-border, #e2e8f0);
+    --psy-surface:    var(--pivand-surface, #f7fafc);
+    --psy-white:      var(--pivand-white, #ffffff);
+    --psy-radius:     var(--pivand-radius, 14px);
+    --psy-radius-sm:  var(--pivand-radius-sm, 8px);
+    --psy-shadow:     var(--pivand-shadow, 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04));
+    --psy-font:       var(--pivand-font-fa, 'Vazirmatn', Tahoma, Arial, sans-serif);
+    --psy-transition: var(--pivand-transition, 0.2s ease);
+}
+
+/* ── Wrap ────────────────────────────────────────────────────────────── */
+#psy-exam-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    font-family: var(--psy-font);
+    direction: rtl;
+    color: var(--psy-text);
+}
+
+/* ── Header / Progress ───────────────────────────────────────────────── */
+#psy-exam-header {
+    background: linear-gradient(135deg, var(--psy-blue) 0%, var(--psy-purple) 100%);
+    padding: 20px 28px 18px;
+    border-radius: var(--psy-radius) var(--psy-radius) 0 0;
+}
+
+#psy-progress-wrap {
+    background: rgba(255,255,255,0.22);
+    border-radius: 20px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+#psy-progress-bar {
+    background: #68d391;
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+}
+#psy-progress-text {
+    font-size: 12px;
+    /* بهبود کنتراست: مقدار قبلی rgba(255,255,255,0.65) روی گرادیان آبی/
+       بنفش هدر، نسبت کنتراست کمتر از حداقل WCAG AA (4.5:1) برای متن کوچک
+       داشت. مقدار جدید با یک سایه‌ی ملایم، خوانایی را در نور محیط روشن
+       هم تضمین می‌کند. */
+    color: rgba(255,255,255,0.92);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    text-align: left;
+    letter-spacing: 0.02em;
+    /* این فیلد معمولاً شامل ارقام (مثل «3 / 10») است؛ فونت لاتین اکوسیستم
+       را برای ارقام واضح‌تر به‌عنوان اولویت اول قرار می‌دهیم، با بازگشت
+       به فونت فارسی برای بقیه‌ی متن. */
+    font-family: var(--pivand-font-latin, 'Inter'), var(--psy-font);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Screens ─────────────────────────────────────────────────────────── */
+/* color-scheme: light + !important روی این کارت: چون کارت آزمون همیشه یک
+   کارت روشن است (مستقل از دارک‌مود سایت/OS)، اگر تم/افزونه‌ی دیگری در سایت
+   یک دارک‌مود مستقل (سوییچ دستی، نه prefers-color-scheme) روی تگ‌های عمومی
+   p/label رنگ متن را عوض کند، پس‌زمینه‌ی سفید این کارت نباید ثابت بماند در
+   حالی که فقط متنش تغییر رنگ می‌دهد — نتیجه‌اش متن کم‌کنتراست/نامرئی است.
+   با قفل‌کردن هر دو با هم، کارت مستقل از دارک‌مود بیرونی همیشه خوانا می‌ماند. */
+#psy-exam-wrap {
+    color-scheme: light;
+}
+.psy-screen {
+    display: none;
+    padding: 36px 32px;
+    background: var(--psy-white) !important;
+    color: var(--psy-text) !important;
+    border: 1px solid var(--psy-border);
+    border-top: none;
+    border-radius: 0 0 var(--psy-radius) var(--psy-radius);
+    box-shadow: var(--psy-shadow);
+}
+.psy-screen.active { display: block; }
+
+/* ── Welcome ─────────────────────────────────────────────────────────── */
+.psy-welcome-box {
+    text-align: center;
+    padding: 8px 0 4px;
+}
+.psy-welcome-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    animation: psy-drop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes psy-drop {
+    from { opacity: 0; transform: translateY(-18px) scale(.85); }
+    to   { opacity: 1; transform: none; }
+}
+.psy-welcome-box h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--psy-text);
+}
+.psy-welcome-box > p {
+    font-size: 14px;
+    color: var(--psy-text-mid);
+    margin: 4px 0;
+    line-height: 1.7;
+}
+
+.psy-note {
+    background: var(--psy-blue-bg);
+    border-right: 3px solid var(--psy-blue-light);
+    border-radius: var(--psy-radius-sm);
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--psy-blue);
+    margin: 20px auto 0;
+    max-width: 480px;
+    text-align: right;
+    line-height: 1.8;
+}
+
+/* Scale guide */
+.psy-scale-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--psy-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 28px 0 12px;
+}
+.psy-scale-preview {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+.psy-scale-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--psy-surface);
+    border: 1.5px solid var(--psy-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 58px;
+    transition: border-color 0.15s;
+}
+.psy-scale-item:hover { border-color: #90cdf4; }
+.psy-scale-num {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--psy-blue);
+    line-height: 1;
+}
+.psy-scale-lbl {
+    font-size: 10px;
+    color: var(--psy-text-soft);
+    margin-top: 5px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.psy-btn {
+    padding: 11px 22px;
+    border-radius: var(--psy-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--psy-font);
+    transition: all 0.18s;
+    outline: none;
+}
+.psy-btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(49,130,206,0.35);
+}
+.psy-btn-primary {
+    background: linear-gradient(135deg, var(--psy-blue-light), var(--psy-blue));
+    color: #fff;
+    font-size: 16px;
+    padding: 14px 40px;
+    border-radius: 50px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 16px rgba(49,130,206,0.35);
+    margin-top: 4px;
+}
+.psy-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(49,130,206,0.4);
+}
+.psy-btn-primary:active { transform: none; }
+
+.psy-btn-prev {
+    background: var(--psy-surface);
+    color: var(--psy-text-mid);
+    border: 1.5px solid var(--psy-border);
+}
+.psy-btn-prev:hover { background: var(--psy-border); }
+
+.psy-btn-next, .psy-btn-submit {
+    background: linear-gradient(135deg, #48bb78, var(--psy-green));
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(56,161,105,0.3);
+}
+.psy-btn-next:hover:not(:disabled),
+.psy-btn-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(56,161,105,0.38);
+}
+.psy-btn-submit {
+    padding: 12px 28px;
+    border-radius: 50px;
+}
+.psy-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Question card ───────────────────────────────────────────────────── */
+/* FIX: animation پیش‌فرض حذف شد — کلاس‌های جهت‌دار (psy-enter-*/psy-exit-*) انیمیشن را مدیریت می‌کنند */
+.psy-question-card {
+    /* بدون animation پیش‌فرض */
+}
+/* @keyframes psy-slidein حذف شد — با psy-enter-right/left تداخل داشت */
+
+.psy-question-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--psy-text-soft);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding: 4px 10px;
+    background: var(--psy-surface);
+    border-radius: 20px;
+    border: 1px solid var(--psy-border);
+}
+
+.psy-question-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--psy-text) !important;
+    line-height: 1.75;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1.5px solid var(--psy-border);
+}
+
+/* ── Options ─────────────────────────────────────────────────────────── */
+.psy-options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 32px;
+}
+.psy-option { cursor: pointer; }
+.psy-option input[type=radio] { display: none; }
+
+.psy-option-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border: 2px solid var(--psy-border);
+    border-radius: 10px;
+    background: var(--psy-surface);
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    user-select: none;
+}
+.psy-option:hover .psy-option-box {
+    border-color: #90cdf4;
+    background: var(--psy-blue-bg);
+}
+.psy-option input:checked + .psy-option-box {
+    border-color: var(--psy-blue-light);
+    background: var(--psy-blue-bg);
+    transform: scale(1.005);
+}
+
+.psy-option-val {
+    background: var(--psy-border);
+    color: var(--psy-text-mid);
+    font-weight: 900;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.psy-option input:checked + .psy-option-box .psy-option-val {
+    background: var(--psy-blue-light);
+    color: #fff;
+}
+.psy-option-lbl {
+    font-size: 14px;
+    color: var(--psy-text-mid) !important;
+    line-height: 1.5;
+}
+.psy-option input:checked + .psy-option-box .psy-option-lbl {
+    color: var(--psy-blue) !important;
+    font-weight: 600;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────── */
+.psy-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 4px;
+}
+
+/* ── Loading ─────────────────────────────────────────────────────────── */
+.psy-loading-box {
+    text-align: center;
+    padding: 60px 20px;
+}
+.psy-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--psy-border);
+    border-top-color: var(--psy-blue-light);
+    border-radius: 50%;
+    animation: psy-spin 0.75s linear infinite;
+    margin: 0 auto 20px;
+}
+@keyframes psy-spin { to { transform: rotate(360deg); } }
+.psy-loading-box p {
+    color: var(--psy-text-soft);
+    font-size: 14px;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────── */
+.psy-error-box,
+.psy-error-standalone {
+    text-align: center;
+    padding: 48px 24px;
+}
+.psy-error-icon { font-size: 48px; margin-bottom: 14px; display: block; }
+.psy-error-box p, .psy-error-standalone p {
+    color: var(--psy-text-mid);
+    font-size: 15px;
+    line-height: 1.8;
+    margin: 8px 0 20px;
+}
+.psy-error-standalone h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--psy-text);
+    margin: 0 0 8px;
+}
+
+/* ── Done ────────────────────────────────────────────────────────────── */
+.psy-done-box {
+    text-align: center;
+    padding: 52px 24px;
+}
+.psy-done-icon {
+    font-size: 68px;
+    display: block;
+    margin-bottom: 20px;
+    animation: psy-pop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes psy-pop {
+    from { opacity: 0; transform: scale(.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.psy-done-box h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--psy-green-dark);
+    margin: 0 0 14px;
+}
+.psy-done-box p {
+    font-size: 15px;
+    color: var(--psy-text-mid);
+    line-height: 1.85;
+    margin: 4px 0;
+}
+.psy-done-note {
+    font-size: 13px;
+    color: var(--psy-text-soft);
+    margin-top: 18px !important;
+    padding: 10px 16px;
+    background: var(--psy-surface);
+    border-radius: var(--psy-radius-sm);
+    display: inline-block;
+}
+
+/* ── Resume button ───────────────────────────────────────────────────── */
+.psy-btn-resume {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+    color: #fff;
+    font-size: 14px;
+    padding: 11px 28px;
+    border-radius: 50px;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 14px rgba(221,107,32,0.32);
+    margin-top: 10px;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+.psy-btn-resume:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(221,107,32,0.4);
+}
+#psy-btn-start {
+    margin-top: 10px;
+}
+
+
+@media print {
+    #psy-exam-header, .psy-nav, #psy-btn-start { display: none !important; }
+    .psy-screen { border: none !important; padding: 0 !important; box-shadow: none !important; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    #psy-exam-wrap { margin: 0; }
+    #psy-exam-header {
+        border-radius: 0;
+        padding: 16px 18px 14px;
+    }
+    .psy-screen {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: 24px 16px;
+    }
+    .psy-question-text { font-size: 16px; }
+    .psy-options { gap: 7px; }
+    .psy-option-box { padding: 12px 14px; gap: 10px; }
+    .psy-option-val { width: 30px; height: 30px; font-size: 14px; }
+    .psy-scale-preview { gap: 5px; }
+    .psy-scale-item { min-width: 50px; padding: 8px 8px; }
+    .psy-scale-num { font-size: 17px; }
+    .psy-btn-primary { padding: 13px 28px; font-size: 15px; }
+}
+
+@media (max-width: 360px) {
+    .psy-screen { padding: 20px 13px; }
+    .psy-question-text { font-size: 15px; }
+    .psy-option-box { padding: 11px 12px; gap: 8px; }
+    .psy-welcome-box h2 { font-size: 19px; }
+    .psy-scale-item { min-width: 42px; padding: 7px 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ── Directional slide animations ────────────────────────────────────── */
+.psy-exit-left  { animation: psy-slide-out-left  0.22s ease forwards; }
+.psy-exit-right { animation: psy-slide-out-right 0.22s ease forwards; }
+.psy-enter-right { opacity: 0; transform: translateX(28px); }
+.psy-enter-left  { opacity: 0; transform: translateX(-28px); }
+.psy-enter-active {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+@keyframes psy-slide-out-left  {
+    to { opacity: 0; transform: translateX(-28px); }
+}
+@keyframes psy-slide-out-right {
+    to { opacity: 0; transform: translateX(28px); }
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+#psy-toast {
+    position: fixed;
+    bottom: max(28px, env(safe-area-inset-bottom, 28px)); /* FIX: پشت keyboard مخفی نشود */
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #2d3748;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-family: var(--psy-font);
+    direction: rtl;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+#psy-toast.psy-toast-show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Welcome stagger animations ──────────────────────────────────────── */
+.psy-header-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.psy-header-visible { opacity: 1; pointer-events: auto; }
+
+.psy-anim-1, .psy-anim-2, .psy-anim-3,
+.psy-anim-4, .psy-anim-5, .psy-anim-6 {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: psy-fadeup 0.5s cubic-bezier(.4,0,.2,1) forwards;
+}
+.psy-anim-1 { animation-delay: 0.05s; }
+.psy-anim-2 { animation-delay: 0.18s; }
+.psy-anim-3 { animation-delay: 0.30s; }
+.psy-anim-4 { animation-delay: 0.42s; }
+.psy-anim-5 { animation-delay: 0.54s; }
+.psy-anim-6 { animation-delay: 0.68s; }
+
+@keyframes psy-fadeup {
+    to { opacity: 1; transform: none; }
+}
+
+/* Done screen — stagger هم برای پایان */
+#psy-screen-result.active .psy-done-icon  { animation: psy-pop 0.5s cubic-bezier(.34,1.56,.64,1) 0.05s both; }
+#psy-screen-result.active .psy-done-box h2 { animation: psy-fadeup 0.4s ease 0.3s both; }
+#psy-screen-result.active .psy-done-box p  { animation: psy-fadeup 0.4s ease 0.45s both; opacity: 0; }
+#psy-screen-result.active .psy-done-box p:nth-child(3) { animation-delay: 0.55s; }
+#psy-screen-result.active .psy-done-note   { animation: psy-fadeup 0.4s ease 0.65s both; opacity: 0; }
+
+/* Error standalone — بهتر */
+.psy-error-standalone {
+    text-align: center;
+    padding: 52px 24px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.psy-error-standalone .psy-error-icon {
+    font-size: 54px;
+    display: block;
+    margin-bottom: 16px;
+    animation: psy-drop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.psy-error-standalone h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--psy-text);
+    margin: 0 0 10px;
+    animation: psy-fadeup 0.4s ease 0.2s both;
+    opacity: 0;
+}
+.psy-error-standalone p {
+    font-size: 14px;
+    color: var(--psy-text-mid);
+    line-height: 1.85;
+    animation: psy-fadeup 0.4s ease 0.35s both;
+    opacity: 0;
+}
+
+/* ── هدر/فوترِ مینیمالِ صفحه‌ی مستقل آزمون آنلاین ──────────────────────────
+   جایگزین هدر/فوتر قالب سایت: فقط لوگو + نام درمانگر (بالا) و شماره
+   پشتیبانی + لینک بازگشت به صفحه اصلی (پایین). همان زبان بصری صفحات
+   مستقل پلاگین پنل مراجعین (ورود/نظرسنجی). */
+body.psy-exam-standalone-body {
+    margin: 0;
+    background: var(--psy-surface);
+    min-height: 100vh;
+}
+.psy-exam-page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 8px 16px 40px;
+}
+.psy-exam-chrome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    padding: 32px 16px 8px;
+}
+.psy-exam-logo-link { display: inline-flex; }
+.psy-exam-logo-img {
+    max-height: 56px;
+    width: auto;
+    border-radius: var(--psy-radius-sm);
+}
+.psy-exam-logo-mark {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: inline-block;
+}
+.psy-exam-logo-fallback { display: none; }
+.psy-exam-logo-mark .psy-ring {
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid var(--psy-blue);
+}
+.psy-exam-logo-mark .psy-ring-a { right: 0; }
+.psy-exam-logo-mark .psy-ring-b {
+    left: 0;
+    border-color: var(--psy-purple);
+    opacity: .75;
+}
+.psy-exam-therapist-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--psy-text-mid);
+}
+.psy-exam-chrome-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 24px 16px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    font-size: 13px;
+}
+.psy-exam-support-link,
+.psy-exam-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--psy-text-soft);
+    text-decoration: none;
+    transition: color var(--psy-transition);
+}
+.psy-exam-support-link:hover,
+.psy-exam-back-link:hover { color: var(--psy-blue); }
+.psy-exam-back-link svg { width: 16px; height: 16px; }
+
+/* ═══ گزارش آزمون (فاز ۱۴.۴) ═══════════════════════════════════════
+   مارک‌آپ گزارش‌ها به‌جای استایل درون‌خطی از این کلاس‌ها استفاده می‌کند.
+   رنگ‌های معنایی هر آزمون با کلاس `psy-tone--*` (نه style="…") اعمال می‌شود.
+   ═════════════════════════════════════════════════════════════════ */
+.psy-tone--success { --psy-c: #276749; --psy-bg: #f0fff4; }
+.psy-tone--warning { --psy-c: #d69e2e; --psy-bg: #fffff0; }
+.psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
+.psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
+.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
+.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
+.psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
+
+.psy-report-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.psy-report-row--center { align-items: center; }
+.psy-report-col { flex: 1 1 280px; min-width: 280px; }
+
+.psy-report-card {
+    flex: 1 1 140px;
+    min-width: 140px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--psy-bg, var(--psy-white));
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-top: 4px solid var(--psy-c, var(--psy-border));
+}
+.psy-report-card--outlined {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    border-inline-start: 4px solid var(--psy-c, var(--psy-border));
+}
+.psy-report-card--tint {
+    background: var(--psy-bg, var(--psy-surface));
+    border: 2px solid var(--psy-c, var(--psy-border));
+    border-radius: 10px;
+    padding: 20px;
+    margin-block-end: 24px;
+}
+.psy-report-card--panel {
+    flex: 1;
+    min-width: 280px;
+    background: var(--psy-white);
+    border: 1px solid var(--psy-border);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+}
+.psy-report-card__label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text-soft));
+    margin-block-end: 4px;
+}
+.psy-report-card__value {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-card__sub {
+    font-size: 11px;
+    color: var(--psy-text-soft);
+    margin-block-start: 4px;
+}
+
+.psy-score-badge {
+    background: var(--psy-c, #718096);
+    color: #fff;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.psy-score-badge--sm {
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+}
+
+.psy-report-progress {
+    background: #edf2f7;
+    border-radius: 4px;
+    block-size: 8px;
+    overflow: hidden;
+    margin-block-start: 8px;
+}
+.psy-report-progress--tall { block-size: 10px; margin-block-start: 12px; }
+.psy-report-progress__bar {
+    background: var(--psy-c, var(--psy-blue));
+    block-size: 100%;
+    border-radius: 4px;
+}
+
+.psy-report-section-title {
+    margin: 24px 0 12px;
+    font-size: 15px;
+    color: #2d3748;
+    border-block-end: 2px solid #e2e8f0;
+    padding-block-end: 8px;
+}
+
+.psy-clinical {
+    background: var(--psy-bg, #fffaf0);
+    border: 1px solid rgba(0, 0, 0, .08);
+    border-inline-start: 4px solid var(--psy-c, #c05621);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-block-end: 10px;
+}
+.psy-clinical__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-block-end: 8px;
+}
+.psy-clinical__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-clinical__desc {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: #4a5568;
+    line-height: 1.7;
+}
+.psy-clinical__note {
+    font-size: 11px;
+    font-style: italic;
+    margin-block-start: 4px;
+    color: var(--psy-c, var(--psy-text-soft));
+}
+
+.psy-report-note {
+    background: var(--psy-bg, #fffaf0);
+    border-inline-start: 4px solid var(--psy-c, #c05621);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 12px;
+    color: #4a5568;
+    line-height: 1.8;
+}
+
+.psy-report-caption { font-size: 11px; color: #a0aec0; }
+.psy-report-muted { color: #4a5568; }
+.psy-report-chart { max-height: 260px; }
+
+.psy-text { color: var(--psy-c, var(--psy-text)); }
+.psy-report-title { margin-top: 0; font-size: 17px; }
+.psy-report-score-name { font-size: 15px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-clinical__hint {
+    background: var(--psy-bg, #fff5f5);
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--psy-c, var(--psy-text-soft));
+}
+.psy-report-panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-block-end: 30px;
+}
+.psy-report-panel--soft { background: #f7fafc; }
+.psy-report-panel__title { margin: 0 0 12px; font-size: 15px; color: #2d3748; }
+.psy-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.psy-report-table--center { text-align: center; }
+.psy-report-table th,
+.psy-report-table td { padding: 8px 10px; border: 1px solid #e2e8f0; }
+.psy-report-table thead th { background: #f7fafc; font-weight: 700; color: #4a5568; }
+.psy-report-table__corner { width: 15%; border: 0; }
+.psy-report-table__cell--current { background: #f0fff4; font-weight: 700; }
+.psy-report-table__cell--current-alt { background: #fff5f5; font-weight: 700; }
+.psy-report-en { color: #a0aec0; font-size: 10px; }
+.psy-report-refs {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 11px;
+    color: #a0aec0;
+    line-height: 1.8;
+}
+.psy-report-refs b { color: #4a5568; }
+
+/* عرض نوار پیشرفت — جایگزین width درون‌خطی (۰ تا ۱۰۰ در گام ۵٪) */
+.psy-w--0 { inline-size: 0%; }
+.psy-w--5 { inline-size: 5%; }
+.psy-w--10 { inline-size: 10%; }
+.psy-w--15 { inline-size: 15%; }
+.psy-w--20 { inline-size: 20%; }
+.psy-w--25 { inline-size: 25%; }
+.psy-w--30 { inline-size: 30%; }
+.psy-w--35 { inline-size: 35%; }
+.psy-w--40 { inline-size: 40%; }
+.psy-w--45 { inline-size: 45%; }
+.psy-w--50 { inline-size: 50%; }
+.psy-w--55 { inline-size: 55%; }
+.psy-w--60 { inline-size: 60%; }
+.psy-w--65 { inline-size: 65%; }
+.psy-w--70 { inline-size: 70%; }
+.psy-w--75 { inline-size: 75%; }
+.psy-w--80 { inline-size: 80%; }
+.psy-w--85 { inline-size: 85%; }
+.psy-w--90 { inline-size: 90%; }
+.psy-w--95 { inline-size: 95%; }
+.psy-w--100 { inline-size: 100%; }
+
+.psy-report-text { font-size: 13px; color: #4a5568; line-height: 1.8; margin: 0; }
+.psy-report-desc { margin: 10px 0 6px; font-size: 12px; color: #4a5568; }
+.psy-report-bold { font-weight: 700; }
+.psy-report-row--loose { gap: 24px; align-items: flex-start; margin-block-end: 30px; }
+.psy-report-col--wide { flex: 1.2 1 300px; min-width: 300px; }
+.psy-report-table__head { background: #f7fafc; font-weight: 700; color: #4a5568; }
+.psy-report-table__cell--start { text-align: start; }
+.psy-report-card--stack { margin-block-end: 16px; }
+
+/* هشدار بالینی (PHQ-9 سوال ۹، BDI-II سوال ۹) */
+.psy-report-alert {
+    background: var(--psy-bg, #fff5f5);
+    border: 2px solid var(--psy-c, #9b2c2c);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-block-end: 20px;
+}
+.psy-report-alert__title { margin: 0 0 6px; font-size: 16px; color: var(--psy-c, #9b2c2c); }
+.psy-report-alert__text { margin: 0; font-size: 13px; color: #742a2a; line-height: 1.8; }
+
+/* بلوک نمرهٔ کل */
+.psy-report-hero__title { margin: 0 0 6px; font-size: 17px; color: var(--psy-c, var(--psy-text)); }
+.psy-report-hero__text { margin: 0; font-size: 13px; color: #4a5568; }
+
+/* خط‌کش مقیاس زیر نوار پیشرفت */
+.psy-report-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #a0aec0;
+    margin-block-start: 4px;
+}
+.psy-report-scale__mark { color: var(--psy-c, #718096); font-weight: 700; }
+
+/* نوار پیشرفت با زمینهٔ گرادیان (BDI-II) */
+.psy-report-progress--gradient {
+    position: relative;
+    block-size: 14px;
+    border-radius: 6px;
+    margin-block-start: 14px;
+}
+.psy-report-progress--gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #276749, #d69e2e, #c05621, #9b2c2c);
+    opacity: .2;
+}
+.psy-report-progress--gradient .psy-report-progress__bar {
+    position: relative;
+    z-index: 1;
+    border-radius: 6px;
+}
+
+/* پنل نمودار */
+.psy-report-chart-panel { margin-block-end: 24px; }
+.psy-report-chart--tall { max-height: 300px; }
+.psy-report-chart--bar { max-height: 280px; }
+
+/* کارت زیرمقیاس (BDI-II) */
+.psy-report-row--tight { gap: 16px; }
+.psy-report-subcard {
+    flex: 1 1 220px;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    border-block-start: 4px solid var(--psy-c, #718096);
+}
+.psy-report-subcard__label { font-size: 13px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-subcard__en { font-size: 11px; color: #a0aec0; margin-block-end: 10px; }
+.psy-report-subcard__value { font-size: 28px; font-weight: 900; color: var(--psy-c, var(--psy-text)); }
+.psy-report-subcard__max { font-size: 14px; color: #718096; }
+
+/* ردیف زیرمقیاس فشرده (DAS) */
+.psy-report-item {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-block-end: 10px;
+    border-inline-start: 4px solid var(--psy-c, #718096);
+}
+.psy-report-item__name { font-size: 14px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-item__en { font-size: 10px; color: #a0aec0; margin-inline-start: 6px; }
+.psy-report-item__score { font-size: 13px; font-weight: 700; }
+.psy-report-item__note { margin-block-start: 6px; font-size: 11px; color: var(--psy-c, var(--psy-text-soft)); }
+
+.psy-report-table__head--strong { background: #edf2f7; }
+.psy-report-cell--soft { color: #718096; font-size: 11px; }
+
+/* بلوک نمرهٔ کل — نسخهٔ وسط‌چین با عدد بزرگ (RAS / SWLS) */
+.psy-report-hero--center {
+    background: var(--psy-bg, var(--psy-surface));
+    border: 2px solid var(--psy-c, var(--psy-border));
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin-block-end: 24px;
+    text-align: center;
+}
+.psy-report-hero--sm { padding: 22px; border-radius: 10px; }
+.psy-report-hero__title--lg { font-size: 18px; }
+.psy-report-hero__number {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-hero__unit { font-size: 20px; color: #718096; }
+.psy-report-hero__row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    margin: 16px 0;
+}
+.psy-report-pill {
+    display: inline-block;
+    background: var(--psy-c, var(--psy-blue));
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+}
+.psy-report-hero__note { margin: 14px 0 0; font-size: 13px; color: #4a5568; }
+
+/* گیج با نشانگر cut-off */
+.psy-report-gauge { max-width: 400px; margin-inline: auto; position: relative; }
+.psy-report-gauge--spaced { margin-block-start: 16px; }
+.psy-report-gauge__track {
+    background: #edf2f7;
+    border-radius: 8px;
+    block-size: 18px;
+    overflow: hidden;
+    position: relative;
+}
+.psy-report-gauge__track--sm { block-size: 14px; }
+.psy-report-gauge--gradient .psy-report-gauge__track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #c53030, #d69e2e, #276749);
+    opacity: .25;
+}
+.psy-report-gauge__fill {
+    background: var(--psy-c, var(--psy-blue));
+    block-size: 100%;
+    border-radius: 8px;
+    position: relative;
+    z-index: 1;
+}
+.psy-report-gauge__cutoff {
+    position: absolute;
+    inset-block-start: -4px;
+    inset-inline-start: 75%;
+    inline-size: 2px;
+    block-size: 26px;
+    background: #c53030;
+    z-index: 2;
+}
+.psy-report-scale__neutral { color: #718096; }
+
+/* جدول پاسخ‌ها */
+.psy-report-table--zebra tbody tr:nth-child(even) { background: #f7fafc; }
+.psy-report-table__cell--num { text-align: center; color: #a0aec0; }
+.psy-report-table__cell--center { text-align: center; }
+.psy-report-table--cols-5-12 tbody td:nth-child(1) { width: 5%; }
+.psy-report-table--cols-5-12 tbody td:nth-child(3) { width: 12%; }
+.psy-report-table--cols-5-12 tbody td:nth-child(4) { width: 30%; }
+.psy-report-table__cell--q { color: #4a5568; line-height: 1.5; }
+.psy-report-table__cell--score { text-align: center; font-weight: 700; font-size: 14px; }
+
+/* کادر یادداشت/راهنمای آبی */
+.psy-report-note-box {
+    background: #ebf8ff;
+    border: 1px solid #90cdf4;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-block-end: 24px;
+}
+.psy-report-note-box--compact {
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-block-end: 20px;
+    font-size: 12px;
+    color: #2b6cb0;
+}
+.psy-report-note-box__title { margin: 0 0 8px; font-size: 14px; color: #2b6cb0; }
+.psy-report-note-box__text { margin: 0; font-size: 12px; color: #4a5568; line-height: 1.8; }
+
+/* نمودار وسط‌چین و کوچک */
+.psy-report-chart-panel--center { text-align: center; }
+.psy-report-chart--sm { max-height: 200px; }
+.psy-report-chart--inline { display: inline-block; max-width: 400px; }
+.psy-report-chart-panel--top { margin-block-start: 20px; margin-block-end: 0; }
+.psy-report-table .psy-report-progress { margin-block-start: 0; }
+
+.psy-report-center { text-align: center; }
+
+/* ستون نمرهٔ کل + نوار عریض (PAM) */
+.psy-report-total { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-block-end: 16px; }
+.psy-report-total__body { flex: 1; min-width: 200px; }
+.psy-report-progress--wide {
+    background: #e2e8f0;
+    block-size: 14px;
+    border-radius: 6px;
+    margin-block-end: 6px;
+}
+.psy-report-progress__bar { transition: inline-size .4s ease; }
+.psy-report-progress__bar--partner { opacity: .5; }
+.psy-report-hint { font-size: 12px; color: #718096; }
+.psy-report-hint--sm { font-size: 11px; color: #718096; margin-block-end: 3px; }
+
+/* نوار نکتهٔ بالینی (PAM) */
+.psy-report-tip {
+    background: var(--psy-bg, var(--psy-surface));
+    border-inline-start: 4px solid var(--psy-c, var(--psy-border));
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--psy-c, var(--psy-text));
+    margin-block-end: 20px;
+}
+.psy-report-tip--lg { padding: 14px 16px; line-height: 1.8; }
+
+/* نمودار با عرض محدود */
+.psy-report-chart-wrap { max-inline-size: 560px; margin: 0 auto 28px; }
+
+/* کارت زیرمقیاس بزرگ‌تر (PAM) */
+.psy-report-item--lg { padding: 14px 16px; margin-block-end: 12px; }
+.psy-report-scoreline { display: flex; gap: 8px; align-items: center; }
+.psy-report-partner { font-size: 11px; color: #718096; text-align: center; }
+.psy-report-partner__value { font-size: 16px; font-weight: 700; }
+.psy-report-desc--flush { margin: 0 0 8px; font-size: 13px; line-height: 1.7; }
+
+/* جدول مقایسهٔ زوجین (PAM) */
+.psy-report-scroll { overflow-x: auto; margin-block-end: 20px; }
+.psy-report-table--compare { font-size: 13px; }
+.psy-report-table--compare th {
+    padding: 10px 12px;
+    border: 0;
+    border-block-end: 2px solid #e2e8f0;
+    background: #f7fafc;
+}
+.psy-report-table--compare td {
+    padding: 9px 12px;
+    border: 0;
+    border-block-end: 1px solid #edf2f7;
+}
+.psy-report-table--compare tbody tr:last-child td {
+    padding: 10px 12px;
+    background: #f7fafc;
+    font-weight: 700;
+    border-block-end: 0;
+}
+.psy-report-compare__label { color: var(--psy-c, var(--psy-text)); font-weight: 600; }
+.psy-report-compare__me { text-align: center; font-weight: 700; color: #2b6cb0; }
+.psy-report-compare__partner { text-align: center; font-weight: 700; color: #276749; }
+.psy-report-compare__diff { text-align: center; color: #718096; }
+.psy-report-align {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(0, 0, 0, .04);
+    background: color-mix(in srgb, var(--psy-c, #718096) 14%, transparent);
+    color: var(--psy-c, var(--psy-text));
+}
+
+/* منابع کم‌رنگ (PAM) */
+.psy-report-refs--muted {
+    margin-block-start: 28px;
+    padding: 12px 16px;
+    background: #f7fafc;
+    border: 0;
+    border-radius: 6px;
+    line-height: 1.9;
+    color: #718096;
+}
+.psy-report-pill--spaced { margin-block-start: 16px; }
+/* واریانت‌های دستهٔ سوم (BAI / STAI / RSES / GHQ-28) */
+.psy-report-alert__title--sm { font-size: 14px; }
+.psy-report-alert__text--plum { color: #44337a; font-size: 12px; }
+.psy-report-infobox {
+    background: #edf2f7;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-block-end: 20px;
+    font-size: 13px;
+    color: #4a5568;
+}
+.psy-report-hero__note--sm { margin: 6px 0 0; font-size: 12px; color: #718096; }
+.psy-report-card--tint.psy-report-card--tight { margin-block-end: 20px; }
+.psy-report-panel--tight { margin-block-end: 20px; }
+.psy-report-item__score--lg { font-size: 14px; }
+/* دستهٔ چهارم: گزارش‌های چندزیرمقیاسی (SCL-90-R / YSQ / NEO) */
+.psy-report-block { margin-block-end: 30px; }
+.psy-report-title-rule {
+    font-size: 15px;
+    border-block-end: 2px solid #e2e8f0;
+    padding-block-end: 8px;
+    margin: 0 0 12px;
+}
+.psy-report-title-rule__sub {
+    display: block;
+    font-size: 11px;
+    color: #a0aec0;
+    font-weight: 400;
+}
+.psy-report-chart--xl { max-height: 320px; }
+.psy-report-chart--domains { max-height: 280px; }
+.psy-report-col--sm { flex: 1 1 300px; min-width: 300px; max-width: 500px; }
+
+/* جدول رتبه‌بندی طرحواره‌ها */
+.psy-report-table--brand thead th { background: #2b6cb0; color: #fff; }
+.psy-report-table--rank td { padding: 7px 8px; }
+.psy-report-table--rank tbody tr { border-block-end: 1px solid #edf2f7; }
+.psy-report-row--tint { background: var(--psy-bg, transparent); }
+.psy-report-table__cell--rank { color: #718096; font-weight: 700; }
+.psy-report-table__cell--score-lg {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-table__cell--tone { color: var(--psy-c, var(--psy-text)); font-weight: 700; font-size: 11px; }
+.psy-report-table__cell--bold { font-weight: 700; }
+.psy-report-dot { font-size: 10px; }
+
+/* نوار حوزه‌های YSQ */
+.psy-report-domain { margin-block-end: 12px; }
+.psy-report-domain__head { display: flex; justify-content: space-between; margin-block-end: 4px; }
+.psy-report-domain__name { font-size: 12px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-domain__value { font-size: 13px; font-weight: 700; }
+.psy-report-domain__en { font-size: 10px; color: #a0aec0; margin-block-start: 2px; }
+
+/* چیپ‌های «نمره پایین/بالا» در NEO */
+.psy-report-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.psy-report-chip {
+    flex: 1;
+    min-width: 200px;
+    background: var(--psy-bg, var(--psy-surface));
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-chip--muted {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-block-start: 8px;
+    background: #f7fafc;
+    color: #718096;
+    padding: 7px 10px;
+}
+.psy-col--8 { width: 8%; }
+.psy-col--16 { width: 16%; }
+.psy-col--28 { width: 28%; }
+.psy-report-name-lg { font-size: 16px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+/* دستهٔ پنجم: MDQ / EPDS / DERS */
+.psy-report-chart--xs { max-height: 180px; }
+.psy-report-trio {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-block-start: 14px;
+    font-size: 13px;
+}
+.psy-report-trio__cell {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.psy-report-trio__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-trio__label { color: #718096; margin-block-start: 4px; }
+.psy-report-trio__hint { font-size: 11px; color: var(--psy-c, #718096); margin-block-start: 4px; }
+.psy-report-tag {
+    display: inline-block;
+    background: var(--psy-bg, var(--psy-surface));
+    color: var(--psy-c, var(--psy-text));
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+/* دستهٔ ششم: قصه‌های عشق استرنبرگ */
+.psy-report-chart--lg { max-height: 440px; }
+.psy-report-alert--compact {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    margin-block-end: 10px;
+}
+.psy-report-alert__icon { font-size: 18px; margin-block-start: 1px; }
+.psy-report-alert__text--sm { font-size: 12px; color: #4a5568; line-height: 1.7; }
+.psy-report-trio__cell--soft {
+    background: var(--psy-bg, #f7fafc);
+    border: 0;
+    text-align: start;
+    padding: 12px;
+    border-radius: 8px;
+}
+.psy-report-trio__title { font-size: 12px; font-weight: 700; color: var(--psy-c, var(--psy-text)); }
+.psy-report-trio__text { margin: 6px 0 0; font-size: 12px; color: #4a5568; line-height: 1.7; }
+.psy-report-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 24px;
+    block-size: 24px;
+    border-radius: 50%;
+    background: var(--psy-c, #718096);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    margin-inline-end: 8px;
+    vertical-align: middle;
+}
+.psy-report-swatch {
+    display: inline-block;
+    inline-size: 10px;
+    block-size: 10px;
+    border-radius: 50%;
+    background: var(--psy-c, #718096);
+    margin-inline-end: 6px;
+    vertical-align: middle;
+}
+.psy-report-en--inline { margin-inline-start: 6px; }
+.psy-report-bar {
+    background: #edf2f7;
+    border-radius: 4px;
+    block-size: 6px;
+    overflow: hidden;
+}
+.psy-report-bar__fill {
+    block-size: 100%;
+    border-radius: 4px;
+    background: var(--psy-c, #718096);
+}
+
+.psy-report-table--striped tbody tr:nth-child(even) td { background: #f7fafc; }
+/* دستهٔ هفتم: باورهای غیرمنطقی الیس (IBT) */
+.psy-report-panel__title--center { text-align: center; color: #2d3748; }
+.psy-report-subtle { font-size: 12px; color: #718096; margin: 0 0 10px; }
+.psy-report-chip--block { display: block; margin-block-start: 8px; }
+/* دستهٔ هشتم: LAS / CSI */
+.psy-report-hero__percent-wrap { text-align: center; }
+.psy-report-hero__percent {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--psy-c, var(--psy-text));
+}
+.psy-report-hero__percent-label { font-size: 12px; color: #718096; }
+.psy-report-track { position: relative; margin-block-start: 16px; }
+.psy-report-track .psy-report-progress {
+    block-size: 16px;
+    margin-block-start: 0;
+    border-radius: 6px;
+}
+.psy-report-track .psy-report-progress__bar { border-radius: 6px; }
+.psy-report-cutoff {
+    position: absolute;
+    inset-block-start: -4px;
+    inline-size: 2px;
+    block-size: 24px;
+    background: #c53030;
+}
+.psy-cutoff--0 { inset-inline-start: 0%; }
+.psy-cutoff--5 { inset-inline-start: 5%; }
+.psy-cutoff--10 { inset-inline-start: 10%; }
+.psy-cutoff--15 { inset-inline-start: 15%; }
+.psy-cutoff--20 { inset-inline-start: 20%; }
+.psy-cutoff--25 { inset-inline-start: 25%; }
+.psy-cutoff--30 { inset-inline-start: 30%; }
+.psy-cutoff--35 { inset-inline-start: 35%; }
+.psy-cutoff--40 { inset-inline-start: 40%; }
+.psy-cutoff--45 { inset-inline-start: 45%; }
+.psy-cutoff--50 { inset-inline-start: 50%; }
+.psy-cutoff--55 { inset-inline-start: 55%; }
+.psy-cutoff--60 { inset-inline-start: 60%; }
+.psy-cutoff--65 { inset-inline-start: 65%; }
+.psy-cutoff--70 { inset-inline-start: 70%; }
+.psy-cutoff--75 { inset-inline-start: 75%; }
+.psy-cutoff--80 { inset-inline-start: 80%; }
+.psy-cutoff--85 { inset-inline-start: 85%; }
+.psy-cutoff--90 { inset-inline-start: 90%; }
+.psy-cutoff--95 { inset-inline-start: 95%; }
+.psy-cutoff--100 { inset-inline-start: 100%; }
+.psy-report-chart--gauge {
+    max-height: 200px;
+    max-width: 400px;
+    margin-inline: auto;
+}
+.psy-report-note--sm { font-size: 11px; color: #a0aec0; margin: 12px 0 0; }
+.psy-report-panel--center { text-align: center; }
+/* دستهٔ نهم: FMS / ACE / AUDIT */
+.psy-report-text--spaced { margin-block-start: 14px; }
+.psy-report-en-like { font-size: 12px; color: #718096; margin-block-start: 6px; }
+.psy-report-chart-wrap { max-width: 560px; margin-inline: auto; }
+.psy-report-refs--soft { background: #f7fafc; color: #718096; line-height: 1.9; }
+/* کمکی عمومی */
+.psy-is-hidden { display: none; }

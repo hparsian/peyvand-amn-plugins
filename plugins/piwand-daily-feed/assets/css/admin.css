@@ -1,0 +1,122 @@
+/**
+ * پیوند امن — فید روزانه
+ * استایل صفحه‌ی تنظیمات + متاباکس نوشتن پست فید.
+ * قبلاً به‌صورت دو <style> اینلاین جدا در class-settings.php و
+ * class-post-type.php چاپ می‌شد، حالا با wp_enqueue_style لود می‌شود.
+ */
+
+/* ── صفحه‌ی تنظیمات (pwdf-settings) ─────────────────────────────────────── */
+
+.pwdf-settings-wrap {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    direction: rtl;
+    animation: pwdf-admin-fade-up 0.4s cubic-bezier(.22,.9,.35,1) both;
+}
+.pwdf-settings-wrap h1 { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+@keyframes pwdf-admin-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pwdf-settings-wrap, .pwdf-settings-wrap * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+.pwdf-shortcode-box {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--pivand-primary-bg, #f0fdfa); border: 1px solid #ccfbf1; border-right: 4px solid var(--pivand-primary, #0f766e);
+    padding: 14px 18px; border-radius: 12px; margin: 14px 0 22px;
+    box-shadow: 0 2px 10px rgba(15,23,42,0.04);
+}
+.pwdf-shortcode-label { font-weight: 700; color: #0f766e; }
+.pwdf-shortcode-box code {
+    background: #fff; border: 1px solid #e2e8f0; padding: 5px 12px; border-radius: 8px;
+    direction: ltr; display: inline-block; font-size: 13px;
+}
+#pwdf_copy_msg { color: #16a34a; font-size: 12px; font-weight: 700; }
+.pwdf-shortcode-box button {
+    border-radius: 8px !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.pwdf-shortcode-box button:hover { transform: translateY(-1px); }
+
+.pwdf-tabs {
+    display: flex; gap: 4px; margin-bottom: 0; border-bottom: none;
+    padding: 5px; background: #f8fafc; border-radius: 999px; width: fit-content; max-width: 100%;
+    overflow-x: auto;
+}
+.pwdf-tab {
+    padding: 9px 20px; border: none; background: none; cursor: pointer;
+    border-radius: 999px; font-size: 13.5px; font-weight: 700;
+    font-family: 'Vazirmatn', Tahoma, sans-serif; color: #64748b;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.pwdf-tab:hover:not(.active) { color: #0f766e; }
+.pwdf-tab:focus-visible {
+    outline: var(--pivand-focus-outline, 2px solid #14b8a6);
+    outline-offset: var(--pivand-focus-offset, 2px);
+}
+.pwdf-tab.active {
+    background: linear-gradient(135deg, var(--pivand-primary-light, #14b8a6), var(--pivand-primary, #0f766e));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(15,118,110,0.28);
+    margin-bottom: 0;
+}
+.pwdf-tab-content {
+    display: none; background: #fff; border: 1px solid #e2e8f0;
+    padding: 22px; border-radius: 14px; margin-top: 14px;
+    box-shadow: 0 4px 18px rgba(15,23,42,0.05);
+    animation: pwdf-tab-in 0.3s cubic-bezier(.22,.9,.35,1) both;
+}
+@keyframes pwdf-tab-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+.pwdf-tab-content.active { display: block; }
+.pwdf-settings-wrap .form-table th { width: 220px; font-family: inherit; font-weight: 700; color: #334155; }
+.pwdf-settings-wrap .form-table input[type="text"],
+.pwdf-settings-wrap .form-table input[type="number"],
+.pwdf-settings-wrap .form-table select,
+.pwdf-settings-wrap .form-table textarea {
+    border-radius: 8px; border: 1.5px solid #cbd5e1; transition: border-color .18s, box-shadow .18s;
+}
+.pwdf-settings-wrap .form-table input:focus,
+.pwdf-settings-wrap .form-table select:focus,
+.pwdf-settings-wrap .form-table textarea:focus {
+    border-color: var(--pivand-primary-light, #14b8a6); box-shadow: 0 0 0 3px rgba(20,184,166,.15); outline: none;
+}
+.pwdf-settings-wrap .button-primary {
+    background: linear-gradient(135deg, var(--pivand-primary-light, #14b8a6), var(--pivand-primary, #0f766e)) !important;
+    border-color: var(--pivand-primary, #0f766e) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 3px 10px rgba(15,118,110,.25);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.pwdf-settings-wrap .button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15,118,110,.32);
+}
+.pwdf-settings-wrap #submit,
+.pwdf-settings-wrap input#submit {
+    margin-top: 20px;
+}
+
+@media (max-width: 782px) {
+    .pwdf-tab-content { padding: 16px; }
+    .pwdf-settings-wrap .form-table th { width: auto; }
+    .pwdf-shortcode-box { padding: 12px 14px; }
+}
+
+/* ── متاباکس پست فید روزانه (post.php / post-new.php) ───────────────────── */
+
+.pwdf-meta-row { margin-bottom: 12px; }
+.pwdf-meta-row label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+.pwdf-meta-row select,
+.pwdf-meta-row input[type=text] { width: 100%; }
+.pwdf-color-row { display: flex; gap: 6px; align-items: center; }
+.pwdf-color-row input[type=color] { width: 40px; height: 32px; border: none; padding: 0; cursor: pointer; }
+.pwdf-color-row input[type=text] { flex: 1; }
+#pwdf_default_colors { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.pwdf-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 0 1px #ccc; }

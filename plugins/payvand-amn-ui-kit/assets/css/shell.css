@@ -1,0 +1,325 @@
+/* ============================================================
+   پیوند امن — کیت رابط کاربری · پوسته‌ها (shell.css)
+   فقط برای صفحاتی که کل صفحه مالِ ماست (ورود، پنل مراجع) یا ناحیه‌های
+   اختصاصی داخل پیشخوان (.pui-shell / .pui-admin). هیچ قاعده‌ای روی
+   html/body به‌جز پوستهٔ تمام‌صفحه (.pui-page) نوشته نمی‌شود.
+   ============================================================ */
+
+@layer pui.base {
+    /* پوستهٔ تمام‌صفحه: صفحهٔ ورود و پنل مراجع */
+    html.pui-page,
+    html.pui-page body {
+        margin: 0;
+        min-block-size: 100%;
+        background: var(--pui-bg);
+        color: var(--pui-text);
+        font-family: var(--pui-font);
+    }
+
+    html.pui-page body { line-height: var(--pui-lh); }
+}
+
+@layer pui.components {
+    /* ── ورود / احراز هویت ─────────────────────────────── */
+    .pui-auth {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        min-block-size: 100dvh;
+        background: var(--pui-bg);
+    }
+
+    .pui-auth__brand {
+        position: relative;
+        display: none;
+        padding: clamp(2rem, 5vw, 4rem);
+        background:
+            radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--pui-accent) 38%, transparent), transparent 55%),
+            radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--pui-sand) 45%, transparent), transparent 60%),
+            var(--pui-brown);
+        color: var(--pui-cream);
+        overflow: hidden;
+    }
+
+    .pui-auth__brand::after {
+        content: "";
+        position: absolute;
+        inset: auto -12% -22% -12%;
+        block-size: 55%;
+        border-radius: 50% 50% 0 0;
+        background: color-mix(in srgb, var(--pui-cream) 8%, transparent);
+        filter: blur(1px);
+    }
+
+    .pui-auth__brand-inner {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        align-content: space-between;
+        gap: var(--pui-s7);
+        max-inline-size: 46ch;
+    }
+
+    .pui-auth__logo { display: flex; align-items: center; gap: var(--pui-s3); font-weight: 700; font-size: var(--pui-fs-lg); }
+
+    .pui-auth__mark {
+        display: inline-flex;
+        inline-size: 46px;
+        block-size: 46px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--pui-cream) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--pui-cream) 28%, transparent);
+        color: var(--pui-cream);
+    }
+
+    .pui-auth__headline { font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.5; color: var(--pui-cream); font-weight: 700; }
+    .pui-auth__lead { margin-block-start: var(--pui-s3); color: color-mix(in srgb, var(--pui-cream) 78%, transparent); font-size: var(--pui-fs-md); }
+
+    .pui-auth__points { display: grid; gap: var(--pui-s3); margin: 0; padding: 0; list-style: none; }
+    .pui-auth__point { display: flex; align-items: center; gap: var(--pui-s3); font-size: var(--pui-fs-sm); color: color-mix(in srgb, var(--pui-cream) 85%, transparent); }
+
+    .pui-auth__point svg { color: var(--pui-gold); }
+
+    .pui-auth__main {
+        display: grid;
+        align-items: center;
+        justify-items: center;
+        padding: clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .pui-auth__card {
+        inline-size: min(100%, 440px);
+        background: var(--pui-surface);
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-xl);
+        box-shadow: var(--pui-shadow-lg);
+        padding: clamp(1.25rem, 3vw, 2rem);
+    }
+
+    .pui-auth__mobile-brand { display: flex; align-items: center; gap: var(--pui-s2); margin-block-end: var(--pui-s5); font-weight: 700; }
+    .pui-auth__mobile-brand .pui-auth__mark { background: var(--pui-accent-soft); border-color: color-mix(in srgb, var(--pui-accent) 45%, transparent); color: var(--pui-text); inline-size: 40px; block-size: 40px; }
+
+    .pui-auth__title { font-size: var(--pui-fs-xl); }
+    .pui-auth__sub { margin-block: var(--pui-s2) var(--pui-s5); color: var(--pui-text-muted); font-size: var(--pui-fs-sm); }
+    .pui-auth__form { display: grid; gap: var(--pui-s4); }
+    .pui-auth__actions { display: grid; gap: var(--pui-s2); }
+    .pui-auth__alt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--pui-s2); font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+    .pui-auth__timer { font-variant-numeric: tabular-nums; color: var(--pui-text-muted); font-size: var(--pui-fs-xs); }
+    .pui-auth__support { margin-block-start: var(--pui-s5); padding-block-start: var(--pui-s4); border-block-start: 1px solid var(--pui-border-soft); font-size: var(--pui-fs-xs); color: var(--pui-text-muted); text-align: center; }
+    .pui-auth__error { margin: 0; }
+
+    @media (min-width: 900px) {
+        .pui-auth { grid-template-columns: 1.05fr .95fr; }
+        .pui-auth__brand { display: block; }
+        .pui-auth__mobile-brand { display: none; }
+    }
+
+    /* ── پوستهٔ پنل (مراجع) ────────────────────────────── */
+    .pui-app {
+        display: grid;
+        grid-template-areas: "topbar" "main" "navbar";
+        grid-template-rows: auto 1fr auto;
+        min-block-size: 100dvh;
+        background: var(--pui-bg);
+    }
+
+    .pui-app__topbar {
+        grid-area: topbar;
+        position: sticky;
+        inset-block-start: 0;
+        z-index: var(--pui-z-nav);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s4);
+        padding: var(--pui-s3) var(--pui-s4);
+        background: color-mix(in srgb, var(--pui-surface) 88%, transparent);
+        backdrop-filter: saturate(140%) blur(10px);
+        border-block-end: 1px solid var(--pui-border-soft);
+    }
+
+    .pui-app__brand { display: flex; align-items: center; gap: var(--pui-s2); font-weight: 700; }
+    .pui-app__brand-mark {
+        display: inline-flex;
+        inline-size: 34px;
+        block-size: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--pui-primary);
+        color: var(--pui-on-primary);
+    }
+
+    .pui-app__user { display: flex; align-items: center; gap: var(--pui-s2); min-inline-size: 0; }
+    .pui-app__user-info { display: grid; line-height: 1.35; }
+    .pui-app__user-name { font-size: var(--pui-fs-sm); font-weight: 600; }
+    .pui-app__user-meta { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+
+    .pui-app__body {
+        grid-area: main;
+        display: grid;
+        gap: var(--pui-s5);
+        padding: var(--pui-s4);
+        inline-size: auto;
+        min-inline-size: 0;
+        max-inline-size: 1180px;
+    }
+
+    .pui-app__sidebar { display: none; }
+
+    .pui-app__navbar {
+        grid-area: navbar;
+        position: sticky;
+        inset-block-end: 0;
+        z-index: var(--pui-z-nav);
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        gap: 2px;
+        padding: var(--pui-s2);
+        background: var(--pui-surface);
+        border-block-start: 1px solid var(--pui-border-soft);
+    }
+
+    .pui-app__navlink {
+        display: grid;
+        justify-items: center;
+        gap: 2px;
+        padding: var(--pui-s2) var(--pui-s1);
+        border: 0;
+        border-radius: var(--pui-r-md);
+        background: transparent;
+        color: var(--pui-text-muted);
+        font: inherit;
+        font-size: 11px;
+        cursor: pointer;
+        min-block-size: 52px;
+    }
+
+    .pui-app__navlink[aria-current="page"],
+    .pui-app__navlink[aria-selected="true"] { color: var(--pui-text); background: var(--pui-accent-soft); font-weight: 600; }
+
+    .pui-app__footer { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--pui-s3); padding: var(--pui-s5) 0 var(--pui-s6); font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+
+    @media (min-width: 1024px) {
+        .pui-app {
+            grid-template-areas: "sidebar topbar" "sidebar main";
+            grid-template-columns: 250px minmax(0, 1fr);
+            grid-template-rows: auto 1fr;
+        }
+        .pui-app__sidebar {
+            grid-area: sidebar;
+            display: grid;
+            align-content: start;
+            gap: var(--pui-s5);
+            padding: var(--pui-s5) var(--pui-s4);
+            background: var(--pui-surface);
+            border-inline-end: 1px solid var(--pui-border-soft);
+            position: sticky;
+            inset-block-start: 0;
+            block-size: 100dvh;
+        }
+        .pui-app__navbar { display: none; }
+        .pui-app__body { padding: var(--pui-s6) var(--pui-s7); }
+    }
+
+    /* ── داشبورد/کنسول (پیشخوان) ──────────────────────── */
+    .pui-admin {
+        max-inline-size: 1280px;
+        margin-block: var(--pui-s5);
+        margin-inline-end: var(--pui-s6);
+        display: grid;
+        gap: var(--pui-s5);
+    }
+
+    .pui-page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+    }
+
+    .pui-page-head__title { font-size: var(--pui-fs-xl); }
+    .pui-page-head__sub { color: var(--pui-text-muted); font-size: var(--pui-fs-sm); margin-block-start: 2px; }
+    .pui-page-head__actions { display: flex; gap: var(--pui-s2); }
+
+    .pui-calendar {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: var(--pui-s2);
+    }
+
+    .pui-calendar__day {
+        display: grid;
+        gap: var(--pui-s1);
+        min-block-size: 108px;
+        padding: var(--pui-s2);
+        border: 1px solid var(--pui-border-soft);
+        border-radius: var(--pui-r-md);
+        background: var(--pui-surface);
+    }
+
+    .pui-calendar__day--today { border-color: var(--pui-accent-line); background: var(--pui-accent-soft); }
+    .pui-calendar__label { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+    .pui-calendar__slot {
+        display: block;
+        padding: 3px 6px;
+        border-radius: 6px;
+        background: var(--pui-surface-3);
+        font-size: 11px;
+        color: var(--pui-text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 767px) {
+        .pui-calendar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .pui-calendar__day { min-block-size: 84px; }
+    }
+
+    /* نمودار میله‌ای سبک (پیش‌نمایش؛ نسخهٔ نهایی ApexCharts است) */
+    .pui-bars { display: flex; align-items: flex-end; gap: var(--pui-s2); block-size: 150px; padding-block-start: var(--pui-s2); }
+    .pui-bars__col { flex: 1; display: grid; align-content: end; gap: 4px; justify-items: center; }
+    .pui-bars__bar { inline-size: 100%; border-radius: 6px 6px 2px 2px; background: var(--pui-accent); min-block-size: 4px; }
+    .pui-bars__bar--muted { background: var(--pui-sand); }
+    .pui-bars__label { font-size: 10px; color: var(--pui-text-soft); }
+
+    /* نوار پایین صفحهٔ پیش‌نمایش */
+    .pui-kit-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+        padding: var(--pui-s3) var(--pui-s4);
+        border-block-end: 1px solid var(--pui-border-soft);
+        background: var(--pui-surface);
+    }
+}
+
+/* ── پیشخوان: پرکردن ناحیهٔ محتوا با زمینهٔ کیت (فقط صفحه‌ای که کلاس را دارد) ── */
+body.pui-admin-page #wpbody-content {
+    padding-block-end: 0;
+}
+
+body.pui-admin-page .pui-shell.pui-admin {
+    margin: -10px -20px 0;
+    padding: 20px 20px 56px;
+    min-height: calc(100vh - 32px);
+    background: var(--pui-bg);
+    color: var(--pui-text);
+}
+
+@media (max-width: 782px) {
+    body.pui-admin-page .pui-shell.pui-admin {
+        margin: 0;
+        padding: 16px 12px 44px;
+    }
+
+    body.pui-admin-page #wpbody-content {
+        padding-inline: 0;
+    }
+}

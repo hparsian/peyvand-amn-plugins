@@ -1,0 +1,688 @@
+/* ============================================================
+   پیوند امن — پنل مراجع · پوستهٔ برند (panel-skin.css)
+   نسخه 1.0.0 — گام ۳ فاز ۱۲
+
+   قواعد سخت:
+     • این فایل بعد از panel.css بارگذاری می‌شود و فقط ساختار موجودِ پنل
+       (کلاس‌های zdp-*) را به توکن‌های کیت برند نگاشت می‌کند؛ هیچ ID یا
+       کلاس جدیدی که panel.js به آن وابسته باشد اضافه/حذف نمی‌شود.
+     • همهٔ انتخابگرها زیر .zdp-panel-shell هستند؛ چیزی به بقیهٔ سایت نشت
+       نمی‌کند. تنها استثنا `body.zdp-panel-blank` است که همان قالب
+       تمام‌صفحهٔ خود این افزونه است.
+     • رنگ/شعاع/سایه فقط از --pui-* (با fallback) می‌آید.
+   ============================================================ */
+
+.zdp-panel-shell {
+    --pui-bg: #F4F0E8;
+    --pui-surface: #FFFFFF;
+    --pui-surface-2: #FAF7F1;
+    --pui-surface-3: #F1ECE2;
+    --pui-text: #51483F;
+    --pui-text-soft: #6B5F52;
+    --pui-text-muted: #8A7F72;
+    --pui-border: #D9D1C4;
+    --pui-border-soft: #E8E1D6;
+    --pui-primary: #51483F;
+    --pui-on-primary: #F4F0E8;
+    --pui-accent: #C8B48A;
+    --pui-accent-soft: #F3EAD8;
+    --pui-danger: #9B3A32;
+    --pui-danger-soft: #FBEDEB;
+    --pui-success: #3D6B4F;
+    --pui-success-soft: #ECF4EE;
+    --pui-fs-xs: .78rem;
+    --pui-fs-sm: .875rem;
+    --pui-fs-md: 1rem;
+    --pui-fs-lg: 1.15rem;
+    --pui-s1: 4px;
+    --pui-s2: 8px;
+    --pui-s3: 12px;
+    --pui-s4: 16px;
+    --pui-s5: 24px;
+    --pui-s6: 32px;
+    --pui-r-sm: 8px;
+    --pui-r-md: 12px;
+    --pui-r-lg: 16px;
+    --pui-r-xl: 22px;
+    --pui-shadow-sm: 0 1px 2px rgba(81, 72, 63, .08);
+    --pui-shadow-lg: 0 18px 40px -26px rgba(81, 72, 63, .45);
+    --pui-font: Vazirmatn, Tahoma, Arial, sans-serif;
+
+    /* نگاشت متغیرهای قدیمی panel.css به پالت برند. این کار اجازه می‌دهد
+       همهٔ قواعد موجود (گرادیان‌ها، تب فعال، تقویم، نشان‌ها) بدون بازنویسی
+       تک‌تک انتخابگرها هم‌رنگ کیت شوند — فقط در محدودهٔ همین پنل. */
+    --zdp-teal: #6B5F52;
+    --zdp-teal-dark: #51483F;
+    --zdp-teal-light: #8A7A66;
+    --zdp-teal-mid: #5A5147;
+    --zdp-teal-bg: #F7F1E7;
+    --zdp-indigo: #51483F;
+    --zdp-rose: #9B3A32;
+    --zdp-green: #3D6B4F;
+    --zdp-amber: #8A6A2F;
+    --zdp-ink: #51483F;
+    --zdp-mid: #6B5F52;
+    --zdp-soft: #8A7F72;
+    --zdp-border: #D9D1C4;
+    --zdp-border-soft: #E8E1D6;
+    --zdp-surface: #FAF7F1;
+    --zdp-white: #FFFFFF;
+    --zdp-radius: 14px;
+    --zdp-radius-lg: 18px;
+    --zdp-radius-sm: 10px;
+    --zdp-shadow: 0 1px 2px rgba(81, 72, 63, .07);
+    --zdp-shadow-sm: 0 1px 2px rgba(81, 72, 63, .07);
+    --zdp-shadow-md: 0 10px 24px -18px rgba(81, 72, 63, .5);
+
+    font-family: var(--pui-font);
+    color: var(--pui-text);
+    max-inline-size: 1080px;
+}
+
+.zdp-panel-shell *,
+.zdp-panel-shell *::before,
+.zdp-panel-shell *::after { box-sizing: border-box; }
+
+body.zdp-panel-blank {
+    background:
+        radial-gradient(900px 380px at 88% -12%, rgba(200, 180, 138, .26), transparent 62%),
+        radial-gradient(700px 340px at 0% 108%, rgba(184, 173, 160, .22), transparent 60%),
+        var(--pui-bg, #F4F0E8);
+}
+
+/* ── نوار بالا ─────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-shell-topbar {
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-xl);
+    box-shadow: var(--pui-shadow-sm);
+    padding: var(--pui-s3) var(--pui-s4);
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark {
+    inline-size: 38px;
+    block-size: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--pui-primary);
+    color: var(--pui-accent);
+    flex: 0 0 auto;
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring {
+    inline-size: 16px;
+    block-size: 16px;
+    border-width: 1.5px;
+    border-color: var(--pui-accent);
+    animation: none;
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-a { inset-inline-end: 9px; inset-block-start: 11px; }
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-b { inset-inline-start: 9px; inset-block-start: 11px; }
+
+.zdp-panel-shell .zdp-shell-brand-name {
+    font-size: var(--pui-fs-md);
+    font-weight: 700;
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-shell-user-avatar {
+    background: var(--pui-accent-soft);
+    border: 1px solid rgba(200, 180, 138, .55);
+    color: var(--pui-text);
+    font-weight: 700;
+}
+
+.zdp-panel-shell .zdp-shell-user-name { color: var(--pui-text); font-weight: 600; }
+.zdp-panel-shell .zdp-shell-user-mobile { color: var(--pui-text-muted); }
+
+.zdp-panel-shell .zdp-logout {
+    color: var(--pui-text-soft);
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-md);
+    padding: var(--pui-s2) var(--pui-s3);
+    font-weight: 600;
+}
+
+.zdp-panel-shell .zdp-logout:hover {
+    color: var(--pui-text);
+    background: var(--pui-surface-3);
+    transform: none;
+}
+
+.zdp-panel-shell .zdp-logout:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+}
+
+/* ── ردیف تب‌ها ────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-tabs {
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-xl);
+    box-shadow: var(--pui-shadow-sm);
+    padding: var(--pui-s1);
+    gap: 2px;
+}
+
+.zdp-panel-shell .zdp-tab {
+    color: var(--pui-text-soft);
+    border-radius: var(--pui-r-md);
+    padding: 11px 14px;
+    min-block-size: 44px;
+    font-size: var(--pui-fs-sm);
+    font-weight: 600;
+}
+
+.zdp-panel-shell .zdp-tab:hover:not(.active) {
+    color: var(--pui-text);
+    background: var(--pui-surface-2);
+}
+
+.zdp-panel-shell .zdp-tab.active {
+    color: var(--pui-on-primary);
+    background: var(--pui-primary);
+    box-shadow: none;
+}
+
+.zdp-panel-shell .zdp-tab:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+}
+
+.zdp-panel-shell .zdp-tab-badge {
+    background: var(--pui-accent);
+    color: var(--pui-text);
+    font-weight: 700;
+}
+
+.zdp-panel-shell .zdp-tab.active .zdp-tab-badge {
+    background: var(--pui-accent);
+    color: var(--pui-text);
+}
+
+/* ── بدنهٔ اصلی ────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-shell-main {
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-xl);
+    box-shadow: var(--pui-shadow-sm);
+    padding: clamp(16px, 3vw, 28px);
+}
+
+/* ── کارت‌های خلاصه ───────────────────────────────────────── */
+.zdp-panel-shell .zdp-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--pui-s3);
+    margin: 0 0 var(--pui-s5);
+}
+
+.zdp-panel-shell .zdp-stat-card {
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-lg);
+    padding: var(--pui-s4);
+    gap: var(--pui-s1);
+}
+
+.zdp-panel-shell .zdp-stat-card:hover {
+    box-shadow: var(--pui-shadow-sm);
+    transform: none;
+    border-color: var(--pui-border);
+}
+
+.zdp-panel-shell .zdp-stat-card-highlight {
+    background: var(--pui-accent-soft);
+    border-color: rgba(200, 180, 138, .6);
+}
+
+.zdp-panel-shell .zdp-stat-icon {
+    inline-size: 36px;
+    block-size: 36px;
+    border-radius: 10px;
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border-soft);
+    color: var(--pui-text);
+    box-shadow: none;
+    margin-block-end: var(--pui-s2);
+}
+
+.zdp-panel-shell .zdp-stat-label { color: var(--pui-text-muted); font-weight: 600; }
+.zdp-panel-shell .zdp-stat-value { color: var(--pui-text); font-size: var(--pui-fs-lg); font-weight: 700; }
+.zdp-panel-shell .zdp-stat-sub { color: var(--pui-text-soft); }
+
+/* ── کارت‌ها، عنوان بخش‌ها و فرم‌ها ───────────────────────── */
+.zdp-panel-shell .zdp-card {
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-lg);
+    padding: var(--pui-s4) var(--pui-s4) var(--pui-s5);
+}
+
+.zdp-panel-shell .zdp-card h3 {
+    margin: 0 0 var(--pui-s4);
+    font-size: var(--pui-fs-md);
+    font-weight: 700;
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-section-title {
+    margin: var(--pui-s5) 0 var(--pui-s3);
+    padding-block-end: var(--pui-s2);
+    font-size: var(--pui-fs-md);
+    font-weight: 700;
+    color: var(--pui-text);
+    border-block-end: 1px solid var(--pui-border-soft);
+    display: flex;
+    align-items: center;
+    gap: var(--pui-s2);
+}
+
+.zdp-panel-shell .zdp-field-row { gap: var(--pui-s3); }
+
+.zdp-panel-shell label {
+    font-size: var(--pui-fs-sm);
+    font-weight: 600;
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell input[type="text"],
+.zdp-panel-shell input[type="tel"],
+.zdp-panel-shell input[type="email"],
+.zdp-panel-shell input[type="date"],
+.zdp-panel-shell input[type="number"],
+.zdp-panel-shell input[type="password"],
+.zdp-panel-shell select,
+.zdp-panel-shell textarea {
+    inline-size: 100%;
+    min-block-size: 46px;
+    padding: 10px 12px;
+    background: var(--pui-surface);
+    border: 1px solid var(--pui-border);
+    border-radius: var(--pui-r-md);
+    color: var(--pui-text);
+    font-family: inherit;
+    font-size: var(--pui-fs-sm);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.zdp-panel-shell textarea { min-block-size: 96px; resize: vertical; }
+
+.zdp-panel-shell input:focus,
+.zdp-panel-shell select:focus,
+.zdp-panel-shell textarea:focus {
+    outline: none !important;
+    border-color: var(--pui-text);
+    box-shadow: 0 0 0 3px rgba(81, 72, 63, .12);
+}
+
+.zdp-panel-shell input::placeholder,
+.zdp-panel-shell textarea::placeholder { color: var(--pui-text-muted); }
+
+.zdp-panel-shell input[type="file"] {
+    inline-size: 100%;
+    padding: var(--pui-s3);
+    background: var(--pui-surface);
+    border: 1px dashed var(--pui-border);
+    border-radius: var(--pui-r-md);
+    font-size: var(--pui-fs-sm);
+    color: var(--pui-text-soft);
+}
+
+/* ── دکمه‌ها ──────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-btn-primary,
+.zdp-panel-shell .zdp-btn-primary:hover,
+.zdp-panel-shell .zdp-btn-primary:focus,
+.zdp-panel-shell .zdp-btn-primary:active {
+    min-block-size: 46px;
+    border: 1px solid var(--pui-primary) !important;
+    border-radius: var(--pui-r-md);
+    background: var(--pui-primary) !important;
+    background-image: none !important;
+    color: var(--pui-on-primary) !important;
+    font-weight: 600;
+    box-shadow: none !important;
+}
+
+.zdp-panel-shell .zdp-btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--pui-primary) 88%, #000) !important;
+    transform: none;
+    filter: none;
+}
+
+.zdp-panel-shell .zdp-btn-primary:disabled { opacity: .9; }
+.zdp-panel-shell .zdp-btn-primary:focus-visible { outline: 2px solid var(--pui-text); outline-offset: 3px; }
+.zdp-panel-shell .zdp-btn-spinner { border-color: rgba(244, 240, 232, .45); border-top-color: var(--pui-on-primary); }
+
+.zdp-panel-shell .zdp-link-btn,
+.zdp-panel-shell .zdp-list-item-cta {
+    color: var(--pui-text) !important;
+    background: var(--pui-surface) !important;
+    border: 1px solid var(--pui-border) !important;
+    border-radius: var(--pui-r-md);
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: none !important;
+}
+
+.zdp-panel-shell .zdp-list-item-cta:hover,
+.zdp-panel-shell .zdp-link-btn:hover {
+    background: var(--pui-surface-3) !important;
+    transform: none;
+}
+
+/* ── فهرست‌ها (نوبت‌ها، آزمون‌ها، پیام‌ها) ─────────────────── */
+.zdp-panel-shell .zdp-booking-list,
+.zdp-panel-shell .zdp-card-list,
+.zdp-panel-shell .zdp-quiz-list,
+.zdp-panel-shell .zdp-message-list {
+    display: grid;
+    gap: var(--pui-s3);
+    margin: 0;
+    padding: 0;
+}
+
+.zdp-panel-shell .zdp-list-item,
+.zdp-panel-shell .zdp-card-list > *,
+.zdp-panel-shell .zdp-quiz-list > *,
+.zdp-panel-shell .zdp-message-list > * {
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-lg);
+    padding: var(--pui-s3) var(--pui-s4);
+}
+
+.zdp-panel-shell .zdp-list-item-icon {
+    background: var(--pui-accent-soft);
+    color: var(--pui-text);
+    border-radius: 10px;
+}
+
+.zdp-panel-shell .zdp-list-item-meta { color: var(--pui-text-muted); }
+.zdp-panel-shell .zdp-list-item-body { color: var(--pui-text); }
+
+/* ── وضعیت‌ها ────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-status {
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: var(--pui-fs-xs);
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.zdp-panel-shell .zdp-status-تایید-شده,
+.zdp-panel-shell .zdp-status-فعال,
+.zdp-panel-shell .zdp-status-انجام-شده {
+    color: var(--pui-success);
+    background: var(--pui-success-soft);
+    border-color: color-mix(in srgb, var(--pui-success) 30%, transparent);
+}
+
+.zdp-panel-shell .zdp-status-ناموفق,
+.zdp-panel-shell .zdp-status-لغو-شده,
+.zdp-panel-shell .zdp-status-عدم-حضور {
+    color: var(--pui-danger);
+    background: var(--pui-danger-soft);
+    border-color: color-mix(in srgb, var(--pui-danger) 30%, transparent);
+}
+
+.zdp-panel-shell .zdp-status-در-انتظار-پرداخت,
+.zdp-panel-shell .zdp-status-در-انتظار-تایید-واریز,
+.zdp-panel-shell .zdp-status-در-انتظار-بررسی {
+    color: var(--pui-text);
+    background: var(--pui-accent-soft);
+    border-color: rgba(200, 180, 138, .6);
+}
+
+/* ── پیام‌ها و پاسخ پیشخوان ──────────────────────────────── */
+.zdp-panel-shell .zdp-admin-reply {
+    background: var(--pui-accent-soft);
+    border: 1px solid rgba(200, 180, 138, .5);
+    border-radius: var(--pui-r-md);
+    padding: var(--pui-s3);
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-admin-reply-label { color: var(--pui-text-soft); font-weight: 600; }
+.zdp-panel-shell .zdp-admin-hint,
+.zdp-panel-shell .zdp-message-pending { color: var(--pui-text-muted); }
+
+.zdp-panel-shell .zdp-pending-payment-box,
+.zdp-panel-shell .zdp-receipt-uploaded-box {
+    background: var(--pui-accent-soft);
+    border: 1px solid rgba(200, 180, 138, .55);
+    border-radius: var(--pui-r-lg);
+}
+
+/* ── حالت خالی ───────────────────────────────────────────── */
+.zdp-panel-shell .zdp-empty-state {
+    background: var(--pui-surface-2);
+    border: 1px dashed var(--pui-border);
+    border-radius: var(--pui-r-lg);
+    color: var(--pui-text-soft);
+    padding: var(--pui-s6) var(--pui-s4);
+}
+
+.zdp-panel-shell .zdp-empty-state-icon {
+    color: var(--pui-text-muted);
+    display: flex;
+    justify-content: center;
+    margin-block-end: var(--pui-s2);
+}
+
+.zdp-panel-shell .zdp-empty-state-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+/* آیکون‌های SVG درون‌خطی، جانشین ایموجی در عنوان و متن */
+.zdp-panel-shell .zdp-icon-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.18em;
+    margin-inline-end: 6px;
+    color: var(--pui-accent-line);
+}
+
+.zdp-panel-shell .zdp-icon-inline svg {
+    width: 17px;
+    height: 17px;
+}
+
+.zdp-panel-shell .zdp-bw-notice li .zdp-icon-inline {
+    color: var(--pui-text-muted);
+    margin-inline-end: 8px;
+}
+
+/* ── پاورقی ──────────────────────────────────────────────── */
+.zdp-panel-shell .zdp-panel-footer {
+    border-block-start: 1px solid var(--pui-border-soft);
+    padding-block-start: var(--pui-s3);
+    margin-block-start: var(--pui-s5);
+    color: var(--pui-text-muted);
+}
+
+.zdp-panel-shell .zdp-panel-back-link,
+.zdp-panel-shell .zdp-panel-support-link {
+    color: var(--pui-text-soft);
+    font-size: var(--pui-fs-sm);
+    text-decoration: none;
+}
+
+/* ── فوکوس سراسری داخل پنل ───────────────────────────────── */
+.zdp-panel-shell :focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+    border-radius: var(--pui-r-sm);
+}
+
+@media (max-width: 720px) {
+    .zdp-panel-shell .zdp-shell-main { padding: var(--pui-s4); }
+    .zdp-panel-shell .zdp-stats-grid { grid-template-columns: 1fr; }
+    .zdp-panel-shell .zdp-field-row { grid-template-columns: 1fr; }
+    .zdp-panel-shell .zdp-tab { flex: 0 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zdp-panel-shell *,
+    .zdp-panel-shell *::before,
+    .zdp-panel-shell *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+    }
+}
+
+/* ── اصلاح نهایی تب‌ها (panel.css برای تب غیرفعال هم گرادیان می‌گذارد) ── */
+.zdp-panel-shell .zdp-tabs .zdp-tab,
+.zdp-panel-shell .zdp-tabs .zdp-tab:not(.active),
+.zdp-panel-shell .zdp-tabs .zdp-tab:not(.active):hover,
+.zdp-panel-shell .zdp-tabs .zdp-tab:not(.active):focus {
+    background: transparent !important;
+    background-image: none !important;
+    color: var(--pui-text-soft) !important;
+    box-shadow: none !important;
+}
+
+.zdp-panel-shell .zdp-tabs .zdp-tab:not(.active):hover {
+    background: var(--pui-surface-2) !important;
+    color: var(--pui-text) !important;
+}
+
+.zdp-panel-shell .zdp-tabs .zdp-tab.active,
+.zdp-panel-shell .zdp-tabs .zdp-tab.active:hover,
+.zdp-panel-shell .zdp-tabs .zdp-tab.active:focus {
+    background: var(--pui-primary) !important;
+    background-image: none !important;
+    color: var(--pui-on-primary) !important;
+    box-shadow: none !important;
+}
+
+.zdp-panel-shell .zdp-tabs .zdp-tab:focus-visible {
+    outline: 2px solid var(--pui-text);
+    outline-offset: 2px;
+}
+
+/* نشان برند: دو حلقهٔ درهم‌تنیده (نماد پیوند) روی مربع قهوه‌ای */
+.zdp-panel-shell .zdp-shell-brand-mark {
+    position: relative;
+    overflow: hidden;
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring {
+    position: absolute;
+    inline-size: 13px;
+    block-size: 13px;
+    border: 2px solid var(--pui-accent);
+    border-radius: 50%;
+    inset-block-start: 12px;
+    animation: none;
+}
+
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-a { inset-inline-start: 10px; }
+.zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-b { inset-inline-start: 18px; }
+
+/* کادر قوانین رزرو داخل ویجت نوبت‌دهی (panel.css رنگ فیروزه‌ای هاردکد دارد) */
+.zdp-panel-shell .zdp-bw-notice {
+    background: var(--pui-accent-soft) !important;
+    border: 1px solid rgba(200, 180, 138, .55) !important;
+    border-inline-end: 4px solid var(--pui-accent) !important;
+    border-radius: var(--pui-r-lg);
+    color: var(--pui-text) !important;
+}
+
+.zdp-panel-shell .zdp-bw-notice li { color: var(--pui-text-soft); }
+.zdp-panel-shell .zdp-bw-notice li:first-child { color: var(--pui-text); }
+
+/* چیپ‌های راهنما/فیلتر تقویم */
+.zdp-panel-shell .zdp-bw-legend-chip,
+.zdp-panel-shell .zdp-bw-qf-btn {
+    border-radius: 999px;
+    border: 1px solid var(--pui-border);
+    background: var(--pui-surface);
+    color: var(--pui-text-soft);
+    font-size: var(--pui-fs-xs);
+}
+
+.zdp-panel-shell .zdp-bw-qf-btn.is-active,
+.zdp-panel-shell .zdp-bw-qf-btn[aria-pressed="true"],
+.zdp-panel-shell .zdp-bw-qf-btn:hover {
+    background: var(--pui-accent-soft);
+    border-color: rgba(200, 180, 138, .7);
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-bw-selected-summary {
+    background: var(--pui-surface-2);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-md);
+    color: var(--pui-text);
+}
+
+/* تقویم جلالی داخل پنل */
+.zdp-panel-shell .zdp-jalali-cal-days button.zdp-jalali-selected {
+    background: var(--pui-primary) !important;
+    color: var(--pui-on-primary) !important;
+}
+
+.zdp-panel-shell .zdp-jalali-cal-days button.zdp-jalali-today {
+    color: var(--pui-text) !important;
+    border-color: var(--pui-accent) !important;
+}
+
+/* ── شبکهٔ ساعت‌های خالی/پر (رنگ‌های سبز هاردکد panel.css) ── */
+.zdp-panel-shell .zdp-bw-day-header {
+    background: var(--pui-accent-soft);
+    border: 1px solid rgba(200, 180, 138, .55);
+    border-radius: var(--pui-r-lg);
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-bw-day-nav {
+    border: 1px solid var(--pui-border);
+    background: var(--pui-surface);
+    color: var(--pui-text);
+}
+
+.zdp-panel-shell .zdp-bw-day-nav:hover:not(:disabled) { background: var(--pui-surface-3); }
+
+.zdp-panel-shell .zdp-bw-day-slot {
+    font-weight: 700;
+    border-radius: var(--pui-r-md);
+}
+
+.zdp-panel-shell button.zdp-bw-cell-open {
+    background: var(--pui-surface);
+    color: var(--pui-text);
+    box-shadow: inset 0 0 0 1px var(--pui-accent);
+}
+
+.zdp-panel-shell button.zdp-bw-cell-open:hover {
+    background: var(--pui-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--pui-accent), 0 6px 14px -10px rgba(81, 72, 63, .6);
+}
+
+.zdp-panel-shell button.zdp-bw-cell-open::before { color: var(--pui-accent); }
+
+.zdp-panel-shell button.zdp-bw-cell-open.zdp-bw-cell-selected {
+    background: var(--pui-primary);
+    color: var(--pui-on-primary);
+    box-shadow: none;
+}
+
+.zdp-panel-shell button.zdp-bw-cell-open.zdp-bw-cell-selected::before { color: var(--pui-accent); }
+
+.zdp-panel-shell .zdp-bw-cell-taken {
+    background: var(--pui-danger-soft);
+    color: color-mix(in srgb, var(--pui-danger) 65%, #fff);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pui-danger) 25%, transparent);
+}
+
+.zdp-panel-shell .zdp-bw-cell-closed {
+    background: var(--pui-surface-3);
+    color: var(--pui-text-muted);
+    box-shadow: inset 0 0 0 1px var(--pui-border-soft);
+}

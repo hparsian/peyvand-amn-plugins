@@ -1,0 +1,794 @@
+/* ── Psy Quiz Admin Styles — v3.4.0 (بازطراحی: هم‌راستا با برند teal/rose اکوسیستم) ── */
+
+:root {
+    /* از این نسخه: رنگ‌ها از توکن‌های مشترک اکوسیستم (--pivand-*) می‌خوانند
+       تا داشبورد ادمین این افزونه با بقیه‌ی داشبوردها (پنل مراجعان، پرونده
+       مراجعین، ...) یکپارچه باشد. */
+    --psy-teal:       var(--pivand-primary, #0f766e);
+    --psy-teal-light: var(--pivand-primary-light, #14b8a6);
+    --psy-teal-bg:    var(--pivand-primary-bg, #f0fdfa);
+    --psy-teal-mid:   var(--pivand-primary-mid, #5eead4);
+    --psy-rose:       var(--pivand-danger, #e11d48);
+    --psy-rose-bg:    var(--pivand-danger-bg, #fff1f2);
+    --psy-amber:      var(--pivand-warning, #c05621);
+    --psy-amber-bg:   var(--pivand-warning-bg, #fffaf0);
+    --psy-text:       var(--pivand-ink, #1e293b);
+    --psy-text-mid:   var(--pivand-ink-mid, #475569);
+    --psy-text-soft:  var(--pivand-ink-soft, #64748b);
+    --psy-border:     var(--pivand-border, #e2e8f0);
+    --psy-surface:    var(--pivand-surface, #f8fafc);
+    --psy-white:      var(--pivand-white, #ffffff);
+    --psy-radius:     var(--pivand-radius-sm, 10px);
+    --psy-shadow-sm:  var(--pivand-shadow-sm, 0 1px 3px rgba(15,23,42,0.07), 0 1px 2px rgba(15,23,42,0.04));
+    --psy-shadow:     var(--pivand-shadow, 0 4px 16px rgba(15,23,42,0.07));
+    --psy-transition: var(--pivand-transition, 0.2s ease);
+
+    /* نام‌های قدیمی برای سازگاری با کد موجود (مثلاً استفاده‌ی مستقیم var(--psy-green)) */
+    --psy-blue:       var(--psy-teal);
+    --psy-blue-lt:    var(--psy-teal-light);
+    --psy-blue-bg:    var(--psy-teal-bg);
+    --psy-green:      var(--psy-teal);
+    --psy-green-bg:   var(--psy-teal-bg);
+    --psy-green-mid:  var(--psy-teal-mid);
+}
+
+.psy-admin {
+    direction: rtl;
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+    animation: psy-admin-fade-up 0.4s cubic-bezier(.22,.9,.35,1) both;
+}
+@keyframes psy-admin-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .psy-admin, .psy-admin * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+.psy-admin h1 {
+    margin-bottom: 20px !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: var(--psy-text) !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.psy-admin h1 + a.page-title-action {
+    background: linear-gradient(135deg, var(--psy-teal-light), var(--psy-teal));
+    border: none !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    padding: 6px 18px !important;
+    box-shadow: 0 4px 12px rgba(15,118,110,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.psy-admin h1 + a.page-title-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15,118,110,0.32);
+    color: #fff !important;
+}
+
+/* ── Pill nav / تب‌های افقی (هم‌راستا با subsubsub/tabs بقیه‌ی اکوسیستم) ── */
+.psy-pill-nav {
+    display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 20px;
+    padding: 5px; background: var(--psy-surface); border-radius: 999px;
+    width: fit-content; max-width: 100%; list-style: none;
+}
+.psy-pill-nav a, .psy-pill-nav button {
+    display: inline-block; padding: 8px 18px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; color: var(--psy-text-soft);
+    text-decoration: none; border: none; background: none; cursor: pointer;
+    font-family: inherit; white-space: nowrap;
+    transition: background .2s ease, color .2s ease;
+}
+.psy-pill-nav a:hover, .psy-pill-nav button:hover { color: var(--psy-teal); }
+.psy-pill-nav a.current, .psy-pill-nav button.current,
+.psy-pill-nav a.active,  .psy-pill-nav button.active {
+    background: linear-gradient(135deg, var(--psy-teal-light), var(--psy-teal));
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(15,118,110,.28);
+}
+
+/* ── Stats row ───────────────────────────────────────────────────────── */
+.psy-stats-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 24px;
+}
+.psy-stat-card {
+    flex: 1;
+    min-width: 130px;
+    background: var(--psy-white);
+    border: 1px solid var(--psy-border);
+    border-top: 4px solid #ccc;
+    border-radius: var(--psy-radius);
+    padding: 16px 18px;
+    text-align: center;
+    box-shadow: var(--psy-shadow-sm);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.psy-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--psy-shadow);
+}
+.psy-stat-val {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+.psy-stat-lbl {
+    font-size: 11px;
+    color: var(--psy-text-soft);
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* ── Table ───────────────────────────────────────────────────────────── */
+.psy-table th,
+.psy-table td {
+    text-align: right !important;
+    vertical-align: middle !important;
+    padding: 10px 14px !important;
+}
+.psy-table thead th {
+    background: var(--psy-surface) !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--psy-text-soft) !important;
+}
+.psy-table tbody tr { transition: background 0.15s ease; }
+.psy-table tbody tr:hover td { background: #fafcff !important; }
+.psy-admin table.widefat {
+    border-radius: var(--psy-radius);
+    overflow: hidden;
+    box-shadow: var(--psy-shadow-sm);
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────── */
+.psy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+.psy-badge-done    { background: var(--psy-teal-bg);  color: var(--psy-teal);     border: 1px solid var(--psy-teal-mid); }
+.psy-badge-pending { background: var(--psy-amber-bg);  color: var(--psy-amber);    border: 1px solid #fbd38d; }
+.psy-badge-expired { background: var(--psy-surface);   color: var(--psy-text-soft);border: 1px solid var(--psy-border); }
+.psy-badge-revoked { background: var(--psy-rose-bg);   color: var(--psy-rose);     border: 1px solid #fecdd3; }
+
+/* ── Actions ─────────────────────────────────────────────────────────── */
+.psy-filter-bar {
+    margin: 12px 0 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.psy-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.psy-link-input {
+    width: 180px !important;
+    direction: ltr;
+    background: var(--psy-surface) !important;
+    font-size: 11px !important;
+    border-color: var(--psy-border) !important;
+    border-radius: 6px !important;
+}
+.psy-copy-btn { white-space: nowrap; }
+.psy-wa-btn {
+    background: #25D366 !important;
+    color: #fff !important;
+    border-color: #1ebe5d !important;
+    white-space: nowrap;
+}
+.psy-wa-btn:hover { background: #1aa851 !important; }
+.psy-btn-notify {
+    background: #d97706 !important;
+    color: #fff !important;
+    border-color: #b45309 !important;
+    white-space: nowrap;
+}
+.psy-btn-notify:hover { background: #b45309 !important; }
+.psy-wa-btn:focus-visible,
+.psy-wa-btn-big:focus-visible,
+.psy-btn-notify:focus-visible,
+.psy-copy-btn:focus-visible {
+    outline: var(--pivand-focus-outline, 2px solid #14b8a6);
+    outline-offset: var(--pivand-focus-offset, 2px);
+}
+
+/* ── Form card ───────────────────────────────────────────────────────── */
+.psy-form-card {
+    background: var(--psy-white);
+    border: 1px solid var(--psy-border);
+    border-radius: var(--psy-radius);
+    padding: 26px 30px;
+    max-width: 720px;
+    margin-top: 20px;
+    box-shadow: var(--psy-shadow-sm);
+}
+.psy-form-card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--psy-text);
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--psy-border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Success box ─────────────────────────────────────────────────────── */
+.psy-success-box {
+    background: var(--psy-green-bg);
+    border: 2px solid var(--psy-green-mid);
+    border-radius: 12px;
+    padding: 24px 28px;
+    max-width: 720px;
+    margin: 16px 0 24px;
+    box-shadow: var(--psy-shadow-sm);
+}
+.psy-success-box h2 {
+    color: var(--psy-green);
+    margin-top: 0;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.psy-link-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+.psy-link-input-big {
+    flex: 1;
+    min-width: 220px;
+    direction: ltr;
+    background: var(--psy-white) !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+}
+.psy-wa-btn-big {
+    background: #25D366 !important;
+    color: #fff !important;
+    border-color: #1ebe5d !important;
+    font-size: 14px !important;
+    padding: 7px 16px !important;
+    border-radius: 6px !important;
+}
+
+/* ── Report ──────────────────────────────────────────────────────────── */
+.psy-report-wrap .psy-report-meta {
+    color: var(--psy-text-mid);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.psy-report-body {
+    margin-top: 20px;
+    background: var(--psy-white);
+    border: 1px solid var(--psy-border);
+    border-radius: var(--psy-radius);
+    padding: 30px;
+    box-shadow: var(--psy-shadow-sm);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────── */
+.psy-pagination {
+    margin-top: 18px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.psy-pagination .button {
+    border-radius: 6px !important;
+    min-width: 36px;
+    text-align: center;
+}
+.psy-pagination-ellipsis { color: var(--psy-text-soft); padding: 0 4px; }
+.psy-pagination-count { margin-right: 8px; font-size: 12px; color: var(--psy-text-soft); }
+
+/* ── Print ───────────────────────────────────────────────────────────── */
+@media print {
+    #adminmenuwrap, #wpadminbar, #wpfooter,
+    .psy-actions, .button, h1 a, .page-title-action { display: none !important; }
+    .psy-report-body { border: none !important; padding: 0 !important; box-shadow: none !important; }
+}
+
+/* ── Generic card ────────────────────────────────────────────────────── */
+.psy-card {
+    background: var(--psy-white);
+    border-radius: var(--psy-radius);
+    box-shadow: var(--psy-shadow-sm);
+    overflow: hidden;
+}
+.psy-card-pad { padding: 18px; }
+.psy-card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--psy-border);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--psy-text);
+}
+.psy-card-empty {
+    padding: 30px;
+    text-align: center;
+    color: var(--psy-text-soft);
+    font-size: 13px;
+}
+.psy-card-empty .psy-card-empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+/* ── Mini stat row (debug/tracker pages) ─────────────────────────────── */
+.psy-mini-stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.psy-mini-stat {
+    background: var(--stat-bg, var(--psy-surface));
+    border: 1px solid var(--stat-color, var(--psy-border));
+    border-radius: 8px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 90px;
+}
+.psy-mini-stat-val { font-size: 22px; font-weight: 700; color: var(--stat-color, var(--psy-text)); }
+.psy-mini-stat-lbl { font-size: 12px; color: var(--stat-color, var(--psy-text-soft)); margin-top: 2px; }
+
+/* ── Two-column panel grid (debug/tracker layouts) ───────────────────── */
+.psy-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.psy-grid-side { display: grid; gap: 20px; align-items: start; }
+@media (max-width: 900px) {
+    .psy-grid-2col, .psy-grid-side { grid-template-columns: 1fr !important; }
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────── */
+.psy-progress-track { background: var(--psy-border); border-radius: 4px; height: 20px; overflow: hidden; }
+.psy-progress-fill { background: var(--psy-green-mid); height: 100%; float: right; }
+.psy-progress-lbl { font-size: 12px; color: var(--psy-green); margin-top: 4px; font-weight: 700; }
+
+/* ── Notice / empty-state box (plain, non-WP notice) ─────────────────── */
+.psy-notice-plain {
+    background: var(--psy-surface);
+    border: 1px solid var(--psy-border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--psy-text-soft);
+}
+.psy-notice-plain.is-warning { background: #fffaf0; border-color: #fbd38d; color: #c05621; }
+.psy-notice-plain.is-error   { background: #fff5f5; border-color: #fed7d7; color: #c53030; }
+.psy-notice-plain.is-success { background: var(--psy-teal-bg); border-color: var(--psy-teal-mid); color: var(--psy-teal); }
+
+/* ── Level badges (log tab) ──────────────────────────────────────────── */
+.psy-level-badge {
+    background: var(--lvl-color, var(--psy-text-soft));
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ── Dark output panel (scorer tab) ──────────────────────────────────── */
+.psy-dark-panel {
+    background: #1a202c;
+    border-radius: var(--psy-radius);
+    padding: 20px;
+    color: #a0aec0;
+}
+.psy-dark-panel pre { color: #a0aec0; font-size: 12px; margin: 0; overflow: auto; direction: ltr; text-align: left; line-height: 1.7; }
+.psy-dark-panel .psy-dark-panel-error { background: #742a2a; border-radius: 6px; padding: 12px; color: #fc8181; font-size: 12px; }
+
+/* ── JSON modal ──────────────────────────────────────────────────────── */
+.psy-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; }
+.psy-modal-overlay.is-open { display: flex; }
+.psy-modal-box { background: var(--psy-white); border-radius: var(--psy-radius); padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow: auto; position: relative; }
+.psy-modal-close { position: absolute; top: 12px; left: 12px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--psy-text-soft); }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 782px) {
+    .psy-stats-row { gap: 8px; }
+    .psy-stat-card { padding: 12px 14px; }
+    .psy-stat-val { font-size: 24px; }
+    .psy-actions { flex-direction: column; align-items: flex-start; }
+    .psy-link-input { width: 100% !important; }
+    .psy-form-card { padding: 18px 16px; }
+    .psy-mini-stats { gap: 8px; }
+    .psy-mini-stat { padding: 10px 14px; min-width: calc(50% - 4px); }
+}
+
+@media (max-width: 480px) {
+    .psy-stat-card { min-width: calc(50% - 4px); }
+    .psy-stat-val { font-size: 20px; }
+    .psy-form-card { padding: 14px; }
+    .psy-report-body { padding: 18px; }
+    .psy-mini-stat-val { font-size: 18px; }
+    .psy-modal-box { padding: 16px; }
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────
+   جایگزین الگوهای style="" پرتکرار در admin/pages/*.php و admin/class-psy-debug*.php.
+   استایل‌های محاسبه‌شده‌ی داینامیک (رنگ بر اساس داده‌ی بالینی) اینجا نیستند —
+   آن‌ها هنوز به‌صورت inline باقی می‌مانند، چون واقعاً از دیتای زمان اجرا می‌آیند.
+   ─────────────────────────────────────────────────────────────────────── */
+.psy-text-soft   { color: var(--psy-text-soft) !important; }
+.psy-text-mid    { color: var(--psy-text-mid) !important; }
+.psy-line-relaxed { color: var(--psy-text); line-height: 1.5; }
+.psy-text-danger { color: var(--psy-rose) !important; }
+.psy-text-danger-outline { color: var(--psy-rose) !important; border-color: var(--psy-rose) !important; }
+.psy-text-amber  { color: var(--psy-amber) !important; }
+.psy-text-purple { color: #7c3aed !important; }
+.psy-text-bold   { font-weight: 700 !important; }
+.psy-text-center { text-align: center !important; }
+.psy-text-xs     { font-size: 12px !important; }
+
+.psy-badge-purple-solid { background: #7c3aed !important; color: #fff !important; }
+.psy-badge-danger-solid { background: var(--psy-rose) !important; color: #fff !important; }
+
+.psy-mt-6  { margin-top: 6px !important; }
+.psy-mt-16 { margin-top: 16px !important; }
+.psy-mb-6  { margin-bottom: 6px !important; }
+.psy-mr-6  { margin-right: 6px !important; }
+.psy-search-form { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.psy-mb-8  { margin-bottom: 8px !important; }
+.psy-mt-0  { margin-top: 0 !important; }
+.psy-mb-10 { margin-bottom: 10px !important; }
+.psy-mb-16 { margin-bottom: 16px !important; }
+
+.psy-empty-state { text-align: center; padding: 30px; color: var(--psy-text-soft); }
+
+.psy-inline-flex-wrap {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 16px;
+}
+.psy-inline-flex-wrap-sm { display: flex; flex-wrap: wrap; gap: 6px; }
+.psy-push-end { margin-right: auto; font-size: 12px; color: var(--psy-text-soft); }
+
+.psy-field-label-sm {
+    display: block; font-size: 12px; font-weight: 700; color: var(--psy-text-soft); margin-bottom: 6px;
+}
+.psy-min-w-320 { min-width: 320px; }
+.psy-min-w-260 { min-width: 260px; }
+.psy-quick-pick-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── صفحه‌ی مقایسه‌ی زوجین (couples) ─────────────────────────────────── */
+.psy-mb-28 { margin-bottom: 28px !important; }
+.psy-card-title-flush { margin-top: 0; font-size: 16px; color: var(--psy-text); }
+.psy-table-max-680 { max-width: 680px; }
+.psy-table-max-900 { max-width: 900px; }
+.psy-section-title { font-size: 15px; color: var(--psy-text); margin-bottom: 12px; }
+.psy-col-40  { width: 40px; }
+.psy-col-120 { width: 120px; }
+.psy-col-160 { width: 160px; }
+.psy-min-w-340 { min-width: 340px; }
+.psy-min-w-160 { min-width: 160px; }
+.psy-select-invalid { border-color: var(--psy-rose) !important; }
+
+/* دو رنگ ثابت برای تفکیک بصری «مراجع اول» / «مراجع دوم» در کل صفحه‌ی مقایسه */
+.psy-person-1-text  { color: var(--psy-teal) !important; }
+.psy-person-2-text  { color: var(--psy-rose) !important; }
+.psy-person-1-bg    { background: var(--psy-teal-bg); border-color: var(--psy-teal); }
+.psy-person-2-bg    { background: var(--psy-rose-bg); border-color: var(--psy-rose); }
+.psy-person-1-solid { background: var(--psy-teal); }
+.psy-person-2-solid { background: var(--psy-rose); }
+
+.psy-couple-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.psy-couple-person-card { flex: 1; min-width: 220px; border-radius: 12px; padding: 18px; border: 1.5px solid; }
+.psy-couple-person-label { font-size: 13px; color: var(--psy-text-soft); margin-bottom: 4px; }
+.psy-couple-person-name  { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.psy-couple-person-meta  { font-size: 12px; color: var(--psy-text-mid); margin-bottom: 4px; }
+.psy-couple-person-meta-tight { margin-bottom: 8px; }
+.psy-couple-person-badge {
+    color: #fff; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-block;
+}
+
+.psy-flags-box { background: var(--psy-amber-bg); border: 1.5px solid #f6ad55; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+.psy-flags-box h3 { margin: 0 0 12px; font-size: 14px; color: var(--psy-amber); }
+.psy-flags-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.psy-flags-col { flex: 1; min-width: 200px; }
+.psy-flags-col strong { font-size: 12px; }
+.psy-flags-msg { margin: 6px 0 0; font-size: 12px; color: var(--psy-text-mid); line-height: 1.6; }
+
+.psy-panel { background: var(--psy-white); border-radius: 12px; box-shadow: var(--psy-shadow-sm); margin-bottom: 24px; }
+.psy-panel-clip { overflow: hidden; }
+.psy-panel-pad { padding: 24px; }
+.psy-panel-title { margin: 0 0 16px; font-size: 15px; color: var(--psy-text); }
+.psy-panel-title-bordered {
+    margin: 0; padding: 16px 20px; font-size: 15px; color: var(--psy-text); border-bottom: 1px solid var(--psy-border);
+}
+.psy-chart-tall { max-height: 620px; }
+.psy-mb-20 { margin-bottom: 20px !important; }
+
+/* ── جدول مقایسه‌ی کامل قصه‌ها (couples/compare) ─────────────────────── */
+.psy-compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.psy-compare-table thead tr { background: var(--psy-surface); }
+.psy-compare-table th {
+    padding: 10px 16px; font-weight: 600; border-bottom: 1px solid var(--psy-border); color: var(--psy-text-mid);
+}
+.psy-compare-table th.psy-col-right  { text-align: right; }
+.psy-compare-table th.psy-col-center { text-align: center; }
+.psy-col-80 { width: 80px; }
+.psy-compare-table td { padding: 9px 16px; border-bottom: 1px solid var(--psy-border); }
+.psy-compare-table tbody tr:nth-child(even) { background: var(--psy-surface); }
+.psy-compare-table .psy-col-center { text-align: center; }
+.psy-compare-table .psy-cell-bold  { font-weight: 700; }
+
+.psy-story-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-left: 6px; vertical-align: middle;
+    background: var(--psy-c, #718096);
+}
+.psy-top-badge {
+    font-size: 10px; border-radius: 4px; padding: 1px 5px; margin-right: 4px;
+}
+.psy-top-badge.psy-person-1-bg { color: var(--psy-teal); }
+.psy-top-badge.psy-person-2-bg { color: var(--psy-rose); }
+
+.psy-diff-good { color: var(--psy-teal) !important; }
+.psy-diff-mid  { color: var(--psy-amber) !important; }
+.psy-diff-high { color: #9b2c2c !important; }
+
+.psy-compare-bar-row { display: flex; align-items: center; gap: 4px; }
+.psy-compare-bar-track { border-radius: 4px; height: 8px; flex: 1; overflow: hidden; }
+.psy-compare-bar-fill  { height: 100%; border-radius: 4px; }
+
+.psy-summary-box { border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1.5px solid; }
+.psy-summary-box.is-aligned    { background: var(--psy-teal-bg);  border-color: var(--psy-teal); }
+.psy-summary-box.is-diverging  { background: var(--psy-amber-bg); border-color: #f6ad55; }
+.psy-summary-box h3 { margin: 0 0 10px; font-size: 14px; }
+.psy-summary-box.is-aligned h3   { color: var(--psy-teal); }
+.psy-summary-box.is-diverging h3 { color: var(--psy-amber); }
+.psy-summary-box p { margin: 0 0 8px; font-size: 13px; color: var(--psy-text-mid); line-height: 1.7; }
+.psy-summary-conflict-label { margin: 8px 0 4px; font-size: 12px; color: var(--psy-amber); font-weight: 700; }
+.psy-conflict-chip {
+    display: inline-block; background: var(--psy-white); border: 1px solid #f6ad55; border-radius: 6px;
+    padding: 3px 10px; font-size: 12px; margin: 3px 3px 0 0; color: #9b2c2c;
+}
+
+/* ── ابزار داخلی توسعه‌دهنده: Debug Tracker / Debug Log ─────────────────── */
+.psy-h1-sub { font-size: 13px; font-weight: normal; color: var(--psy-text-soft); }
+.psy-progress-panel { flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center; }
+.psy-progress-caption { font-size: 12px; color: var(--psy-text-mid); margin-bottom: 4px; }
+.psy-inline-form { display: inline; }
+.psy-editing-outline { outline: 2px solid var(--psy-teal); }
+.psy-group-title {
+    border-bottom: 2px solid var(--psy-teal); padding-bottom: 6px; color: var(--psy-teal); margin-top: 24px;
+}
+.psy-col-40pct { width: 40%; }
+.psy-col-20pct { width: 20%; }
+.psy-col-15pct { width: 15%; }
+.psy-col-10pct { width: 10%; }
+.psy-file-cell { font-family: monospace; font-size: 12px; word-break: break-all; }
+.psy-help-icon { cursor: help; color: var(--psy-teal); }
+.psy-file-changed-note { color: #721c24; }
+.psy-td-soft { font-size: 12px; color: var(--psy-text-mid); }
+.psy-sticky-panel { position: sticky; top: 32px; }
+.psy-file-path-box {
+    display: block; background: var(--psy-surface); padding: 8px; border-radius: 4px;
+    font-size: 11px; margin-bottom: 16px; word-break: break-all;
+}
+.psy-error-box-tight { text-align: right; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; }
+.psy-field-label-block { display: block; font-weight: 700; margin-bottom: 6px; }
+.psy-radio-stack { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.psy-radio-option {
+    display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; border: 1px solid #ddd;
+}
+.psy-textarea-plain {
+    width: 100%; box-sizing: border-box; font-family: Tahoma, sans-serif; font-size: 12px;
+    border: 1px solid #ddd; border-radius: 4px; padding: 8px; direction: rtl;
+}
+.psy-hint-muted { font-size: 11px; color: #999; margin: 8px 0; }
+.psy-btn-row { display: flex; gap: 8px; margin-top: 12px; }
+
+/* ── Debug panel (تب‌های لاگ/تستر/سیستم/دیتابیس) ─────────────────────── */
+.psy-nav-tabs-mb { margin-bottom: 20px; }
+.psy-filter-form {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.psy-filter-form-tight { display: flex; gap: 8px; margin-bottom: 16px; }
+.psy-input-h32 { height: 32px; border-radius: 4px; border: 1px solid #ccd0d4; padding: 0 8px; }
+.psy-input-h30 { height: 30px; border-radius: 4px; border: 1px solid #ccd0d4; padding: 0 8px; }
+.psy-input-w180 { width: 180px; }
+.psy-input-flex-300 { flex: 1; max-width: 300px; }
+.psy-btn-danger-outline { color: var(--psy-rose) !important; border-color: #fc8181 !important; }
+.psy-empty-panel {
+    background: var(--psy-surface); border: 1px solid var(--psy-border); border-radius: 8px;
+}
+.psy-debug-table { width: 100%; border-collapse: collapse; }
+.psy-debug-table.is-sm { font-size: 12px; }
+.psy-debug-table.is-md { font-size: 13px; }
+.psy-va-top { vertical-align: top; }
+.psy-va-top-mono { vertical-align: top; font-family: monospace; color: #7c3aed; font-size: 11px; }
+.psy-va-top-relaxed { vertical-align: top; color: var(--psy-text); line-height: 1.6; }
+.psy-va-top-center { vertical-align: top; text-align: center; }
+.psy-va-top-soft { vertical-align: top; color: var(--psy-text-soft); white-space: nowrap; }
+.psy-json-link { cursor: pointer; color: var(--psy-teal); text-decoration: underline; font-size: 11px; }
+.psy-panel-title-sm { margin: 0 0 12px; font-size: 14px; color: var(--psy-text); }
+.psy-panel-title-flush { margin: 0; font-size: 14px; color: var(--psy-text); }
+.psy-json-output {
+    background: #1a202c; color: #a0aec0; padding: 16px; border-radius: 6px; font-size: 12px;
+    overflow: auto; margin: 0; direction: ltr; text-align: left;
+}
+.psy-select-block {
+    width: 100%; height: 34px; border-radius: 4px; border: 1px solid #ccd0d4; padding: 0 8px; margin-bottom: 10px;
+}
+.psy-select-sm-block {
+    width: 100%; height: 28px; border-radius: 4px; border: 1px solid #ccd0d4; font-size: 11px;
+}
+.psy-hint-block { font-size: 12px; color: var(--psy-text-soft); line-height: 1.7; }
+.psy-row-between {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.psy-row-between-tight { margin-bottom: 12px; }
+.psy-row-gap-8 { display: flex; gap: 8px; }
+.psy-scroll-panel { max-height: 400px; overflow-y: auto; padding-left: 4px; }
+.psy-col-30 { width: 30px; }
+.psy-col-60 { width: 60px; }
+.psy-col-130 { width: 130px; }
+.psy-td-pad { padding: 6px 8px; }
+.psy-mt-12 { margin-top: 12px !important; }
+.psy-result-label { color: var(--psy-teal-mid); font-size: 13px; font-weight: 700; }
+.psy-result-meta  { color: var(--psy-text-soft); font-size: 11px; }
+.psy-diag-row td:first-child { color: var(--psy-text-mid); }
+.psy-diag-row.is-fail { background: #fff5f5; }
+.psy-diag-row.is-fail td:last-child { color: #c53030; font-weight: 700; }
+.psy-diag-row.is-ok td:last-child { color: var(--psy-teal); font-weight: 700; }
+.psy-diag-ok   { color: var(--psy-teal) !important; }
+.psy-diag-fail { color: #c53030 !important; }
+.psy-quick-actions-title { font-weight: 700; color: var(--psy-text); font-size: 14px; margin-bottom: 16px; }
+.psy-btn-block { width: 100%; }
+.psy-notice-tight-success { text-align: right; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; }
+.psy-notice-tight-warning { text-align: right; padding: 12px 14px; font-size: 12px; }
+.psy-stat-card-dim { opacity: .5; }
+.psy-stat-card-plain { padding: 16px 20px; min-width: 130px; text-align: center; }
+.psy-stat-val-teal { font-size: 22px; font-weight: 700; color: var(--psy-teal); }
+.psy-stat-lbl-mid { font-size: 12px; color: var(--psy-text-mid); margin-top: 2px; }
+.psy-stat-table-name { font-size: 10px; color: #a0aec0; font-family: monospace; margin-top: 4px; }
+.psy-stat-kb { font-size: 10px; color: var(--psy-text-soft); margin-top: 2px; }
+.psy-card-header-plain { font-size: 13px; color: var(--psy-text-mid); font-weight: normal; }
+.psy-th-center { text-align: center; }
+.psy-status-chip { color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 11px; }
+.psy-attempt-ok   { color: var(--psy-teal) !important; font-weight: 700; }
+.psy-attempt-none { color: var(--psy-text-soft) !important; font-weight: 700; }
+.psy-mono { font-family: monospace; }
+.psy-text-strong { color: var(--psy-text) !important; }
+.psy-row-white { background: var(--psy-white); }
+.psy-row-fail  { background: #fff5f5; }
+.psy-grid-280 { grid-template-columns: 280px 1fr; }
+.psy-pill-input-sm {
+    font-size: 12px !important; padding: 4px 10px !important; height: auto !important; line-height: 1.6 !important;
+}
+
+.psy-lead { color: var(--psy-text-soft); margin-bottom: 24px; }
+.psy-required { color: var(--psy-rose); font-weight: 700; }
+.psy-mt-20 { margin-top: 20px !important; }
+.psy-mt-24 { margin-top: 24px !important; }
+.psy-card-title { margin-bottom: 16px; font-size: 1.1rem; }
+.psy-card-title-dark { margin: 20px 0 4px; color: var(--psy-text); }
+.psy-list-loose { line-height: 2.2; color: var(--psy-text-mid); padding-right: 20px; }
+.psy-list-disc { list-style: disc; padding-right: 20px; }
+.psy-textarea-mono {
+    width: 100%; font-family: monospace; font-size: 13px; direction: rtl;
+    border-radius: 8px; border: 2px solid var(--psy-border); padding: 12px; resize: vertical;
+}
+.psy-field-row { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+
+.psy-card-warn {
+    margin-top: 16px; background: var(--psy-amber-bg); border-right: 4px solid #d69e2e;
+}
+.psy-card-warn h3 { margin-bottom: 10px; font-size: .95rem; color: #744210; }
+.psy-card-warn p  { font-size: .9rem; color: #744210; line-height: 1.8; }
+
+/* ── ویجت درگ‌ودراپ «آزمون‌های پرکاربرد» در صفحه‌ی تنظیمات ─────────────── */
+.psy-th-top { vertical-align: top; padding-top: 16px; }
+.psy-mb-12  { margin-bottom: 12px !important; }
+.psy-w-100  { width: 100px; }
+
+.psy-popular-builder { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.psy-popular-col { flex: 1; min-width: 280px; }
+.psy-popular-col-title { font-weight: 600; margin-bottom: 8px; color: var(--psy-text); }
+
+.psy-popular-list {
+    list-style: none; margin: 0; padding: 0; min-height: 60px;
+    border: 2px dashed #c3c4c7; border-radius: 8px; background: var(--psy-surface);
+}
+.psy-popular-list:empty::after {
+    content: 'هیچ آزمونی انتخاب نشده — از ستون راست اضافه کنید';
+    display: block; padding: 16px; color: var(--psy-text-soft); font-size: 13px; text-align: center;
+}
+.psy-popular-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin: 4px;
+    background: var(--psy-white); border: 1px solid var(--psy-border); border-radius: 6px; cursor: grab;
+}
+.psy-popular-item-handle { color: var(--psy-text-soft); font-size: 16px; }
+.psy-popular-item-name   { flex: 1; font-size: 13px; }
+.psy-popular-item-remove {
+    background: none; border: none; color: var(--psy-rose); cursor: pointer; font-size: 16px; padding: 0 4px;
+}
+
+.psy-pool-search {
+    width: 100%; margin-bottom: 8px; padding: 6px 10px;
+    border: 1px solid var(--psy-border); border-radius: 6px; font-size: 13px;
+}
+.psy-pool-list {
+    list-style: none; margin: 0; padding: 0; max-height: 320px; overflow-y: auto;
+    border: 1px solid var(--psy-border); border-radius: 8px; background: var(--psy-white);
+}
+.psy-pool-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-bottom: 1px solid var(--psy-surface); font-size: 13px; cursor: pointer;
+}
+.psy-pool-item.psy-pool-added { opacity: .4; cursor: default; }
+.psy-pool-item-name { flex: 1; }
+.psy-pool-added-label { color: var(--psy-text-soft); font-size: 11px; }
+.psy-pool-add-btn {
+    background: var(--psy-teal) !important; color: #fff !important; border: none !important;
+    border-radius: 6px !important; padding: 3px 10px !important; cursor: pointer; font-size: 12px !important;
+}
+.psy-pool-add-btn:hover { background: var(--psy-teal-light) !important; }
+
+.sortable-ghost { opacity: .4; background: var(--psy-teal-bg) !important; }
+
+/* ── تُن‌های کیت برای کامپوننت‌های ادمین (فاز ۱۴) ─────────────────────── */
+.psy-tone--success { --psy-c: #276749; --psy-bg: #f0fff4; }
+.psy-tone--warning { --psy-c: #b7791f; --psy-bg: #fffff0; }
+.psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
+.psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
+.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
+.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
+.psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
+
+/* کامپوننت‌های ادمین از این متغیرها تغذیه می‌شوند */
+.psy-tone--success,
+.psy-tone--warning,
+.psy-tone--accent,
+.psy-tone--danger,
+.psy-tone--info,
+.psy-tone--purple,
+.psy-tone--neutral {
+    --stat-color: var(--psy-c);
+    --stat-bg: var(--psy-bg);
+    --lvl-color: var(--psy-c);
+}
+.psy-row-tint { background: var(--psy-bg, var(--psy-white)); }
+.psy-bg-tint  { background: var(--psy-bg, transparent); }
+.psy-chip-tone { background: var(--psy-c, #718096); color: #fff; }
+.psy-grid-side--edit { grid-template-columns: 1fr 380px; }
+@media (max-width: 900px) { .psy-grid-side--edit { grid-template-columns: 1fr !important; } }
+.psy-details-summary { cursor: pointer; font-weight: 700; font-size: 14px; }
+.psy-row-changed { background: var(--psy-amber-bg); }
+
+/* عرض‌های گام ۵٪ برای نوارهای ادمین */
+.psy-w--0 { inline-size: 0%; }
+.psy-w--5 { inline-size: 5%; }
+.psy-w--10 { inline-size: 10%; }
+.psy-w--15 { inline-size: 15%; }
+.psy-w--20 { inline-size: 20%; }
+.psy-w--25 { inline-size: 25%; }
+.psy-w--30 { inline-size: 30%; }
+.psy-w--35 { inline-size: 35%; }
+.psy-w--40 { inline-size: 40%; }
+.psy-w--45 { inline-size: 45%; }
+.psy-w--50 { inline-size: 50%; }
+.psy-w--55 { inline-size: 55%; }
+.psy-w--60 { inline-size: 60%; }
+.psy-w--65 { inline-size: 65%; }
+.psy-w--70 { inline-size: 70%; }
+.psy-w--75 { inline-size: 75%; }
+.psy-w--80 { inline-size: 80%; }
+.psy-w--85 { inline-size: 85%; }
+.psy-w--90 { inline-size: 90%; }
+.psy-w--95 { inline-size: 95%; }
+.psy-w--100 { inline-size: 100%; }

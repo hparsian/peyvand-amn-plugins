@@ -1,0 +1,143 @@
+/* ============================================================
+   پیوند امن — آزمون‌های روان‌شناختی — admin-skin.css (فاز ۱۲ / گام ۴)
+   پوستهٔ برند پیشخوان آزمون‌ها. Scope: .psy-admin
+   admin.css متغیرهای --psy-* را روی :root تعریف می‌کند و مقدارشان همان‌جا
+   resolve می‌شود؛ پس اینجا دوباره با پالت برند مقداردهی می‌شوند تا با
+   پنل پرونده‌ها یک زبان بصری داشته باشند.
+   ============================================================ */
+
+.psy-admin {
+    --pivand-primary:        #51483F;
+    --pivand-primary-dark:   #3F3830;
+    --pivand-primary-light:  #C8B48A;
+    --pivand-primary-bg:     #EFE6D3;
+    --pivand-primary-mid:    #D9C9A9;
+    --pivand-ink:            #51483F;
+    --pivand-ink-mid:        #6B5F52;
+    --pivand-ink-soft:       #857A6C;
+    --pivand-border:         #DDD5C8;
+    --pivand-border-soft:    #EFE9DE;
+    --pivand-surface:        #FAF7F1;
+    --pivand-white:          #FFFFFF;
+    --pivand-danger:         #9B3A2E;
+    --pivand-danger-bg:      #F7E7E3;
+    --pivand-warning:        #8A5A18;
+    --pivand-warning-bg:     #F8EEDC;
+    --pivand-success:        #3F6B4F;
+    --pivand-success-bg:     #E8F1EB;
+    --pivand-shadow-sm:      0 1px 2px rgba(81, 72, 63, .08);
+    --pivand-shadow:         0 6px 20px rgba(81, 72, 63, .10), 0 1px 3px rgba(81, 72, 63, .06);
+
+    --psy-teal:        #51483F;
+    --psy-teal-light:  #C8B48A;
+    --psy-teal-bg:     #EFE6D3;
+    --psy-teal-mid:    #D9C9A9;
+    --psy-rose:        #9B3A2E;
+    --psy-rose-bg:     #F7E7E3;
+    --psy-amber:       #8A5A18;
+    --psy-amber-bg:    #F8EEDC;
+    --psy-text:        #51483F;
+    --psy-text-mid:    #6B5F52;
+    --psy-text-soft:   #857A6C;
+    --psy-border:      #DDD5C8;
+    --psy-surface:     #FAF7F1;
+    --psy-white:       #FFFFFF;
+}
+
+.psy-admin h1 {
+    color: #51483F !important;
+}
+
+.psy-admin h1 + a.page-title-action {
+    background: #51483F;
+    color: #F4F0E8 !important;
+    box-shadow: 0 4px 12px rgba(81, 72, 63, .18);
+}
+
+.psy-admin h1 + a.page-title-action:hover {
+    background: #3F3830;
+    box-shadow: 0 6px 16px rgba(81, 72, 63, .24);
+    color: #F4F0E8 !important;
+}
+
+/* تب‌های افقی: آیتم فعال قهوه‌ای، آیتم‌های دیگر روی کرم */
+.psy-admin .psy-pill-nav {
+    background: #EFE9DE;
+    border-radius: 14px;
+}
+
+.psy-admin .psy-pill-nav a:hover,
+.psy-admin .psy-pill-nav button:hover {
+    color: #51483F;
+    background: rgba(200, 180, 138, .28);
+}
+
+.psy-admin .psy-pill-nav a.current,
+.psy-admin .psy-pill-nav button.current,
+.psy-admin .psy-pill-nav a.active,
+.psy-admin .psy-pill-nav button.active {
+    background: #51483F;
+    color: #F4F0E8 !important;
+    box-shadow: none;
+}
+
+/* کارت‌های آماری: نوار سمت بالا با طلایی برند */
+.psy-admin .psy-stat-card {
+    border-top-color: #C8B48A;
+}
+
+.psy-admin .psy-stat-val {
+    color: #51483F;
+}
+
+.psy-admin .psy-table thead th {
+    background: #FAF7F1;
+    color: #6B5F52;
+}
+
+.psy-admin .psy-table tbody tr:hover td {
+    background: #FAF7F1 !important;
+}
+
+.psy-admin .psy-badge-done {
+    background: #E8F1EB;
+    color: #3F6B4F;
+    border-color: rgba(63, 107, 79, .28);
+}
+
+.psy-admin .psy-badge-pending {
+    background: #F8EEDC;
+    color: #8A5A18;
+    border-color: rgba(200, 180, 138, .55);
+}
+
+.psy-admin .psy-badge-revoked {
+    background: #F7E7E3;
+    color: #9B3A2E;
+    border-color: rgba(155, 58, 46, .25);
+}
+
+.psy-admin .button.button-primary {
+    background: #51483F !important;
+    border-color: #51483F !important;
+    color: #F4F0E8 !important;
+    box-shadow: none;
+}
+
+.psy-admin .button.button-primary:hover {
+    background: #3F3830 !important;
+    border-color: #3F3830 !important;
+}
+
+.psy-admin .psy-form-card {
+    border-color: #DDD5C8;
+}
+
+.psy-admin .psy-success-box {
+    background: #E8F1EB;
+    border-color: rgba(63, 107, 79, .25);
+}
+
+.psy-admin .psy-success-box h2 {
+    color: #3F6B4F;
+}

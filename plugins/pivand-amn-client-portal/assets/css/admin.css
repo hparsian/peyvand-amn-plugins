@@ -1,0 +1,225 @@
+/* ============================================================
+   پیوند امن — پنل مدیریت زوج‌درمان — admin.css v1.0.0
+   بازطراحی کامل ظاهری پنل مدیریت. Scope: .zdp-admin
+   فقط حالت روشن — بدون dark mode.
+   ============================================================ */
+
+.zdp-admin {
+    /* از این نسخه: از توکن‌های مشترک اکوسیستم (--pivand-*) می‌خواند تا با
+       بقیه‌ی داشبوردهای ادمین یکپارچه باشد. */
+    --zda-teal:       var(--pivand-primary, #0f766e);
+    --zda-teal-light: var(--pivand-primary-light, #14b8a6);
+    --zda-teal-bg:    var(--pivand-primary-bg, #f0fdfa);
+    --zda-ink:        var(--pivand-ink, #1e293b);
+    --zda-mid:        var(--pivand-ink-mid, #475569);
+    --zda-soft:       var(--pivand-ink-soft, #64748b);
+    --zda-border:     var(--pivand-border, #e2e8f0);
+    --zda-surface:    var(--pivand-surface, #f8fafc);
+    --zda-radius:     var(--pivand-radius, 12px);
+    --zda-shadow:     var(--pivand-shadow, 0 4px 18px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04));
+    --zda-transition: var(--pivand-transition, 0.2s ease);
+    /* رنگ‌های وضعیت — دقیقاً همان مقادیرِ --zdp-green/red/amber که در
+       panel.css برای همین منظور تعریف شده‌اند (نگاه کن به بخش «بج‌های
+       وضعیت» پایین). عمداً یکی نگه داشته شدند تا رنگ «تایید شده» در پنل
+       مراجع و پیشخوان مدیریت یک چیز به نظر برسد، نه دو برند مختلف. */
+    --zda-success:    var(--pivand-success, #16a34a);
+    --zda-danger:     var(--pivand-danger, #dc2626);
+    --zda-warning:    var(--pivand-warning, #d97706);
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    animation: zda-fade-up 0.4s cubic-bezier(.22,.9,.35,1) both;
+}
+@keyframes zda-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zdp-admin, .zdp-admin * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.zdp-admin h1 { font-weight: 800; color: var(--zda-ink); }
+.zdp-admin h2 { font-weight: 700; color: var(--zda-ink); }
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.zdp-admin .nav-tab-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: none;
+    padding: 5px;
+    background: var(--zda-surface);
+    border-radius: 999px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 16px 0 22px;
+}
+.zdp-admin .nav-tab {
+    border: none;
+    background: none;
+    color: var(--zda-soft);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    margin: 0;
+}
+.zdp-admin .nav-tab:hover { color: var(--zda-teal); background: none; }
+.zdp-admin .nav-tab-active,
+.zdp-admin .nav-tab-active:hover {
+    background: linear-gradient(135deg, var(--zda-teal-light), var(--zda-teal));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(15,118,110,0.28);
+}
+
+/* ── Cards / boxes ────────────────────────────────────────── */
+.zdp-admin .card {
+    background: #fff;
+    border: 1px solid var(--zda-border);
+    border-radius: var(--zda-radius);
+    box-shadow: var(--zda-shadow);
+    padding: 18px 20px !important;
+    transition: box-shadow 0.2s ease;
+}
+.zdp-admin .card:hover { box-shadow: 0 8px 26px rgba(15,23,42,0.09); }
+
+/* ── Tables ───────────────────────────────────────────────── */
+.zdp-admin table.widefat {
+    border: 1px solid var(--zda-border);
+    border-radius: var(--zda-radius);
+    overflow: hidden;
+    box-shadow: var(--zda-shadow);
+    border-spacing: 0;
+}
+.zdp-admin table.widefat thead th {
+    background: var(--zda-surface);
+    color: var(--zda-mid);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.zdp-admin table.widefat.striped tbody tr:nth-child(odd) { background: var(--zda-surface); }
+.zdp-admin table.widefat tbody tr { transition: background 0.15s ease; }
+.zdp-admin table.widefat tbody tr:hover { background: var(--zda-teal-bg); }
+.zdp-admin table.widefat td, .zdp-admin table.widefat th { padding: 12px 14px; }
+
+/* ── Form table ───────────────────────────────────────────── */
+.zdp-admin table.form-table th { font-weight: 700; color: var(--zda-mid); }
+.zdp-admin table.form-table input.regular-text,
+.zdp-admin table.form-table input[type="text"],
+.zdp-admin table.form-table select,
+.zdp-admin table.form-table textarea {
+    border-radius: 8px;
+    border: 1.5px solid var(--zda-border);
+    padding: 9px 12px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.zdp-admin table.form-table input:focus,
+.zdp-admin table.form-table select:focus,
+.zdp-admin table.form-table textarea:focus {
+    border-color: var(--zda-teal-light);
+    box-shadow: 0 0 0 3px rgba(20,184,166,0.15);
+    outline: none;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.zdp-admin .button {
+    border-radius: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.zdp-admin .button:hover { transform: translateY(-1px); }
+.zdp-admin .button-primary {
+    background: linear-gradient(135deg, var(--zda-teal-light), var(--zda-teal)) !important;
+    border-color: var(--zda-teal) !important;
+    box-shadow: 0 3px 10px rgba(15,118,110,0.25);
+}
+.zdp-admin .button-primary:hover { box-shadow: 0 6px 16px rgba(15,118,110,0.32); }
+
+/* ── تب نظرسنجی: دکمه‌ی کپی برای اینستاگرام ──────────────────── */
+.zdp-ig-copy-btn { margin-inline-start: 6px; }
+
+/* ── بج‌های وضعیت ──────────────────────────────────────────────
+   رفع خلأ بصری: تا قبل از این نسخه، وضعیت نوبت/پیام/نظرسنجی در
+   پیشخوان فقط متن ساده و بی‌رنگ بود، در حالی که پنل مراجع سال‌هاست
+   همین وضعیت‌ها را با بج رنگی (panel.css → .zdp-status-*) نشان
+   می‌دهد. اینجا همان قرارداد اسلاگ‌سازی (فاصله → خط‌تیره، از طریق
+   Admin::status_badge()) با همان دسته‌بندی رنگی تکرار شده، به‌علاوه‌ی
+   دو وضعیتِ پیام (خوانده‌نشده/پاسخ‌داده‌شده) که مخصوص پیشخوان است. */
+.zdp-admin .zdp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    /* پیش‌فرض خنثی: هر وضعیتی که در دسته‌بندی‌های رنگی پایین صراحتاً
+       ذکر نشده باشد (مثلاً یک وضعیت سفارشیِ جدید که بعداً اضافه شود)،
+       خاکستری خنثی می‌گیرد، نه بی‌رنگ کامل. چون قوانین رنگیِ پایین با
+       همان specificity ولی بعداً در فایل تعریف شده‌اند، طبق cascade
+       عادی روی این پیش‌فرض برنده می‌شوند. */
+    color: var(--zda-mid);
+    background: var(--zda-surface);
+}
+.zdp-admin .zdp-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.zdp-admin .zdp-badge-تایید-شده,
+.zdp-admin .zdp-badge-فعال,
+.zdp-admin .zdp-badge-انجام-شده,
+.zdp-admin .zdp-badge-پاسخ-داده-شده {
+    color: var(--zda-success);
+    background: #f0fdf4;
+}
+.zdp-admin .zdp-badge-ناموفق,
+.zdp-admin .zdp-badge-لغو-شده,
+.zdp-admin .zdp-badge-عدم-حضور {
+    color: var(--zda-danger);
+    background: #fef2f2;
+}
+.zdp-admin .zdp-badge-در-انتظار-پرداخت,
+.zdp-admin .zdp-badge-در-انتظار-تایید-واریز,
+.zdp-admin .zdp-badge-در-انتظار-بررسی,
+.zdp-admin .zdp-badge-خوانده-نشده {
+    color: var(--zda-warning);
+    background: #fffbeb;
+}
+
+/* ── کارت پیام‌ها ─────────────────────────────────────────────── */
+.zdp-admin .zdp-message-card { max-width: 100%; margin-bottom: 12px; }
+.zdp-admin .zdp-message-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.zdp-admin .zdp-message-card-reply {
+    color: var(--zda-teal);
+    background: var(--zda-teal-bg);
+    border-right: 3px solid var(--zda-teal);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+/* ── Notices ──────────────────────────────────────────────── */
+.zdp-admin .notice { border-radius: 10px; box-shadow: var(--zda-shadow); }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 782px) {
+    .zdp-admin table.widefat,
+    .zdp-admin table.widefat thead {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .zdp-admin .nav-tab-wrapper { border-radius: var(--zda-radius); }
+    .zdp-admin .nav-tab { padding: 8px 14px; font-size: 12px; }
+    .zdp-admin .card { padding: 14px !important; }
+}
