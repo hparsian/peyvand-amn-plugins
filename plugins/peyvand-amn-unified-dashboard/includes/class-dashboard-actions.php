@@ -24,10 +24,19 @@ final class PAS_Dashboard_Actions {
 	}
 
 	/**
+	 * شناسهٔ عمل‌ها نقطه‌دار است (مثل `updates.refresh` و `case.save`)؛
+	 * `sanitize_key()` نقطه را پاک می‌کرد و فرم‌های Action Bus بدون فیلد
+	 * مخفی رندر می‌شدند (صفحهٔ سفید روی admin-post.php).
+	 */
+	private static function action_id( $id ) {
+		return (string) preg_replace( '/[^a-z0-9._-]/', '', strtolower( (string) $id ) );
+	}
+
+	/**
 	 * @param array{label:string,cap:string,nonce:string,handler:callable,audit:string,object:string} $config
 	 */
 	public static function register( $id, array $config ) {
-		$id = sanitize_key( (string) $id );
+		$id = self::action_id( $id );
 
 		if ( $id === '' || empty( $config['handler'] ) ) {
 			return;
@@ -47,11 +56,15 @@ final class PAS_Dashboard_Actions {
 	}
 
 	public static function get( $id ) {
+		$id = self::action_id( $id );
+
 		return isset( self::$actions[ $id ] ) ? self::$actions[ $id ] : null;
 	}
 
 	/** آدرس admin-post برای یک عمل */
 	public static function url( $id, array $args = array() ) {
+		$id = self::action_id( $id );
+
 		return add_query_arg(
 			array_merge(
 				array(
@@ -86,7 +99,7 @@ final class PAS_Dashboard_Actions {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification -- The nonce for this action id is verified a few lines below.
-		$id     = isset( $_POST['pas_action'] ) ? sanitize_key( wp_unslash( $_POST['pas_action'] ) ) : '';
+		$id     = isset( $_POST['pas_action'] ) ? self::action_id( wp_unslash( $_POST['pas_action'] ) ) : '';
 		$config = self::get( $id );
 
 		if ( ! $config ) {

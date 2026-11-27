@@ -1165,6 +1165,7 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
 @media (max-width: 782px) {
     /* نوار مدیریت وردپرس در این عرض ۴۶px است؛ چسبیدن نوار بالا به ۳۲px
        باعث می‌شد زیر نوار مدیریت پنهان شود. */
+    body.pas-dashboard-page,
     .pvn-shell {
         --pvn-adminbar-h: 46px;
     }
@@ -1251,82 +1252,102 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
 /* ═══════════════════════════════════════════════════════════
    ۲.۱۱ — چیدمان «یک ناحیهٔ اسکرول»
    ═══════════════════════════════════════════════════════════
-   پیش از این، اسکرول ستون محتوا همان اسکرول کل صفحهٔ وردپرس
-   بود: نوار بالا و ناوبری همراه محتوا جابه‌جا می‌شدند و کاربر
-   جای خودش را گم می‌کرد. اکنون فقط ناحیهٔ کاری اسکرول دارد و
-   ستون‌های کناری/بالا در جای خود می‌مانند.
-   این قواعد فقط روی صفحهٔ داشبورد (body.pas-dashboard-page)
-   عمل می‌کنند؛ بقیهٔ پیشخوان وردپرس دست‌نخورده است. */
+   پیش از این، متغیر --pvn-adminbar-h فقط روی .pvn-shell تعریف شده بود
+   (نه روی #wpbody-content)، پس calc(100dvh - var(--pvn-adminbar-h)) نامعتبر
+   می‌شد و با overflow: hidden روی body و #wpbody-content اسکرول کل داشبورد
+   قفل می‌شد. اکنون متغیر روی body تعریف می‌شود و قفل اسکرول فقط در دسکتاپ
+   (>= 861px) با زنجیرهٔ کامل min-block-size: 0 اعمال می‌گردد تا در موبایل
+   اسکرول طبیعی صفحه هم از کار نیفتد. */
 
 body.pas-dashboard-page {
-    overflow: hidden;
-}
-
-/*
- * محتوا یک ستون flex می‌شود: اطلاعیه‌های وردپرس (اگر باشند) بالای صفحه
- * می‌مانند و پوسته بقیهٔ ارتفاع را می‌گیرد؛ پس هیچ‌چیز از پایین صفحه
- * بریده نمی‌شود و فقط ناحیهٔ کاری اسکرول دارد.
- */
-body.pas-dashboard-page #wpbody-content {
-    display: flex;
-    flex-direction: column;
-    block-size: calc(100dvh - var(--pvn-adminbar-h));
-    min-block-size: 0;
-    padding-block-end: 0;
-    overflow: hidden;
-}
-
-body.pas-dashboard-page #wpbody-content > .notice,
-body.pas-dashboard-page #wpbody-content > .updated,
-body.pas-dashboard-page #wpbody-content > .error,
-body.pas-dashboard-page #wpbody-content > .update-nag {
-    flex: 0 0 auto;
-    margin-inline: clamp(16px, 2.4vw, 32px);
-}
-
-body.pas-dashboard-page #wpfooter {
-    display: none;
-}
-
-.pvn-shell {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    block-size: auto;
-    min-block-size: 0;
-    margin-block: 0;
-    overflow: hidden;
-}
-
-.pvn-frame {
-    flex: 1 1 auto;
-    block-size: auto;
-    min-block-size: 0;
-}
-
-.pvn-body {
-    /* یک ردیف که دقیقاً ارتفاع باقی‌مانده را پر می‌کند؛ بدون این، ارتفاع ردیف
-       با محتوا رشد می‌کند و ستون محتوا هیچ‌وقت اسکرول داخلی نمی‌شود. */
-    grid-template-rows: minmax(0, 1fr);
-    min-block-size: 0;
-    align-items: stretch;
-}
-
-.pvn-main {
-    min-block-size: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    --pvn-adminbar-h: 32px;
 }
 
 @media (min-width: 861px) {
+    body.pas-dashboard-page {
+        overflow: hidden;
+    }
+
+    body.pas-dashboard-page #wpbody-content {
+        display: flex;
+        flex-direction: column;
+        float: none;
+        block-size: calc(100dvh - var(--pvn-adminbar-h));
+        max-block-size: calc(100dvh - var(--pvn-adminbar-h));
+        min-block-size: 0;
+        padding-block-end: 0;
+        overflow: hidden;
+    }
+
+    body.pas-dashboard-page #wpbody-content > .notice,
+    body.pas-dashboard-page #wpbody-content > .updated,
+    body.pas-dashboard-page #wpbody-content > .error,
+    body.pas-dashboard-page #wpbody-content > .update-nag {
+        flex: 0 0 auto;
+        margin-inline: clamp(16px, 2.4vw, 32px);
+    }
+
+    body.pas-dashboard-page #wpfooter {
+        display: none;
+    }
+
+    .pvn-shell {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        block-size: auto;
+        min-block-size: 0;
+        margin-block: 0;
+        overflow: hidden;
+    }
+
+    .pvn-frame {
+        flex: 1 1 auto;
+        block-size: auto;
+        min-block-size: 0;
+        overflow: hidden;
+    }
+
+    .pvn-body {
+        grid-template-rows: minmax(0, 1fr);
+        min-block-size: 0;
+        align-items: stretch;
+        overflow: hidden;
+    }
+
+    .pvn-main {
+        min-block-size: 0;
+        block-size: 100%;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+    }
+
     /* ناوبری داخل قاب می‌ماند و فقط خودش در صورت نیاز اسکرول می‌شود. */
     .pvn-nav {
         position: relative;
         inset-block-start: auto;
         align-self: stretch;
         block-size: auto;
+        min-block-size: 0;
         overflow-y: auto;
+    }
+}
+
+@media (max-width: 860px) {
+    body.pas-dashboard-page,
+    body.pas-dashboard-page #wpbody-content {
+        overflow-y: visible;
+        block-size: auto;
+    }
+
+    .pvn-shell,
+    .pvn-frame,
+    .pvn-body,
+    .pvn-main {
+        block-size: auto;
+        min-block-size: 0;
+        overflow-y: visible;
     }
 }
 

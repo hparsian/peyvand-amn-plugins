@@ -682,6 +682,7 @@ final class PAS_Dashboard_Updater {
 	 */
 	public static function refresh() {
 		self::clear_cache();
+		delete_site_transient( 'update_plugins' );
 		$status = self::status();
 
 		if ( $status['error'] !== '' ) {
