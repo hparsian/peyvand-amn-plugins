@@ -1,5 +1,10 @@
 # تغییرات Gemini Site Operator
 
+## 1.6.4
+
+### رفع خطای ۴۰۰ `MINIMAL` روی مدل `gemini-3.8-flash`
+- **تطبیق `thinkingLevel` در `GSO_Gemini`:** سطح `MINIMAL` فقط برای مدل‌های `flash-lite` (مانند `gemini-3.1-flash-lite`) ارسال می‌شود و برای `gemini-3.8-flash` و سایر مدل‌های سری Gemini 3 از سطح مجاز `LOW`/`MEDIUM` استفاده می‌گردد تا خطای `Thinking level MINIMAL is not supported for this model` رخ ندهد و درخواست‌ها مستقیماً در اولین تلاش موفق شوند.
+
 ## 1.6.3
 
 ### رفع تداخل آپدیت خودکار با کش داشبورد یکپارچه

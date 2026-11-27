@@ -259,7 +259,7 @@ class GSO_Gemini {
 	 * تنظیم پارامترهای سازگار با خانواده مدل (Gemini 4 / Gemini 3 / Gemini 2.5).
 	 *
 	 * - مدل‌های Gemini 4 پارامترهای temperature/candidateCount/thinkingBudget را نمی‌پذیرند و باید thinkingLevel بگیرند (حداقل LOW).
-	 * - مدل‌های Gemini 3 از thinkingLevel پشتیبانی می‌کنند (MINIMAL روی flash/lite).
+	 * - مدل‌های Gemini 3 از thinkingLevel پشتیبانی می‌کنند (MINIMAL فقط روی flash-lite؛ بقیه حداقل LOW).
 	 * - مدل‌های Gemini 2.5 از thinkingBudget استفاده می‌کنند.
 	 * - وقتی تفکر روشن است و سقف توکن خیلی کم (مثلاً 120) باشد، سقف به حداقل 512/768 افزایش می‌یابد تا پاسخ خالی برنگردد.
 	 *
@@ -289,10 +289,12 @@ class GSO_Gemini {
 		}
 
 		if ( preg_match( '/^gemini-3/i', $model ) ) {
-			if ( preg_match( '/pro/i', $model ) ) {
+			if ( preg_match( '/flash-lite/i', $model ) ) {
+				$level = ( 'deep' === $kind && ( null === $explicit || (int) $explicit > 0 ) ) ? 'MEDIUM' : 'MINIMAL';
+			} elseif ( preg_match( '/pro/i', $model ) ) {
 				$level = ( 'deep' === $kind && ( null === $explicit || (int) $explicit > 0 ) ) ? 'HIGH' : 'LOW';
 			} else {
-				$level = ( 'deep' === $kind && ( null === $explicit || (int) $explicit > 0 ) ) ? 'MEDIUM' : 'MINIMAL';
+				$level = ( 'deep' === $kind && ( null === $explicit || (int) $explicit > 0 ) ) ? 'MEDIUM' : 'LOW';
 			}
 			$body['generationConfig']['thinkingConfig'] = array( 'thinkingLevel' => $level );
 			if ( 'MINIMAL' !== $level && $max_out < 512 ) {
