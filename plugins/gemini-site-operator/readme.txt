@@ -4,7 +4,7 @@ Tags: seo, gemini, ai, audit, content
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,9 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 قیمت هرگز حدس زده نمی‌شود و فقط به‌صورت «نیازمند اقدام دستی» گزارش می‌شود. تغییرات محتوایی در حالت «پیشنهاد + تأیید» فقط پس از تأیید اپراتور اعمال می‌شوند.
 
 == Changelog ==
+
+= 1.6.3 =
+* رفع تداخل آپدیت با کش داشبورد یکپارچه: انتقال `inject_update` به اولویت `99`، هم‌گام‌سازی با `force-check=1` و تضمین تزریق بستهٔ تاییدشده در `run_update()`.
 
 = 1.6.2 =
 * به‌روزرسانی مدل‌های پیش‌فرض به `gemini-3.8-flash` و `gemini-4-hydrogen` به همراه مهاجرت خودکار مدل‌های منسوخ (`2.5`/`2.0`/`1.x`) هنگام ارتقا.

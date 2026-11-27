@@ -52,8 +52,17 @@ jobs:
                   continue
 
               with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+                  root_info = zipfile.ZipInfo(f'{slug}/')
+                  root_info.external_attr = (0o40755 << 16) | 0x10
+                  zf.writestr(root_info, b'')
                   for root, dirs, files in os.walk(src_dir):
                       dirs[:] = sorted(d for d in dirs if d not in {'.git', '__pycache__', 'node_modules'})
+                      for d in dirs:
+                          full_dir = os.path.join(root, d)
+                          rel_dir = os.path.relpath(full_dir, 'plugins').replace(os.sep, '/') + '/'
+                          dir_info = zipfile.ZipInfo(rel_dir)
+                          dir_info.external_attr = (0o40755 << 16) | 0x10
+                          zf.writestr(dir_info, b'')
                       for fn in sorted(files):
                           if fn in {'.DS_Store', 'Thumbs.db'} or fn.endswith('.log'):
                               continue

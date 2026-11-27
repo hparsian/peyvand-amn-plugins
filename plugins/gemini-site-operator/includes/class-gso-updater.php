@@ -22,7 +22,7 @@ class GSO_Updater {
 	 * ثبت فیلترها.
 	 */
 	public static function init(): void {
-		add_filter( 'pre_set_site_transient_update_plugins', array( __CLASS__, 'inject_update' ) );
+		add_filter( 'pre_set_site_transient_update_plugins', array( __CLASS__, 'inject_update' ), 99 );
 		add_filter( 'plugins_api', array( __CLASS__, 'plugin_info' ), 10, 3 );
 		add_filter( 'auto_update_plugin', array( __CLASS__, 'auto_update' ), 10, 2 );
 		add_action( 'upgrader_process_complete', array( __CLASS__, 'flush_cache' ), 10, 2 );
@@ -91,14 +91,16 @@ class GSO_Updater {
 	 * @return mixed
 	 */
 	public static function inject_update( $transient ) {
-		if ( ! is_object( $transient ) || empty( $transient->checked ) || ! is_array( $transient->checked ) ) {
+		if ( ! is_object( $transient ) ) {
 			return $transient;
 		}
-		$file = self::plugin_file();
-		if ( ! isset( $transient->checked[ $file ] ) ) {
-			return $transient;
+		if ( is_admin() && ! empty( $_GET['force-check'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			self::refresh();
 		}
-		$installed = (string) $transient->checked[ $file ];
+		$file      = self::plugin_file();
+		$installed = ( ! empty( $transient->checked ) && is_array( $transient->checked ) && isset( $transient->checked[ $file ] ) )
+			? (string) $transient->checked[ $file ]
+			: self::installed_version();
 		$release   = self::release();
 		if ( null === $release || ! version_compare( $release['version'], $installed, '>' ) ) {
 			return $transient;
@@ -120,6 +122,9 @@ class GSO_Updater {
 			'compatibility' => new stdClass(),
 		);
 
+		if ( ! isset( $transient->response ) || ! is_array( $transient->response ) ) {
+			$transient->response = array();
+		}
 		$transient->response[ $file ] = $item;
 		return $transient;
 	}
@@ -403,6 +408,17 @@ class GSO_Updater {
 
 		$file      = self::plugin_file();
 		$transient = get_site_transient( 'update_plugins' );
+
+		if ( ! is_object( $transient ) || empty( $transient->response[ $file ] ) ) {
+			$release = self::latest_release();
+			if ( is_array( $release ) && version_compare( $release['version'], self::installed_version(), '>' ) ) {
+				if ( ! is_object( $transient ) ) {
+					$transient = new stdClass();
+				}
+				$transient = self::inject_update( $transient );
+				set_site_transient( 'update_plugins', $transient );
+			}
+		}
 
 		if ( ! is_object( $transient ) || empty( $transient->response[ $file ] ) ) {
 			return new WP_Error( 'gso_upgrade_none', 'نسخهٔ تازه‌تری برای نصب پیدا نشد؛ ابتدا «بررسی به‌روزرسانی» را بزنید.' );

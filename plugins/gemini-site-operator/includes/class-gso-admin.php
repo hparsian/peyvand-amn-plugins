@@ -375,6 +375,7 @@ class GSO_Admin {
 	/** بررسی دوبارهٔ نسخه در GitHub — هیچ فایلی تغییر نمی‌کند. */
 	private static function handle_updates_check(): void {
 		GSO_Updater::refresh();
+		delete_site_transient( 'update_plugins' );
 		$release = GSO_Updater::latest_release();
 
 		if ( ! is_array( $release ) ) {

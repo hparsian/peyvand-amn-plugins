@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Gemini Site Operator — اپراتور هوشمند کل سایت
  * Description: اپراتور هوشمند و ناظر دائمی وردپرس: ممیزی کل سایت، صف اولویت‌بندی، اصلاح گام‌به‌گام یا دسته‌ای با پیش‌نمایش، Snapshot و بازگشت، تولید محتوا/متا/Alt/CSS و پایش رویدادمحور و دوره‌ای — متصل مستقیم و امن به Gemini API با کلید شخصی.
- * Version: 1.6.2
+ * Version: 1.6.3
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Tested up to: 7.1
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSO_VERSION', '1.6.2' );
+define( 'GSO_VERSION', '1.6.3' );
 define( 'GSO_FILE', __FILE__ );
 define( 'GSO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSO_URL', plugin_dir_url( __FILE__ ) );

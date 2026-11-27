@@ -450,7 +450,9 @@ final class PAS_Dashboard_Updater {
 		}
 
 		self::$injecting = true;
-		$catalog         = self::catalog();
+		// اگر مدیر از صفحهٔ «پیشخوان ← به‌روزرسانی‌ها» روی «بررسی دوباره» کلیک کرد، کش ۶ ساعته هم تازه شود.
+		$force_check     = is_admin() && ! empty( $_GET['force-check'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$catalog         = self::catalog( $force_check );
 		$installed       = self::installed_plugins();
 		$known           = self::plugins();
 
@@ -489,8 +491,14 @@ final class PAS_Dashboard_Updater {
 				unset( $transient->no_update[ $plugin_file ] );
 				$transient->response[ $plugin_file ] = (object) $item;
 			} else {
-				unset( $transient->response[ $plugin_file ] );
-				$transient->no_update[ $plugin_file ] = (object) $item;
+				// اگر آپدیتر اختصاصیِ خود افزونه (مثل GSO_Updater) نسخهٔ تازه‌تری ثبت کرده، پاکش نکن.
+				$existing_ver = ( isset( $transient->response[ $plugin_file ]->new_version ) )
+					? (string) $transient->response[ $plugin_file ]->new_version
+					: '';
+				if ( '' === $existing_ver || ! version_compare( $existing_ver, $current, '>' ) ) {
+					unset( $transient->response[ $plugin_file ] );
+					$transient->no_update[ $plugin_file ] = (object) $item;
+				}
 			}
 		}
 
