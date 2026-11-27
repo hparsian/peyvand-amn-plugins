@@ -1,0 +1,85 @@
+name: Package Updated WordPress Plugins
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'plugins/**'
+      - '.github/workflows/package-plugins.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: package-plugins-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-zips:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build missing plugin zips in dist/
+        run: |
+          python3 - <<'PY'
+          import os, re, zipfile
+
+          os.makedirs('dist', exist_ok=True)
+          created = []
+
+          for slug in sorted(os.listdir('plugins')):
+              src_dir = os.path.join('plugins', slug)
+              main_file = os.path.join(src_dir, f'{slug}.php')
+              if not os.path.isdir(src_dir) or not os.path.isfile(main_file):
+                  continue
+
+              with open(main_file, 'r', encoding='utf-8') as f:
+                  header = f.read(4096)
+
+              m = re.search(r'^\s*\*?\s*Version:\s*([0-9][0-9A-Za-z.\-]*)\s*$', header, re.M | re.I)
+              if not m:
+                  continue
+
+              version = m.group(1).strip()
+              zip_path = os.path.join('dist', f'{slug}-{version}.zip')
+              if os.path.exists(zip_path):
+                  continue
+
+              with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+                  for root, dirs, files in os.walk(src_dir):
+                      dirs[:] = sorted(d for d in dirs if d not in {'.git', '__pycache__', 'node_modules'})
+                      for fn in sorted(files):
+                          if fn in {'.DS_Store', 'Thumbs.db'} or fn.endswith('.log'):
+                              continue
+                          full = os.path.join(root, fn)
+                          rel = os.path.relpath(full, 'plugins').replace(os.sep, '/')
+                          zf.write(full, rel)
+
+              with zipfile.ZipFile(zip_path, 'r') as zf:
+                  bad = zf.testzip()
+                  if bad is not None:
+                      raise RuntimeError(f'Corrupt zip entry {bad} in {zip_path}')
+
+              created.append(zip_path)
+              print(f'Created {zip_path}')
+
+          if not created:
+              print('All plugin versions already packaged in dist/.')
+          PY
+
+      - name: Commit and push dist packages
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add dist/*.zip
+            git commit -m "chore(dist): package updated WordPress plugins [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
