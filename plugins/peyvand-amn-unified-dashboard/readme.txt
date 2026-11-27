@@ -4,7 +4,7 @@ Tags: therapist, dashboard, clinical, persian, rtl
 Requires at least: 5.8
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 2.12.1
+Stable tag: 2.12.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,9 +117,11 @@ PHP 8.1 یا بالاتر می‌خواهند. داشبورد روی PHP 7.4 ه�
 
 == Changelog ==
 
+= 2.12.2 =
+* پاک‌کردن ترنزینت `update_plugins` هنگام «بررسی دوبارهٔ مخزن»، تازه‌سازی کش هنگام `force-check=1` در پیشخوان و حفظ نسخه‌های تازه‌تری که آپدیتر اختصاصیِ خود افزونه (مانند `GSO_Updater`) ثبت کرده است تا تداخلی با به‌روزرسانی افزونه‌های دیگر ایجاد نشود
+
 = 2.12.1 =
 * رفع صفحهٔ سفید هنگام زدن «بررسی دوبارهٔ مخزن» و فرم‌های Action Bus: در `PAS_Dashboard_Actions`، تابع `sanitize_key()` نقطه (`.`) را از شناسهٔ عمل‌هایی مثل `updates.refresh` و `case.save` حذف می‌کرد و فرم بدون فیلد مخفی به `admin-post.php` ارسال می‌شد؛ با تابع اختصاصی `action_id()` برطرف شد
-* پاک‌کردن ترنزینت `update_plugins` هنگام «بررسی دوبارهٔ مخزن»، تازه‌سازی کش هنگام `force-check=1` در پیشخوان و حفظ نسخه‌های تازه‌تری که آپدیتر اختصاصیِ خود افزونه (مانند `GSO_Updater`) ثبت کرده است
 * رفع قفل‌شدن اسکرول داشبورد در `shell-v2.css`: متغیر `--pvn-adminbar-h` روی `body.pas-dashboard-page` تعریف شد، `float` روی `#wpbody-content` برداشته شد و ناحیهٔ اسکرول دسکتاپ/موبایل اصلاح گردید
 
 = 2.12.0 =
