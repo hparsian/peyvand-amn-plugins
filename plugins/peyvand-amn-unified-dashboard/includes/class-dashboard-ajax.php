@@ -207,10 +207,34 @@ final class PAS_Dashboard_Ajax {
 
 		$slug = sanitize_key( (string) self::post( 'slug' ) );
 
+		// اگر آپدیت به خطای مرگبار PHP بخورد، به‌جای پاسخ خالی/۵۰۰ JSON خوانا برگردد.
+		self::guard_ajax_fatals();
+
 		// خروجی/هشدار احتمالی آپ‌گریدر نباید JSON را خراب کند.
+		$buffer = ob_get_level();
 		ob_start();
-		$result = PAS_Dashboard_Updater::run( array( 'slug' => $slug ) );
-		ob_end_clean();
+
+		try {
+			$result = PAS_Dashboard_Updater::run( array( 'slug' => $slug ) );
+		} catch ( Throwable $e ) {
+			$result = array(
+				'ok'      => false,
+				'message' => $e->getMessage(),
+				'id'      => 0,
+			);
+		}
+
+		while ( ob_get_level() > $buffer ) {
+			ob_end_clean();
+		}
+
+		if ( ! is_array( $result ) ) {
+			$result = array(
+				'ok'      => false,
+				'message' => __( 'پاسخ نامعتبر از آپ‌گریدر دریافت شد.', 'peyvand-amn-dashboard' ),
+				'id'      => 0,
+			);
+		}
 
 		$ok = ! empty( $result['ok'] );
 
@@ -227,5 +251,41 @@ final class PAS_Dashboard_Ajax {
 		}
 
 		wp_send_json_success( $data );
+	}
+
+	/** خطای مرگبار در آپدیت AJAX → پیام JSON به‌جای پاسخ خالی. */
+	private static function guard_ajax_fatals() {
+		register_shutdown_function(
+			static function () {
+				$error = error_get_last();
+				$fatal = array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR );
+
+				if ( ! is_array( $error ) || ! in_array( (int) $error['type'], $fatal, true ) ) {
+					return;
+				}
+
+				while ( ob_get_level() > 0 ) {
+					ob_end_clean();
+				}
+
+				if ( ! headers_sent() ) {
+					status_header( 500 );
+					header( 'Content-Type: application/json; charset=utf-8' );
+				}
+
+				echo wp_json_encode(
+					array(
+						'success' => false,
+						'data'    => array(
+							'message' => sprintf(
+								/* translators: %s: PHP error message */
+								__( 'به‌روزرسانی نیمه‌تمام ماند (سقف زمان یا حافظهٔ هاست): %s', 'peyvand-amn-dashboard' ),
+								(string) $error['message']
+							),
+						),
+					)
+				);
+			}
+		);
 	}
 }

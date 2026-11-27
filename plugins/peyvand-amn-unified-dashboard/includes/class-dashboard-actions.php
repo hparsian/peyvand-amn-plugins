@@ -109,8 +109,38 @@ final class PAS_Dashboard_Actions {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification -- Nonce, capability and dashboard access were verified above.
-		$post   = wp_unslash( $_POST );
-		$result = call_user_func( $config['handler'], is_array( $post ) ? $post : array() );
+		$post = wp_unslash( $_POST );
+		$post = is_array( $post ) ? $post : array();
+
+		// اگر خطای مرگبار PHP رخ دهد، به‌جای صفحهٔ سفید پیام خوانا نشان داده شود.
+		self::guard_fatals( isset( $post['_pas_redirect'] ) ? (string) $post['_pas_redirect'] : '' );
+
+		/*
+		 * هر خروجی پراکندهٔ هندلر (هشدار PHP، پیام آپ‌گریدر وردپرس) گرفته و
+		 * دور ریخته می‌شود. پیش از این، آپدیت افزونه چند بایت خروجی تولید
+		 * می‌کرد؛ سپس wp_safe_redirect نمی‌توانست header بفرستد و مرورگر پس
+		 * از زدن «به‌روزرسانی» صفحهٔ سفید/خالی نشان می‌داد.
+		 */
+		$buffer = ob_get_level();
+		ob_start();
+
+		try {
+			$result = call_user_func( $config['handler'], $post );
+		} catch ( Throwable $e ) {
+			$result = array(
+				'ok'      => false,
+				'message' => sprintf(
+					/* translators: %s: PHP error message */
+					__( 'عملیات با خطا متوقف شد: %s', 'peyvand-amn-dashboard' ),
+					$e->getMessage()
+				),
+				'id'      => 0,
+			);
+		}
+
+		while ( ob_get_level() > $buffer ) {
+			ob_end_clean();
+		}
 
 		if ( is_wp_error( $result ) ) {
 			$result = array(
@@ -137,6 +167,46 @@ final class PAS_Dashboard_Actions {
 
 		wp_safe_redirect( $redirect );
 		exit;
+	}
+
+	/**
+	 * اگر عملیات به خطای مرگبار PHP (سقف زمان/حافظه) خورد، به‌جای صفحهٔ سفید
+	 * یک پیام خوانا نشان داده می‌شود تا مدیر بداند چه رخ داده است.
+	 *
+	 * @param string $fallback نشانی بازگشت که فرم فرستاده است.
+	 */
+	private static function guard_fatals( $fallback = '' ) {
+		register_shutdown_function(
+			static function () use ( $fallback ) {
+				$error = error_get_last();
+				$fatal = array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR );
+
+				if ( ! is_array( $error ) || ! in_array( (int) $error['type'], $fatal, true ) ) {
+					return;
+				}
+
+				while ( ob_get_level() > 0 ) {
+					ob_end_clean();
+				}
+
+				if ( ! headers_sent() ) {
+					status_header( 500 );
+					header( 'Content-Type: text/html; charset=utf-8' );
+				}
+
+				$url = wp_validate_redirect(
+					esc_url_raw( (string) $fallback ),
+					admin_url( 'admin.php?page=' . PAS_DASHBOARD_SLUG . '&module=updates' )
+				);
+
+				echo '<!doctype html><html dir="rtl" lang="fa"><meta charset="utf-8"><title>عملیات نیمه‌تمام ماند</title><body style="font-family:Tahoma,sans-serif;padding:32px;line-height:2">';
+				echo '<h1>عملیات نیمه‌تمام ماند</h1>';
+				echo '<p>سرور هنگام اجرای این عملیات متوقف شد (احتمالاً سقف زمان اجرا یا حافظهٔ هاست). اگر به‌روزرسانی افزونه بود، فایل‌ها ممکن است نیمه‌جایگزین شده باشند؛ یک‌بار دیگر «به‌روزرسانی» را بزنید یا بسته را دستی نصب کنید.</p>';
+				echo '<p dir="ltr" style="color:#b32d2e">' . esc_html( (string) $error['message'] ) . '</p>';
+				echo '<p><a href="' . esc_url( $url ) . '">بازگشت به داشبورد</a></p>';
+				echo '</body></html>';
+			}
+		);
 	}
 
 	public static function register_defaults() {

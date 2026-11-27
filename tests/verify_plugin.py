@@ -796,6 +796,7 @@ def main():
 
     allowlist = [
         "peyvand-amn-unified-dashboard",
+        "gemini-site-operator",
         "pivand-amn-core",
         "pivand-amn-case-file",
         "pivand-amn-client-portal",
@@ -812,7 +813,7 @@ def main():
     if missing_slugs:
         fail("updates", "allowlist missing: " + ", ".join(missing_slugs))
     else:
-        ok("updates: closed allowlist covers the twelve ecosystem plugins")
+        ok("updates: closed allowlist covers the thirteen ecosystem plugins")
 
     if (
         "'https' !== strtolower" in updater_src

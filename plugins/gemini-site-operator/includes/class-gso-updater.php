@@ -329,6 +329,115 @@ class GSO_Updater {
 	}
 
 	/**
+	 * نسخهٔ نصب‌شده از هدر فایل اصلی افزونه.
+	 *
+	 * @return string
+	 */
+	public static function installed_version(): string {
+		$headers = self::local_headers();
+		return (string) $headers['Version'];
+	}
+
+	/**
+	 * آخرین نسخهٔ منتشرشده — برای نمایش در تنظیمات و دکمهٔ به‌روزرسانی.
+	 *
+	 * @return array{version:string,package:string,url:string}|null
+	 */
+	public static function latest_release(): ?array {
+		return self::release();
+	}
+
+	/**
+	 * پاک‌کردن کش انتشار تا «بررسی به‌روزرسانی» واقعاً به GitHub برود.
+	 */
+	public static function refresh(): void {
+		delete_site_transient( self::CACHE );
+	}
+
+	/**
+	 * نصب آخرین نسخه با آپ‌گریدر رسمی وردپرس.
+	 *
+	 * بسته همان dist مخزن است؛ مسیر نصب همان مسیر «پیشخوان ← به‌روزرسانی‌ها»
+	 * است، فقط از داخل خود افزونه هم در دسترس می‌شود.
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function run_update() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			return new WP_Error( 'gso_upgrade_cap', 'کپابیلیتی به‌روزرسانی افزونه‌ها برای شما فعال نیست.' );
+		}
+
+		if ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS ) {
+			return new WP_Error( 'gso_upgrade_locked', 'نصب و تغییر فایل‌ها در این سایت غیرفعال است (DISALLOW_FILE_MODS).' );
+		}
+
+		self::refresh();
+		delete_site_transient( 'update_plugins' );
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		if ( ! class_exists( 'WP_Upgrader_Skin' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader-skin.php';
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		if ( ! class_exists( 'Automatic_Upgrader_Skin' ) ) {
+			$skin_file = ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
+			if ( file_exists( $skin_file ) ) {
+				require_once $skin_file;
+			}
+		}
+
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- بهترین تلاش؛ روی هاست‌های محدود بی‌اثر است.
+		}
+
+		if ( function_exists( 'wp_raise_memory_limit' ) ) {
+			wp_raise_memory_limit( 'admin' );
+		}
+
+		wp_update_plugins();
+
+		$file      = self::plugin_file();
+		$transient = get_site_transient( 'update_plugins' );
+
+		if ( ! is_object( $transient ) || empty( $transient->response[ $file ] ) ) {
+			return new WP_Error( 'gso_upgrade_none', 'نسخهٔ تازه‌تری برای نصب پیدا نشد؛ ابتدا «بررسی به‌روزرسانی» را بزنید.' );
+		}
+
+		$upgrader = class_exists( 'Automatic_Upgrader_Skin' )
+			? new Plugin_Upgrader( new Automatic_Upgrader_Skin() )
+			: new Plugin_Upgrader( new WP_Upgrader_Skin() );
+
+		$result = $upgrader->upgrade( $file );
+
+		if ( true === $result ) {
+			GSO_Logger::log( 'success', 'updater.apply', 'افزونه از مخزن GitHub به آخرین نسخه به‌روزرسانی شد.' );
+			return true;
+		}
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$message = '';
+		if ( isset( $upgrader->skin->result ) && is_wp_error( $upgrader->skin->result ) ) {
+			$message = $upgrader->skin->result->get_error_message();
+		}
+		if ( '' === $message && ! empty( $upgrader->skin->errors ) && is_array( $upgrader->skin->errors ) ) {
+			$message = implode( ' ', array_map( 'wp_strip_all_tags', $upgrader->skin->errors ) );
+		}
+		if ( '' === $message ) {
+			$message = 'به‌روزرسانی انجام نشد؛ دسترسی نوشتن فایل یا اتصال به گیت‌هاب را بررسی کنید.';
+		}
+
+		return new WP_Error( 'gso_upgrade_failed', $message );
+	}
+
+	/**
 	 * تغییرات نسخه به‌صورت HTML برای مودال جزئیات.
 	 *
 	 * @return string

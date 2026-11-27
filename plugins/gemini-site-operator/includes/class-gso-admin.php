@@ -188,6 +188,12 @@ class GSO_Admin {
 			case 'clear_logs':
 				self::handle_clear_logs();
 				break;
+			case 'updates_check':
+				self::handle_updates_check();
+				break;
+			case 'updates_apply':
+				self::handle_updates_apply();
+				break;
 			case 'prune':
 				GSO_Queue::prune();
 				GSO_Snapshot::prune();
@@ -364,6 +370,85 @@ class GSO_Admin {
 	private static function handle_clear_logs(): void {
 		GSO_Logger::clear();
 		self::redirect_notice( 'gso-logs', 'گزارش عملیات پاک شد.' );
+	}
+
+	/** بررسی دوبارهٔ نسخه در GitHub — هیچ فایلی تغییر نمی‌کند. */
+	private static function handle_updates_check(): void {
+		GSO_Updater::refresh();
+		$release = GSO_Updater::latest_release();
+
+		if ( ! is_array( $release ) ) {
+			self::redirect_notice( 'gso-settings', 'نسخهٔ تازه از گیت‌هاب خوانده نشد؛ اتصال سرور به raw.githubusercontent.com را بررسی کنید.', 'error' );
+		}
+
+		$latest = (string) ( $release['version'] ?? '' );
+
+		if ( '' !== $latest && version_compare( $latest, GSO_Updater::installed_version(), '>' ) ) {
+			self::redirect_notice( 'gso-settings', sprintf( 'نسخهٔ %s در مخزن منتشر شده است؛ دکمهٔ «به‌روزرسانی» را بزنید.', $latest ), 'warning' );
+		}
+
+		self::redirect_notice( 'gso-settings', sprintf( 'افزونه به‌روز است (نسخهٔ %s).', GSO_Updater::installed_version() ) );
+	}
+
+	/**
+	 * نصب نسخهٔ تازه از بستهٔ مخزن.
+	 *
+	 * خروجی پراکندهٔ آپ‌گریدر (هشدار PHP، پیام اسکین) پیش از redirect گرفته و
+	 * دور ریخته می‌شود؛ بدون این، header قابل ارسال نیست و مرورگر صفحهٔ سفید
+	 * نشان می‌دهد. خطای مرگبار هم به پیام خوانا تبدیل می‌شود.
+	 */
+	private static function handle_updates_apply(): void {
+		$level = ob_get_level();
+		ob_start();
+		self::guard_upgrade_fatals();
+
+		try {
+			$result = GSO_Updater::run_update();
+		} catch ( Throwable $e ) {
+			$result = new WP_Error( 'gso_upgrade_exception', $e->getMessage() );
+		}
+
+		while ( ob_get_level() > $level ) {
+			ob_end_clean();
+		}
+
+		if ( is_wp_error( $result ) ) {
+			self::redirect_notice( 'gso-settings', $result->get_error_message(), 'error' );
+		}
+
+		self::redirect_notice( 'gso-settings', 'افزونه به آخرین نسخه به‌روزرسانی شد.' );
+	}
+
+	/** جایگزینی صفحهٔ سفید با پیام خوانا اگر آپدیت به خطای مرگبار PHP خورد. */
+	private static function guard_upgrade_fatals(): void {
+		register_shutdown_function(
+			static function (): void {
+				$error = error_get_last();
+				$fatal = array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR );
+
+				if ( ! is_array( $error ) || ! in_array( (int) $error['type'], $fatal, true ) ) {
+					return;
+				}
+
+				while ( ob_get_level() > 0 ) {
+					ob_end_clean();
+				}
+
+				if ( ! headers_sent() ) {
+					status_header( 500 );
+					header( 'Content-Type: text/html; charset=utf-8' );
+				}
+
+				$url = admin_url( 'admin.php?page=gso-settings' );
+
+				echo '<!doctype html><html dir="rtl" lang="fa"><meta charset="utf-8"><title>به‌روزرسانی نیمه‌تمام ماند</title><body style="font-family:Tahoma,sans-serif;padding:32px;line-height:2">';
+				echo '<h1>به‌روزرسانی نیمه‌تمام ماند</h1>';
+				echo '<p>سرور هنگام نصب بسته متوقف شد (احتمالاً سقف زمان اجرا یا حافظه). فایل‌های افزونه ممکن است نیمه‌جایگزین شده باشند؛ یک‌بار دیگر «به‌روزرسانی» را بزنید یا بسته را دستی نصب کنید.</p>';
+				echo '<p dir="ltr" style="color:#b32d2e">' . esc_html( (string) $error['message'] ) . '</p>';
+				echo '<p><a href="' . esc_url( $url ) . '">بازگشت به تنظیمات</a></p>';
+				echo '</body></html>';
+			}
+		);
 	}
 
 	// phpcs:enable WordPress.Security.NonceVerification.Missing

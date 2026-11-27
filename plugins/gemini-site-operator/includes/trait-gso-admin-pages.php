@@ -88,6 +88,7 @@ trait GSO_Admin_Pages {
 		<div class="wrap gso-wrap">
 			<h1 class="gso-title"><span class="dashicons dashicons-superhero-alt"></span> اپراتور هوشمند سایت</h1>
 			<?php self::print_notice(); ?>
+			<?php self::render_update_card(); ?>
 
 			<?php if ( ! $has_key ) : ?>
 				<div class="notice notice-warning">
@@ -573,6 +574,46 @@ trait GSO_Admin_Pages {
 	/* تنظیمات                                                            */
 	/* ------------------------------------------------------------------ */
 
+	/**
+	 *کارت «نسخه و به‌روزرسانی» — نسخهٔ نصب‌شده در برابر آخرین نسخهٔ مخزن.
+	 *
+	 * پیش‌تر تنها راه آپدیت، صفحهٔ «به‌روزرسانی‌های» وردپرس بود و اگر ترنزینت
+	 * آن کش می‌شد یا فیلتر تزریق اجرا نمی‌شد، هیچ گزینه‌ای برای آپدیت دیده
+	 * نمی‌شد. این کارت همان مسیر رسمی نصب را از داخل خود افزونه هم باز می‌کند.
+	 */
+	public static function render_update_card(): void {
+		$current = GSO_Updater::installed_version();
+		$release = GSO_Updater::latest_release();
+		$latest  = is_array( $release ) ? (string) ( $release['version'] ?? '' ) : '';
+		$newer   = '' !== $latest && version_compare( $latest, $current, '>' );
+		?>
+		<div class="gso-card" style="margin-bottom:16px">
+			<h2>نسخه و به‌روزرسانی</h2>
+			<p>
+				نسخهٔ نصب‌شده: <strong dir="ltr"><?php echo esc_html( $current ); ?></strong>
+				<?php if ( '' !== $latest ) : ?>
+					— آخرین نسخهٔ مخزن: <strong dir="ltr"><?php echo esc_html( $latest ); ?></strong>
+				<?php else : ?>
+					— آخرین نسخهٔ مخزن خوانده نشد.
+				<?php endif; ?>
+			</p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;margin-inline-end:8px">
+				<input type="hidden" name="gso_action" value="updates_check">
+				<?php wp_nonce_field( 'gso_updates_check' ); ?>
+				<button class="button" type="submit">بررسی به‌روزرسانی</button>
+			</form>
+			<?php if ( $newer ) : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block" onsubmit="return confirm('افزونه از بستهٔ مخزن GitHub به‌روزرسانی شود؟');">
+					<input type="hidden" name="gso_action" value="updates_apply">
+					<?php wp_nonce_field( 'gso_updates_apply' ); ?>
+					<button class="button button-primary" type="submit">به‌روزرسانی به نسخهٔ <?php echo esc_html( $latest ); ?></button>
+				</form>
+			<?php endif; ?>
+			<p class="description">آپدیت با آپ‌گریدر رسمی وردپرس و از بستهٔ <code dir="ltr">dist/</code> مخزن GitHub انجام می‌شود؛ همان نسخه در «پیشخوان ← به‌روزرسانی‌ها» هم دیده می‌شود.</p>
+		</div>
+		<?php
+	}
+
 	public static function render_settings(): void {
 		self::guard();
 		$settings = GSO_Settings::all();
@@ -582,6 +623,7 @@ trait GSO_Admin_Pages {
 		<div class="wrap gso-wrap">
 			<h1 class="gso-title">تنظیمات Gemini Site Operator</h1>
 			<?php self::print_notice(); ?>
+			<?php self::render_update_card(); ?>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'gso_settings_group' ); ?>
 				<div class="gso-grid gso-grid-2">

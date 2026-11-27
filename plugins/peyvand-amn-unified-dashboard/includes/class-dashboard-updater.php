@@ -46,6 +46,7 @@ final class PAS_Dashboard_Updater {
 	public static function plugins() {
 		return array(
 			'peyvand-amn-unified-dashboard' => 'peyvand-amn-unified-dashboard/peyvand-amn-unified-dashboard.php',
+			'gemini-site-operator'          => 'gemini-site-operator/gemini-site-operator.php',
 			'pivand-amn-core'               => 'pivand-amn-core/pivand-amn-core.php',
 			'pivand-amn-case-file'          => 'pivand-amn-case-file/pivand-amn-case-file.php',
 			'pivand-amn-client-portal'      => 'pivand-amn-client-portal/pivand-amn-client-portal.php',
@@ -823,7 +824,20 @@ final class PAS_Dashboard_Updater {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/misc.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		if ( ! class_exists( 'WP_Upgrader_Skin' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader-skin.php';
+		}
+
 		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		// کلاس اسکین خودکار در همهٔ نسخه‌های وردپرس از فایل آپ‌گریدر بارگذاری
+		// نمی‌شود؛ بدون این بررسی، ساخت اسکین به خطای مرگبار می‌رسید.
+		if ( ! class_exists( 'Automatic_Upgrader_Skin' ) ) {
+			$skin_file = ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
+			if ( file_exists( $skin_file ) ) {
+				require_once $skin_file;
+			}
+		}
 
 		if ( function_exists( 'set_time_limit' ) ) {
 			@set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- بهترین تلاش؛ روی هاست‌های محدود بی‌اثر است.
@@ -841,7 +855,11 @@ final class PAS_Dashboard_Updater {
 			}
 
 			try {
-				$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
+				$upgrader = new Plugin_Upgrader(
+					class_exists( 'Automatic_Upgrader_Skin' )
+						? new Automatic_Upgrader_Skin()
+						: new WP_Upgrader_Skin()
+				);
 				$result   = $upgrader->upgrade( $file );
 
 				if ( true === $result ) {
