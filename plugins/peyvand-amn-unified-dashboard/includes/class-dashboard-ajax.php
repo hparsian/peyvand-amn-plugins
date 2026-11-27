@@ -15,6 +15,7 @@ final class PAS_Dashboard_Ajax {
 		add_action( 'wp_ajax_pas_dashboard_delete_note', array( __CLASS__, 'delete_note' ) );
 		add_action( 'wp_ajax_pas_dashboard_restore_note', array( __CLASS__, 'restore_note' ) );
 		add_action( 'wp_ajax_pas_dashboard_mark_notifications_read', array( __CLASS__, 'mark_notifications_read' ) );
+		add_action( 'wp_ajax_pas_dashboard_update_plugin', array( __CLASS__, 'update_plugin' ) );
 	}
 
 	/**
@@ -185,5 +186,46 @@ final class PAS_Dashboard_Ajax {
 		}
 
 		wp_send_json_success( array( 'unread' => PAS_Dashboard_Notifications::unread_count( $user_id ) ) );
+	}
+
+	/* ── به‌روزرسانی یک افزونهٔ اکوسیستم ──────────────────────────────── */
+
+	/**
+	 * چرا AJAX و نه یک فرم کامل؟ آپدیت چند بسته در یک درخواست می‌تواند به
+	 * سقف زمان اجرای PHP بخورد و پاسخ نیمه‌کاره برگرداند (همان صفحهٔ سفیدی که
+	 * مدیر بعد از زدن «به‌روزرسانی» می‌دید). اینجا هر درخواست فقط یک بسته را
+	 * آپدیت می‌کند؛ پاسخ همیشه JSON است و خطا به‌جای قطع‌شدن صفحه، پیام
+	 * قابل خواندن دارد. کلید و کپابیلیتی از همان Action Bus می‌آید.
+	 */
+	public static function update_plugin() {
+		self::guard( 'updates_run' );
+
+		if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'update_plugins' ) ) {
+			PAS_Dashboard_Security::record_denied( 'updates.run', 'plugin', 0 );
+			wp_send_json_error( array( 'message' => __( 'دسترسی به به‌روزرسانی افزونه‌ها برای شما فعال نیست.', 'peyvand-amn-dashboard' ) ), 403 );
+		}
+
+		$slug = sanitize_key( (string) self::post( 'slug' ) );
+
+		// خروجی/هشدار احتمالی آپ‌گریدر نباید JSON را خراب کند.
+		ob_start();
+		$result = PAS_Dashboard_Updater::run( array( 'slug' => $slug ) );
+		ob_end_clean();
+
+		$ok = ! empty( $result['ok'] );
+
+		PAS_Dashboard_Audit_Log::record( 'updates.run', 'plugin', 0, $ok ? 'ok' : 'error' );
+
+		$data = array(
+			'slug'    => $slug,
+			'message' => (string) ( $result['message'] ?? '' ),
+			'state'   => $ok ? 'current' : 'error',
+		);
+
+		if ( ! $ok ) {
+			wp_send_json_error( $data );
+		}
+
+		wp_send_json_success( $data );
 	}
 }

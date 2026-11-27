@@ -350,4 +350,121 @@
 				window.location.reload();
 			});
 	});
+
+	/* ── به‌روزرسانی افزونه‌ها ────────────────────────────────
+	   هر بسته در یک درخواست AJAX جدا آپدیت می‌شود و صفحه هرگز با POST کامل
+	   جابه‌جا نمی‌شود. پیش از این، یک درخواست طولانی (چند بسته با هم) می‌توانست
+	   از سقف زمان اجرای PHP بگذرد و پاسخ نیمه‌کاره، صفحهٔ سفید نشان دهد؛
+	   اکنون خطا همان‌جا در ردیف افزونه به‌صورت پیام دیده می‌شود. */
+	var updateBusy = false;
+
+	function setUpdateState($scope, text, tone) {
+		var $state = $scope.find('[data-pas-update-state]').first();
+
+		if (!$state.length) {
+			return;
+		}
+
+		$state.text(text || '')
+			.removeClass('is-ok is-error is-busy')
+			.addClass(tone ? 'is-' + tone : '');
+	}
+
+	function updateOnePlugin(slug) {
+		var $form = $('[data-pas-update-form][data-slug="' + slug + '"]');
+		var deferred = $.Deferred();
+
+		post('pas_dashboard_update_plugin', { slug: slug }, 'updates_run')
+			.done(function (response) {
+				var ok = !!(response && response.success);
+				var message = (response && response.data && response.data.message) || (ok ? cfg.i18n.updateDone : cfg.i18n.error);
+
+				setUpdateState($form, ok ? cfg.i18n.updateDone : message, ok ? 'ok' : 'error');
+
+				if (ok) {
+					$form.find('[data-pas-update-trigger]').prop('disabled', true).text(cfg.i18n.updateDone);
+				}
+
+				deferred.resolve({ ok: ok, message: message });
+			})
+			.fail(function (xhr) {
+				var message = (xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) || cfg.i18n.error;
+
+				setUpdateState($form, message, 'error');
+				deferred.resolve({ ok: false, message: message });
+			});
+
+		return deferred.promise();
+	}
+
+	$(document).on('submit', '[data-pas-update-form]', function (event) {
+		event.preventDefault();
+
+		if (updateBusy) {
+			return;
+		}
+
+		var $form = $(this);
+		var isAll = $form.is('[data-pas-update-all]');
+
+		if (!window.confirm(isAll ? cfg.i18n.updateAllConfirm : cfg.i18n.updateConfirm)) {
+			return;
+		}
+
+		var slugs = [];
+
+		if (isAll) {
+			$('[data-pas-update-form][data-slug]').each(function () {
+				slugs.push(String($(this).attr('data-slug') || ''));
+			});
+		} else {
+			slugs.push(String($form.attr('data-slug') || ''));
+		}
+
+		slugs = slugs.filter(function (slug) {
+			return slug !== '';
+		});
+
+		if (!slugs.length) {
+			return;
+		}
+
+		updateBusy = true;
+		$form.find('[data-pas-update-trigger]').prop('disabled', true);
+		setUpdateState($form, cfg.i18n.updating, 'busy');
+		toast(cfg.i18n.updating, 'info');
+
+		var failures = 0;
+		var index = 0;
+
+		function next() {
+			if (index >= slugs.length) {
+				updateBusy = false;
+
+				toast(failures === 0 ? cfg.i18n.updateDone : cfg.i18n.error, failures === 0 ? 'success' : 'error');
+
+				window.setTimeout(function () {
+					window.location.reload();
+				}, failures === 0 ? 900 : 2400);
+
+				return;
+			}
+
+			var slug = slugs[index];
+			index++;
+
+			if (isAll) {
+				setUpdateState($('[data-pas-update-form][data-slug="' + slug + '"]'), cfg.i18n.updating, 'busy');
+			}
+
+			updateOnePlugin(slug).then(function (result) {
+				if (!result.ok) {
+					failures++;
+				}
+				next();
+			});
+		}
+
+		next();
+	});
 })(jQuery);

@@ -1247,3 +1247,235 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
         transition: none;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ۲.۱۱ — چیدمان «یک ناحیهٔ اسکرول»
+   ═══════════════════════════════════════════════════════════
+   پیش از این، اسکرول ستون محتوا همان اسکرول کل صفحهٔ وردپرس
+   بود: نوار بالا و ناوبری همراه محتوا جابه‌جا می‌شدند و کاربر
+   جای خودش را گم می‌کرد. اکنون فقط ناحیهٔ کاری اسکرول دارد و
+   ستون‌های کناری/بالا در جای خود می‌مانند.
+   این قواعد فقط روی صفحهٔ داشبورد (body.pas-dashboard-page)
+   عمل می‌کنند؛ بقیهٔ پیشخوان وردپرس دست‌نخورده است. */
+
+body.pas-dashboard-page {
+    overflow: hidden;
+}
+
+/*
+ * محتوا یک ستون flex می‌شود: اطلاعیه‌های وردپرس (اگر باشند) بالای صفحه
+ * می‌مانند و پوسته بقیهٔ ارتفاع را می‌گیرد؛ پس هیچ‌چیز از پایین صفحه
+ * بریده نمی‌شود و فقط ناحیهٔ کاری اسکرول دارد.
+ */
+body.pas-dashboard-page #wpbody-content {
+    display: flex;
+    flex-direction: column;
+    block-size: calc(100dvh - var(--pvn-adminbar-h));
+    min-block-size: 0;
+    padding-block-end: 0;
+    overflow: hidden;
+}
+
+body.pas-dashboard-page #wpbody-content > .notice,
+body.pas-dashboard-page #wpbody-content > .updated,
+body.pas-dashboard-page #wpbody-content > .error,
+body.pas-dashboard-page #wpbody-content > .update-nag {
+    flex: 0 0 auto;
+    margin-inline: clamp(16px, 2.4vw, 32px);
+}
+
+body.pas-dashboard-page #wpfooter {
+    display: none;
+}
+
+.pvn-shell {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    block-size: auto;
+    min-block-size: 0;
+    margin-block: 0;
+    overflow: hidden;
+}
+
+.pvn-frame {
+    flex: 1 1 auto;
+    block-size: auto;
+    min-block-size: 0;
+}
+
+.pvn-body {
+    /* یک ردیف که دقیقاً ارتفاع باقی‌مانده را پر می‌کند؛ بدون این، ارتفاع ردیف
+       با محتوا رشد می‌کند و ستون محتوا هیچ‌وقت اسکرول داخلی نمی‌شود. */
+    grid-template-rows: minmax(0, 1fr);
+    min-block-size: 0;
+    align-items: stretch;
+}
+
+.pvn-main {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+@media (min-width: 861px) {
+    /* ناوبری داخل قاب می‌ماند و فقط خودش در صورت نیاز اسکرول می‌شود. */
+    .pvn-nav {
+        position: relative;
+        inset-block-start: auto;
+        align-self: stretch;
+        block-size: auto;
+        overflow-y: auto;
+    }
+}
+
+/* ── «شما اینجا هستید» در ناوبری ─────────────────────── */
+
+.pvn-nav__now {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 9px 11px;
+    border: 1px solid var(--pui-border-soft);
+    border-radius: 4px 14px 14px 14px;
+    background: var(--pui-surface);
+    box-shadow: var(--pui-shadow-sm);
+}
+
+.pvn-nav__now-icon {
+    display: inline-flex;
+    color: var(--pui-primary);
+    flex: 0 0 auto;
+}
+
+.pvn-nav__now-text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    line-height: 1.35;
+}
+
+.pvn-nav__now-text small {
+    font-size: 10px;
+    color: var(--pui-text-soft);
+}
+
+.pvn-nav__now-text b {
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--pui-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pvn-nav__group.is-current .pvn-nav__label {
+    color: var(--pui-primary);
+}
+
+/* ── سرصفحهٔ صفحه: مسیر + نشان گروه ─────────────────── */
+
+.pvn-pagehead {
+    align-items: center;
+}
+
+.pvn-pagehead__text {
+    min-inline-size: 0;
+}
+
+.pvn-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-block-end: 6px;
+    color: var(--pui-text-soft);
+    font-size: 11.5px;
+}
+
+.pvn-breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.pvn-breadcrumb a:hover {
+    color: var(--pui-primary);
+    text-decoration: underline;
+}
+
+.pvn-breadcrumb b {
+    color: var(--pui-text);
+    font-weight: 600;
+}
+
+.pvn-pagehead__aside {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pvn-pagehead__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-full);
+    background: var(--pui-surface);
+    color: var(--pui-text-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+}
+
+/* ── جدول به‌روزرسانی‌ها: ستون زمان ─────────────────── */
+
+.pvn-shell .pvn-updates-table td {
+    vertical-align: middle;
+}
+
+.pvn-shell .pvn-updated {
+    display: inline-block;
+    color: var(--pui-text);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.pvn-shell .pvn-update-checked {
+    margin-block-start: 2px;
+}
+
+.pvn-update-state {
+    display: inline-block;
+    margin-inline-start: 8px;
+    color: var(--pui-text-muted);
+    font-size: 11px;
+}
+
+.pvn-update-state.is-busy { color: var(--pui-primary); }
+.pvn-update-state.is-ok { color: var(--pui-success); }
+.pvn-update-state.is-error { color: var(--pui-danger); }
+
+.pvn-shell .pas-inline-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .pvn-breadcrumb {
+        font-size: 11px;
+    }
+
+    .pvn-pagehead__aside {
+        display: none;
+    }
+
+    .pvn-update-state {
+        display: block;
+        margin-inline-start: 0;
+    }
+}

@@ -464,3 +464,101 @@
         transition: none;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ۲.۱ — لوگوی سایت + منوی چسبان
+   ═══════════════════════════════════════════════════════════
+   دو تغییر تجربهٔ کاربری: نشان ساختگی افزونه جای خود را به لوگوی
+   سایت میزبان داد، و ردیف تب‌ها هنگام اسکرول زیر لبهٔ بالای صفحه
+   می‌چسبد تا کاربر همیشه بداند در کدام بخش است و یک کلیک تا
+   بخش‌های دیگر فاصله داشته باشد. */
+
+/* ── لوگوی سایت میزبان ─────────────────────────────────── */
+
+.zdp-panel-shell .zdp-shell-brand {
+    min-inline-size: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.zdp-panel-shell .zdp-shell-brand-logo {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    max-inline-size: 150px;
+}
+
+.zdp-brand-logo {
+    display: block;
+    inline-size: auto;
+    block-size: auto;
+    max-inline-size: 150px;
+    max-block-size: 40px;
+    object-fit: contain;
+}
+
+.zdp-panel-shell .zdp-brand-initial,
+.zdp-login-shell .zdp-brand-initial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    border-radius: 10px 4px 10px 10px;
+    background: var(--pvn-primary);
+    color: #F6F3EC;
+    font-family: 'IBM Plex Sans Arabic', 'Vazirmatn', sans-serif;
+    font-weight: 600;
+}
+
+.zdp-login-shell .zdp-brand-logo {
+    max-block-size: 44px;
+    max-inline-size: 200px;
+}
+
+.zdp-login-mobile-brand .zdp-brand-logo {
+    max-block-size: 38px;
+    max-inline-size: 160px;
+}
+
+/* ── منوی تب‌ها: چسبیدن به بالای دید هنگام اسکرول ─────────── */
+
+.zdp-panel-shell .zdp-tabs {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 20;
+    background: var(--zdp-white);
+    box-shadow: 0 1px 0 var(--pvn-line), 0 10px 20px -16px rgba(41, 45, 42, .55);
+}
+
+/* پرش به تب انتخاب‌شده نباید زیر نوار چسبان پنهان شود. */
+.zdp-panel-shell .zdp-tab-panel {
+    scroll-margin-block-start: 76px;
+}
+
+/* ── تنفس بیشتر در چیدمان محتوا ──────────────────────── */
+
+.zdp-panel-shell .zdp-stats-grid {
+    gap: 14px;
+}
+
+.zdp-panel-shell .zdp-tab-panel {
+    margin-block-start: 4px;
+}
+
+@media (max-width: 720px) {
+    .zdp-panel-shell .zdp-tabs {
+        scroll-padding-inline: 8px;
+    }
+
+    .zdp-brand-logo {
+        max-block-size: 32px;
+        max-inline-size: 120px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zdp-panel-shell .zdp-tabs {
+        scroll-behavior: auto;
+    }
+}

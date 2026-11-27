@@ -390,6 +390,26 @@ body.zdp-panel-blank {
 }
 .zdp-welcome-logo-img { max-height: 88px; width: auto; }
 
+/* نشان سایت (لوگوی سفارشی/آیکن سایت/حرف اول نام) — اندازه‌های همان لوگوی
+   خوش‌آمد، تا صفحهٔ نظرسنجی هم بدون پوستهٔ ۲ درست دیده شود. */
+.zdp-welcome-logo .zdp-brand-logo {
+    max-height: 88px;
+    width: auto;
+}
+
+.zdp-brand-initial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 12px 4px 12px 12px;
+    background: var(--zdp-teal);
+    color: var(--zdp-white);
+    font-weight: 700;
+    font-size: 18px;
+}
+
 .zdp-welcome-title {
     font-size: 22px;
     animation: zdp-fade-up 0.4s ease 0.1s both;

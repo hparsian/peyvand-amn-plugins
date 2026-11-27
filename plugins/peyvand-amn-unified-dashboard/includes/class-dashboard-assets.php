@@ -10,6 +10,19 @@ final class PAS_Dashboard_Assets {
 	public static function init() {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'admin_head', array( __CLASS__, 'early_theme' ) );
+		add_filter( 'admin_body_class', array( __CLASS__, 'body_class' ) );
+	}
+
+	/**
+	 * نشانه‌گذاری صفحهٔ داشبورد روی <body> تا چیدمان «یک ناحیهٔ اسکرول» فقط
+	 * همین صفحه را بگیرد و صفحات دیگر پیشخوان وردپرس دست‌نخورده بمانند.
+	 */
+	public static function body_class( $classes ) {
+		if ( self::is_dashboard_page() ) {
+			$classes .= ' pas-dashboard-page';
+		}
+
+		return $classes;
 	}
 
 	/** آیا صفحهٔ جاری، صفحهٔ داشبورد است؟ */
@@ -111,11 +124,17 @@ final class PAS_Dashboard_Assets {
 					'note_delete'       => PAS_Dashboard_Security::nonce( 'note_delete' ),
 					'note_restore'      => PAS_Dashboard_Security::nonce( 'note_restore' ),
 					'notifications_read' => PAS_Dashboard_Security::nonce( 'notifications_read' ),
+					'updates_run'       => PAS_Dashboard_Security::nonce( 'updates_run' ),
 				),
 				'i18n'    => array(
 					'confirmDelete' => __( 'این یادداشت از نمای پرونده حذف می‌شود (نسخه‌ی قبلی در تاریخچه می‌ماند). ادامه می‌دهید؟', 'peyvand-amn-dashboard' ),
 					'saving'        => __( 'در حال ذخیره…', 'peyvand-amn-dashboard' ),
 					'error'         => __( 'خطا در ارتباط با سرور.', 'peyvand-amn-dashboard' ),
+					'updating'      => __( 'در حال به‌روزرسانی…', 'peyvand-amn-dashboard' ),
+					'updateDone'    => __( 'به‌روزرسانی انجام شد؛ بازخوانی صفحه…', 'peyvand-amn-dashboard' ),
+					'updateConfirm' => __( 'این افزونه از بستهٔ مخزن گیت‌هاب به‌روزرسانی شود؟', 'peyvand-amn-dashboard' ),
+					'updateAllConfirm' => __( 'همهٔ افزونه‌های دارای به‌روزرسانی، یکی‌یکی از مخزن گیت‌هاب به‌روزرسانی شوند؟', 'peyvand-amn-dashboard' ),
+					'updateWaiting' => __( 'در انتظار…', 'peyvand-amn-dashboard' ),
 					'confirmTitle'  => __( 'تأیید عملیات', 'peyvand-amn-dashboard' ),
 					'editTitle'     => __( 'ویرایش یادداشت جلسه', 'peyvand-amn-dashboard' ),
 					'newTitle'      => __( 'افزودن یادداشت جدید', 'peyvand-amn-dashboard' ),

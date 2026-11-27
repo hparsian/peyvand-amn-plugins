@@ -55,6 +55,35 @@ abstract class PAS_Dashboard_Module {
 			. ' aria-hidden="true" focusable="false">' . $paths[ $id ] . '</svg>';
 	}
 
+	/**
+	 * گروه‌بندی ناوبری کناری — بر اساس وظیفه، نه افزونه.
+	 *
+	 * هم قالب کناری و هم سرصفحهٔ صفحه از همین منبع می‌خوانند تا برچسب
+	 * «شما اینجا هستید» با گروهی که در منو برجسته شده یکی باشد.
+	 *
+	 * @return array<string,array<int,string>>
+	 */
+	public static function nav_groups() {
+		return array(
+			__( 'کار بالینی', 'peyvand-amn-dashboard' ) => array( 'overview', 'patients', 'case_files', 'assessments', 'appointments' ),
+			__( 'پیگیری', 'peyvand-amn-dashboard' )     => array( 'reports', 'communications', 'followup', 'notifications' ),
+			__( 'مدیریت', 'peyvand-amn-dashboard' )     => array( 'ecosystem', 'updates', 'system_health', 'settings', 'audit' ),
+		);
+	}
+
+	/** عنوان گروهی که یک ماژول در آن قرار دارد (یا رشتهٔ خالی). */
+	public static function group_for( $module_id ) {
+		$module_id = (string) $module_id;
+
+		foreach ( self::nav_groups() as $label => $ids ) {
+			if ( in_array( $module_id, $ids, true ) ) {
+				return (string) $label;
+			}
+		}
+
+		return '';
+	}
+
 	/** آیکون داشبورد برای هر ماژول (کلاس dashicons). */
 	public static function icon_for( $id ) {
 		$icons = array(

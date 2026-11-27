@@ -536,13 +536,18 @@ def main():
     matrix_src = open(os.path.join(PLUGIN, "includes/class-dashboard-permissions.php"), encoding="utf-8").read()
     sidebar = open(os.path.join(PLUGIN, "templates/sidebar.php"), encoding="utf-8").read()
     loader = open(os.path.join(PLUGIN, "includes/class-dashboard-loader.php"), encoding="utf-8").read()
+    # گروه‌بندی ناوبری از ۲.۱۱.۰ در PAS_Dashboard_Module::nav_groups() است؛
+    # قالب کناری همان منبع را می‌خواند تا مسیر صفحه و برجسته‌سازی گروه
+    # (بخش «شما اینجا هستید») یک منبع داشته باشند.
+    nav_source = sidebar + open(os.path.join(PLUGIN, "includes/modules.php"), encoding="utf-8").read()
+    nav_reads_groups = "PAS_Dashboard_Module::nav_groups()" in sidebar
 
     if "'ecosystem'" in matrix_src and "PAS_Dashboard_Module_Ecosystem" in matrix_src and "ACCESS_MANAGE" in matrix_src:
         ok("ecosystem: module registered behind the management access level")
     else:
         fail("ecosystem", "module not registered in the permission matrix")
 
-    if "'followup'" in sidebar and "'ecosystem'" in sidebar:
+    if "'followup'" in nav_source and "'ecosystem'" in nav_source and nav_reads_groups:
         ok("nav: followup and ecosystem modules are reachable from the sidebar")
     else:
         fail("nav", "sidebar omits followup or ecosystem")
@@ -863,7 +868,7 @@ def main():
     else:
         fail("updates", "loader does not require or initialize the updater")
 
-    if "'updates'" in matrix_src and "PAS_Dashboard_Module_Updates" in matrix_src and "'updates'" in sidebar:
+    if "'updates'" in matrix_src and "PAS_Dashboard_Module_Updates" in matrix_src and "'updates'" in nav_source and nav_reads_groups:
         ok("updates: module registered behind management access and reachable from the sidebar")
     else:
         fail("updates", "module is not registered or not reachable")

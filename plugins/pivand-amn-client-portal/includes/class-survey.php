@@ -392,29 +392,17 @@ final class Survey
 
         $support_phone = trim((string) get_option('zdp_support_phone', ''));
 
-        // همان هدرِ «خوش‌آمد»ی که صفحه‌ی ورود پنل دارد (لوگوی سایت اگر
-        // تنظیم شده باشد، وگرنه نشانِ دو حلقه‌ی متصل) — طبق درخواست
-        // کارفرما، تا صفحه‌ی مستقل نظرسنجی هم همان هویت بصری پنل را
-        // داشته باشد، نه یک h3 ساده‌ی بی‌هویت.
-        $custom_logo_id = get_theme_mod('custom_logo');
-        $logo_html      = $custom_logo_id ? wp_get_attachment_image($custom_logo_id, 'medium', false, [
-            'class' => 'zdp-welcome-logo-img',
-            'alt'   => esc_attr(get_bloginfo('name')),
-        ]) : '';
+        // همان نشان سایت که در نوار بالای پنل و صفحهٔ ورود استفاده می‌شود
+        // (لوگوی سفارشی، سپس آیکن سایت، سپس حرف اول نام سایت) تا صفحهٔ
+        // مستقل نظرسنجی هم هویت سایت میزبان را داشته باشد.
+        $brand_markup = zdp_site_brand_markup();
 
         ob_start();
         ?>
         <div class="zdp-survey-stage">
         <div class="zdp-panel zdp-survey-panel" dir="rtl">
             <div class="zdp-welcome">
-                <?php if ($logo_html) : ?>
-                    <div class="zdp-welcome-logo"><?php echo $logo_html; ?></div>
-                <?php else : ?>
-                    <div class="zdp-welcome-mark" aria-hidden="true">
-                        <span class="zdp-ring zdp-ring-a"></span>
-                        <span class="zdp-ring zdp-ring-b"></span>
-                    </div>
-                <?php endif; ?>
+                <div class="zdp-welcome-logo"><?php echo $brand_markup; ?></div>
                 <h2 class="zdp-welcome-title">نظرسنجی از جلسه مشاوره</h2>
             </div>
             <div class="zdp-card-form-heading">

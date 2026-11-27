@@ -292,6 +292,69 @@ final class PAS_Dashboard_Updater {
 
 	/* ── وضعیت نصب‌شده ─────────────────────────────────────────────────── */
 
+	/**
+	 * زمان آخرین آپدیتِ انجام‌شده از همین داشبورد را برای یک اسلاگ ثبت می‌کند.
+	 *
+	 * وردپرس خودش تاریخ نصب/آپدیت هر افزونه را نگه نمی‌دارد؛ بدون این مقدار،
+	 * ستون «آخرین به‌روزرسانی» در جدول به تاریخ فایل برمی‌گشت که پس از هر
+	 * آپدیت دستی یا همگام‌سازی مخزن گمراه‌کننده است.
+	 */
+	public static function record_update_time( $slug ) {
+		$slug = sanitize_key( (string) $slug );
+
+		if ( '' === $slug ) {
+			return;
+		}
+
+		// زمان‌ها داخل همان آپشن تنظیمات داشبورد ذخیره می‌شوند تا کلید تازه‌ای
+		// به فضای آپشن‌های وردپرس اضافه نشود (مالکیت آپشن یکتاست).
+		$settings = get_option( PAS_DASHBOARD_OPTION, array() );
+		$settings = is_array( $settings ) ? $settings : array();
+		$times    = isset( $settings['update_times'] ) && is_array( $settings['update_times'] )
+			? $settings['update_times']
+			: array();
+
+		$times[ $slug ] = time();
+
+		$settings['update_times'] = $times;
+
+		update_option( PAS_DASHBOARD_OPTION, $settings );
+	}
+
+	/** اسلاگِ یک فایل افزونه از فهرست سفید (یا رشتهٔ خالی). */
+	public static function slug_for_file( $plugin_file ) {
+		$slug = array_search( (string) $plugin_file, self::plugins(), true );
+
+		return false === $slug ? '' : (string) $slug;
+	}
+
+	/**
+	 * آخرین زمان آپدیت یک افزونه (timestamp یونیکس، ۰ اگر نامشخص).
+	 *
+	 * ثبتِ خودِ داشبورد دقیق‌ترین منبع است؛ اگر نبود، زمان تغییر فایل اصلی
+	 * افزونه (که وردپرس هنگام نصب/آپدیت جایگزین می‌کند) استفاده می‌شود. هیچ
+	 * تاریخی ساختگی نمایش داده نمی‌شود: نبودِ هر دو یعنی «نامشخص».
+	 */
+	public static function last_updated_ts( $slug, $plugin_file = '' ) {
+		$settings = get_option( PAS_DASHBOARD_OPTION, array() );
+		$times    = is_array( $settings ) && isset( $settings['update_times'] ) && is_array( $settings['update_times'] )
+			? $settings['update_times']
+			: array();
+		$saved    = isset( $times[ $slug ] ) ? (int) $times[ $slug ] : 0;
+		$file     = 0;
+
+		if ( '' !== (string) $plugin_file && defined( 'WP_PLUGIN_DIR' ) ) {
+			$path = WP_PLUGIN_DIR . '/' . ltrim( (string) $plugin_file, '/' );
+
+			if ( file_exists( $path ) ) {
+				$mtime = filemtime( $path );
+				$file  = false === $mtime ? 0 : (int) $mtime;
+			}
+		}
+
+		return max( $saved, $file );
+	}
+
 	/** @return array<string,array<string,string>> فهرست افزونه‌های نصب‌شده از وردپرس */
 	private static function installed_plugins() {
 		if ( ! function_exists( 'get_plugins' ) ) {
@@ -348,8 +411,9 @@ final class PAS_Dashboard_Updater {
 				'latest'    => $latest,
 				'state'     => $state,
 				'detail'    => $detail,
-				'package'   => isset( $catalog['items'][ $slug ] ) ? (string) $catalog['items'][ $slug ]['package'] : '',
-				'size'      => isset( $catalog['items'][ $slug ] ) ? (int) $catalog['items'][ $slug ]['size'] : 0,
+				'package'    => isset( $catalog['items'][ $slug ] ) ? (string) $catalog['items'][ $slug ]['package'] : '',
+				'size'       => isset( $catalog['items'][ $slug ] ) ? (int) $catalog['items'][ $slug ]['size'] : 0,
+				'updated_ts' => self::last_updated_ts( (string) $slug, (string) $plugin_file ),
 			);
 		}
 
@@ -518,11 +582,34 @@ final class PAS_Dashboard_Updater {
 		return $args;
 	}
 
-	/** پس از هر آپدیت، فهرست دوباره خوانده شود تا وضعیت کهنه نماند. */
+	/**
+	 * پس از هر آپدیت، فهرست دوباره خوانده شود و زمان آپدیت ثبت شود.
+	 *
+	 * این هوک هم آپدیت از داشبورد و هم آپدیت از «پیشخوان ← به‌روزرسانی‌ها»
+	 * (و آپدیت خودکار) را پوشش می‌دهد؛ پس تاریخِ ستون همیشه واقعی است.
+	 */
 	public static function after_upgrade( $upgrader, $hook_extra ) {
-		if ( is_array( $hook_extra ) && ( $hook_extra['action'] ?? '' ) === 'update' ) {
-			self::clear_cache();
+		if ( ! is_array( $hook_extra ) || ( $hook_extra['action'] ?? '' ) !== 'update' ) {
+			return;
 		}
+
+		$files = array();
+
+		if ( ! empty( $hook_extra['plugin'] ) ) {
+			$files[] = (string) $hook_extra['plugin'];
+		}
+
+		if ( ! empty( $hook_extra['plugins'] ) && is_array( $hook_extra['plugins'] ) ) {
+			foreach ( $hook_extra['plugins'] as $file ) {
+				$files[] = (string) $file;
+			}
+		}
+
+		foreach ( array_unique( $files ) as $file ) {
+			self::record_update_time( self::slug_for_file( $file ) );
+		}
+
+		self::clear_cache();
 	}
 
 	/* ── عملیات نوشتنی (از Action Bus) ─────────────────────────────────── */
@@ -669,45 +756,15 @@ final class PAS_Dashboard_Updater {
 			);
 		}
 
-		// ترنزینت تازه تا بسته‌های همین بررسی در آپ‌گریدر دیده شوند.
-		delete_site_transient( 'update_plugins' );
-		if ( ! function_exists( 'wp_update_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/update.php';
-		}
-		wp_update_plugins();
-
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/misc.php';
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-		$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
-		$results  = $upgrader->bulk_upgrade( $files );
-
-		$done   = 0;
-		$failed = 0;
-
-		if ( is_array( $results ) ) {
-			foreach ( $results as $result ) {
-				if ( true === $result ) {
-					$done++;
-				} else {
-					$failed++;
-				}
-			}
-		} else {
-			$failed = count( $files );
-		}
+		$result = self::perform_updates( $files );
 
 		self::clear_cache();
 		delete_site_transient( 'update_plugins' );
 
-		if ( $done === 0 ) {
-			$reason = '';
-
-			if ( isset( $upgrader->skin->result ) && is_wp_error( $upgrader->skin->result ) ) {
-				$reason = ' ' . $upgrader->skin->result->get_error_message();
-			}
+		if ( $result['done'] === 0 ) {
+			$reason = ! empty( $result['errors'] )
+				? ' ' . implode( ' ', array_slice( $result['errors'], 0, 2 ) )
+				: '';
 
 			return array(
 				'ok'       => false,
@@ -723,21 +780,91 @@ final class PAS_Dashboard_Updater {
 
 		return array(
 			'ok'       => true,
-			'message'  => $failed > 0
+			'message'  => $result['failed'] > 0
 				? sprintf(
 					/* translators: 1: updated, 2: failed */
 					__( '%1$d افزونه به‌روز شد و %2$d افزونه ناموفق بود.', 'peyvand-amn-dashboard' ),
-					$done,
-					$failed
+					(int) $result['done'],
+					(int) $result['failed']
 				)
 				: sprintf(
 					/* translators: %d: updated plugins */
 					__( '%d افزونه از مخزن گیت‌هاب به‌روز شد.', 'peyvand-amn-dashboard' ),
-					$done
+					(int) $result['done']
 				),
 			'id'       => 0,
 			'redirect' => self::module_url(),
 		);
+	}
+
+	/**
+	 * آپدیت واقعی بسته‌ها — هر افزونه در یک تلاش جداگانه.
+	 *
+	 * صفحهٔ سفید پس از زدن «به‌روزرسانی» ریشه در یک درخواستِ طولانی داشت:
+	 * آپدیت چند بسته با هم می‌تواند از سقف زمان اجرا یا حافظهٔ هاست بگذرد و
+	 * PHP با خطای مرگبار همان درخواست را قطع کند (پاسخ HTML ناقص = صفحهٔ
+	 * سفید). اکنون هر فایل جدا آپدیت می‌شود، خطای یک بسته بقیه را متوقف
+	 * نمی‌کند و هیچ استثنایی از این تابع بیرون نمی‌زند.
+	 *
+	 * @return array{done:int,failed:int,errors:array<int,string>}
+	 */
+	private static function perform_updates( array $files ) {
+		$out = array( 'done' => 0, 'failed' => 0, 'errors' => array() );
+
+		// ترنزینت تازه تا بسته‌های همین بررسی در آپ‌گریدر دیده شوند.
+		delete_site_transient( 'update_plugins' );
+
+		if ( ! function_exists( 'wp_update_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/update.php';
+		}
+
+		wp_update_plugins();
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- بهترین تلاش؛ روی هاست‌های محدود بی‌اثر است.
+		}
+
+		if ( function_exists( 'wp_raise_memory_limit' ) ) {
+			wp_raise_memory_limit( 'admin' );
+		}
+
+		foreach ( $files as $file ) {
+			$file = (string) $file;
+
+			if ( '' === $file ) {
+				continue;
+			}
+
+			try {
+				$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
+				$result   = $upgrader->upgrade( $file );
+
+				if ( true === $result ) {
+					$out['done']++;
+					self::record_update_time( self::slug_for_file( $file ) );
+					continue;
+				}
+
+				$out['failed']++;
+
+				if ( is_wp_error( $result ) ) {
+					$out['errors'][] = $result->get_error_message();
+				} elseif ( isset( $upgrader->skin->result ) && is_wp_error( $upgrader->skin->result ) ) {
+					$out['errors'][] = $upgrader->skin->result->get_error_message();
+				}
+			} catch ( Throwable $e ) {
+				// خطای یک بسته نباید کل درخواست را قطع کند.
+				$out['failed']++;
+				$out['errors'][] = $e->getMessage();
+			}
+		}
+
+		return $out;
 	}
 
 	/* ── نمایش ─────────────────────────────────────────────────────────── */

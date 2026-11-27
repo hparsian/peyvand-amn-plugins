@@ -341,6 +341,49 @@ function get_client_ip(): string
  * صفحه‌ای که شناسه‌اش در zdp_panel_page_id ذخیره شده برگردانده می‌شود و
  * تنها اگر آن صفحه نبود، /panel/ به‌عنوان fallback می‌آید.
  */
+/**
+ * نام برند برای کنار لوگو — نام خود سایت میزبان، نه نام افزونه.
+ */
+function zdp_site_brand_name(): string
+{
+    $name = trim((string) get_bloginfo('name'));
+
+    return $name !== '' ? $name : 'پیوند امن';
+}
+
+/**
+ * نشان سایت برای نوار بالای پنل، صفحهٔ ورود و نظرسنجی.
+ *
+ * ترتیب: لوگوی سفارشی قالب، سپس آیکن سایت، و در آخر حرف اول نام سایت.
+ * لوگوی ساختگی خودِ افزونه (دو حلقهٔ درهم‌تنیده) دیگر جایی رندر نمی‌شود تا
+ * مراجع در هر نما هویت سایت میزبان را ببیند.
+ */
+function zdp_site_brand_markup(): string
+{
+    $name = zdp_site_brand_name();
+
+    $logo_id = (int) get_theme_mod('custom_logo');
+    if ($logo_id > 0) {
+        $image = wp_get_attachment_image($logo_id, 'medium', false, [
+            'class' => 'zdp-brand-logo',
+            'alt'   => $name,
+        ]);
+
+        if (is_string($image) && $image !== '') {
+            return $image;
+        }
+    }
+
+    $icon = (string) get_site_icon_url(96);
+    if ($icon !== '') {
+        return '<img class="zdp-brand-logo" src="' . esc_url($icon) . '" alt="' . esc_attr($name) . '" loading="lazy" decoding="async" />';
+    }
+
+    $initial = function_exists('mb_substr') ? mb_substr($name, 0, 1) : substr($name, 0, 1);
+
+    return '<span class="zdp-brand-initial" aria-hidden="true">' . esc_html($initial) . '</span>';
+}
+
 function zdp_panel_url(): string
 {
     $page_id = (int) get_option('zdp_panel_page_id');

@@ -114,6 +114,25 @@
 
 .zdp-login-brand-mark svg { inline-size: 22px; block-size: 22px; }
 
+/* لوگوی سایت میزبان در ستون برند و نشان موبایل صفحهٔ ورود */
+.zdp-login-brand-logo .zdp-brand-logo {
+    max-block-size: 44px;
+    max-inline-size: 200px;
+    inline-size: auto;
+}
+
+.zdp-login-stage .zdp-login-mobile-brand .zdp-brand-logo {
+    max-block-size: 38px;
+    max-inline-size: 160px;
+    inline-size: auto;
+}
+
+.zdp-login-stage .zdp-brand-initial {
+    inline-size: 38px;
+    block-size: 38px;
+    border-radius: 12px;
+}
+
 .zdp-login-brand-img {
     max-block-size: 56px;
     inline-size: auto;

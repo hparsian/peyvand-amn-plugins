@@ -13,13 +13,21 @@ $pas_crypto = PAS_Dashboard_Core_Bridge::crypto_ready();
  * گروه‌بندی ماژول‌ها: فقط گروه‌هایی که حداقل یک ماژول مجاز دارند رندر
  * می‌شوند. ترتیب گروه‌ها از کار روزمره به مدیریت می‌رود.
  */
-$pas_groups = array(
-	__( 'کار بالینی', 'peyvand-amn-dashboard' ) => array( 'overview', 'patients', 'case_files', 'assessments', 'appointments' ),
-	__( 'پیگیری', 'peyvand-amn-dashboard' )     => array( 'reports', 'communications', 'followup', 'notifications' ),
-	__( 'مدیریت', 'peyvand-amn-dashboard' )     => array( 'ecosystem', 'updates', 'system_health', 'settings', 'audit' ),
-);
+$pas_groups        = PAS_Dashboard_Module::nav_groups();
+$pas_current_group = isset( $module ) && $module instanceof PAS_Dashboard_Module
+	? PAS_Dashboard_Module::group_for( $module->id )
+	: '';
 ?>
 <nav class="pvn-nav pas-sidebar" id="pas-sidebar" aria-label="<?php esc_attr_e( 'ناوبری داشبورد', 'peyvand-amn-dashboard' ); ?>">
+	<?php if ( isset( $module ) && $module instanceof PAS_Dashboard_Module ) : ?>
+		<p class="pvn-nav__now">
+			<span class="pvn-nav__now-icon" aria-hidden="true"><?php echo PAS_Dashboard_Module::svg( $module->id, 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="pvn-nav__now-text">
+				<small><?php esc_html_e( 'شما اینجا هستید', 'peyvand-amn-dashboard' ); ?></small>
+				<b><?php echo esc_html( $module->title ); ?></b>
+			</span>
+		</p>
+	<?php endif; ?>
 	<?php foreach ( $pas_groups as $pas_group_label => $pas_ids ) : ?>
 		<?php
 		$pas_items = array();
@@ -33,7 +41,7 @@ $pas_groups = array(
 			continue;
 		}
 		?>
-		<div class="pvn-nav__group">
+		<div class="pvn-nav__group<?php echo esc_attr( $pas_current_group === $pas_group_label ? ' is-current' : '' ); ?>">
 			<p class="pvn-nav__label"><?php echo esc_html( $pas_group_label ); ?></p>
 
 			<?php foreach ( $pas_items as $pas_id => $pas_item ) : ?>

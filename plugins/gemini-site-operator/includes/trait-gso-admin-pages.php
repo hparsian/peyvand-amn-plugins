@@ -616,6 +616,7 @@ trait GSO_Admin_Pages {
 							</tr>
 						</table>
 						<p><button type="button" class="button" data-gso-task="test_api">تست اتصال</button></p>
+						<p class="description">تست اتصال از کلید <strong>ذخیره‌شده</strong> استفاده می‌کند؛ ابتدا «ذخیره تنظیمات» را بزنید و سپس تست کنید.</p>
 					</div>
 
 					<div class="gso-card">

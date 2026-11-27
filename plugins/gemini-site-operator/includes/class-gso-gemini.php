@@ -167,7 +167,7 @@ class GSO_Gemini {
 			}
 			$tried[] = $model;
 
-			$result = self::dispatch( $model, $body, $key, $deadline );
+			$result = self::dispatch( $model, self::with_thinking( $body, $model, $kind, $args ), $key, $deadline );
 
 			if ( ! is_wp_error( $result ) ) {
 				GSO_Limiter::register_success();
@@ -179,8 +179,9 @@ class GSO_Gemini {
 			$data = is_array( $data ) ? $data : array();
 			$code = (int) ( $data['status'] ?? 0 );
 
-			// سوئیچ خودکار مدل فقط وقتی مدل در دسترس نیست؛ خطاهای نرخ با Backoff مدیریت می‌شوند.
-			$switchable = 404 === $code;
+			// سوئیچ خودکار مدل فقط وقتی مدل در دسترس یا پشتیبانی نمی‌شود؛ خطاهای نرخ با Backoff مدیریت می‌شوند.
+			$switchable = 404 === $code
+				|| ( 400 === $code && (bool) preg_match( '/model|not found|not supported|unsupported/i', $result->get_error_message() ) );
 			if ( ! $switchable || empty( GSO_Settings::get( 'auto_model_switch', true ) ) ) {
 				break;
 			}
@@ -203,6 +204,40 @@ class GSO_Gemini {
 	private static function model_for( string $kind, array $args ): string {
 		$model = (string) ( $args['model'] ?? GSO_Settings::model( $kind ) );
 		return (string) preg_replace( '/[^a-zA-Z0-9._\-]/', '', $model );
+	}
+
+	/**
+	 * افزودن «بودجهٔ تفکر» مناسب مدل به بدنهٔ درخواست.
+	 *
+	 * مدل‌های Gemini ۲.۵ به بعد پیش از پاسخ «فکر» می‌کنند و توکن‌های تفکر از همان
+	 * maxOutputTokens کم می‌شود؛ با بودجهٔ کوچک (مثل تست اتصال یا JSON کوتاه) متن
+	 * خروجی خالی برمی‌گردد و کاربر خطا می‌بیند. برای مدل‌های flash/lite تفکر را
+	 * خاموش می‌کنیم و مدل‌های pro (که بودجهٔ صفر را نمی‌پذیرند) دست‌نخورده می‌مانند.
+	 *
+	 * @param array  $body  بدنهٔ درخواست.
+	 * @param string $model نام مدل.
+	 * @param string $kind  bulk|deep.
+	 * @param array  $args  آرگومان‌ها (thinking_budget صریح).
+	 * @return array
+	 */
+	private static function with_thinking( array $body, string $model, string $kind, array $args ): array {
+		$explicit = $args['thinking_budget'] ?? null;
+		if ( null === $explicit && ! preg_match( '/gemini-(?:(?:2\.[5-9])|[3-9])/i', $model ) ) {
+			// thinkingConfig روی مدل‌های قدیمی‌تر پشتیبانی نمی‌شود.
+			return $body;
+		}
+
+		if ( preg_match( '/pro/i', $model ) ) {
+			if ( null === $explicit ) {
+				return $body;
+			}
+			$budget = max( 128, (int) $explicit );
+		} else {
+			$budget = null === $explicit ? ( 'deep' === $kind ? 1024 : 0 ) : max( 0, (int) $explicit );
+		}
+
+		$body['generationConfig']['thinkingConfig'] = array( 'thinkingBudget' => $budget );
+		return $body;
 	}
 
 	/**
@@ -310,9 +345,12 @@ class GSO_Gemini {
 		$text   = self::extract_text( $json );
 		$finish = (string) ( $json['candidates'][0]['finishReason'] ?? '' );
 		if ( '' === trim( $text ) && '' !== $finish ) {
+			$message = 'MAX_TOKENS' === $finish
+				? 'سقف توکن خروجی پیش از تولید متن تمام شد (MAX_TOKENS)؛ «حداکثر توکن خروجی» را بالا ببرید.'
+				: sprintf( 'پاسخ Gemini خالی بود (%s).', $finish );
 			return new WP_Error(
 				'gso_empty_reply',
-				sprintf( 'پاسخ Gemini خالی بود (%s).', $finish ),
+				$message,
 				array( 'retryable' => 'MAX_TOKENS' !== $finish )
 			);
 		}
@@ -421,13 +459,54 @@ class GSO_Gemini {
 	 * @return array|WP_Error
 	 */
 	public static function test_connection() {
+		$model  = GSO_Settings::model( 'bulk' );
 		$result = self::text(
 			'فقط بنویس: اتصال برقرار است.',
-			array( 'model_kind' => 'bulk', 'max_tokens' => 64, 'temperature' => 0, 'block' => true )
+			array(
+				'model'           => $model,
+				'model_kind'      => 'bulk',
+				'max_tokens'      => 512,
+				'temperature'     => 0,
+				'thinking_budget' => 0,
+				'block'           => true,
+			)
 		);
 		if ( is_wp_error( $result ) ) {
-			return $result;
+			return self::friendly_error( $result, $model );
 		}
-		return array( 'message' => $result, 'model' => GSO_Settings::model( 'bulk' ) );
+		return array( 'message' => $result, 'model' => $model );
+	}
+
+	/**
+	 * افزودن راهنمای عملی فارسی به خطاهای رایج اتصال/کلید.
+	 *
+	 * @param WP_Error $error خطا.
+	 * @param string   $model مدل استفاده‌شده.
+	 * @return WP_Error
+	 */
+	private static function friendly_error( WP_Error $error, string $model ): WP_Error {
+		$data   = $error->get_error_data();
+		$status = is_array( $data ) && isset( $data['status'] ) ? (int) $data['status'] : 0;
+		$code   = (string) $error->get_error_code();
+		$hint   = '';
+
+		if ( 'gso_no_key' === $code ) {
+			$hint = 'کلید ذخیره نشده است؛ فیلد کلید را پر کنید و «ذخیره تنظیمات» را بزنید.';
+		} elseif ( 400 === $status || 401 === $status || 403 === $status ) {
+			$hint = 'کلید یا دسترسی پذیرفته نشد؛ در Google AI Studio یک کلید تازه بسازید، بدون فاصله/نقل‌قول بچسبانید و مطمئن شوید API «Generative Language» برای همان پروژه فعال است.';
+		} elseif ( 404 === $status ) {
+			$hint = sprintf( 'مدل «%s» با این کلید در دسترس نیست؛ در تنظیمات نام مدل را به gemini-2.5-flash تغییر دهید.', $model );
+		} elseif ( 429 === $status || 'gso_quota' === $code || 'gso_rate_limited' === $code ) {
+			$hint = 'محدودیت نرخ/سهمیه فعال است؛ چند لحظه صبر کنید یا تنظیمات را دوباره ذخیره کنید تا وضعیت محدودیت پاک شود.';
+		} elseif ( 'gso_empty_reply' === $code ) {
+			$hint = '«حداکثر توکن خروجی» را در تنظیمات بالا ببرید.';
+		} elseif ( 'gso_transport' === $code ) {
+			$hint = 'اتصال خروجی سرور به generativelanguage.googleapis.com برقرار نشد؛ فایروال هاست، پروکسی یا گواهی SSL را بررسی کنید.';
+		}
+
+		if ( '' === $hint ) {
+			return $error;
+		}
+		return new WP_Error( $code, $error->get_error_message() . ' — ' . $hint, $data );
 	}
 }

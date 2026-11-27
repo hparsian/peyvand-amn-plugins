@@ -90,6 +90,10 @@ class GSO_Admin {
 	 * زمان‌بندی مجدد پس از ذخیره تنظیمات.
 	 */
 	public static function on_settings_saved(): void {
+		// با ذخیرهٔ تنظیمات (مثلاً کلید تازه یا افزایش سقف)، قفل نرخ/سهمیهٔ قبلی پاک شود
+		// تا خطای قدیمی مانع «تست اتصال» نشود.
+		GSO_Limiter::clear_backoff();
+
 		$next = wp_next_scheduled( 'gso_schedule_scan' );
 		if ( $next ) {
 			wp_unschedule_event( $next, 'gso_schedule_scan' );

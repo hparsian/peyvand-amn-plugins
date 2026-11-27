@@ -736,14 +736,34 @@
         var tabs = document.querySelectorAll('.zdp-tab');
         if (!tabs.length) return;
 
+        // نشانگر «بخش جاری» برای صفحه‌خوان‌ها؛ ردیف تب‌ها چسبان است، پس
+        // همان تب توپر همیشه مشخص می‌کند کاربر در کدام قسمت است.
+        tabs.forEach(function (t) {
+            if (t.classList.contains('active')) {
+                t.setAttribute('aria-current', 'true');
+            }
+        });
+
+        function revealTab(tab) {
+            if (!tab || typeof tab.scrollIntoView !== 'function') return;
+            try {
+                tab.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+            } catch (e) {
+                // مرورگرهای قدیمی: رفتار پیش‌فرض کافی است.
+            }
+        }
+
         tabs.forEach(function (tab) {
             tab.addEventListener('click', function () {
                 tabs.forEach(function (t) {
                     t.classList.remove('active');
                     t.setAttribute('aria-selected', 'false');
+                    t.removeAttribute('aria-current');
                 });
                 tab.classList.add('active');
                 tab.setAttribute('aria-selected', 'true');
+                tab.setAttribute('aria-current', 'true');
+                revealTab(tab);
 
                 var shown = null;
                 document.querySelectorAll('.zdp-tab-panel').forEach(function (panel) {

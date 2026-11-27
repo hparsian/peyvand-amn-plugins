@@ -231,8 +231,8 @@ final class Client_Panel
                     <?php if ($logo_html) : ?>
                         <?php echo $logo_html; ?>
                     <?php else : ?>
-                        <span class="zdp-login-brand-mark" aria-hidden="true"><?php echo $this->icon('link'); ?></span>
-                        <span>پیوند امن</span>
+                        <?php echo $this->site_brand_markup(); ?>
+                        <span><?php echo esc_html($this->site_brand_name()); ?></span>
                     <?php endif; ?>
                 </div>
                 <h2 class="zdp-login-brand-title">به پیوند امن خوش آمدید</h2>
@@ -247,8 +247,8 @@ final class Client_Panel
             <div class="zdp-login-main">
             <div class="zdp-panel zdp-login" dir="rtl">
             <div class="zdp-login-mobile-brand">
-                <span class="zdp-login-brand-mark" aria-hidden="true"><?php echo $this->icon('link'); ?></span>
-                <span>پیوند امن</span>
+                <?php echo $this->site_brand_markup(); ?>
+                <span><?php echo esc_html($this->site_brand_name()); ?></span>
             </div>
 
             <div class="zdp-login-head">
@@ -342,6 +342,28 @@ final class Client_Panel
     }
 
     /**
+     * نام برند برای نمایش کنار لوگو — نام خودِ سایت میزبان، نه نام افزونه.
+     * اگر سایت نامی نداشته باشد، همان نام تجاری اکوسیستم برمی‌گردد.
+     */
+    private function site_brand_name(): string
+    {
+        return zdp_site_brand_name();
+    }
+
+    /**
+     * نشان سایت در نوار بالای پنل و صفحهٔ ورود.
+     *
+     * ترتیب انتخاب: لوگوی سفارشی قالب (سفارشی‌ساز ← هویت سایت)، سپس آیکن
+     * سایت (favicon بزرگ)، و در آخر حرف اول نام سایت. لوگوی ساختگی خودِ
+     * افزونه (دو حلقه + «پیوند امن») دیگر در پنل رندر نمی‌شود تا مراجع در
+     * هر نگاه، هویت سایت میزبان را ببیند.
+     */
+    private function site_brand_markup(): string
+    {
+        return zdp_site_brand_markup();
+    }
+
+    /**
      * آیکن‌های SVG درون‌خطی سبک (بدون فونت/کتابخانه‌ی خارجی، بدون درخواست
      * HTTP اضافه) که فقط برای این پوسته‌ی جدید UI استفاده می‌شوند. عمداً در
      * همین کلاس presentation نگه داشته شده‌اند و هیچ منطق کسب‌وکاری را لمس
@@ -424,13 +446,10 @@ final class Client_Panel
         <div class="zdp-panel zdp-panel-shell" dir="rtl" data-user-mobile="<?php echo esc_attr($mobile); ?>">
 
             <header class="zdp-shell-topbar">
-                <div class="zdp-shell-brand">
-                    <span class="zdp-shell-brand-mark" aria-hidden="true">
-                        <span class="zdp-ring zdp-ring-a"></span>
-                        <span class="zdp-ring zdp-ring-b"></span>
-                    </span>
-                    <span class="zdp-shell-brand-name">پیوند امن</span>
-                </div>
+                <a class="zdp-shell-brand" href="<?php echo esc_url(home_url('/')); ?>" title="<?php echo esc_attr($this->site_brand_name()); ?>">
+                    <span class="zdp-shell-brand-logo"><?php echo $this->site_brand_markup(); ?></span>
+                    <span class="zdp-shell-brand-name"><?php echo esc_html($this->site_brand_name()); ?></span>
+                </a>
 
                 <div class="zdp-shell-user">
                     <span class="zdp-shell-user-avatar" aria-hidden="true"><?php echo esc_html($avatar_text); ?></span>

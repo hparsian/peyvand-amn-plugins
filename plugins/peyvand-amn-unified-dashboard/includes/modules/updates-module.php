@@ -37,6 +37,14 @@ final class PAS_Dashboard_Module_Updates extends PAS_Dashboard_Module {
 			$status['branch']
 		) ) . '</p>';
 
+		if ( (int) $status['fetched_at'] > 0 ) {
+			$html .= '<p class="pas-muted pvn-update-checked">' . esc_html( sprintf(
+				/* translators: %s: Jalali date and time */
+				__( 'آخرین بررسی مخزن: %s', 'peyvand-amn-dashboard' ),
+				self::jalali_time( (int) $status['fetched_at'] )
+			) ) . '</p>';
+		}
+
 		if ( $status['error'] !== '' ) {
 			$html .= $this->notice( 'warning', $status['error'] );
 		}
@@ -47,10 +55,11 @@ final class PAS_Dashboard_Module_Updates extends PAS_Dashboard_Module {
 		$html .= '</form>';
 
 		if ( $summary['update'] > 0 ) {
-			$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="pas-inline-form">';
+			$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="pas-inline-form" data-pas-update-form="1" data-pas-update-all="1">';
 			$html .= PAS_Dashboard_Actions::fields( 'updates.run', $this->url() );
 			$html .= '<input type="hidden" name="slug" value="" />';
-			$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'به‌روزرسانی همهٔ افزونه‌ها', 'peyvand-amn-dashboard' ) . '</button>';
+			$html .= '<button class="pas-btn pas-btn-primary" type="submit" data-pas-update-trigger>' . esc_html__( 'به‌روزرسانی همهٔ افزونه‌ها', 'peyvand-amn-dashboard' ) . '</button>';
+			$html .= '<span class="pvn-update-state" data-pas-update-state aria-live="polite"></span>';
 			$html .= '</form>';
 		}
 
@@ -71,29 +80,36 @@ final class PAS_Dashboard_Module_Updates extends PAS_Dashboard_Module {
 	/** جدول وضعیت همهٔ افزونه‌های فهرست سفید. */
 	private function render_table( array $status ) {
 		$html  = $this->card_open( __( 'وضعیت نسخه‌ها', 'peyvand-amn-dashboard' ) );
-		$html .= '<div class="pas-table-wrap"><table class="pas-table"><thead><tr>';
+		$html .= '<div class="pas-table-wrap"><table class="pas-table pvn-updates-table"><thead><tr>';
 		$html .= '<th>' . esc_html__( 'افزونه', 'peyvand-amn-dashboard' ) . '</th>';
 		$html .= '<th>' . esc_html__( 'نسخهٔ نصب‌شده', 'peyvand-amn-dashboard' ) . '</th>';
 		$html .= '<th>' . esc_html__( 'آخرین نسخهٔ مخزن', 'peyvand-amn-dashboard' ) . '</th>';
+		$html .= '<th>' . esc_html__( 'آخرین به‌روزرسانی', 'peyvand-amn-dashboard' ) . '</th>';
 		$html .= '<th>' . esc_html__( 'وضعیت', 'peyvand-amn-dashboard' ) . '</th>';
-		$html .= '<th>' . esc_html__( 'جزئیات', 'peyvand-amn-dashboard' ) . '</th>';
 		$html .= '<th>' . esc_html__( 'عملیات', 'peyvand-amn-dashboard' ) . '</th>';
 		$html .= '</tr></thead><tbody>';
 
 		foreach ( $status['items'] as $item ) {
+			$slug       = (string) $item['slug'];
+			$updated_ts = (int) ( $item['updated_ts'] ?? 0 );
+			$updated    = $updated_ts > 0
+				? self::jalali_time( $updated_ts )
+				: __( 'نامشخص', 'peyvand-amn-dashboard' );
+
 			$html .= '<tr>';
-			$html .= '<td data-label="' . esc_attr__( 'افزونه', 'peyvand-amn-dashboard' ) . '"><strong>' . esc_html( (string) $item['name'] ) . '</strong><br /><code dir="ltr">' . esc_html( (string) $item['slug'] ) . '</code></td>';
+			$html .= '<td data-label="' . esc_attr__( 'افزونه', 'peyvand-amn-dashboard' ) . '"><strong>' . esc_html( (string) $item['name'] ) . '</strong><br /><code dir="ltr">' . esc_html( $slug ) . '</code></td>';
 			$html .= '<td data-label="' . esc_attr__( 'نسخهٔ نصب‌شده', 'peyvand-amn-dashboard' ) . '"><span dir="ltr">' . esc_html( $item['current'] !== '' ? (string) $item['current'] : '—' ) . '</span></td>';
 			$html .= '<td data-label="' . esc_attr__( 'آخرین نسخهٔ مخزن', 'peyvand-amn-dashboard' ) . '"><span dir="ltr">' . esc_html( $item['latest'] !== '' ? (string) $item['latest'] : '—' ) . '</span></td>';
-			$html .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '"><span class="pas-badge ' . esc_attr( PAS_Dashboard_Updater::state_class( (string) $item['state'] ) ) . '">' . esc_html( PAS_Dashboard_Updater::state_label( (string) $item['state'] ) ) . '</span></td>';
-			$html .= '<td data-label="' . esc_attr__( 'جزئیات', 'peyvand-amn-dashboard' ) . '">' . esc_html( (string) $item['detail'] ) . '</td>';
+			$html .= '<td data-label="' . esc_attr__( 'آخرین به‌روزرسانی', 'peyvand-amn-dashboard' ) . '"><time class="pvn-updated" datetime="' . esc_attr( $updated_ts > 0 ? gmdate( 'c', $updated_ts ) : '' ) . '">' . esc_html( $updated ) . '</time></td>';
+			$html .= '<td data-label="' . esc_attr__( 'وضعیت', 'peyvand-amn-dashboard' ) . '"><span class="pas-badge ' . esc_attr( PAS_Dashboard_Updater::state_class( (string) $item['state'] ) ) . '" title="' . esc_attr( (string) $item['detail'] ) . '">' . esc_html( PAS_Dashboard_Updater::state_label( (string) $item['state'] ) ) . '</span></td>';
 			$html .= '<td data-label="' . esc_attr__( 'عملیات', 'peyvand-amn-dashboard' ) . '">';
 
 			if ( 'update' === $item['state'] ) {
-				$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="pas-inline-form">';
+				$html .= '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="pas-inline-form" data-pas-update-form="1" data-slug="' . esc_attr( $slug ) . '">';
 				$html .= PAS_Dashboard_Actions::fields( 'updates.run', $this->url() );
-				$html .= '<input type="hidden" name="slug" value="' . esc_attr( (string) $item['slug'] ) . '" />';
-				$html .= '<button class="pas-btn pas-btn-primary" type="submit">' . esc_html__( 'به‌روزرسانی', 'peyvand-amn-dashboard' ) . '</button>';
+				$html .= '<input type="hidden" name="slug" value="' . esc_attr( $slug ) . '" />';
+				$html .= '<button class="pas-btn pas-btn-primary" type="submit" data-pas-update-trigger>' . esc_html__( 'به‌روزرسانی', 'peyvand-amn-dashboard' ) . '</button>';
+				$html .= '<span class="pvn-update-state" data-pas-update-state aria-live="polite"></span>';
 				$html .= '</form>';
 			} else {
 				$html .= '<span class="pas-muted">—</span>';
@@ -107,6 +123,19 @@ final class PAS_Dashboard_Module_Updates extends PAS_Dashboard_Module {
 		$html .= $this->card_close();
 
 		return $html;
+	}
+
+	/** تاریخ + ساعت شمسی از یک timestamp (وقت محلی سایت). */
+	private static function jalali_time( $timestamp ) {
+		$timestamp = (int) $timestamp;
+
+		if ( $timestamp <= 0 ) {
+			return '—';
+		}
+
+		$local = function_exists( 'wp_date' ) ? wp_date( 'Y-m-d H:i:s', $timestamp ) : gmdate( 'Y-m-d H:i:s', $timestamp );
+
+		return PAS_Dashboard_Core_Bridge::jalali_datetime( (string) $local );
 	}
 
 	/**
