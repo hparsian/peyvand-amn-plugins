@@ -123,6 +123,7 @@
 
 .gso-dot-critical { background: #d63638; }
 .gso-dot-high { background: #dba617; }
+.gso-dot-medium { background: #e08a00; }
 .gso-dot-low { background: #2271b1; }
 
 .gso-progress {
@@ -242,6 +243,7 @@
 
 .gso-badge-critical { background: #fcf0f1; color: #b32d2e; border: 1px solid #f0c4c5; }
 .gso-badge-high { background: #fcf9e8; color: #8a6100; border: 1px solid #f0e2b6; }
+.gso-badge-medium { background: #fff4e5; color: #8a4b00; border: 1px solid #f3d9b5; }
 .gso-badge-low { background: #eef6fc; color: #135e96; border: 1px solid #c6e1f5; }
 
 .gso-status-open { background: #f6f7f7; color: #3c434a; }

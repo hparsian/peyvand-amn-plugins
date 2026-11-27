@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Gemini Site Operator — اپراتور هوشمند کل سایت
  * Description: اپراتور هوشمند و ناظر دائمی وردپرس: ممیزی کل سایت، صف اولویت‌بندی، اصلاح گام‌به‌گام یا دسته‌ای با پیش‌نمایش، Snapshot و بازگشت، تولید محتوا/متا/Alt/CSS و پایش رویدادمحور و دوره‌ای — متصل مستقیم و امن به Gemini API با کلید شخصی.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Tested up to: 7.1
@@ -19,6 +19,7 @@
  *   includes/class-gso-install.php     اسکیمای دیتابیس، فعال/غیرفعال‌سازی، کران
  *   includes/class-gso-logger.php      گزارش عملیات
  *   includes/class-gso-limiter.php     محدودیت نرخ، سهمیه روزانه و Backoff
+ *   includes/class-gso-contract.php    قرارداد و اسکیمای JSON خروجی Gemini
  *   includes/class-gso-gemini.php      کلاینت Gemini (wp_remote_post، JSON، سوئیچ مدل)
  *   includes/class-gso-seo.php         پل فیلدهای متای افزونه‌های سئو
  *   includes/class-gso-issues.php      CRUD نواقص، امتیاز سلامت، آمار، صف
@@ -38,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSO_VERSION', '1.3.0' );
+define( 'GSO_VERSION', '1.4.0' );
 define( 'GSO_FILE', __FILE__ );
 define( 'GSO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSO_URL', plugin_dir_url( __FILE__ ) );
@@ -58,6 +59,7 @@ require_once GSO_DIR . 'includes/class-gso-settings.php';
 require_once GSO_DIR . 'includes/class-gso-install.php';
 require_once GSO_DIR . 'includes/class-gso-logger.php';
 require_once GSO_DIR . 'includes/class-gso-limiter.php';
+require_once GSO_DIR . 'includes/class-gso-contract.php';
 require_once GSO_DIR . 'includes/class-gso-gemini.php';
 require_once GSO_DIR . 'includes/class-gso-seo.php';
 require_once GSO_DIR . 'includes/class-gso-issues.php';

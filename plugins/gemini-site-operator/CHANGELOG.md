@@ -1,5 +1,16 @@
 # تغییرات Gemini Site Operator
 
+## 1.4.0
+
+### قرارداد یکپارچهٔ JSON خروجی Gemini
+- کلاس تازهٔ `GSO_Contract` اضافه شد: پاکت استاندارد `schema_version`/`mode`/`target`/`health_score`/`summary`/`issues`/`proposed_changes`/`warnings` به‌همراه اسکیمای `responseSchema` و متن قرارداد که به انتهای پرامپت افزوده می‌شود.
+- آیتم‌های `issues` حالا `issue_id`، `category`، `priority_rank`، `field_path`، `current_value_excerpt`، `recommended_action`، `auto_fix_safe` و `requires_manual_approval` دارند؛ ترتیب گزارش بر اساس بحرانیت و اولویت است.
+- `proposed_changes` برای سئو (عنوان، متا، کلیدواژه، canonical، robots)، محتوا (HTML، خلاصه، هدینگ‌ها، لینک داخلی)، رسانه (Alt) و ووکامرس (توضیح کوتاه/کامل، دسته، برچسب، Alt شاخص/گالری، محصول مکمل، بررسی قیمت و موجودی و `unverified_specs_note`) تعریف شد.
+- `GSO_Gemini::json()` با پرچم `contract` متن قرارداد را تزریق و پاسخ را با `GSO_Contract::normalize()` استاندارد می‌کند؛ کلید ناشناخته حذف و نوع/مقدار نامعتبر اصلاح می‌شود.
+- بازیابی JSON: اگر پاسخ نامعتبر یا ناقص باشد، یک درخواست ترمیمی با دمای ۰.۱ و توکن بیشتر فرستاده می‌شود؛ در صورت شکست دوباره خطای `gso_json_failed` با دلیل ثبت و آیتم `failed` علامت می‌خورد و بچ بعدی ادامه می‌یابد.
+- سطح چهارم «متوسط» به `medium` اضافه شد: پذیرش در `GSO_Issues`، ترتیب اولویت، آمار داشبورد، فیلتر نواقص، نشان سطح و امتیاز سلامت.
+- تحلیل هوشمند صفحه (`ai_review_post`) حالا از همان پاکت استفاده می‌کند و دسته و مسیر فیلد هر ایراد را در `fix_payload` نگه می‌دارد.
+
 ## 1.3.0
 
 ### به‌روزرسانی خودکار از GitHub

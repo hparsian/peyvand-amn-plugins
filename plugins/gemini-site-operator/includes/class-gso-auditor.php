@@ -921,7 +921,7 @@ class GSO_Auditor {
 				GSO_Issues::upsert(
 					array(
 						'object_id'   => $post_id,
-						'object_type' => get_post_type( $post_id ) ?: 'post',
+						'object_type' => get_post_type( $post_id ) ? get_post_type( $post_id ) : 'post',
 						'issue_type'  => 'image_missing_alt_' . substr( $key, 0, 8 ),
 						'severity'    => 'high',
 						'title'       => sprintf( 'تصویر بدون Alt در «%s»', get_the_title( $post_id ) ),
@@ -970,7 +970,7 @@ class GSO_Auditor {
 			GSO_Issues::upsert(
 				array(
 					'object_id'   => $post_id,
-					'object_type' => get_post_type( $post_id ) ?: 'post',
+					'object_type' => get_post_type( $post_id ) ? get_post_type( $post_id ) : 'post',
 					'issue_type'  => 'broken_link_' . substr( md5( $url ), 0, 10 ),
 					'severity'    => 'critical',
 					'title'       => sprintf( 'لینک شکسته در «%s»', get_the_title( $post_id ) ),
@@ -1068,55 +1068,58 @@ class GSO_Auditor {
 		$content = trim( preg_replace( '/\s+/u', ' ', $content ) );
 		$content = mb_substr( $content, 0, 6000 );
 
-		$prompt = "این صفحه وردپرس را از نظر سئو، تجربه کاربری، ساختار محتوا و نرخ تبدیل بررسی کن.\n"
-			. "عنوان: " . $post->post_title . "\n"
-			. "نوع: " . $post->post_type . "\n"
+		$object_type = in_array( $post->post_type, GSO_Contract::object_types(), true ) ? $post->post_type : 'post';
+		$prompt      = "این صفحه وردپرس را از نظر سئو، تجربه کاربری، ساختار محتوا و نرخ تبدیل بررسی کن.\n"
+			. 'عنوان: ' . $post->post_title . "\n"
+			. 'نوع: ' . $post->post_type . "\n"
 			. "متن:\n" . $content . "\n\n"
-			. "حداکثر ۶ ایراد واقعی و قابل‌اجرا بده. برای هر مورد: type (اسلاگ انگلیسی کوتاه)، severity (critical|high|low)، description (فارسی، دقیق و مبتنی بر متن) و suggestion (فارسی و قابل‌اجرا). از کلی‌گویی پرهیز کن.";
+			. 'حداکثر ۶ ایراد واقعی و قابل‌اجرا بده و هر ایراد را با فیلدهای قرارداد در آرایه issues ثبت کن. از کلی‌گویی پرهیز کن.';
 
-		$schema = array(
-			'type'       => 'OBJECT',
-			'properties' => array(
-				'issues' => array(
-					'type'  => 'ARRAY',
-					'items' => array(
-						'type'       => 'OBJECT',
-						'properties' => array(
-							'type'        => array( 'type' => 'STRING' ),
-							'severity'    => array( 'type' => 'STRING' ),
-							'description' => array( 'type' => 'STRING' ),
-							'suggestion'  => array( 'type' => 'STRING' ),
-						),
-						'required'   => array( 'type', 'severity', 'description', 'suggestion' ),
-					),
-				),
-			),
-			'required'   => array( 'issues' ),
+		$schema = GSO_Contract::envelope_schema( 'audit', $object_type );
+		$result = GSO_Gemini::json(
+			$prompt,
+			$schema,
+			array(
+				'model_kind'  => 'bulk',
+				'contract'    => true,
+				'mode'        => 'audit',
+				'object_type' => $object_type,
+			)
 		);
-
-		$result = GSO_Gemini::json( $prompt, $schema, array( 'model_kind' => 'bulk' ) );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 
-		$issues = $result['issues'] ?? array();
-		$count  = 0;
-		foreach ( (array) $issues as $item ) {
-			$type = sanitize_key( (string) ( $item['type'] ?? 'ai_suggestion' ) );
+		$count = 0;
+		foreach ( (array) ( $result['issues'] ?? array() ) as $item ) {
+			$type = sanitize_key( (string) ( $item['issue_id'] ?? 'ai_suggestion' ) );
 			if ( '' === $type ) {
 				$type = 'ai_suggestion';
 			}
-			$severity = in_array( $item['severity'] ?? '', array( 'critical', 'high', 'low' ), true ) ? $item['severity'] : 'low';
+			$severity = in_array( $item['severity'] ?? '', GSO_Contract::severities(), true ) ? $item['severity'] : 'low';
+			$title    = (string) ( $item['title'] ?? '' );
+			if ( '' === $title ) {
+				$title = sprintf( 'پیشنهاد هوش مصنوعی برای «%s»', $post->post_title );
+			}
+			$suggestion = (string) ( $item['recommended_action'] ?? '' );
+			if ( '' === $suggestion ) {
+				$suggestion = (string) ( $item['current_value_excerpt'] ?? '' );
+			}
 			GSO_Issues::upsert(
 				array(
 					'object_id'   => $post_id,
-					'object_type' => $post->post_type,
+					'object_type' => $object_type,
 					'issue_type'  => 'ai_' . $type,
 					'severity'    => $severity,
-					'title'       => sprintf( 'پیشنهاد هوش مصنوعی برای «%s»', $post->post_title ),
+					'title'       => $title,
 					'description' => (string) ( $item['description'] ?? '' ),
-					'suggestion'  => (string) ( $item['suggestion'] ?? '' ),
+					'suggestion'  => $suggestion,
 					'fix_type'    => 'manual',
+					'fix_payload' => array(
+						'category'     => (string) ( $item['category'] ?? '' ),
+						'field_path'   => (string) ( $item['field_path'] ?? '' ),
+						'auto_fix_safe' => ! empty( $item['auto_fix_safe'] ),
+					),
 				)
 			);
 			++$count;
@@ -1543,7 +1546,7 @@ class GSO_Auditor {
 		GSO_Issues::upsert(
 			array(
 				'object_id'   => $post_id,
-				'object_type' => get_post_type( $post_id ) ?: 'post',
+				'object_type' => get_post_type( $post_id ) ? get_post_type( $post_id ) : 'post',
 				'issue_type'  => 'missing_internal_links',
 				'severity'    => 'low',
 				'title'       => sprintf( 'نبود لینک داخلی در «%s»', get_the_title( $post_id ) ),

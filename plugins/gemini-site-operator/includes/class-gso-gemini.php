@@ -33,18 +33,72 @@ class GSO_Gemini {
 	/**
 	 * درخواست با خروجی JSON ساختاریافته.
 	 *
+	 * با پرچم contract، متن قرارداد به پرامپت اضافه و پاسخ به پاکت استاندارد
+	 * (GSO_Contract) تبدیل می‌شود. اگر JSON نامعتبر یا ناقص برگردد، یک بار
+	 * درخواست ترمیمی با دمای پایین‌تر فرستاده می‌شود و اگر باز هم نامعتبر بود،
+	 * خطای gso_json_failed با دلیل ثبت می‌گردد تا صف آن را failed علامت بزند.
+	 *
 	 * @param string $prompt دستور.
 	 * @param array  $schema اسکیمای پاسخ (OpenAPI subset).
-	 * @param array  $args   تنظیمات.
+	 * @param array  $args   تنظیمات؛ contract، mode و object_type.
 	 * @return array|WP_Error آرایه decode‌شده.
 	 */
 	public static function json( string $prompt, array $schema, array $args = array() ) {
+		$contract = ! empty( $args['contract'] );
+		$mode     = (string) ( $args['mode'] ?? 'audit' );
+		$type     = (string) ( $args['object_type'] ?? 'post' );
+
+		if ( $contract ) {
+			$prompt .= "\n\n" . GSO_Contract::instruction( $mode, $type );
+		}
+
+		unset( $args['contract'], $args['mode'], $args['object_type'] );
 		$args['schema'] = $schema;
-		$result         = self::request( $prompt, $args, true );
+
+		$result = self::request( $prompt, $args, true );
+
+		if ( is_wp_error( $result ) && 'gso_json' === $result->get_error_code() ) {
+			$retry                = $args;
+			$retry['temperature'] = 0.1;
+			$retry['max_tokens']  = min( 8192, (int) ( $args['max_tokens'] ?? GSO_Settings::get( 'max_output_tokens', 4096 ) ) + 1024 );
+
+			$repaired = self::request(
+				$prompt . "\n\nپاسخ قبلی JSON معتبر و کامل نبود. همان گزارش را از نو بنویس و فقط یک شیء JSON کامل برگردان؛ بدون متن اضافه و بدون بلوک کد.",
+				$retry,
+				true
+			);
+
+			if ( is_wp_error( $repaired ) ) {
+				GSO_Logger::log(
+					'error',
+					'gemini.json_failed',
+					sprintf( 'پاسخ JSON حتی پس از تلاش ترمیمی نامعتبر ماند: %s', $repaired->get_error_message() )
+				);
+				return new WP_Error(
+					'gso_json_failed',
+					'پاسخ Gemini پس از یک تلاش ترمیمی هم JSON معتبر نبود.',
+					array( 'reason' => $repaired->get_error_message() )
+				);
+			}
+
+			GSO_Logger::log( 'warning', 'gemini.json_repaired', 'پاسخ JSON نامعتبر بود و در تلاش ترمیمی اصلاح شد.' );
+			$result = $repaired;
+		}
+
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		return $result['data'] ?? new WP_Error( 'gso_json', 'پاسخ JSON معتبر نبود.' );
+
+		$data = $result['data'] ?? null;
+		if ( ! is_array( $data ) ) {
+			return new WP_Error( 'gso_json', 'پاسخ JSON معتبر نبود.' );
+		}
+
+		if ( $contract ) {
+			$data = GSO_Contract::normalize( $data, $mode, array( 'object_type' => $type ) );
+		}
+
+		return $data;
 	}
 
 	/**

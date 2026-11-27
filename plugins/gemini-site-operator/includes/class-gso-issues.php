@@ -36,13 +36,13 @@ class GSO_Issues {
 		$object_id   = absint( $issue['object_id'] );
 		$object_type = sanitize_key( $issue['object_type'] );
 		$issue_type  = sanitize_key( $issue['issue_type'] );
-		$severity    = in_array( $issue['severity'], array( 'critical', 'high', 'low' ), true ) ? $issue['severity'] : 'low';
+		$severity    = in_array( $issue['severity'], array( 'critical', 'high', 'medium', 'low' ), true ) ? $issue['severity'] : 'low';
 		$fingerprint = md5( $object_type . '|' . $object_id . '|' . $issue_type );
 		$payload     = is_array( $issue['fix_payload'] ) ? wp_json_encode( $issue['fix_payload'] ) : (string) $issue['fix_payload'];
 		$now         = current_time( 'mysql' );
 
 		$existing = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE fingerprint = %s", $fingerprint )
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}gso_issues WHERE fingerprint = %s", $fingerprint )
 		);
 
 		if ( $existing ) {
@@ -97,9 +97,8 @@ class GSO_Issues {
 	 */
 	public static function get( int $id ): ?object {
 		global $wpdb;
-		$table = GSO_Install::table( 'issues' );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $row ?: null;
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}gso_issues WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return $row ? $row : null;
 	}
 
 	/**
@@ -110,7 +109,6 @@ class GSO_Issues {
 	 */
 	public static function query( array $args = array() ): array {
 		global $wpdb;
-		$table = GSO_Install::table( 'issues' );
 
 		$args = wp_parse_args(
 			$args,
@@ -163,7 +161,7 @@ class GSO_Issues {
 		}
 
 		$order_map = array(
-			'priority' => "CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, id DESC",
+			'priority' => "CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, id DESC",
 			'newest'   => 'id DESC',
 			'oldest'   => 'id ASC',
 			'object'   => 'object_type ASC, object_id ASC',
@@ -175,8 +173,9 @@ class GSO_Issues {
 		$params[] = $limit;
 		$params[] = $offset;
 
-		$sql = "SELECT * FROM {$table} WHERE " . implode( ' AND ', $where ) . " ORDER BY {$order} LIMIT %d OFFSET %d";
-		return (array) $wpdb->get_results( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB
+		// $order فقط از $order_map سفیدلیست بالا مقدار می‌گیرد و ورودی کاربر نیست.
+		$sql = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}gso_issues WHERE " . implode( ' AND ', $where ) . " ORDER BY {$order} LIMIT %d OFFSET %d", $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (array) $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -187,11 +186,10 @@ class GSO_Issues {
 	 */
 	public static function count( array $args = array() ): int {
 		global $wpdb;
-		$table   = GSO_Install::table( 'issues' );
-		$where   = array( '1=1' );
-		$params  = array();
-		$status  = (string) ( $args['status'] ?? '' );
-		$severity = (string) ( $args['severity'] ?? '' );
+		$where       = array( '1=1' );
+		$params      = array();
+		$status      = (string) ( $args['status'] ?? '' );
+		$severity    = (string) ( $args['severity'] ?? '' );
 		$object_type = (string) ( $args['object_type'] ?? '' );
 
 		if ( '' !== $status ) {
@@ -217,11 +215,11 @@ class GSO_Issues {
 			$params[] = sanitize_key( $object_type );
 		}
 
-		$sql = "SELECT COUNT(*) FROM {$table} WHERE " . implode( ' AND ', $where );
 		if ( $params ) {
-			return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB
+			$sql = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}gso_issues WHERE " . implode( ' AND ', $where ), $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			return (int) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
 		}
-		return (int) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}gso_issues WHERE " . implode( ' AND ', $where ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -231,12 +229,12 @@ class GSO_Issues {
 	 */
 	public static function stats(): array {
 		global $wpdb;
-		$table = GSO_Install::table( 'issues' );
-		$rows  = (array) $wpdb->get_results( "SELECT severity, status, COUNT(*) AS c FROM {$table} GROUP BY severity, status" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$rows = (array) $wpdb->get_results( "SELECT severity, status, COUNT(*) AS c FROM {$wpdb->prefix}gso_issues GROUP BY severity, status" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 
 		$out = array(
 			'critical' => 0,
 			'high'     => 0,
+			'medium'   => 0,
 			'low'      => 0,
 			'open'     => 0,
 			'proposed' => 0,
@@ -266,7 +264,7 @@ class GSO_Issues {
 	 */
 	public static function health_score( ?array $stats = null ): int {
 		$stats = $stats ?? self::stats();
-		$penalty = ( $stats['critical'] * 6 ) + ( $stats['high'] * 2 ) + ( $stats['low'] * 0.5 );
+		$penalty = ( $stats['critical'] * 6 ) + ( $stats['high'] * 2 ) + ( ( $stats['medium'] ?? 0 ) * 1.5 ) + ( $stats['low'] * 0.5 );
 		return (int) max( 0, min( 100, round( 100 - $penalty ) ) );
 	}
 

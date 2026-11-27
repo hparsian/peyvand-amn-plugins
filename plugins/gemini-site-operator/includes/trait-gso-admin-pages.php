@@ -27,6 +27,7 @@ trait GSO_Admin_Pages {
 		$map = array(
 			'critical' => array( 'بحرانی', 'gso-badge-critical' ),
 			'high'     => array( 'مهم', 'gso-badge-high' ),
+			'medium'   => array( 'متوسط', 'gso-badge-medium' ),
 			'low'      => array( 'بهینه‌سازی', 'gso-badge-low' ),
 		);
 		$item = $map[ $severity ] ?? array( $severity, 'gso-badge-low' );
@@ -107,6 +108,7 @@ trait GSO_Admin_Pages {
 					<ul class="gso-stat-list">
 						<li><span class="gso-dot gso-dot-critical"></span> بحرانی <strong><?php echo esc_html( (string) $stats['critical'] ); ?></strong></li>
 						<li><span class="gso-dot gso-dot-high"></span> مهم <strong><?php echo esc_html( (string) $stats['high'] ); ?></strong></li>
+						<li><span class="gso-dot gso-dot-medium"></span> متوسط <strong><?php echo esc_html( (string) $stats['medium'] ); ?></strong></li>
 						<li><span class="gso-dot gso-dot-low"></span> بهینه‌سازی <strong><?php echo esc_html( (string) $stats['low'] ); ?></strong></li>
 						<li class="gso-muted">اصلاح‌شده تا امروز: <?php echo esc_html( (string) $stats['fixed'] ); ?></li>
 					</ul>
@@ -254,6 +256,7 @@ trait GSO_Admin_Pages {
 					<option value="">همه سطوح</option>
 					<option value="critical" <?php selected( $severity, 'critical' ); ?>>بحرانی</option>
 					<option value="high" <?php selected( $severity, 'high' ); ?>>مهم</option>
+					<option value="medium" <?php selected( $severity, 'medium' ); ?>>متوسط</option>
 					<option value="low" <?php selected( $severity, 'low' ); ?>>بهینه‌سازی</option>
 				</select>
 				<select name="status">

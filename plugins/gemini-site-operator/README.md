@@ -16,6 +16,7 @@ gemini-site-operator/
 │   ├── class-gso-install.php         اسکیمای ۴ جدول، dbDelta، فعال/غیرفعال، کران‌ها
 │   ├── class-gso-logger.php          لاگ عملیات در جدول اختصاصی + حذف داده حساس
 │   ├── class-gso-limiter.php         محدودیت نرخ، سهمیه روزانه، Backoff نمایی + Jitter
+│   ├── class-gso-contract.php        قرارداد JSON خروجی Gemini: پاکت، اسکیما، استانداردسازی
 │   ├── class-gso-gemini.php          کلاینت Gemini: wp_remote_post، JSON schema، سوئیچ مدل
 │   ├── class-gso-seo.php             پل Yoast/Rank Math/AIOSEO + متای جایگزین + JSON-LD
 │   ├── class-gso-issues.php          CRUD نواقص، آمار، امتیاز سلامت، برچسب‌ها
@@ -133,6 +134,15 @@ gemini-site-operator/
 - خطای ۴۲۹ مربوط به سهمیه روزانه، صف را به `paused_quota` می‌برد تا درخواست بی‌نتیجه ارسال نشود.
 - **سوئیچ خودکار مدل:** اسکن و اصلاح سریع با `bulk_model`، تولید/بازنویسی با `deep_model`؛ در صورت در دسترس نبودن مدل (۴۰۴/۴۰۰) یک‌بار مدل دیگر امتحان می‌شود (قابل خاموش‌کردن با `auto_model_switch`).
 - `timeout` هر درخواست بین ۲۰ تا ۱۲۰ ثانیه (پیشنهاد ۴۵–۶۰) و هرگز بیشتر از بودجه زمانی دسته نیست.
+
+### قرارداد JSON خروجی (نسخهٔ ۱.۰)
+
+- `GSO_Contract` تک‌منبع اسکیما، متن قرارداد و اعتبارسنجی است؛ با پرچم `contract`، متن قرارداد به پرامپت افزوده و پاسخ به پاکت استاندارد تبدیل می‌شود:
+  `schema_version`، `mode` (`audit | fix_preview | bulk_fix`)، `target` (`object_type`، `object_id`، `url`)، `health_score`، `summary`، `issues`، `proposed_changes` و `warnings`.
+- هر آیتم `issues` شامل `issue_id`، `category` (`seo | content | structure | media | woocommerce | technical`)، `severity` (`critical | high | medium | low`)، `priority_rank`، `title`، `description`، `field_path`، `current_value_excerpt`، `recommended_action`، `auto_fix_safe` و `requires_manual_approval` است.
+- `proposed_changes` چهار بخش دارد: `seo` (عنوان/توضیح متا، کلیدواژه، canonical، robots)، `content` (عنوان، HTML، خلاصه، یادداشت هدینگ‌ها، لینک‌های داخلی)، `media` (Alt تصاویر) و `woocommerce` (توضیح کوتاه/کامل، دسته و برچسب، Alt شاخص/گالری، محصولات مکمل، بررسی قیمت و موجودی، `unverified_specs_note`).
+- اگر JSON ناقص یا نامعتبر برگردد، یک بار درخواست ترمیمی با دمای پایین‌تر و توکن بیشتر فرستاده می‌شود؛ در صورت شکست دوم، خطای `gso_json_failed` با دلیل ثبت و آیتم `failed` علامت می‌خورد و بچ بعدی ادامه می‌یابد.
+- `GSO_Contract::normalize()` کلیدهای ناشناخته را حذف، نوع‌ها را اصلاح، مقادیر غیرمجاز را به مقدار امن تبدیل و ایرادها را بر اساس سطح و `priority_rank` مرتب می‌کند؛ ورودی خام مدل هرگز بی‌واسطه ذخیره نمی‌شود.
 
 ## به‌روزرسانی از GitHub
 
