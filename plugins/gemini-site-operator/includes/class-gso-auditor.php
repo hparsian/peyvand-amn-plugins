@@ -1024,7 +1024,7 @@ class GSO_Auditor {
 			return (bool) $cached['ok'];
 		}
 
-		$response = wp_remote_head(
+		$response = wp_safe_remote_head(
 			$url,
 			array(
 				'timeout'     => 4,
@@ -1035,7 +1035,7 @@ class GSO_Auditor {
 
 		$code = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );
 		if ( in_array( $code, array( 403, 405, 501 ), true ) ) {
-			$response = wp_remote_get( $url, array( 'timeout' => 4, 'redirection' => 3 ) );
+			$response = wp_safe_remote_get( $url, array( 'timeout' => 4, 'redirection' => 3 ) );
 			$code     = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );
 		}
 

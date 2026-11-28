@@ -346,11 +346,17 @@ final class Booking
         }
 
         $blackout = get_option('zdp_blackout_dates', []);
+        if (!is_array($blackout)) {
+            $blackout = [];
+        }
         if (in_array($date, $blackout, true)) {
             return 'در این تاریخ امکان رزرو نوبت وجود ندارد (تعطیل).';
         }
 
-        $hours    = get_option('zdp_business_hours', self::default_business_hours());
+        $hours = get_option('zdp_business_hours', self::default_business_hours());
+        if (!is_array($hours)) {
+            $hours = self::default_business_hours();
+        }
         $weekday  = (int) gmdate('w', $ts); // 0=یکشنبه ... 6=شنبه، مطابق date('w') وردپرس
         $day_conf = $hours[$weekday] ?? ['enabled' => false, 'start' => '09:00', 'end' => '21:00', 'mode' => 'both'];
 
@@ -615,30 +621,31 @@ final class Booking
             return ['success' => false, 'data' => ['message' => 'سیستم موقتاً شلوغ است، لطفاً چند ثانیه دیگر دوباره تلاش کنید.']];
         }
 
-        $already_taken = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM $table WHERE booking_date = %s AND booking_time = %s AND status NOT IN ('ناموفق', 'لغو شده')",
-            $date,
-            $time
-        ));
+        try {
+            $already_taken = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table WHERE booking_date = %s AND booking_time = %s AND status NOT IN ('ناموفق', 'لغو شده')",
+                $date,
+                $time
+            ));
 
-        if ($already_taken > 0) {
+            if ($already_taken > 0) {
+                return ['success' => false, 'data' => ['message' => 'این بازه‌ی زمانی هم‌اکنون توسط مراجع دیگری رزرو شد. لطفاً زمان دیگری انتخاب کنید.']];
+            }
+
+            $inserted = $wpdb->query($wpdb->prepare(
+                "INSERT INTO $table (user_id, service_name, price, booking_date, booking_time, status, created_at)
+                 VALUES (%d, %s, %s, %s, %s, %s, %s)",
+                $user_id,
+                $service_name,
+                $price,
+                $date,
+                $time,
+                $initial_status,
+                now_utc()
+            ));
+        } finally {
             $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
-            return ['success' => false, 'data' => ['message' => 'این بازه‌ی زمانی هم‌اکنون توسط مراجع دیگری رزرو شد. لطفاً زمان دیگری انتخاب کنید.']];
         }
-
-        $inserted = $wpdb->query($wpdb->prepare(
-            "INSERT INTO $table (user_id, service_name, price, booking_date, booking_time, status, created_at)
-             VALUES (%d, %s, %s, %s, %s, %s, %s)",
-            $user_id,
-            $service_name,
-            $price,
-            $date,
-            $time,
-            $initial_status,
-            now_utc()
-        ));
-
-        $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
 
         if ($inserted === false) {
             return ['success' => false, 'data' => ['message' => 'خطا در ثبت نوبت. لطفاً دوباره تلاش کنید.']];
@@ -1033,6 +1040,12 @@ final class Booking
     {
         $hours    = get_option('zdp_business_hours', self::default_business_hours());
         $blackout = get_option('zdp_blackout_dates', []);
+        if (!is_array($hours)) {
+            $hours = self::default_business_hours();
+        }
+        if (!is_array($blackout)) {
+            $blackout = [];
+        }
         $duration = self::SLOT_DURATION_MINUTES;
 
         // گسترده‌ترین بازه‌ی کاریِ تعریف‌شده در بین روزهای هفته‌ی فعال، برای
@@ -1403,7 +1416,7 @@ final class Booking
         $sql     .= " ORDER BY b.created_at DESC LIMIT %d";
         $params[] = $limit;
 
-        return $wpdb->get_results($wpdb->prepare($sql, $params));
+        return $wpdb->get_results($wpdb->prepare($sql, ...$params));
     }
 
     public function update_status(int $booking_id, string $status): void

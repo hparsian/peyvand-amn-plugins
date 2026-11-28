@@ -237,7 +237,7 @@ trait ACO_Admin_Pages {
                         <label class="aco-soft7">جستجو در عنوان</label>
                         <div class="aco-flex8">
                             <input type="text" name="s" value="<?php echo esc_attr( $search ); ?>"
-                                   placeholder="جستجو..." / class="aco-text9">
+                                   placeholder="جستجو..." class="aco-text9">
                             <button type="submit" class="button aco-u10">🔍</button>
                         </div>
                     </div>
@@ -426,8 +426,8 @@ trait ACO_Admin_Pages {
                         <span class="btn-text">🔄 شروع بهبود</span>
                         <span class="btn-loading aco-hidden1">⏳ در حال پردازش...</span>
                     </button>
-                    <a id="aco-rw-modal-edit-link" href="#" target="_blank" class="button aco-hidden60">✏️ ویرایش مقاله</a>
-                    <a id="aco-rw-modal-view-link" href="#" target="_blank" class="button aco-hidden60">👁 مشاهده</a>
+                    <a id="aco-rw-modal-edit-link" href="#" target="_blank" rel="noopener noreferrer" class="button aco-hidden60">✏️ ویرایش مقاله</a>
+                    <a id="aco-rw-modal-view-link" href="#" target="_blank" rel="noopener noreferrer" class="button aco-hidden60">👁 مشاهده</a>
                     <button id="aco-rw-modal-close2" class="button aco-u61">بستن</button>
                 </div>
             </div>
@@ -536,7 +536,7 @@ trait ACO_Admin_Pages {
                     <input type="hidden" name="seo"    value="<?php echo esc_attr( $score_filter ); ?>" />
                     <input type="text" name="s" value="<?php echo esc_attr( $search ); ?>"
                            placeholder="🔍 جستجو در عنوان..."
-                           / class="aco-text65">
+                           class="aco-text65">
                     <button type="submit" class="button">جستجو</button>
                     <?php if ( $search ) : ?>
                     <a href="<?php echo esc_url( add_query_arg( [ 's' => '', 'paged' => 1 ] ) ); ?>" class="button">✕</a>
@@ -658,7 +658,7 @@ trait ACO_Admin_Pages {
                             </td>
                             <td class="aco-u82">
                                 <a href="<?php echo esc_url( get_edit_post_link() ); ?>" class="button button-small">ویرایش</a>
-                                <a href="<?php echo esc_url( get_permalink() ); ?>" class="button button-small" target="_blank">مشاهده</a>
+                                <a href="<?php echo esc_url( get_permalink() ); ?>" class="button button-small" target="_blank" rel="noopener noreferrer">مشاهده</a>
                             </td>
                         </tr>
                     <?php endwhile; wp_reset_postdata(); ?>
@@ -766,16 +766,16 @@ trait ACO_Admin_Pages {
                 <div id="aco-section-openrouter" class="aco-provider-section">
                     <div class="aco-field">
                         <label>کلید API — OpenRouter</label>
-                        <input type="password" id="aco-openrouter-key" value="" autocomplete="new-password" placeholder="<?php echo $s['openrouter_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-or-v1-...'; ?>" / class="aco-full85">
+                        <input type="password" id="aco-openrouter-key" value="" autocomplete="new-password" placeholder="<?php echo $s['openrouter_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-or-v1-...'; ?>" class="aco-full85">
                         <p class="description aco-key-set-note" data-has-key="<?php echo $s['openrouter_key'] !== '' ? '1' : '0'; ?>"><?php echo $s['openrouter_key'] !== '' ? 'برای حفظ کلید فعلی، این فیلد را خالی بگذار.' : ''; ?></p>
                         <p class="description">
-                            ثبت‌نام رایگان در <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> &larr; کلید بسازید
+                            ثبت‌نام رایگان در <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a> &larr; کلید بسازید
                         </p>
                     </div>
                     <div class="aco-field">
                         <label>مدل OpenRouter</label>
-                        <input type="text" id="aco-openrouter-model" value="<?php echo esc_attr( $s['openrouter_model'] ); ?>" placeholder="google/gemma-4-31b-it:free" / class="aco-full85">
-                        <p class="description">لیست مدل‌های رایگان: <a href="https://openrouter.ai/models?order=top-weekly&supported_parameters=free" target="_blank">openrouter.ai/models</a></p>
+                        <input type="text" id="aco-openrouter-model" value="<?php echo esc_attr( $s['openrouter_model'] ); ?>" placeholder="google/gemma-4-31b-it:free" class="aco-full85">
+                        <p class="description">لیست مدل‌های رایگان: <a href="https://openrouter.ai/models?order=top-weekly&supported_parameters=free" target="_blank" rel="noopener noreferrer">openrouter.ai/models</a></p>
                     </div>
                 </div>
 
@@ -783,15 +783,15 @@ trait ACO_Admin_Pages {
                 <div id="aco-section-deepseek" class="aco-provider-section aco-hidden1">
                     <div class="aco-field">
                         <label>کلید API — DeepSeek</label>
-                        <input type="password" id="aco-deepseek-key" value="" autocomplete="new-password" placeholder="<?php echo $s['deepseek_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-...'; ?>" / class="aco-full85">
+                        <input type="password" id="aco-deepseek-key" value="" autocomplete="new-password" placeholder="<?php echo $s['deepseek_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-...'; ?>" class="aco-full85">
                         <p class="description aco-key-set-note" data-has-key="<?php echo $s['deepseek_key'] !== '' ? '1' : '0'; ?>"><?php echo $s['deepseek_key'] !== '' ? 'برای حفظ کلید فعلی، این فیلد را خالی بگذار.' : ''; ?></p>
                         <p class="description">
-                            ثبت‌نام در <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> — ۵ میلیون توکن رایگان اولیه
+                            ثبت‌نام در <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">platform.deepseek.com</a> — ۵ میلیون توکن رایگان اولیه
                         </p>
                     </div>
                     <div class="aco-field">
                         <label>مدل DeepSeek</label>
-                        <input type="text" id="aco-deepseek-model" value="<?php echo esc_attr( $s['deepseek_model'] ); ?>" placeholder="deepseek-chat" / class="aco-full85">
+                        <input type="text" id="aco-deepseek-model" value="<?php echo esc_attr( $s['deepseek_model'] ); ?>" placeholder="deepseek-chat" class="aco-full85">
                         <p class="description"><code>deepseek-chat</code> = V3 &nbsp;|&nbsp; <code>deepseek-reasoner</code> = R1</p>
                     </div>
                 </div>
@@ -800,20 +800,20 @@ trait ACO_Admin_Pages {
                 <div id="aco-section-openai" class="aco-provider-section aco-hidden1">
                     <div class="aco-field">
                         <label>کلید API — OpenAI</label>
-                        <input type="password" id="aco-openai-key" value="" autocomplete="new-password" placeholder="<?php echo $s['openai_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-...'; ?>" / class="aco-full85">
+                        <input type="password" id="aco-openai-key" value="" autocomplete="new-password" placeholder="<?php echo $s['openai_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-...'; ?>" class="aco-full85">
                         <p class="description aco-key-set-note" data-has-key="<?php echo $s['openai_key'] !== '' ? '1' : '0'; ?>"><?php echo $s['openai_key'] !== '' ? 'برای حفظ کلید فعلی، این فیلد را خالی بگذار.' : ''; ?></p>
                         <p class="description">
-                            کلید از <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>
+                            کلید از <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">platform.openai.com/api-keys</a>
                         </p>
                     </div>
                     <div class="aco-field">
                         <label>مدل OpenAI (متن/مقاله)</label>
-                        <input type="text" id="aco-openai-model" value="<?php echo esc_attr( $s['openai_model'] ); ?>" placeholder="gpt-4o-mini" / class="aco-full85">
+                        <input type="text" id="aco-openai-model" value="<?php echo esc_attr( $s['openai_model'] ); ?>" placeholder="gpt-4o-mini" class="aco-full85">
                         <p class="description">پیش‌فرض <code>gpt-4o-mini</code> — ارزان و برای مقاله‌نویسی مناسب.</p>
                     </div>
                     <div class="aco-field">
                         <label>مدل تصویرسازی OpenAI</label>
-                        <input type="text" id="aco-openai-image-model" value="<?php echo esc_attr( $s['openai_image_model'] ?? 'gpt-image-1' ); ?>" placeholder="gpt-image-1" / class="aco-full85">
+                        <input type="text" id="aco-openai-image-model" value="<?php echo esc_attr( $s['openai_image_model'] ?? 'gpt-image-1' ); ?>" placeholder="gpt-image-1" class="aco-full85">
                         <p class="description">
                             جدا از مدل بالا (که برای متن است) — سرویس تخصصی تصویرسازی OpenAI. پیش‌فرض <code>gpt-image-1</code>؛
                             گزینه دیگر: <code>dall-e-3</code>. فقط وقتی استفاده می‌شود که «تولید خودکار تصویر شاخص» روشن باشد
@@ -826,15 +826,15 @@ trait ACO_Admin_Pages {
                 <div id="aco-section-gemini" class="aco-provider-section aco-hidden1">
                     <div class="aco-field">
                         <label>کلید API — Google Gemini</label>
-                        <input type="password" id="aco-gemini-key" value="" autocomplete="new-password" placeholder="<?php echo $s['gemini_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'AIza...'; ?>" / class="aco-full85">
+                        <input type="password" id="aco-gemini-key" value="" autocomplete="new-password" placeholder="<?php echo $s['gemini_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'AIza...'; ?>" class="aco-full85">
                         <p class="description aco-key-set-note" data-has-key="<?php echo $s['gemini_key'] !== '' ? '1' : '0'; ?>"><?php echo $s['gemini_key'] !== '' ? 'برای حفظ کلید فعلی، این فیلد را خالی بگذار.' : ''; ?></p>
                         <p class="description">
-                            کلید رایگان از <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+                            کلید رایگان از <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>
                         </p>
                     </div>
                     <div class="aco-field">
                         <label>مدل Gemini</label>
-                        <input type="text" id="aco-gemini-model" value="<?php echo esc_attr( $s['gemini_model'] ); ?>" placeholder="gemini-3.8-flash" / class="aco-full85">
+                        <input type="text" id="aco-gemini-model" value="<?php echo esc_attr( $s['gemini_model'] ); ?>" placeholder="gemini-3.8-flash" class="aco-full85">
                         <p class="description">پیشنهاد: <code>gemini-3.8-flash</code> یا <code>gemini-4-hydrogen</code>. ⚠️ برای محتوای پزشکی/روان‌شناسی، فیلتر ایمنی Gemini گاهی پاسخ را بلاک می‌کند.</p>
                     </div>
                 </div>
@@ -843,16 +843,16 @@ trait ACO_Admin_Pages {
                 <div id="aco-section-anthropic" class="aco-provider-section aco-hidden1">
                     <div class="aco-field">
                         <label>کلید API — Anthropic Claude</label>
-                        <input type="password" id="aco-anthropic-key" value="" autocomplete="new-password" placeholder="<?php echo $s['anthropic_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-ant-...'; ?>" / class="aco-full85">
+                        <input type="password" id="aco-anthropic-key" value="" autocomplete="new-password" placeholder="<?php echo $s['anthropic_key'] !== '' ? '•••••••• (تنظیم شده — برای تغییر، مقدار جدید وارد کن)' : 'sk-ant-...'; ?>" class="aco-full85">
                         <p class="description aco-key-set-note" data-has-key="<?php echo $s['anthropic_key'] !== '' ? '1' : '0'; ?>"><?php echo $s['anthropic_key'] !== '' ? 'برای حفظ کلید فعلی، این فیلد را خالی بگذار.' : ''; ?></p>
                         <p class="description">
-                            کلید از <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>
+                            کلید از <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>
                         </p>
                     </div>
                     <div class="aco-field">
                         <label>مدل Anthropic</label>
-                        <input type="text" id="aco-anthropic-model" value="<?php echo esc_attr( $s['anthropic_model'] ); ?>" placeholder="claude-3-5-haiku-20241022" / class="aco-full85">
-                        <p class="description">نام دقیق مدل را از <a href="https://docs.claude.com/en/docs/about-claude/models" target="_blank">مستندات مدل‌های Claude</a> بررسی کنید — این شناسه‌ها به‌روزرسانی می‌شوند.</p>
+                        <input type="text" id="aco-anthropic-model" value="<?php echo esc_attr( $s['anthropic_model'] ); ?>" placeholder="claude-3-5-haiku-20241022" class="aco-full85">
+                        <p class="description">نام دقیق مدل را از <a href="https://docs.claude.com/en/docs/about-claude/models" target="_blank" rel="noopener noreferrer">مستندات مدل‌های Claude</a> بررسی کنید — این شناسه‌ها به‌روزرسانی می‌شوند.</p>
                     </div>
                 </div>
 
@@ -1220,7 +1220,7 @@ trait ACO_Admin_Pages {
                             <td><?php echo $item->seo_score !== null ? esc_html( $item->seo_score ) . '/۱۰۰' : wp_kses( '<span class="aco-soft72">—</span>', [ 'span' => [ 'style' => [] ] ] ); ?></td>
                             <td>
                                 <?php if ( $item->post_id ) : ?>
-                                <a href="<?php echo esc_url( get_edit_post_link( $item->post_id ) ); ?>" target="_blank" class="button button-small">ویرایش</a>
+                                <a href="<?php echo esc_url( get_edit_post_link( $item->post_id ) ); ?>" target="_blank" rel="noopener noreferrer" class="button button-small">ویرایش</a>
                                 <?php else : ?>
                                 <span class="aco-soft72">—</span>
                                 <?php endif; ?>
@@ -1450,14 +1450,14 @@ trait ACO_Admin_Pages {
                     <?php endif; ?>
                 </div>
 
-                <hr / class="aco-u86">
+                <hr class="aco-u86" />
                 <h3 class="aco-u143">🔁 چرخه بررسی</h3>
 
                 <div class="aco-field">
                     <label>هر پست هر چند روز بررسی شود</label>
                     <input type="number" id="aco-crawler-interval-days"
                            value="<?php echo esc_attr( $s['interval_days'] ); ?>"
-                           min="1" max="365" step="1" / class="aco-u144">
+                           min="1" max="365" step="1" class="aco-u144" />
                     <span class="aco-soft145">روز</span>
                     <p class="description">پیشنهاد: ۳۰ روز. در سایت‌های بزرگ می‌توانید ۶۰–۹۰ روز تنظیم کنید.</p>
                 </div>
@@ -1466,7 +1466,7 @@ trait ACO_Admin_Pages {
                     <label>ساعت اجرای شبانه</label>
                     <input type="number" id="aco-crawler-run-hour"
                            value="<?php echo esc_attr( $s['run_hour'] ); ?>"
-                           min="0" max="23" step="1" / class="aco-u144">
+                           min="0" max="23" step="1" class="aco-u144" />
                     <span class="aco-soft145">(۰ تا ۲۳، به وقت سایت)</span>
                     <p class="description">پیش‌فرض: ۳ (یعنی ۰۳:۰۰ بامداد). بعد از تغییر، حتماً «ذخیره تنظیمات کرم» را بزنید.</p>
                 </div>
@@ -1475,19 +1475,19 @@ trait ACO_Admin_Pages {
                     <label>حداکثر تعداد پست در هر شب</label>
                     <input type="number" id="aco-crawler-posts-per-night"
                            value="<?php echo esc_attr( $s['posts_per_night'] ); ?>"
-                           min="1" max="50" step="1" / class="aco-u144">
+                           min="1" max="50" step="1" class="aco-u144" />
                     <span class="aco-soft145">پست</span>
                     <p class="description">برای کنترل مصرف API. پیشنهاد: ۵–۱۰ پست.</p>
                 </div>
 
-                <hr / class="aco-u86">
+                <hr class="aco-u86" />
                 <h3 class="aco-u143">📊 معیارهای بازنویسی</h3>
 
                 <div class="aco-field">
                     <label>بازنویسی اگر امتیاز سئو زیر این باشد</label>
                     <input type="number" id="aco-crawler-seo-threshold"
                            value="<?php echo esc_attr( $s['seo_threshold'] ); ?>"
-                           min="0" max="100" step="5" / class="aco-u144">
+                           min="0" max="100" step="5" class="aco-u144" />
                     <span class="aco-soft145">از ۱۰۰</span>
                     <p class="description">پیشنهاد: ۶۰. مقالاتی که امتیاز سئو ندارند (صفر) نادیده گرفته می‌شوند.</p>
                 </div>
@@ -1496,24 +1496,24 @@ trait ACO_Admin_Pages {
                     <label>بازنویسی اگر بیشتر از این مدت ویرایش نشده باشد</label>
                     <input type="number" id="aco-crawler-stale-months"
                            value="<?php echo esc_attr( $s['stale_months'] ); ?>"
-                           min="1" max="60" step="1" / class="aco-u144">
+                           min="1" max="60" step="1" class="aco-u144" />
                     <span class="aco-soft145">ماه</span>
                     <p class="description">پیشنهاد: ۶ ماه. محتوای قدیمی حتی با سئوی خوب بازنویسی می‌شود.</p>
                 </div>
 
-                <hr / class="aco-u86">
+                <hr class="aco-u86" />
                 <h3 class="aco-u143">🔗 معیار لینک داخلی</h3>
 
                 <div class="aco-field">
                     <label>اگر تعداد لینک داخلی کمتر از این بود → لینک inject</label>
                     <input type="number" id="aco-crawler-min-links"
                            value="<?php echo esc_attr( $s['min_links'] ); ?>"
-                           min="0" max="20" step="1" / class="aco-u144">
+                           min="0" max="20" step="1" class="aco-u144" />
                     <span class="aco-soft145">لینک</span>
                     <p class="description">لینک inject رایگان است (بدون API call). صفر = این چک غیرفعال.</p>
                 </div>
 
-                <hr / class="aco-u86">
+                <hr class="aco-u86" />
                 <h3 class="aco-u143">✅ بازبینی قبل از انتشار</h3>
 
                 <div class="aco-field aco-u146">
@@ -1575,7 +1575,7 @@ trait ACO_Admin_Pages {
                     >
                     <div class="aco-flex155">
                         <div>
-                            <a href="<?php echo esc_url( get_edit_post_link( $pr['post_id'] ) ); ?>" target="_blank" class="aco-text156">
+                            <a href="<?php echo esc_url( get_edit_post_link( $pr['post_id'] ) ); ?>" target="_blank" rel="noopener noreferrer" class="aco-text156">
                                 <?php echo esc_html( $pr['title'] ); ?>
                             </a>
                             <p class="aco-soft157">
@@ -1705,7 +1705,7 @@ trait ACO_Admin_Pages {
                             </td>
                             <td>
                                 <?php if ( $row['post_id'] ) : ?>
-                                <a href="<?php echo esc_url( get_edit_post_link( $row['post_id'] ) ); ?>" target="_blank" class="aco-u178">
+                                <a href="<?php echo esc_url( get_edit_post_link( $row['post_id'] ) ); ?>" target="_blank" rel="noopener noreferrer" class="aco-u178">
                                     <?php echo esc_html( $row['title'] ); ?>
                                 </a>
                                 <?php else : ?>
@@ -1812,7 +1812,7 @@ trait ACO_Admin_Pages {
                         <tr>
                             <td>
                                 <?php if ( ! empty( $row['post_id'] ) ) : ?>
-                                <a href="<?php echo esc_url( get_edit_post_link( $row['post_id'] ) ); ?>" target="_blank">
+                                <a href="<?php echo esc_url( get_edit_post_link( $row['post_id'] ) ); ?>" target="_blank" rel="noopener noreferrer">
                                     <?php echo esc_html( $row['title'] ?? '—' ); ?>
                                 </a>
                                 <?php else : ?>

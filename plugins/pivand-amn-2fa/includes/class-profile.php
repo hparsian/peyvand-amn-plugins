@@ -167,6 +167,9 @@ final class Pas_2FA_Profile
 
     public function handle_generate(): void
     {
+        if (!is_user_logged_in()) {
+            wp_die('دسترسی غیرمجاز', 403);
+        }
         check_admin_referer('pas_2fa_generate');
         $uid = get_current_user_id();
 
@@ -183,6 +186,9 @@ final class Pas_2FA_Profile
 
     public function handle_confirm(): void
     {
+        if (!is_user_logged_in()) {
+            wp_die('دسترسی غیرمجاز', 403);
+        }
         check_admin_referer('pas_2fa_confirm');
         $uid     = get_current_user_id();
         $pending = get_transient(self::PENDING_TRANSIENT_PREFIX . $uid);
@@ -213,9 +219,13 @@ final class Pas_2FA_Profile
 
     public function handle_disable(): void
     {
+        if (!is_user_logged_in()) {
+            wp_die('دسترسی غیرمجاز', 403);
+        }
         check_admin_referer('pas_2fa_disable');
         $uid = get_current_user_id();
         delete_user_meta($uid, 'pas_2fa_secret');
+        delete_user_meta($uid, 'pas_2fa_last_totp_step');
         Pas_2FA_Backup_Codes::delete_all($uid);
         wp_safe_redirect(add_query_arg('pas_2fa', 'disabled', get_edit_profile_url($uid)));
         exit;
@@ -228,6 +238,9 @@ final class Pas_2FA_Profile
      */
     public function handle_regenerate_codes(): void
     {
+        if (!is_user_logged_in()) {
+            wp_die('دسترسی غیرمجاز', 403);
+        }
         check_admin_referer('pas_2fa_regenerate_codes');
         $uid = get_current_user_id();
 

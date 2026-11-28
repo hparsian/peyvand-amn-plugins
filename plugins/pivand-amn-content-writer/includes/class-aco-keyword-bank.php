@@ -423,7 +423,7 @@ class ACO_Keyword_Bank {
              AND created_at <= %s
              ORDER BY ( traffic_updated_at IS NULL ) DESC, traffic_updated_at ASC
              LIMIT 20",
-            gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) )
+            wp_date( 'Y-m-d H:i:s', time() - ( 7 * DAY_IN_SECONDS ) )
         ) );
 
         $updated = 0;

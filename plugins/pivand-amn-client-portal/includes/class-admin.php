@@ -886,6 +886,12 @@ final class Admin
     {
         $services = get_option('zdp_services_list', []);
         $cards    = get_option('zdp_manual_payment_cards', []);
+        if (!is_array($services)) {
+            $services = [];
+        }
+        if (!is_array($cards)) {
+            $cards = [];
+        }
         $method   = get_option('zdp_payment_method', 'zarinpal');
 
         $edit_id      = isset($_GET['edit_service']) ? sanitize_text_field(wp_unslash($_GET['edit_service'])) : '';
@@ -924,8 +930,8 @@ final class Admin
                         echo esc_html($type_labels[$s['type'] ?? 'both'] ?? 'تلفنی و حضوری');
                     ?></td>
                     <td>
-                        <a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=zdp-admin&tab=services&edit_service=' . urlencode($s['id']))); ?>">ویرایش</a>
-                        <a class="button button-small" style="color:#b91c1c;" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_delete_service&service_id=' . urlencode($s['id'])), 'zdp_delete_service_' . $s['id'])); ?>" onclick="return confirm('حذف این خدمت؟');">حذف</a>
+                        <a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=zdp-admin&tab=services&edit_service=' . rawurlencode((string) $s['id']))); ?>">ویرایش</a>
+                        <a class="button button-small" style="color:#b91c1c;" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_delete_service&service_id=' . rawurlencode((string) $s['id'])), 'zdp_delete_service_' . $s['id'])); ?>" onclick="return confirm('حذف این خدمت؟');">حذف</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -981,7 +987,7 @@ final class Admin
                     <td dir="ltr"><?php echo esc_html($c['iban'] ?? ''); ?></td>
                     <td><?php echo esc_html($c['holder_name']); ?></td>
                     <td>
-                        <a class="button button-small" style="color:#b91c1c;" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_delete_card&card_id=' . urlencode($c['id'])), 'zdp_delete_card_' . $c['id'])); ?>" onclick="return confirm('حذف این کارت؟');">حذف</a>
+                        <a class="button button-small" style="color:#b91c1c;" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=zdp_delete_card&card_id=' . rawurlencode((string) $c['id'])), 'zdp_delete_card_' . $c['id'])); ?>" onclick="return confirm('حذف این کارت؟');">حذف</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -1015,7 +1021,10 @@ final class Admin
         }
 
         if ($name !== '' && $price !== '') {
-            $services   = get_option('zdp_services_list', []);
+            $services = get_option('zdp_services_list', []);
+            if (!is_array($services)) {
+                $services = [];
+            }
             $services[] = ['id' => uniqid('svc_', true), 'name' => $name, 'price' => $price, 'type' => $type];
             update_option('zdp_services_list', $services);
             audit_log('service_added', ['name' => $name]);
@@ -1050,6 +1059,9 @@ final class Admin
 
         if ($service_id !== '' && $name !== '' && $price !== '') {
             $services = get_option('zdp_services_list', []);
+            if (!is_array($services)) {
+                $services = [];
+            }
             $found    = false;
 
             foreach ($services as &$s) {
@@ -1083,7 +1095,10 @@ final class Admin
         check_admin_referer('zdp_delete_service_' . $service_id);
 
         $services = get_option('zdp_services_list', []);
-        $services = array_values(array_filter($services, static fn ($s) => $s['id'] !== $service_id));
+        if (!is_array($services)) {
+            $services = [];
+        }
+        $services = array_values(array_filter($services, static fn ($s) => is_array($s) && ($s['id'] ?? '') !== $service_id));
         update_option('zdp_services_list', $services);
         audit_log('service_deleted', ['id' => $service_id]);
 
@@ -1102,7 +1117,10 @@ final class Admin
         $holder = sanitize_text_field(wp_unslash($_POST['card_holder_name'] ?? ''));
 
         if ($bank !== '' && $number !== '' && $holder !== '') {
-            $cards   = get_option('zdp_manual_payment_cards', []);
+            $cards = get_option('zdp_manual_payment_cards', []);
+            if (!is_array($cards)) {
+                $cards = [];
+            }
             $cards[] = ['id' => uniqid('card_', true), 'bank_name' => $bank, 'card_number' => $number, 'iban' => $iban, 'holder_name' => $holder];
             update_option('zdp_manual_payment_cards', $cards);
             audit_log('card_added', ['bank' => $bank]);
@@ -1122,7 +1140,10 @@ final class Admin
         check_admin_referer('zdp_delete_card_' . $card_id);
 
         $cards = get_option('zdp_manual_payment_cards', []);
-        $cards = array_values(array_filter($cards, static fn ($c) => $c['id'] !== $card_id));
+        if (!is_array($cards)) {
+            $cards = [];
+        }
+        $cards = array_values(array_filter($cards, static fn ($c) => is_array($c) && ($c['id'] ?? '') !== $card_id));
         update_option('zdp_manual_payment_cards', $cards);
         audit_log('card_deleted', ['id' => $card_id]);
 

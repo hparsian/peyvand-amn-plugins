@@ -46,8 +46,9 @@ final class Pas_CF_Reports
         $cases_table = Pas_CF_Installer::table('cases');
         $notes_table = Pas_CF_Installer::table('notes');
 
-        $today = current_time('Y-m-d');
-        $since = date('Y-m-d', strtotime($today . ' -' . $days . ' days'));
+        $today_dt = new \DateTimeImmutable('today', wp_timezone());
+        $today    = $today_dt->format('Y-m-d');
+        $since    = $today_dt->modify('-' . $days . ' days')->format('Y-m-d');
 
         // ۱) پرونده‌ها به تفکیک وضعیت.
         // برای سرپرست/ادمین، scope برابر 1=1 است و هیچ placeholder‌ای در کوئری

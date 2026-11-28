@@ -453,7 +453,7 @@ final class Pas_CF_Admin
                 <?php echo $case ? 'پرونده: ' . esc_html($case->full_name ?: $case->phone) : 'پرونده‌ی جدید'; ?>
                 <?php if ($case) : ?>
                     <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=pas_cf_print_case&case_id=' . $case->id), 'pas_cf_print_case')); ?>"
-                       target="_blank" rel="noopener" class="page-title-action">🖨 پرینت / ذخیره PDF</a>
+                       target="_blank" rel="noopener noreferrer" class="page-title-action">🖨 پرینت / ذخیره PDF</a>
                 <?php endif; ?>
             </h1>
             <?php if ($case) : ?>
@@ -1570,7 +1570,16 @@ final class Pas_CF_Admin
         $out = fopen('php://output', 'w');
         fwrite($out, "\xEF\xBB\xBF"); // BOM — بدون این، اکسل فارسی متن UTF-8 را درست نمی‌خواند.
 
-        fputcsv($out, ['نام', 'موبایل', 'موضوع', 'وضعیت', 'درمانگر مسئول', 'حساب مراجع (OTP)', 'آخرین جلسه', 'آخرین به‌روزرسانی']);
+        $csv_cell = static function ($value): string {
+            $str = (string) $value;
+            $str = str_replace(["\r\n", "\r", "\n"], ' ', $str);
+            if ($str !== '' && preg_match('/^[\s\x00-\x1F]*[=+\-@\t]/u', $str)) {
+                return "'" . $str;
+            }
+            return $str;
+        };
+
+        fputcsv($out, ['نام', 'موبایل', 'موضوع', 'وضعیت', 'درمانگر مسئول', 'حساب مراجع (OTP)', 'آخرین جلسه', 'آخرین به‌روزرسانی'], ',', '"', '');
 
         foreach ($cases as $case) {
             $linked_user  = Pas_CF_Case_File::find_linked_wp_user($case->phone);
@@ -1578,15 +1587,15 @@ final class Pas_CF_Admin
             $last_session = $last_session_map[$case->id] ?? '';
 
             fputcsv($out, [
-                $case->full_name,
-                $case->phone,
-                $case->topic,
-                $case->status,
-                $therapist ? $therapist->display_name : '',
-                $linked_user ? 'متصل' : 'بدون حساب',
-                $last_session ? Pas_CF_Jalali::to_jalali_string($last_session) : '',
-                Pas_CF_Jalali::to_jalali_datetime_string($case->updated_at),
-            ]);
+                $csv_cell($case->full_name),
+                $csv_cell($case->phone),
+                $csv_cell($case->topic),
+                $csv_cell($case->status),
+                $csv_cell($therapist ? $therapist->display_name : ''),
+                $csv_cell($linked_user ? 'متصل' : 'بدون حساب'),
+                $csv_cell($last_session ? Pas_CF_Jalali::to_jalali_string($last_session) : ''),
+                $csv_cell(Pas_CF_Jalali::to_jalali_datetime_string($case->updated_at)),
+            ], ',', '"', '');
         }
 
         fclose($out);

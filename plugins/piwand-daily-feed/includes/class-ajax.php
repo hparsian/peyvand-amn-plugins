@@ -25,11 +25,15 @@ class PWDF_Ajax {
         if ( apply_filters( 'pwdf_use_forwarded_ip', false ) ) {
             $forwarded = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '' ) );
             if ( $forwarded ) {
-                $parts = explode( ',', $forwarded );
-                return trim( $parts[0] );
+                $parts     = explode( ',', $forwarded );
+                $validated = filter_var( trim( $parts[0] ), FILTER_VALIDATE_IP );
+                if ( $validated !== false ) {
+                    return $validated;
+                }
             }
         }
-        return sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
+        $remote = filter_var( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ), FILTER_VALIDATE_IP );
+        return $remote !== false ? $remote : '0.0.0.0';
     }
 
     private static function check_rate_limit( $action ) {
@@ -56,7 +60,7 @@ class PWDF_Ajax {
             return;
         }
 
-        if ( get_post_type( $post_id ) !== 'pwdf_card' ) {
+        if ( get_post_type( $post_id ) !== 'pwdf_card' || get_post_status( $post_id ) !== 'publish' ) {
             wp_send_json_error( 'invalid_type' );
             return;
         }

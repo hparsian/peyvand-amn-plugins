@@ -232,7 +232,7 @@ class ACO_Image_Generator {
              . '&nologo=true'
              . '&seed=' . wp_rand( 1, 999999 );
 
-        $response = wp_remote_get( $url, [
+        $response = wp_safe_remote_get( $url, [
             'timeout'     => self::TIMEOUT,
             'redirection' => 3,
         ] );
@@ -278,7 +278,7 @@ class ACO_Image_Generator {
             'n'      => 1,
         ] );
 
-        $response = wp_remote_post( self::OPENAI_IMAGES_URL, [
+        $response = wp_safe_remote_post( self::OPENAI_IMAGES_URL, [
             'timeout'     => self::TIMEOUT,
             'redirection' => 3,
             'headers'     => [
@@ -315,9 +315,20 @@ class ACO_Image_Generator {
 
         // dall-e-3 (یا حالت‌های دیگر) معمولاً یک url موقت برمی‌گرداند — باید دانلود شود
         if ( ! empty( $item['url'] ) && is_string( $item['url'] ) ) {
-            $img_response = wp_remote_get( $item['url'], [ 'timeout' => self::TIMEOUT, 'redirection' => 3 ] );
+            $download_url = esc_url_raw( $item['url'], [ 'https' ] );
+            if ( ! $download_url || ! wp_http_validate_url( $download_url ) ) {
+                return null;
+            }
+            $img_response = wp_safe_remote_get( $download_url, [ 'timeout' => self::TIMEOUT, 'redirection' => 3 ] );
             if ( is_wp_error( $img_response ) ) {
                 ACO_Logger::error( 'OpenAI Images: دانلود تصویر از url ناموفق بود — ' . $img_response->get_error_message(), 'image' );
+                return null;
+            }
+            if ( (int) wp_remote_retrieve_response_code( $img_response ) !== 200 ) {
+                return null;
+            }
+            $content_type = wp_remote_retrieve_header( $img_response, 'content-type' );
+            if ( is_string( $content_type ) && $content_type !== '' && strpos( $content_type, 'image/' ) !== 0 ) {
                 return null;
             }
             $img_body = wp_remote_retrieve_body( $img_response );
@@ -347,7 +358,7 @@ class ACO_Image_Generator {
             'modalities' => [ 'image', 'text' ],
         ] );
 
-        $response = wp_remote_post( self::OPENROUTER_URL, [
+        $response = wp_safe_remote_post( self::OPENROUTER_URL, [
             'timeout'     => self::TIMEOUT,
             'redirection' => 3,
             'headers'     => [
@@ -385,11 +396,28 @@ class ACO_Image_Generator {
     // پیوست تصویر به کتابخانه رسانه و اتصال به پست
     // ─────────────────────────────────────────────────────────────────
     private static function attach_image_to_post( int $post_id, string $image_data, string $title ) {
+        $info = function_exists( 'getimagesizefromstring' ) ? @getimagesizefromstring( $image_data ) : false;
+        if ( ! is_array( $info ) || empty( $info[0] ) || empty( $info[1] ) || empty( $info[2] ) ) {
+            return new WP_Error( 'aco_invalid_image', 'داده دریافتی تصویر معتبر نیست.' );
+        }
+
+        $ext_map = [
+            IMAGETYPE_JPEG => [ 'ext' => 'jpg',  'mime' => 'image/jpeg' ],
+            IMAGETYPE_PNG  => [ 'ext' => 'png',  'mime' => 'image/png' ],
+            IMAGETYPE_WEBP => [ 'ext' => 'webp', 'mime' => 'image/webp' ],
+            IMAGETYPE_GIF  => [ 'ext' => 'gif',  'mime' => 'image/gif' ],
+        ];
+        if ( ! isset( $ext_map[ $info[2] ] ) ) {
+            return new WP_Error( 'aco_unsupported_image_type', 'فرمت تصویر دریافتی پشتیبانی نمی‌شود.' );
+        }
+        $ext  = $ext_map[ $info[2] ]['ext'];
+        $mime = $ext_map[ $info[2] ]['mime'];
+
         require_once ABSPATH . 'wp-admin/includes/file.php';
         require_once ABSPATH . 'wp-admin/includes/media.php';
         require_once ABSPATH . 'wp-admin/includes/image.php';
 
-        $filename = 'aco-featured-' . $post_id . '-' . time() . '.jpg';
+        $filename = 'aco-featured-' . $post_id . '-' . time() . '.' . $ext;
 
         $upload = wp_upload_bits( $filename, null, $image_data );
         if ( ! empty( $upload['error'] ) ) {
@@ -399,7 +427,7 @@ class ACO_Image_Generator {
         $filetype = wp_check_filetype( $upload['file'], null );
 
         $attachment = [
-            'post_mime_type' => $filetype['type'] ?: 'image/jpeg',
+            'post_mime_type' => $filetype['type'] ?: $mime,
             'post_title'     => sanitize_text_field( $title ),
             'post_content'   => '',
             'post_status'    => 'inherit',

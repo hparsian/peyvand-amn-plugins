@@ -425,7 +425,9 @@ dashboardRouter.post('/api/cases', (req: Request, res: Response) => {
     marriage_type: String(req.body.marriage_type || ''),
     children_count: String(req.body.children_count || ''),
     topic: String(req.body.topic || ''),
-    status: String(req.body.status || 'فعال'),
+    status: (CASE_STATUSES as readonly string[]).includes(String(req.body.status || 'فعال'))
+      ? String(req.body.status || 'فعال')
+      : 'فعال',
     assigned_therapist: Number(req.body.assigned_therapist || 1),
     partner_phone: String(req.body.partner_phone || ''),
     main_conflict_topics: String(req.body.main_conflict_topics || ''),
@@ -571,22 +573,26 @@ dashboardRouter.post('/api/assessments/invite', (req: Request, res: Response) =>
 dashboardRouter.post('/api/assessments/:id/notify', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const inv = store.invitations.find((i) => i.id === id);
-  if (inv) {
-    store.logSms(inv.client_phone, 'Assessment-Invite', `ارسال مجدد دعوت #${id}`);
-    pushFlash('success', `دعوت‌نامه دوباره برای ${inv.client_name} ارسال شد.`);
+  if (!inv) {
+    pushFlash('error', 'دعوت‌نامه مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=assessments');
   }
-  res.redirect('/dashboard?module=assessments');
+  store.logSms(inv.client_phone, 'Assessment-Invite', `ارسال مجدد دعوت #${id}`);
+  pushFlash('success', `دعوت‌نامه دوباره برای ${inv.client_name} ارسال شد.`);
+  return res.redirect('/dashboard?module=assessments');
 });
 
 dashboardRouter.post('/api/assessments/:id/revoke', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const inv = store.invitations.find((i) => i.id === id);
-  if (inv) {
-    inv.status = 'revoked';
-    store.recordAudit('assessment.revoke', 'assessment', id, 'ok', 'ابطال دعوت‌نامهٔ آزمون');
-    pushFlash('warning', 'دعوت‌نامه باطل شد.');
+  if (!inv) {
+    pushFlash('error', 'دعوت‌نامه مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=assessments');
   }
-  res.redirect('/dashboard?module=assessments');
+  inv.status = 'revoked';
+  store.recordAudit('assessment.revoke', 'assessment', id, 'ok', 'ابطال دعوت‌نامهٔ آزمون');
+  pushFlash('warning', 'دعوت‌نامه باطل شد.');
+  return res.redirect('/dashboard?module=assessments');
 });
 
 // Appointments actions
@@ -594,10 +600,17 @@ dashboardRouter.post('/api/bookings', (req: Request, res: Response) => {
   const fullName = String(req.body.full_name || '').trim();
   const mobile = String(req.body.mobile || '').trim();
   const jalaliDate = String(req.body.booking_date_jalali || '').trim();
-  const bookingTime = String(req.body.booking_time || '09:00').trim();
-  const sessionType = String(req.body.session_type || 'individual');
-  const bookingSource = String(req.body.booking_source || 'clinic');
-  const therapistNote = String(req.body.therapist_note || '');
+  const bookingTimeRaw = String(req.body.booking_time || '09:00').trim();
+  const bookingTime = /^([01]\d|2[0-3]):[0-5]\d$/.test(bookingTimeRaw) ? bookingTimeRaw : '09:00';
+  const sessionTypeRaw = String(req.body.session_type || 'individual');
+  const sessionType = Object.prototype.hasOwnProperty.call(SESSION_TYPES, sessionTypeRaw)
+    ? sessionTypeRaw
+    : 'individual';
+  const bookingSourceRaw = String(req.body.booking_source || 'clinic');
+  const bookingSource = Object.prototype.hasOwnProperty.call(BOOKING_SOURCES, bookingSourceRaw)
+    ? bookingSourceRaw
+    : 'clinic';
+  const therapistNote = String(req.body.therapist_note || '').slice(0, 2000);
 
   const isoDate = parseJalaliInputToIso(jalaliDate) ?? todayIso();
   if (!fullName || !mobile) {
@@ -614,60 +627,92 @@ dashboardRouter.post('/api/bookings', (req: Request, res: Response) => {
     therapist_note: therapistNote,
   });
   pushFlash('success', 'نوبت جدید با موفقیت ثبت شد.');
-  res.redirect('/dashboard?module=appointments');
+  return res.redirect('/dashboard?module=appointments');
 });
 
 dashboardRouter.post('/api/bookings/:id/status', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const status = String(req.body.status || '');
   const b = store.bookings.find((item) => item.id === id);
-  if (b && BOOKING_STATUSES.includes(status)) {
-    b.status = status;
-    store.recordAudit('booking.status', 'booking', id, 'ok', `تغییر وضعیت نوبت به ${status}`);
-    pushFlash('success', 'وضعیت نوبت به‌روزرسانی شد.');
+  if (!b) {
+    pushFlash('error', 'نوبت مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=appointments');
   }
-  res.redirect('/dashboard?module=appointments');
+  if (!(BOOKING_STATUSES as readonly string[]).includes(status)) {
+    pushFlash('error', 'وضعیت انتخاب‌شده معتبر نیست.');
+    return res.redirect('/dashboard?module=appointments');
+  }
+  b.status = status;
+  store.recordAudit('booking.status', 'booking', id, 'ok', `تغییر وضعیت نوبت به ${status}`);
+  pushFlash('success', 'وضعیت نوبت به‌روزرسانی شد.');
+  return res.redirect('/dashboard?module=appointments');
 });
 
 dashboardRouter.post('/api/bookings/:id/update', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const b = store.bookings.find((item) => item.id === id);
-  if (b) {
-    const iso = parseJalaliInputToIso(String(req.body.booking_date_jalali || ''));
-    if (iso) b.booking_date = iso;
-    if (req.body.booking_time) b.booking_time = String(req.body.booking_time).slice(0, 5);
-    if (req.body.session_type) {
-      b.session_type = String(req.body.session_type);
-      b.service_name = SESSION_TYPES[b.session_type] ?? b.service_name;
-    }
-    if (req.body.booking_source) b.booking_source = String(req.body.booking_source);
-    if (req.body.status) b.status = String(req.body.status);
-    b.therapist_note = String(req.body.therapist_note ?? b.therapist_note);
-    store.recordAudit('booking.update', 'booking', id, 'ok', 'ویرایش جزئیات نوبت');
-    pushFlash('success', 'جزئیات نوبت ذخیره شد.');
+  if (!b) {
+    pushFlash('error', 'نوبت مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=appointments');
   }
-  res.redirect('/dashboard?module=appointments');
+  const iso = parseJalaliInputToIso(String(req.body.booking_date_jalali || ''));
+  if (iso) b.booking_date = iso;
+  if (req.body.booking_time) {
+    const t = String(req.body.booking_time).trim().slice(0, 5);
+    if (/^([01]\d|2[0-3]):[0-5]\d$/.test(t)) {
+      b.booking_time = t;
+    }
+  }
+  if (req.body.session_type) {
+    const st = String(req.body.session_type);
+    if (Object.prototype.hasOwnProperty.call(SESSION_TYPES, st)) {
+      b.session_type = st;
+      b.service_name = SESSION_TYPES[st] ?? b.service_name;
+    }
+  }
+  if (req.body.booking_source) {
+    const bs = String(req.body.booking_source);
+    if (Object.prototype.hasOwnProperty.call(BOOKING_SOURCES, bs)) {
+      b.booking_source = bs;
+    }
+  }
+  if (req.body.status) {
+    const st = String(req.body.status);
+    if ((BOOKING_STATUSES as readonly string[]).includes(st)) {
+      b.status = st;
+    }
+  }
+  if (req.body.therapist_note !== undefined) {
+    b.therapist_note = String(req.body.therapist_note).slice(0, 2000);
+  }
+  store.recordAudit('booking.update', 'booking', id, 'ok', 'ویرایش جزئیات نوبت');
+  pushFlash('success', 'جزئیات نوبت ذخیره شد.');
+  return res.redirect('/dashboard?module=appointments');
 });
 
 dashboardRouter.post('/api/bookings/:id/reminder', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const b = store.bookings.find((item) => item.id === id);
-  if (b) {
-    store.logSms(b.mobile, 'Booking-Reminder', `یادآور نوبت ${b.ref_id}`);
-    pushFlash('success', `یادآور نوبت برای ${b.full_name} ارسال شد.`);
+  if (!b) {
+    pushFlash('error', 'نوبت مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=appointments');
   }
-  res.redirect('/dashboard?module=appointments');
+  store.logSms(b.mobile, 'Booking-Reminder', `یادآور نوبت ${b.ref_id}`);
+  pushFlash('success', `یادآور نوبت برای ${b.full_name} ارسال شد.`);
+  return res.redirect('/dashboard?module=appointments');
 });
 
 dashboardRouter.post('/api/bookings/:id/delete', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const idx = store.bookings.findIndex((item) => item.id === id);
-  if (idx !== -1) {
-    store.bookings.splice(idx, 1);
-    store.recordAudit('booking.delete', 'booking', id, 'ok', 'حذف نوبت');
-    pushFlash('warning', 'نوبت حذف شد.');
+  if (idx === -1) {
+    pushFlash('error', 'نوبت مورد نظر یافت نشد.');
+    return res.redirect('/dashboard?module=appointments');
   }
-  res.redirect('/dashboard?module=appointments');
+  store.bookings.splice(idx, 1);
+  store.recordAudit('booking.delete', 'booking', id, 'ok', 'حذف نوبت');
+  pushFlash('warning', 'نوبت حذف شد.');
+  return res.redirect('/dashboard?module=appointments');
 });
 
 // Notifications read
@@ -693,13 +738,21 @@ dashboardRouter.post('/api/settings', (req: Request, res: Response) => {
   res.redirect('/dashboard?module=settings');
 });
 
+function csvCell(value: unknown): string {
+  let str = String(value ?? '').replace(/\r\n|\r|\n/g, ' ');
+  if (/^[\s\x00-\x1F]*[=+\-@\t]/.test(str)) {
+    str = `'${str}`;
+  }
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 // CSV export (de-identified clinical metrics)
 dashboardRouter.post('/api/export/cases', (_req: Request, res: Response) => {
   const header = 'case_id,status,therapist,notes_count,updated_at\n';
   const rows = Array.from(store.cases.values())
     .map((c) => {
       const notesCount = (store.notes.get(c.id) ?? []).length;
-      return `${c.id},"${c.status}","${c.assigned_therapist_name}",${notesCount},${c.updated_at}`;
+      return `${c.id},${csvCell(c.status)},${csvCell(c.assigned_therapist_name)},${notesCount},${csvCell(c.updated_at)}`;
     })
     .join('\n');
 

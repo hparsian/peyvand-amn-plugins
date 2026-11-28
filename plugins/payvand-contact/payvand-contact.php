@@ -477,7 +477,7 @@ function payvand_render_form() {
                 <div class="payvand-field full payvand-privacy">
                     <label class="checkbox-label">
                         <input type="checkbox" id="pv-privacy" name="privacy" required>
-                        <span>با <a href="<?php echo esc_url( get_privacy_policy_url() ? get_privacy_policy_url() : home_url( '/privacy-policy' ) ); ?>" target="_blank" rel="noopener">قوانین حریم خصوصی</a> پیوند امن موافقم و اطلاعاتم در اختیار تیم مشاوره قرار می‌گیرد.</span>
+                        <span>با <a href="<?php echo esc_url( get_privacy_policy_url() ? get_privacy_policy_url() : home_url( '/privacy-policy' ) ); ?>" target="_blank" rel="noopener noreferrer">قوانین حریم خصوصی</a> پیوند امن موافقم و اطلاعاتم در اختیار تیم مشاوره قرار می‌گیرد.</span>
                     </label>
                 </div>
             </div>
@@ -524,16 +524,24 @@ function payvand_handle_submit() {
     if ( class_exists( 'Pas_Core_Helpers' ) ) {
         $ip = \Pas_Core_Helpers::get_client_ip();
     } else {
-        $ip = '';
-        foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $header ) {
+        $ip      = '';
+        $headers = apply_filters( 'payvand_use_forwarded_ip', false )
+            ? [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ]
+            : [ 'REMOTE_ADDR' ];
+        foreach ( $headers as $header ) {
             $val = isset( $_SERVER[ $header ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) : '';
             if ( $val ) {
-                // X-Forwarded-For may contain a comma-separated list; take the first entry.
-                $ip = trim( explode( ',', $val )[0] );
-                break;
+                $candidate = trim( explode( ',', $val )[0] );
+                $validated = filter_var( $candidate, FILTER_VALIDATE_IP );
+                if ( $validated !== false ) {
+                    $ip = $validated;
+                    break;
+                }
             }
         }
-        $ip = sanitize_text_field( $ip );
+        if ( $ip === '' ) {
+            $ip = '0.0.0.0';
+        }
     }
     $limit = (int) get_option('payvand_rate_limit', 3);
     $limit = max( 1, $limit );
@@ -544,7 +552,8 @@ function payvand_handle_submit() {
     }
 
     // Sanitize
-    $full_name    = mb_substr( sanitize_text_field( wp_unslash( $_POST['full_name'] ?? '' ) ), 0, 150 );
+    $raw_name     = sanitize_text_field( wp_unslash( $_POST['full_name'] ?? '' ) );
+    $full_name    = function_exists( 'mb_substr' ) ? mb_substr( $raw_name, 0, 150 ) : substr( $raw_name, 0, 150 );
     $phone        = payvand_digits_to_en( sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ) );
     // نرمال‌سازی به فرمت مشترک اکوسیستم (09xxxxxxxxx) — قبلاً اینجا مقدار
     // خام (با فاصله/خط‌تیره‌ی احتمالی) در دیتابیس ذخیره می‌شد، فقط برای
@@ -560,7 +569,8 @@ function payvand_handle_submit() {
     $email        = substr( sanitize_email( wp_unslash( $_POST['email'] ?? '' ) ), 0, 150 );
     $visit_type   = sanitize_text_field( wp_unslash( $_POST['visit_type']   ?? '' ) );
     $consult_type = sanitize_text_field( wp_unslash( $_POST['consult_type'] ?? '' ) );
-    $message      = mb_substr( sanitize_textarea_field( wp_unslash( $_POST['message']  ?? '' ) ), 0, 2000 );
+    $raw_msg      = sanitize_textarea_field( wp_unslash( $_POST['message']  ?? '' ) );
+    $message      = function_exists( 'mb_substr' ) ? mb_substr( $raw_msg, 0, 2000 ) : substr( $raw_msg, 0, 2000 );
     $privacy      = ! empty( $_POST['privacy'] );
 
     // Whitelist enumerable fields (BUG-07)
@@ -646,16 +656,29 @@ function payvand_send_email( $name, $phone, $email, $visit, $consult, $message )
 </div>
 </body></html>';
 
-    $from_email = get_option('payvand_admin_email', get_option('admin_email'));
+    $to = sanitize_email( (string) get_option( 'payvand_admin_email', get_option( 'admin_email' ) ) );
+    if ( ! $to || ! is_email( $to ) ) {
+        $to = sanitize_email( (string) get_option( 'admin_email' ) );
+    }
+    $from_email = sanitize_email( (string) get_option( 'payvand_admin_email', get_option( 'admin_email' ) ) );
+    if ( ! $from_email || ! is_email( $from_email ) ) {
+        $from_email = sanitize_email( (string) get_option( 'admin_email' ) );
+    }
+    $from_email = preg_replace( '/[\r\n]+/', '', (string) $from_email );
+    $safe_name  = trim( (string) preg_replace( '/[\r\n]+/', ' ', (string) $name ) );
+    $safe_email = preg_replace( '/[\r\n]+/', '', (string) sanitize_email( (string) $email ) );
+
     $headers = [
         'Content-Type: text/html; charset=UTF-8',
-        'From: پیوند امن <' . $from_email . '>',
     ];
-    if ( $email && is_email( $email ) ) {
-        $headers[] = 'Reply-To: ' . $email;
+    if ( $from_email && is_email( $from_email ) ) {
+        $headers[] = 'From: پیوند امن <' . $from_email . '>';
     }
-    $subject = '[پیوند امن] پیام جدید از ' . $name;
-    $sent = wp_mail( $to, $subject, $body, $headers );
+    if ( $safe_email && is_email( $safe_email ) ) {
+        $headers[] = 'Reply-To: ' . $safe_email;
+    }
+    $subject = '[پیوند امن] پیام جدید از ' . $safe_name;
+    $sent    = ( $to && is_email( $to ) ) ? wp_mail( $to, $subject, $body, $headers ) : false;
 
     // BUG-08 fix: log mail failures so admin can investigate
     if ( ! $sent ) {

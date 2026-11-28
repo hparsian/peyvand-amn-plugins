@@ -491,6 +491,7 @@ function zdp_find_or_create_user_by_mobile(string $mobile): int|\WP_Error
         return $user_id;
     }
 
+    (new \WP_User((int) $user_id))->set_role('subscriber');
     zdp_set_user_mobile((int) $user_id, $mobile);
 
     return (int) $user_id;
@@ -545,7 +546,7 @@ if (!function_exists('zdp_icon')) {
 
         return sprintf(
             '<svg class="%s" width="%d" height="%d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%s</svg>',
-            $class,
+            esc_attr($class),
             max(12, $size),
             max(12, $size),
             $paths[$name]

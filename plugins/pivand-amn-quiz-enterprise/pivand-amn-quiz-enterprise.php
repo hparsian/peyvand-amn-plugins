@@ -237,6 +237,7 @@ add_action( 'admin_init', [ 'Psy_Page_Clients', 'process_new_client_submission' 
 // ── پردازش لغو/حذف/ارسال اجباری پیش از هر خروجی HTML (همان باگ صفحه سفید،
 // اینجا به‌صورت «صفحه بعد از حذف آزمون هنگ می‌کند» بروز پیدا کرده بود) ──────
 add_action( 'admin_init', [ 'Psy_Page_Clients', 'handle_revoke' ] );
+add_action( 'admin_init', [ 'Psy_Page_Couples', 'process_actions' ] );
 
 // ── Settings API ────────────────────────────────────────────────────────────
 add_action( 'admin_init', function () {

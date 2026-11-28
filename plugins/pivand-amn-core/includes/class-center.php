@@ -288,7 +288,7 @@ final class Pas_Core_Center
         $total  = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table");
         $last24 = (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM $table WHERE created_at >= %s",
-            gmdate('Y-m-d H:i:s', current_time('timestamp') - DAY_IN_SECONDS)
+            wp_date('Y-m-d H:i:s', time() - DAY_IN_SECONDS)
         ));
         $rows = (array) $wpdb->get_results("SELECT mobile, success, reason, created_at FROM $table ORDER BY id DESC LIMIT 5");
 

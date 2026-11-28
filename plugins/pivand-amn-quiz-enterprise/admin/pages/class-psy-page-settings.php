@@ -249,32 +249,67 @@ class Psy_Page_Settings {
                 });
             });
 
+            function findByDataId(container, id) {
+                var items = container.querySelectorAll('li[data-id]');
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].getAttribute('data-id') === id) {
+                        return items[i];
+                    }
+                }
+                return null;
+            }
+
             // ── افزودن آزمون به لیست
             pool.addEventListener('click', function(e){
                 var btn = e.target.closest('.psy-pop-add');
                 if (!btn) return;
-                var id   = btn.getAttribute('data-id');
-                var name = btn.getAttribute('data-name');
+                var id   = String(btn.getAttribute('data-id') || '');
+                var name = String(btn.getAttribute('data-name') || '');
 
                 // بررسی تکراری نبودن
-                if (selected.querySelector('li[data-id="'+id+'"]')) return;
+                if (!id || findByDataId(selected, id)) return;
 
                 var li = document.createElement('li');
                 li.setAttribute('data-id', id);
                 li.className = 'psy-popular-item';
-                li.innerHTML =
-                    '<span class="psy-popular-item-handle">⠿</span>' +
-                    '<span class="psy-popular-item-name">'+escHtml(name)+'</span>' +
-                    '<button type="button" class="psy-pop-remove psy-popular-item-remove" data-id="'+id+'" title="حذف از لیست پرکاربرد">✕</button>' +
-                    '<input type="hidden" name="psy_quiz_popular_tests[]" value="'+id+'">';
+
+                var handle = document.createElement('span');
+                handle.className = 'psy-popular-item-handle';
+                handle.textContent = '⠿';
+
+                var nameSpan = document.createElement('span');
+                nameSpan.className = 'psy-popular-item-name';
+                nameSpan.textContent = name;
+
+                var removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'psy-pop-remove psy-popular-item-remove';
+                removeBtn.setAttribute('data-id', id);
+                removeBtn.title = 'حذف از لیست پرکاربرد';
+                removeBtn.textContent = '✕';
+
+                var hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'psy_quiz_popular_tests[]';
+                hiddenInput.value = id;
+
+                li.appendChild(handle);
+                li.appendChild(nameSpan);
+                li.appendChild(removeBtn);
+                li.appendChild(hiddenInput);
                 selected.appendChild(li);
 
                 // pool آیتم رو به "در لیست" تبدیل کن
-                var poolLi = pool.querySelector('li[data-id="'+id+'"]');
+                var poolLi = findByDataId(pool, id);
                 if (poolLi) {
                     poolLi.classList.add('psy-pool-added');
                     var addBtn = poolLi.querySelector('.psy-pop-add');
-                    if (addBtn) addBtn.outerHTML = '<span class="psy-pool-added-label">✓ در لیست</span>';
+                    if (addBtn && addBtn.parentNode) {
+                        var addedLabel = document.createElement('span');
+                        addedLabel.className = 'psy-pool-added-label';
+                        addedLabel.textContent = '✓ در لیست';
+                        addBtn.parentNode.replaceChild(addedLabel, addBtn);
+                    }
                 }
             });
 
@@ -282,19 +317,24 @@ class Psy_Page_Settings {
             selected.addEventListener('click', function(e){
                 var btn = e.target.closest('.psy-pop-remove');
                 if (!btn) return;
-                var id = btn.getAttribute('data-id');
-                var li = selected.querySelector('li[data-id="'+id+'"]');
+                var id = String(btn.getAttribute('data-id') || '');
+                var li = findByDataId(selected, id);
                 if (li) li.remove();
 
                 // pool آیتم رو به حالت قابل افزودن برگردون
-                var poolLi = pool.querySelector('li[data-id="'+id+'"]');
+                var poolLi = findByDataId(pool, id);
                 if (poolLi) {
                     poolLi.classList.remove('psy-pool-added');
                     var inListSpan = poolLi.querySelector('.psy-pool-added-label');
-                    if (inListSpan) {
-                        var name = poolLi.getAttribute('data-name');
-                        inListSpan.outerHTML =
-                            '<button type="button" class="psy-pop-add psy-pool-add-btn" data-id="'+id+'" data-name="'+escHtml(name)+'">+ افزودن</button>';
+                    if (inListSpan && inListSpan.parentNode) {
+                        var name = String(poolLi.getAttribute('data-name') || '');
+                        var restoreBtn = document.createElement('button');
+                        restoreBtn.type = 'button';
+                        restoreBtn.className = 'psy-pop-add psy-pool-add-btn';
+                        restoreBtn.setAttribute('data-id', id);
+                        restoreBtn.setAttribute('data-name', name);
+                        restoreBtn.textContent = '+ افزودن';
+                        inListSpan.parentNode.replaceChild(restoreBtn, inListSpan);
                     }
                 }
             });
@@ -303,10 +343,6 @@ class Psy_Page_Settings {
                 // SortableJS جابجایی DOM رو خودش انجام می‌ده؛
                 // فقط باید مطمئن بشیم hidden input ها هم جابجا شدن.
                 // چون input ها داخل همون li هستن، با li جابجا می‌شن — نیاز به کار اضافه نیست.
-            }
-
-            function escHtml(s) {
-                return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             }
         })();
         </script>

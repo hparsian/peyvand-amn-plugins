@@ -6,8 +6,26 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Psy_Page_Couples {
 
+    private static ?array $early_result = null;
+
+    public static function process_actions(): void {
+        if ( ! is_admin() ) {
+            return;
+        }
+        $page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+        if ( $page !== 'psy-quiz-couples' || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        self::handle_delete_couple();
+        self::$early_result = self::handle_new_couple();
+    }
+
     private static function handle_new_couple(): ?array {
         if ( ! isset( $_POST['psy_new_couple_nonce'] ) ) return null;
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return [ 'error' => 'دسترسی غیرمجاز.' ];
+        }
         if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['psy_new_couple_nonce'] ) ), 'psy_new_couple' ) ) {
             return [ 'error' => 'خطای امنیتی. لطفاً دوباره امتحان کنید.' ];
         }
@@ -99,9 +117,7 @@ class Psy_Page_Couples {
             return;
         }
 
-        self::handle_delete_couple();
-
-        $result = self::handle_new_couple();
+        $result = self::$early_result;
 
         global $wpdb;
 
@@ -454,7 +470,7 @@ class Psy_Page_Couples {
                             </td>
                             <td class="psy-col-center psy-cell-bold psy-person-1-text"><?php echo number_format( (float)$s1, 1 ); ?></td>
                             <td class="psy-col-center psy-cell-bold psy-person-2-text"><?php echo number_format( (float)$s2, 1 ); ?></td>
-                            <td class="psy-col-center psy-cell-bold <?php echo $diff_class; ?>"><?php echo number_format( (float)$diff, 1 ); ?></td>
+                            <td class="psy-col-center psy-cell-bold <?php echo esc_attr( $diff_class ); ?>"><?php echo number_format( (float)$diff, 1 ); ?></td>
                             <td>
                                 <div class="psy-compare-bar-row">
                                     <div class="psy-compare-bar-track psy-person-1-bg">
@@ -496,7 +512,7 @@ class Psy_Page_Couples {
                 <?php if ( !empty($high_conflicts) ): ?>
                 <p class="psy-summary-conflict-label">اختلاف قابل توجه (≥۳.۵) در قصه‌های زیر:</p>
                 <?php foreach ($high_conflicts as $hc): ?>
-                <span class="psy-conflict-chip"><?php echo esc_html($hc['label']); ?> (<?php echo $hc['diff']; ?>)</span>
+                <span class="psy-conflict-chip"><?php echo esc_html($hc['label']); ?> (<?php echo esc_html((string) $hc['diff']); ?>)</span>
                 <?php endforeach; ?>
                 <?php endif; ?>
             </div>
@@ -520,19 +536,19 @@ class Psy_Page_Couples {
                 new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: <?php echo json_encode($chart_labels, JSON_UNESCAPED_UNICODE); ?>,
+                    labels: <?php echo wp_json_encode($chart_labels, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
                     datasets: [
                         {
-                            label: <?php echo json_encode($att1->client_name, JSON_UNESCAPED_UNICODE); ?>,
-                            data: <?php echo json_encode($chart_d1); ?>,
+                            label: <?php echo wp_json_encode($att1->client_name, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+                            data: <?php echo wp_json_encode($chart_d1); ?>,
                             backgroundColor: 'rgba(15,118,110,0.75)',
                             borderColor: '#0f766e',
                             borderWidth: 1,
                             borderRadius: 4,
                         },
                         {
-                            label: <?php echo json_encode($att2->client_name, JSON_UNESCAPED_UNICODE); ?>,
-                            data: <?php echo json_encode($chart_d2); ?>,
+                            label: <?php echo wp_json_encode($att2->client_name, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+                            data: <?php echo wp_json_encode($chart_d2); ?>,
                             backgroundColor: 'rgba(225,29,72,0.75)',
                             borderColor: '#e11d48',
                             borderWidth: 1,

@@ -118,180 +118,206 @@ final class Pas_Core_Client_Registry
      */
     public static function rebuild(): array
     {
-        global $wpdb;
-
-        self::install();
-
-        $run_start   = current_time('mysql', true);
-        $truncated   = false;
-        $errors      = [];
-        $observations = self::collect_observations($truncated, $errors);
-
-        $clusters = self::cluster($observations);
-
-        $clients_table     = self::table(self::TABLE_CLIENTS);
-        $identifiers_table = self::table(self::TABLE_IDENTIFIERS);
-        $conflicts_table   = self::table(self::TABLE_CONFLICTS);
-
-        $client_count     = 0;
-        $identifier_count = 0;
-        $conflict_count   = 0;
-
-        foreach ($clusters as $cluster) {
-            $keys = $cluster['keys'];
-            if (empty($keys)) {
-                continue;
-            }
-
-            $client_id = self::find_existing_client_id($keys);
-            if ($client_id === '') {
-                $client_id = self::new_client_id();
-            }
-
-            $display_name = '';
-            $mobile       = '';
-            $email        = '';
-            $sources      = [];
-            $conflicts    = self::detect_conflicts($cluster['items'], $keys);
-
-            usort($cluster['items'], static function (array $a, array $b): int {
-                return $a['priority'] <=> $b['priority'];
-            });
-
-            foreach ($cluster['items'] as $item) {
-                if ($display_name === '' && $item['name'] !== '') {
-                    $display_name = $item['name'];
-                }
-                $sources[$item['source']] = ($sources[$item['source']] ?? 0) + 1;
-
-                foreach ($item['identifiers'] as $identifier) {
-                    if ($identifier['type'] === 'mobile' && $mobile === '') {
-                        $mobile = $identifier['value'];
-                    }
-                    if ($identifier['type'] === 'email' && $email === '') {
-                        $email = $identifier['value'];
-                    }
-                }
-            }
-
-            $has_review   = false;
-            foreach ($conflicts as $conflict) {
-                if (in_array($conflict['type'], ['shared_identifier', 'multiple_wp_users', 'multiple_cases'], true)) {
-                    $has_review = true;
-                }
-            }
-
-            $row = [
-                'client_id'      => $client_id,
-                'display_name'   => $display_name,
-                'primary_mobile' => $mobile,
-                'primary_email'  => $email,
-                'status'         => $has_review ? 'review' : 'active',
-                'conflict_count' => count($conflicts),
-                'sources_count'  => count($sources),
-                'updated_at'     => $run_start,
+        if (get_transient('pas_registry_rebuild_lock')) {
+            return [
+                'clients'      => 0,
+                'identifiers'  => 0,
+                'conflicts'    => 0,
+                'observations' => 0,
+                'truncated'    => false,
+                'errors'       => ['بازسازی رجیستری هم‌اکنون در حال اجرا است.'],
             ];
+        }
+        set_transient('pas_registry_rebuild_lock', 1, 300);
 
-            $exists = $wpdb->get_var($wpdb->prepare(
-                "SELECT client_id FROM $clients_table WHERE client_id = %s",
-                $client_id
-            ));
+        try {
+            global $wpdb;
 
-            if ($exists) {
-                $wpdb->update($clients_table, $row, ['client_id' => $client_id]);
-            } else {
-                $row['created_at'] = $run_start;
-                $wpdb->insert($clients_table, $row);
-            }
-            $client_count++;
+            self::install();
 
-            foreach ($cluster['items'] as $item) {
-                foreach ($item['identifiers'] as $identifier) {
-                    $hash = md5(
-                        $identifier['type'] . '|' . $identifier['value'] . '|' . $item['source'] . '|' . $item['ref']
+            $run_start    = current_time('mysql', true);
+            $truncated    = false;
+            $errors       = [];
+            $observations = self::collect_observations($truncated, $errors);
+
+            $clusters = self::cluster($observations);
+
+            $clients_table     = self::table(self::TABLE_CLIENTS);
+            $identifiers_table = self::table(self::TABLE_IDENTIFIERS);
+            $conflicts_table   = self::table(self::TABLE_CONFLICTS);
+
+            $client_count     = 0;
+            $identifier_count = 0;
+            $conflict_count   = 0;
+
+            foreach ($clusters as $cluster) {
+                $keys = $cluster['keys'];
+                if (empty($keys)) {
+                    continue;
+                }
+
+                $client_id = self::find_existing_client_id($keys);
+                if ($client_id === '') {
+                    $client_id = self::new_client_id();
+                }
+
+                $display_name = '';
+                $mobile       = '';
+                $email        = '';
+                $sources      = [];
+                $conflicts    = self::detect_conflicts($cluster['items'], $keys);
+
+                usort($cluster['items'], static function (array $a, array $b): int {
+                    return $a['priority'] <=> $b['priority'];
+                });
+
+                foreach ($cluster['items'] as $item) {
+                    if ($display_name === '' && $item['name'] !== '') {
+                        $display_name = $item['name'];
+                    }
+                    $sources[$item['source']] = ($sources[$item['source']] ?? 0) + 1;
+
+                    foreach ($item['identifiers'] as $identifier) {
+                        if ($identifier['type'] === 'mobile' && $mobile === '') {
+                            $mobile = $identifier['value'];
+                        }
+                        if ($identifier['type'] === 'email' && $email === '') {
+                            $email = $identifier['value'];
+                        }
+                    }
+                }
+
+                $has_review = false;
+                foreach ($conflicts as $conflict) {
+                    if (in_array($conflict['type'], ['shared_identifier', 'multiple_wp_users', 'multiple_cases'], true)) {
+                        $has_review = true;
+                    }
+                }
+
+                $row = [
+                    'client_id'      => $client_id,
+                    'display_name'   => $display_name,
+                    'primary_mobile' => $mobile,
+                    'primary_email'  => $email,
+                    'status'         => $has_review ? 'review' : 'active',
+                    'conflict_count' => count($conflicts),
+                    'sources_count'  => count($sources),
+                    'updated_at'     => $run_start,
+                ];
+
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT client_id FROM $clients_table WHERE client_id = %s",
+                    $client_id
+                ));
+
+                if ($exists) {
+                    $wpdb->update(
+                        $clients_table,
+                        $row,
+                        ['client_id' => $client_id],
+                        ['%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s'],
+                        ['%s']
                     );
+                } else {
+                    $row['created_at'] = $run_start;
+                    $wpdb->insert(
+                        $clients_table,
+                        $row,
+                        ['%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s']
+                    );
+                }
+                $client_count++;
+
+                foreach ($cluster['items'] as $item) {
+                    foreach ($item['identifiers'] as $identifier) {
+                        $hash = md5(
+                            $identifier['type'] . '|' . $identifier['value'] . '|' . $item['source'] . '|' . $item['ref']
+                        );
+
+                        $wpdb->query($wpdb->prepare(
+                            "INSERT INTO $identifiers_table
+                                (client_id, identifier_type, identifier_value, identifier_hash, source, source_ref, display_name, created_at, last_seen_at)
+                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                             ON DUPLICATE KEY UPDATE
+                                client_id = VALUES(client_id),
+                                display_name = VALUES(display_name),
+                                last_seen_at = VALUES(last_seen_at)",
+                            $client_id,
+                            $identifier['type'],
+                            $identifier['value'],
+                            $hash,
+                            $item['source'],
+                            $item['ref'],
+                            $item['name'],
+                            $run_start,
+                            $run_start
+                        ));
+                        $identifier_count++;
+                    }
+                }
+
+                foreach ($conflicts as $conflict) {
+                    $conflict_key = md5($conflict['type'] . '|' . $conflict['identifier_type'] . '|' . $conflict['identifier_value']);
 
                     $wpdb->query($wpdb->prepare(
-                        "INSERT INTO $identifiers_table
-                            (client_id, identifier_type, identifier_value, identifier_hash, source, source_ref, display_name, created_at, last_seen_at)
-                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        "INSERT INTO $conflicts_table
+                            (conflict_key, conflict_type, identifier_type, identifier_value, details, status, detected_at)
+                         VALUES (%s, %s, %s, %s, %s, 'open', %s)
                          ON DUPLICATE KEY UPDATE
-                            client_id = VALUES(client_id),
-                            display_name = VALUES(display_name),
-                            last_seen_at = VALUES(last_seen_at)",
-                        $client_id,
-                        $identifier['type'],
-                        $identifier['value'],
-                        $hash,
-                        $item['source'],
-                        $item['ref'],
-                        $item['name'],
-                        $run_start,
+                            details = VALUES(details),
+                            detected_at = VALUES(detected_at)",
+                        $conflict_key,
+                        $conflict['type'],
+                        $conflict['identifier_type'],
+                        $conflict['identifier_value'],
+                        wp_json_encode($conflict['details'], JSON_UNESCAPED_UNICODE),
                         $run_start
                     ));
-                    $identifier_count++;
+                    $conflict_count++;
                 }
             }
 
-            foreach ($conflicts as $conflict) {
-                $conflict_key = md5($conflict['type'] . '|' . $conflict['identifier_type'] . '|' . $conflict['identifier_value']);
+            // رکوردهایی که این‌بار دیده نشدند از ایندکس کنار می‌روند (فقط ردیف‌های
+            // خودکار؛ هر ردیف دستی آینده با source='manual' دست‌نخورده می‌ماند).
+            $wpdb->query($wpdb->prepare(
+                "DELETE FROM $identifiers_table WHERE source <> 'manual' AND last_seen_at < %s",
+                $run_start
+            ));
 
-                $wpdb->query($wpdb->prepare(
-                    "INSERT INTO $conflicts_table
-                        (conflict_key, conflict_type, identifier_type, identifier_value, details, status, detected_at)
-                     VALUES (%s, %s, %s, %s, %s, 'open', %s)
-                     ON DUPLICATE KEY UPDATE
-                        details = VALUES(details),
-                        detected_at = VALUES(detected_at)",
-                    $conflict_key,
-                    $conflict['type'],
-                    $conflict['identifier_type'],
-                    $conflict['identifier_value'],
-                    wp_json_encode($conflict['details'], JSON_UNESCAPED_UNICODE),
-                    $run_start
-                ));
-                $conflict_count++;
-            }
+            // پرونده‌های بدون شناسه (همه‌ی منابعشان حذف شده) هم از فهرست کنار می‌روند.
+            $wpdb->query(
+                "DELETE c FROM $clients_table c
+                 LEFT JOIN $identifiers_table i ON i.client_id = c.client_id
+                 WHERE i.id IS NULL AND c.merged_into = ''"
+            );
+
+            // تعارض‌های بازِ این‌دوره‌دیده‌نشده پاک می‌شوند؛ تعارض dismiss‌شده آینده
+            // (status='dismissed') دست‌نخورده می‌ماند.
+            $wpdb->query($wpdb->prepare(
+                "DELETE FROM $conflicts_table WHERE status = 'open' AND detected_at < %s",
+                $run_start
+            ));
+
+            update_option('pas_registry_last_rebuild', current_time('mysql'), false);
+            update_option('pas_registry_last_result', [
+                'clients'     => $client_count,
+                'identifiers' => $identifier_count,
+                'conflicts'   => $conflict_count,
+                'truncated'   => $truncated,
+                'errors'      => $errors,
+            ], false);
+
+            return [
+                'clients'      => $client_count,
+                'identifiers'  => $identifier_count,
+                'conflicts'    => $conflict_count,
+                'observations' => count($observations),
+                'truncated'    => $truncated,
+                'errors'       => $errors,
+            ];
+        } finally {
+            delete_transient('pas_registry_rebuild_lock');
         }
-
-        // رکوردهایی که این‌بار دیده نشدند از ایندکس کنار می‌روند (فقط ردیف‌های
-        // خودکار؛ هر ردیف دستی آینده با source='manual' دست‌نخورده می‌ماند).
-        $wpdb->query($wpdb->prepare(
-            "DELETE FROM $identifiers_table WHERE source <> 'manual' AND last_seen_at < %s",
-            $run_start
-        ));
-
-        // پرونده‌های بدون شناسه (همه‌ی منابعشان حذف شده) هم از فهرست کنار می‌روند.
-        $wpdb->query(
-            "DELETE c FROM $clients_table c
-             LEFT JOIN $identifiers_table i ON i.client_id = c.client_id
-             WHERE i.id IS NULL AND c.merged_into = ''"
-        );
-
-        // تعارض‌های بازِ این‌دوره‌دیده‌نشده پاک می‌شوند؛ تعارض dismiss‌شده آینده
-        // (status='dismissed') دست‌نخورده می‌ماند.
-        $wpdb->query($wpdb->prepare(
-            "DELETE FROM $conflicts_table WHERE status = 'open' AND detected_at < %s",
-            $run_start
-        ));
-
-        update_option('pas_registry_last_rebuild', current_time('mysql'), false);
-        update_option('pas_registry_last_result', [
-            'clients'     => $client_count,
-            'identifiers' => $identifier_count,
-            'conflicts'   => $conflict_count,
-            'truncated'   => $truncated,
-            'errors'      => $errors,
-        ], false);
-
-        return [
-            'clients'      => $client_count,
-            'identifiers'  => $identifier_count,
-            'conflicts'    => $conflict_count,
-            'observations' => count($observations),
-            'truncated'    => $truncated,
-            'errors'       => $errors,
-        ];
     }
 
     /**

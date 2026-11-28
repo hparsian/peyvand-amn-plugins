@@ -58,16 +58,17 @@ final class Pas_Log
             'mobile'     => $mobile,
             'body_id'    => $body_id,
             'success'    => $success ? 1 : 0,
-            'reason'     => $reason,
+            'reason'     => mb_substr(sanitize_text_field($reason), 0, 250),
             'created_at' => current_time('mysql'),
         ], ['%s', '%d', '%d', '%s', '%s']);
 
         // پاکسازی سبک: فقط ۲۰۰ رکورد آخر نگه داشته می‌شود.
         $count = (int) $wpdb->get_var('SELECT COUNT(*) FROM ' . self::table());
         if ($count > 200) {
-            $wpdb->query(
-                'DELETE FROM ' . self::table() . ' ORDER BY id ASC LIMIT ' . (int) ($count - 200)
-            );
+            $wpdb->query($wpdb->prepare(
+                'DELETE FROM ' . self::table() . ' ORDER BY id ASC LIMIT %d',
+                $count - 200
+            ));
         }
     }
 
@@ -75,6 +76,7 @@ final class Pas_Log
     public static function recent(int $limit = 50): array
     {
         global $wpdb;
+        $limit = max(1, min(500, $limit));
 
         return $wpdb->get_results($wpdb->prepare(
             'SELECT * FROM ' . self::table() . ' ORDER BY id DESC LIMIT %d',

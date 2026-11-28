@@ -29,7 +29,7 @@ final class PAS_Dashboard_Export {
 	public static function csv_cell( $value ) {
 		$value = (string) $value;
 
-		if ( $value !== '' && false !== strpos( "=+-@\t\r", $value[0] ) ) {
+		if ( $value !== '' && preg_match( '/^[\s\x00-\x1F]*[=+\-@]|[\t\r]/u', $value ) ) {
 			return "'" . $value;
 		}
 

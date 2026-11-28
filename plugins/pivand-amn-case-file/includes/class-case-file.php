@@ -956,7 +956,7 @@ final class Pas_CF_Case_File
         }
 
         $last = (string) ($case->reminder_last_sent_at ?? '');
-        if ($last !== '' && (time() - (int) strtotime($last)) < 12 * HOUR_IN_SECONDS) {
+        if ($last !== '' && (time() - (int) strtotime($last . ' UTC')) < 12 * HOUR_IN_SECONDS) {
             return 'cooldown';
         }
 

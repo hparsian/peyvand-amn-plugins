@@ -96,8 +96,13 @@ final class PAS_Dashboard_Updater {
 		}
 
 		$saved = PAS_Dashboard_Permissions::setting( 'github_token', '' );
+		$saved = is_string( $saved ) ? trim( $saved ) : '';
 
-		return is_string( $saved ) ? trim( $saved ) : '';
+		if ( $saved !== '' && class_exists( 'Pas_Core_Crypto' ) ) {
+			$saved = (string) Pas_Core_Crypto::unwrap_decrypt( $saved );
+		}
+
+		return $saved;
 	}
 
 	public static function has_token() {
@@ -187,7 +192,7 @@ final class PAS_Dashboard_Updater {
 			$headers['Authorization'] = 'Bearer ' . self::token();
 		}
 
-		$response = wp_remote_get(
+		$response = wp_safe_remote_get(
 			$url,
 			array(
 				'timeout'   => 12,
@@ -574,11 +579,22 @@ final class PAS_Dashboard_Updater {
 			return $args;
 		}
 
-		$repo = self::repo();
+		$parts = wp_parse_url( $url );
+		if ( ! is_array( $parts ) || strtolower( (string) ( $parts['scheme'] ?? '' ) ) !== 'https' ) {
+			return $args;
+		}
 
-		if ( false === strpos( $url, 'raw.githubusercontent.com/' . $repo . '/' )
-			&& false === strpos( $url, 'api.github.com/repos/' . $repo )
-			&& false === strpos( $url, 'github.com/' . $repo . '/' ) ) {
+		$host = strtolower( (string) ( $parts['host'] ?? '' ) );
+		$path = (string) ( $parts['path'] ?? '' );
+		$repo = trim( self::repo(), '/' );
+
+		$allowed = (
+			( $host === 'raw.githubusercontent.com' && 0 === strpos( $path, '/' . $repo . '/' ) )
+			|| ( $host === 'api.github.com' && ( $path === '/repos/' . $repo || 0 === strpos( $path, '/repos/' . $repo . '/' ) ) )
+			|| ( $host === 'github.com' && 0 === strpos( $path, '/' . $repo . '/' ) )
+		);
+
+		if ( ! $allowed ) {
 			return $args;
 		}
 
@@ -669,6 +685,9 @@ final class PAS_Dashboard_Updater {
 		if ( $clear_token ) {
 			$current['github_token'] = '';
 		} elseif ( $token !== '' ) {
+			if ( class_exists( 'Pas_Core_Crypto' ) && Pas_Core_Crypto::is_configured() ) {
+				$token = Pas_Core_Crypto::wrap_encrypted( $token );
+			}
 			$current['github_token'] = $token;
 		}
 

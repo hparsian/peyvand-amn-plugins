@@ -352,12 +352,34 @@ final class ZSM_Smtp_Mailer {
         $recipients = [];
         foreach ($to_parts as $address) {
             $address = trim((string) $address);
-            if ($address !== '' && is_email($address)) {
-                $recipients[] = $address;
+            if ($address === '') {
+                continue;
+            }
+            $name  = '';
+            $email = $address;
+            if (preg_match('/^(.*)<([^>]+)>$/', $address, $m)) {
+                $name  = trim(trim($m[1]), "\"' \t");
+                $email = trim($m[2]);
+            }
+            if ($email !== '' && is_email($email)) {
+                $recipients[] = ['email' => $email, 'name' => $name];
             }
         }
 
         return $recipients;
+    }
+
+    private static function is_html_email(array $atts): bool
+    {
+        $headers = $atts['headers'] ?? '';
+        if (is_array($headers)) {
+            $headers = implode("\n", $headers);
+        }
+        if (is_string($headers) && stripos($headers, 'text/html') !== false) {
+            return true;
+        }
+        $content_type = apply_filters('wp_mail_content_type', 'text/plain');
+        return is_string($content_type) && stripos($content_type, 'text/html') !== false;
     }
 
     private static function send_via_brevo(array $atts, array $settings): bool
@@ -375,23 +397,32 @@ final class ZSM_Smtp_Mailer {
 
         $sender_email = $settings['from_email'] !== '' ? $settings['from_email'] : get_bloginfo('admin_email');
         $sender_name  = $settings['from_name']  !== '' ? $settings['from_name']  : get_bloginfo('name');
+        $raw_message  = (string) ($atts['message'] ?? '');
+        $plain_text   = trim(wp_strip_all_tags($raw_message));
 
-        $response = wp_remote_post('https://api.brevo.com/v3/smtp/email', [
+        $payload = [
+            'sender'  => ['name' => $sender_name, 'email' => $sender_email],
+            'to'      => array_map(static function (array $r): array {
+                return $r['name'] !== '' ? ['email' => $r['email'], 'name' => $r['name']] : ['email' => $r['email']];
+            }, $recipients),
+            'subject' => (string) ($atts['subject'] ?? ''),
+        ];
+
+        if (self::is_html_email($atts) && $raw_message !== '') {
+            $payload['htmlContent'] = $raw_message;
+            $payload['textContent'] = $plain_text !== '' ? $plain_text : $raw_message;
+        } else {
+            $payload['textContent'] = $plain_text !== '' ? $plain_text : $raw_message;
+        }
+
+        $response = wp_safe_remote_post('https://api.brevo.com/v3/smtp/email', [
             'timeout' => 15,
             'headers' => [
                 'accept'       => 'application/json',
                 'api-key'      => $settings['brevo_api_key'],
                 'content-type' => 'application/json',
             ],
-            // فقط textContent می‌فرستیم چون wp_mail به‌صورت پیش‌فرض متن ساده
-            // می‌فرستد مگر پلاگین دیگری content-type را به text/html تغییر
-            // داده باشد.
-            'body' => wp_json_encode([
-                'sender'      => ['name' => $sender_name, 'email' => $sender_email],
-                'to'          => array_map(static fn (string $e): array => ['email' => $e], $recipients),
-                'subject'     => (string) ($atts['subject'] ?? ''),
-                'textContent' => wp_strip_all_tags((string) ($atts['message'] ?? '')),
-            ]),
+            'body' => wp_json_encode($payload),
         ]);
 
         if (is_wp_error($response)) {
@@ -583,7 +614,7 @@ final class ZSM_Smtp_Mailer {
                 <p class="description">
                     این بخش فقط وقتی «روش ارسال» بالا روی Brevo باشد استفاده می‌شود — نیازی به باز بودن پورت SMTP روی هاست ندارد.
                     یک حساب رایگان (۳۰۰ ایمیل در روز) توی
-                    <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener">app.brevo.com/settings/keys/api</a>
+                    <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener noreferrer">app.brevo.com/settings/keys/api</a>
                     بساز، یک API Key بگیر، و ایمیل «آدرس فرستنده» بالا رو توی حساب Brevo تأیید کن (Single Sender Verification — فقط یک لینک تأییدیه که به همون ایمیل می‌فرستد).
                 </p>
                 <table class="form-table">
@@ -987,16 +1018,20 @@ final class ZSM_Mail_Queue {
     {
         global $wpdb;
 
-        $wpdb->insert($wpdb->prefix . 'zsm_mail_queue', [
-            'created_at'  => current_time('mysql'),
-            'status'      => $sent ? 'sent' : 'given_up',
-            'attempts'    => 1,
-            'last_method' => $method,
-            'last_error'  => $error,
-            'to_address'  => self::stringify_to($atts),
-            'subject'     => (string) ($atts['subject'] ?? ''),
-            'payload'     => wp_json_encode($atts),
-        ]);
+        $wpdb->insert(
+            $wpdb->prefix . 'zsm_mail_queue',
+            [
+                'created_at'  => current_time('mysql'),
+                'status'      => $sent ? 'sent' : 'given_up',
+                'attempts'    => 1,
+                'last_method' => $method,
+                'last_error'  => $error,
+                'to_address'  => self::stringify_to($atts),
+                'subject'     => (string) ($atts['subject'] ?? ''),
+                'payload'     => wp_json_encode($atts),
+            ],
+            ['%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s']
+        );
     }
 
     /** ذخیره‌ی ایمیلی که همه‌ی تلاش‌های فوری‌اش شکست خورد، برای retry توسط cron. */
@@ -1004,16 +1039,20 @@ final class ZSM_Mail_Queue {
     {
         global $wpdb;
 
-        $wpdb->insert($wpdb->prefix . 'zsm_mail_queue', [
-            'created_at'    => current_time('mysql'),
-            'next_retry_at' => self::next_retry_time(0),
-            'status'        => 'pending',
-            'attempts'      => 1,
-            'last_error'    => $last_error,
-            'to_address'    => self::stringify_to($atts),
-            'subject'       => (string) ($atts['subject'] ?? ''),
-            'payload'       => wp_json_encode($atts),
-        ]);
+        $wpdb->insert(
+            $wpdb->prefix . 'zsm_mail_queue',
+            [
+                'created_at'    => current_time('mysql'),
+                'next_retry_at' => self::next_retry_time(0),
+                'status'        => 'pending',
+                'attempts'      => 1,
+                'last_error'    => $last_error,
+                'to_address'    => self::stringify_to($atts),
+                'subject'       => (string) ($atts['subject'] ?? ''),
+                'payload'       => wp_json_encode($atts),
+            ],
+            ['%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s']
+        );
     }
 
     private static function next_retry_time(int $attempts_so_far): string
@@ -1021,7 +1060,7 @@ final class ZSM_Mail_Queue {
         $index   = min($attempts_so_far, count(self::BACKOFF_MINUTES) - 1);
         $minutes = self::BACKOFF_MINUTES[$index];
 
-        return gmdate('Y-m-d H:i:s', time() + ($minutes * 60));
+        return wp_date('Y-m-d H:i:s', time() + ($minutes * 60));
     }
 
     private static function stringify_to(array $atts): string
@@ -1035,16 +1074,24 @@ final class ZSM_Mail_Queue {
     {
         self::prune_old_rows();
 
-        global $wpdb;
-        $table = $wpdb->prefix . 'zsm_mail_queue';
+        if (get_transient('zsm_processing_queue_lock')) {
+            return;
+        }
+        set_transient('zsm_processing_queue_lock', 1, 120);
 
-        $rows = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}zsm_mail_queue WHERE status = 'pending' AND next_retry_at <= %s ORDER BY id ASC LIMIT 20",
-            current_time('mysql')
-        ));
+        try {
+            global $wpdb;
 
-        foreach ($rows as $row) {
-            self::retry_row($row);
+            $rows = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}zsm_mail_queue WHERE status = 'pending' AND next_retry_at <= %s ORDER BY id ASC LIMIT 20",
+                current_time('mysql')
+            ));
+
+            foreach ((array) $rows as $row) {
+                self::retry_row($row);
+            }
+        } finally {
+            delete_transient('zsm_processing_queue_lock');
         }
     }
 
@@ -1082,7 +1129,13 @@ final class ZSM_Mail_Queue {
 
         $atts = json_decode((string) $row->payload, true);
         if (!is_array($atts)) {
-            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', ['status' => 'given_up', 'last_error' => 'payload خراب بود'], ['id' => $row->id]);
+            $wpdb->update(
+                $wpdb->prefix . 'zsm_mail_queue',
+                ['status' => 'given_up', 'last_error' => 'payload خراب بود'],
+                ['id' => (int) $row->id],
+                ['%s', '%s'],
+                ['%d']
+            );
             return;
         }
 
@@ -1092,29 +1145,47 @@ final class ZSM_Mail_Queue {
         $attempts = (int) $row->attempts + 1;
 
         if ($sent) {
-            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
-                'status'      => 'sent',
-                'attempts'    => $attempts,
-                'last_method' => $used_method,
-                'last_error'  => null,
-            ], ['id' => $row->id]);
+            $wpdb->update(
+                $wpdb->prefix . 'zsm_mail_queue',
+                [
+                    'status'      => 'sent',
+                    'attempts'    => $attempts,
+                    'last_method' => $used_method,
+                    'last_error'  => null,
+                ],
+                ['id' => (int) $row->id],
+                ['%s', '%d', '%s', '%s'],
+                ['%d']
+            );
             return;
         }
 
         if ($attempts >= self::MAX_ATTEMPTS) {
-            $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
-                'status'     => 'given_up',
-                'attempts'   => $attempts,
-                'last_error' => $error,
-            ], ['id' => $row->id]);
+            $wpdb->update(
+                $wpdb->prefix . 'zsm_mail_queue',
+                [
+                    'status'     => 'given_up',
+                    'attempts'   => $attempts,
+                    'last_error' => $error,
+                ],
+                ['id' => (int) $row->id],
+                ['%s', '%d', '%s'],
+                ['%d']
+            );
             return;
         }
 
-        $wpdb->update($wpdb->prefix . 'zsm_mail_queue', [
-            'attempts'      => $attempts,
-            'next_retry_at' => self::next_retry_time($attempts),
-            'last_error'    => $error,
-        ], ['id' => $row->id]);
+        $wpdb->update(
+            $wpdb->prefix . 'zsm_mail_queue',
+            [
+                'attempts'      => $attempts,
+                'next_retry_at' => self::next_retry_time($attempts),
+                'last_error'    => $error,
+            ],
+            ['id' => (int) $row->id],
+            ['%d', '%s', '%s'],
+            ['%d']
+        );
     }
 
     /** آیا جدول صف/لاگ ساخته شده است؟ (برای نمایش وضعیت در داشبورد) */

@@ -341,12 +341,12 @@ class Psy_Quiz_Rest_Handler {
             return;
         }
 
-        $client_name = $inv->client_name;
-        $quiz_name   = $test->get_name();
+        $client_name = (string) $inv->client_name;
+        $quiz_name   = (string) $test->get_name();
         $jalali      = function_exists( 'pa_to_jalali' )
             ? pa_to_jalali( current_time( 'mysql' ), 'Y/m/d ساعت H:i' )
             : current_time( 'Y/m/d H:i' );
-        $site_name   = get_bloginfo( 'name' );
+        $site_name   = trim( (string) preg_replace( '/[\r\n]+/', ' ', wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) ) );
         $report_url  = esc_url( admin_url( 'admin.php?page=psy-quiz-reports&attempt=' . $attempt_id ) );
 
         // ── ساخت جدول پاسخ‌ها ──────────────────────────────────────────
@@ -380,6 +380,11 @@ class Psy_Quiz_Rest_Handler {
         }
 
         // ── ساخت HTML ایمیل ────────────────────────────────────────────
+        $quiz_name_html   = esc_html( $quiz_name );
+        $site_name_html   = esc_html( $site_name );
+        $client_name_html = esc_html( $client_name );
+        $jalali_html      = esc_html( (string) $jalali );
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
@@ -415,8 +420,8 @@ class Psy_Quiz_Rest_Handler {
 
     <!-- هدر -->
     <div class="psy-mail-head">
-      <div class="psy-mail-title">📊 گزارش آزمون — {$quiz_name}</div>
-      <div class="psy-mail-sub">{$site_name}</div>
+      <div class="psy-mail-title">📊 گزارش آزمون — {$quiz_name_html}</div>
+      <div class="psy-mail-sub">{$site_name_html}</div>
     </div>
 
     <!-- اطلاعات مراجع -->
@@ -424,9 +429,9 @@ class Psy_Quiz_Rest_Handler {
       <table>
         <tr>
           <td class="psy-mail-label">👤 نام مراجع:</td>
-          <td class="psy-mail-value--bold">{$client_name}</td>
+          <td class="psy-mail-value--bold">{$client_name_html}</td>
           <td class="psy-mail-label">📅 تاریخ تکمیل:</td>
-          <td class="psy-mail-value">{$jalali}</td>
+          <td class="psy-mail-value">{$jalali_html}</td>
         </tr>
       </table>
     </div>
@@ -468,7 +473,7 @@ class Psy_Quiz_Rest_Handler {
 
     <!-- فوتر -->
     <div class="psy-mail-foot">
-      این ایمیل به صورت خودکار توسط {$site_name} ارسال شده است. این گزارش صرفاً جنبه کمک‌تشخیصی دارد.
+      این ایمیل به صورت خودکار توسط {$site_name_html} ارسال شده است. این گزارش صرفاً جنبه کمک‌تشخیصی دارد.
     </div>
 
   </div>
@@ -476,7 +481,7 @@ class Psy_Quiz_Rest_Handler {
 </html>
 HTML;
 
-        $subject = sprintf( '[%s] گزارش آزمون %s — %s', $site_name, $quiz_name, $client_name );
+        $subject = trim( (string) preg_replace( '/[\r\n]+/', ' ', sprintf( '[%s] گزارش آزمون %s — %s', $site_name, $quiz_name, $client_name ) ) );
 
         // BUG-05: حذف کاراکترهای خطرناک از site_name برای جلوگیری از email header injection
         $safe_from_name = preg_replace( '/[^\p{L}\p{N}\s\-_.@]/u', '', $site_name );

@@ -708,11 +708,13 @@ class GSO_Generator {
 
 	public static function sanitize_css( string $css ): string {
 		$css = preg_replace( '/^```(?:css)?\s*|\s*```$/i', '', trim( $css ) );
-		$css = preg_replace( '#</?style[^>]*>#i', '', (string) $css );
-		$css = preg_replace( '#<\?php.*?\?>#s', '', (string) $css );
-		$css = preg_replace( '/<\/?script[^>]*>/i', '', (string) $css );
+		$css = preg_replace( '#</?(?:style|script)[^>]*>#i', '', (string) $css );
+		$css = preg_replace( '#<\?(?:php|=)?.*?\?>#s', '', (string) $css );
 		$css = preg_replace( '/expression\s*\(/i', '', (string) $css );
-		$css = preg_replace( '/@import[^;]+;/i', '', (string) $css );
+		$css = preg_replace( '/-moz-binding\s*:/i', '', (string) $css );
+		$css = preg_replace( '/\bbehavior\s*:/i', '', (string) $css );
+		$css = preg_replace( '/@import\b[^;\n]*[;\n]?/i', '', (string) $css );
+		$css = preg_replace( '/url\s*\(\s*["\']?\s*(?:javascript|vbscript|data)\s*:/i', 'url(', (string) $css );
 		return trim( (string) $css );
 	}
 

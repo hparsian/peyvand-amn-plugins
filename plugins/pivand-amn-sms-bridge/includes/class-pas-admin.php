@@ -181,7 +181,8 @@ final class Pas_Admin
             <table class="widefat striped">
                 <thead><tr><th>زمان</th><th>موبایل</th><th>bodyId</th><th>نتیجه</th><th>توضیح</th></tr></thead>
                 <tbody>
-                <?php foreach (Pas_Log::recent(50) as $row) : ?>
+                <?php $logs = Pas_Log::recent(50); ?>
+                <?php foreach ($logs as $row) : ?>
                     <tr>
                         <td><?php echo esc_html(function_exists('pas_jalali_datetime') ? pas_jalali_datetime((string) $row->created_at) : (string) $row->created_at); ?></td>
                         <td dir="ltr"><?php echo esc_html($row->mobile); ?></td>
@@ -190,7 +191,7 @@ final class Pas_Admin
                         <td><?php echo esc_html($row->reason); ?></td>
                     </tr>
                 <?php endforeach; ?>
-                <?php if (empty(Pas_Log::recent(1))) : ?>
+                <?php if (empty($logs)) : ?>
                     <tr><td colspan="5">هنوز هیچ پیامکی ارسال نشده.</td></tr>
                 <?php endif; ?>
                 </tbody>

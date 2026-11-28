@@ -125,9 +125,8 @@ class GSO_Settings {
 			if ( '' === $base ) {
 				$out['api_base_url'] = '';
 			} else {
-				$clean = esc_url_raw( $base, array( 'http', 'https' ) );
-				$clean = preg_replace( '#/v1(?:beta|alpha)?(?:/models.*)?$#i', '', rtrim( (string) $clean, '/' ) );
-				$out['api_base_url'] = rtrim( (string) $clean, '/' );
+				$validated = self::validate_api_base_url( $base );
+				$out['api_base_url'] = $validated;
 			}
 		}
 		$out['force_ipv4'] = ! empty( $input['force_ipv4'] );
@@ -219,6 +218,39 @@ class GSO_Settings {
 		return self::normalize_model( (string) $model, $kind );
 	}
 
+	public static function validate_api_base_url( string $base ): string {
+		$clean = esc_url_raw( trim( $base ), array( 'https' ) );
+		if ( '' === $clean ) {
+			return '';
+		}
+		$clean = preg_replace( '#/v1(?:beta|alpha)?(?:/models.*)?$#i', '', rtrim( (string) $clean, '/' ) );
+		$clean = rtrim( (string) $clean, '/' );
+		if ( '' === $clean ) {
+			return '';
+		}
+		$parts = wp_parse_url( $clean );
+		if ( ! is_array( $parts ) || empty( $parts['host'] ) || strtolower( (string) ( $parts['scheme'] ?? '' ) ) !== 'https' ) {
+			return '';
+		}
+		$host = strtolower( trim( (string) $parts['host'], '[]' ) );
+		if ( in_array( $host, array( 'localhost', 'ip6-localhost' ), true ) || substr( $host, -6 ) === '.local' || substr( $host, -9 ) === '.internal' ) {
+			return '';
+		}
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			if ( false === filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return '';
+			}
+		} elseif ( function_exists( 'wp_http_validate_url' ) && ! wp_http_validate_url( $clean ) ) {
+			return '';
+		} else {
+			$resolved = gethostbyname( $host );
+			if ( filter_var( $resolved, FILTER_VALIDATE_IP ) && false === filter_var( $resolved, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return '';
+			}
+		}
+		return $clean;
+	}
+
 	/**
 	 * آدرس پایه API (رسمی یا پروکسی/Worker اختصاصی).
 	 *
@@ -229,9 +261,7 @@ class GSO_Settings {
 		if ( '' === $base ) {
 			return 'https://generativelanguage.googleapis.com';
 		}
-		$clean = esc_url_raw( $base, array( 'http', 'https' ) );
-		$clean = preg_replace( '#/v1(?:beta|alpha)?(?:/models.*)?$#i', '', rtrim( (string) $clean, '/' ) );
-		$clean = rtrim( (string) $clean, '/' );
+		$clean = self::validate_api_base_url( $base );
 		return '' !== $clean ? $clean : 'https://generativelanguage.googleapis.com';
 	}
 
@@ -268,16 +298,21 @@ class GSO_Settings {
 		if ( '' === $plain ) {
 			return '';
 		}
+		if ( class_exists( 'Pas_Core_Crypto' ) && Pas_Core_Crypto::is_configured() ) {
+			return Pas_Core_Crypto::wrap_encrypted( $plain );
+		}
 		if ( ! function_exists( 'openssl_encrypt' ) ) {
 			return 'plain:' . $plain;
 		}
-		$key = hash( 'sha256', wp_salt( 'auth' ) . '|gso', true );
-		$iv  = random_bytes( 16 );
-		$enc = openssl_encrypt( $plain, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
+		$enc_key = hash( 'sha256', wp_salt( 'auth' ) . '|gso-enc', true );
+		$mac_key = hash( 'sha256', wp_salt( 'auth' ) . '|gso-mac', true );
+		$iv      = random_bytes( 16 );
+		$enc     = openssl_encrypt( $plain, 'aes-256-cbc', $enc_key, OPENSSL_RAW_DATA, $iv );
 		if ( false === $enc ) {
-			return 'plain:' . $plain;
+			return '';
 		}
-		return 'gso1:' . base64_encode( $iv . $enc );
+		$mac = hash_hmac( 'sha256', $iv . $enc, $mac_key, true );
+		return 'gso2:' . base64_encode( $mac . $iv . $enc );
 	}
 
 	/**
@@ -290,8 +325,32 @@ class GSO_Settings {
 		if ( '' === $stored ) {
 			return '';
 		}
+		if ( class_exists( 'Pas_Core_Crypto' ) && 0 === strpos( $stored, Pas_Core_Crypto::PREFIX ) ) {
+			return Pas_Core_Crypto::unwrap_decrypt( $stored );
+		}
 		if ( 0 === strpos( $stored, 'plain:' ) ) {
 			return substr( $stored, 6 );
+		}
+		if ( 0 === strpos( $stored, 'gso2:' ) ) {
+			if ( ! function_exists( 'openssl_decrypt' ) ) {
+				return '';
+			}
+			$raw = base64_decode( substr( $stored, 5 ), true );
+			if ( false === $raw || strlen( $raw ) < 64 ) {
+				return '';
+			}
+			$mac     = substr( $raw, 0, 32 );
+			$payload = substr( $raw, 32 );
+			$enc_key = hash( 'sha256', wp_salt( 'auth' ) . '|gso-enc', true );
+			$mac_key = hash( 'sha256', wp_salt( 'auth' ) . '|gso-mac', true );
+			$calc    = hash_hmac( 'sha256', $payload, $mac_key, true );
+			if ( ! hash_equals( $mac, $calc ) ) {
+				return '';
+			}
+			$iv  = substr( $payload, 0, 16 );
+			$enc = substr( $payload, 16 );
+			$out = openssl_decrypt( $enc, 'aes-256-cbc', $enc_key, OPENSSL_RAW_DATA, $iv );
+			return false === $out ? '' : $out;
 		}
 		if ( 0 !== strpos( $stored, 'gso1:' ) ) {
 			return $stored;

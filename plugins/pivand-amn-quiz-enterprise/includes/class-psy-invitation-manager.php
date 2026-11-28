@@ -259,7 +259,9 @@ class Psy_Quiz_Invitation_Manager {
         $wpdb->update(
             $wpdb->prefix . 'psy_invitations',
             [ 'status' => 'completed', 'attempt_id' => $attempt_id ],
-            [ 'id'     => $invitation_id ]
+            [ 'id'     => $invitation_id ],
+            [ '%s', '%d' ],
+            [ '%d' ]
         );
     }
 
@@ -333,7 +335,7 @@ class Psy_Quiz_Invitation_Manager {
         $use_email = ( $client_email !== '' && is_email( $client_email ) );
 
         if ( $use_email ) {
-            $site_name = get_bloginfo( 'name' );
+            $site_name = trim( (string) preg_replace( '/[\r\n]+/', ' ', wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) ) );
             $subject   = 'آزمون شما آماده است — ' . $site_name;
             $body      = "سلام {$client_name} عزیز\n\n"
                 . "آزمونی که برایتان تعریف شده آماده است.\n"
@@ -431,7 +433,7 @@ class Psy_Quiz_Invitation_Manager {
      */
     public static function expiry_message( ?string $expires_at ): string {
         if ( ! $expires_at ) return 'بدون انقضا';
-        $ts   = strtotime( $expires_at );
+        $ts   = strtotime( $expires_at . ' UTC' );
         $diff = $ts - time();
         if ( $diff < 0 ) return 'منقضی شده';
         $days = ceil( $diff / DAY_IN_SECONDS );

@@ -34,7 +34,9 @@ class Psy_Quiz_Offline_Export {
 
         $html = self::build_html( $client_name, $quiz_id, $q_count, $questions, $scale, $q_scales, $email );
 
-        $filename = 'azmon-' . sanitize_title( $client_name ) . '-' . $quiz_id . '.html';
+        $safe_client = sanitize_title( $client_name );
+        $safe_quiz   = sanitize_key( $quiz_id );
+        $filename    = preg_replace( '/[^A-Za-z0-9._-]/', '-', 'azmon-' . ( $safe_client ?: 'client' ) . '-' . ( $safe_quiz ?: 'quiz' ) . '.html' );
         header( 'Content-Type: text/html; charset=UTF-8' );
         header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
         header( 'Cache-Control: no-cache' );
@@ -56,28 +58,31 @@ class Psy_Quiz_Offline_Export {
         // ── ساخت HTML سوالات ─────────────────────────────────────
         $questions_html = '';
         foreach ( $questions as $qnum => $qtext ) {
-            $qs      = $q_scales[$qnum] ?? $scale;
-            $options = '';
+            $qnum_i    = (int) $qnum;
+            $qtext_str = is_array( $qtext ) ? (string) ( $qtext['text'] ?? $qtext['q'] ?? '' ) : (string) $qtext;
+            $qs        = $q_scales[$qnum] ?? $scale;
+            $options   = '';
             foreach ( $qs['labels'] as $val => $lbl ) {
+                $val_safe = htmlspecialchars( (string) $val, ENT_QUOTES, 'UTF-8' );
                 $options .= '<label class="opt-label">
-                    <input type="radio" name="q_' . $qnum . '" value="' . $val . '" onchange="markAnswered(' . $qnum . ')">
+                    <input type="radio" name="q_' . $qnum_i . '" value="' . $val_safe . '" onchange="markAnswered(' . $qnum_i . ')">
                     <span class="opt-box">
-                        <span class="opt-val">' . $val . '</span>
-                        <span class="opt-lbl">' . htmlspecialchars( $lbl, ENT_QUOTES ) . '</span>
+                        <span class="opt-val">' . $val_safe . '</span>
+                        <span class="opt-lbl">' . htmlspecialchars( (string) $lbl, ENT_QUOTES, 'UTF-8' ) . '</span>
                     </span>
                 </label>';
             }
             $questions_html .= '
-            <div class="q-card" id="qcard_' . $qnum . '" data-qnum="' . $qnum . '" hidden>
-                <div class="q-num">سوال ' . $qnum . ' از ' . $q_count . '</div>
-                <div class="progress-bar"><div class="progress-fill" id="prog_' . $qnum . '"></div></div>
-                <div class="q-text">' . htmlspecialchars( $qtext, ENT_QUOTES ) . '</div>
+            <div class="q-card" id="qcard_' . $qnum_i . '" data-qnum="' . $qnum_i . '" hidden>
+                <div class="q-num">سوال ' . $qnum_i . ' از ' . $q_count . '</div>
+                <div class="progress-bar"><div class="progress-fill" id="prog_' . $qnum_i . '"></div></div>
+                <div class="q-text">' . htmlspecialchars( $qtext_str, ENT_QUOTES, 'UTF-8' ) . '</div>
                 <div class="opts">' . $options . '</div>
                 <div class="q-nav">
-                    ' . ( $qnum > 1 ? '<button class="btn btn-prev" onclick="goTo(' . ($qnum-1) . ')">← قبلی</button>' : '<span></span>' ) . '
-                    ' . ( $qnum < $q_count
-                        ? '<button class="btn btn-next" id="next_' . $qnum . '" onclick="goTo(' . ($qnum+1) . ')" disabled>بعدی ←</button>'
-                        : '<button class="btn btn-submit" id="next_' . $qnum . '" onclick="submitAnswers()" disabled>ثبت و ارسال ✓</button>'
+                    ' . ( $qnum_i > 1 ? '<button class="btn btn-prev" onclick="goTo(' . ($qnum_i-1) . ')">← قبلی</button>' : '<span></span>' ) . '
+                    ' . ( $qnum_i < $q_count
+                        ? '<button class="btn btn-next" id="next_' . $qnum_i . '" onclick="goTo(' . ($qnum_i+1) . ')" disabled>بعدی ←</button>'
+                        : '<button class="btn btn-submit" id="next_' . $qnum_i . '" onclick="submitAnswers()" disabled>ثبت و ارسال ✓</button>'
                     ) . '
                 </div>
             </div>';
@@ -271,9 +276,9 @@ class Psy_Quiz_Offline_Export {
       یک فایل متنی (.txt) دانلود می‌شود. آن را برای درمانگر خود ارسال کنید؛ او فایل را باز کرده و پاسخ‌ها را در سیستم ثبت می‌کند.
     </div>
     <p class="mt-20 psy-center">
-      <a href="javascript:void(0)" onclick="sendEmail()" class="link-inline">
+      <button type="button" onclick="sendEmail()" class="link-inline" style="background:none;border:0;cursor:pointer;font-family:inherit;padding:0">
         یا ارسال مستقیم با برنامه ایمیل (اگر روی دستگاه شما تنظیم شده)
-      </a>
+      </button>
     </p>
   </div>
 
@@ -293,10 +298,20 @@ let answered = {};
 let currentQ = 1;
 
 // ── راه‌اندازی مقیاس در صفحه خوشامد
-document.getElementById('global-scale').innerHTML =
-  Object.entries(globalScale).map(([v,l]) =>
-    `<div class="scale-item"><span class="sval">\${v}</span>\${l}</div>`
-  ).join('');
+(function() {
+  const container = document.getElementById('global-scale');
+  if (!container) return;
+  Object.entries(globalScale).forEach(([v, l]) => {
+    const item = document.createElement('div');
+    item.className = 'scale-item';
+    const sval = document.createElement('span');
+    sval.className = 'sval';
+    sval.textContent = String(v);
+    item.appendChild(sval);
+    item.appendChild(document.createTextNode(String(l)));
+    container.appendChild(item);
+  });
+})();
 
 function startQuiz() {
   document.getElementById('screen-welcome').style.display = 'none';

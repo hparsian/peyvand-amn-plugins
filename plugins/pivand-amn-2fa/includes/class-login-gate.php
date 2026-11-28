@@ -39,10 +39,17 @@ final class Pas_2FA_Login_Gate
         // در این مرحله فقط «آیا خالی است یا نه» مهم است، نه مقدار واقعی —
         // پس نیازی به رمزگشایی اینجا نیست (در handle_challenge_submit انجام می‌شود).
 
+        $rememberme  = !empty($_POST['rememberme']);
+        $redirect_to = isset($_REQUEST['redirect_to'])
+            ? wp_validate_redirect(esc_url_raw(wp_unslash($_REQUEST['redirect_to'])), admin_url())
+            : admin_url();
+
         $token = wp_generate_password(32, false, false);
         set_transient(self::TRANSIENT_PREFIX . $token, [
-            'user_id'  => $user->ID,
-            'attempts' => 0,
+            'user_id'     => $user->ID,
+            'attempts'    => 0,
+            'rememberme'  => $rememberme,
+            'redirect_to' => $redirect_to,
         ], self::CHALLENGE_TTL);
 
         // توکن را داخل کد خطا قاچاق می‌کنیم تا در wp_login_failed در دسترس باشد
@@ -74,9 +81,13 @@ final class Pas_2FA_Login_Gate
             exit;
         }
 
-        login_header('تایید دومرحله‌ای', '', null);
+        $has_error = isset($_GET['pas_err']) && sanitize_text_field(wp_unslash($_GET['pas_err'])) === '1';
+        $wp_error  = $has_error ? new \WP_Error('pas_2fa_invalid', 'کد واردشده معتبر یا قابل‌استفاده نیست. لطفاً دوباره تلاش کنید.') : null;
+
+        login_header('تایید دومرحله‌ای', '', $wp_error);
         ?>
         <form name="pas2fa" id="loginform" method="post" action="<?php echo esc_url(add_query_arg('action', 'pas_2fa_verify_submit', wp_login_url())); ?>">
+            <?php wp_nonce_field('pas_2fa_verify_' . $token, 'pas_2fa_nonce'); ?>
             <input type="hidden" name="token" value="<?php echo esc_attr($token); ?>">
             <p>
                 <label for="pas_2fa_code">کد ۶رقمی اپ احراز هویت</label>
@@ -95,11 +106,12 @@ final class Pas_2FA_Login_Gate
     public function handle_challenge_submit(): void
     {
         $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : '';
+        $nonce = isset($_POST['pas_2fa_nonce']) ? sanitize_text_field(wp_unslash($_POST['pas_2fa_nonce'])) : '';
         $code  = isset($_POST['code']) ? sanitize_text_field(wp_unslash($_POST['code'])) : '';
         $key   = self::TRANSIENT_PREFIX . $token;
-        $data  = get_transient($key);
+        $data  = $token !== '' ? get_transient($key) : false;
 
-        if (!$data) {
+        if (!$data || !$nonce || !wp_verify_nonce($nonce, 'pas_2fa_verify_' . $token)) {
             wp_safe_redirect(wp_login_url());
             exit;
         }
@@ -110,32 +122,45 @@ final class Pas_2FA_Login_Gate
             wp_die('تعداد تلاش‌های مجاز تمام شد. دوباره وارد شوید.', 'خطا', ['response' => 429]);
         }
 
-        $secret = get_user_meta((int) $data['user_id'], 'pas_2fa_secret', true);
-        $secret = ($secret && class_exists('Pas_Core_Crypto')) ? Pas_Core_Crypto::unwrap_decrypt((string) $secret) : $secret;
+        $user_id = (int) $data['user_id'];
+        $secret  = get_user_meta($user_id, 'pas_2fa_secret', true);
+        $secret  = ($secret && class_exists('Pas_Core_Crypto')) ? Pas_Core_Crypto::unwrap_decrypt((string) $secret) : $secret;
 
         $verified_via = null;
-        if ($secret && Pas_2FA_Totp::verify((string) $secret, $code)) {
-            $verified_via = 'totp';
-        } elseif (Pas_2FA_Backup_Codes::verify_and_consume((int) $data['user_id'], $code)) {
+        if ($secret) {
+            $matched_step = Pas_2FA_Totp::verify_with_step((string) $secret, $code);
+            if ($matched_step !== null) {
+                $last_step = (int) get_user_meta($user_id, 'pas_2fa_last_totp_step', true);
+                if ($matched_step > $last_step) {
+                    update_user_meta($user_id, 'pas_2fa_last_totp_step', $matched_step);
+                    $verified_via = 'totp';
+                }
+            }
+        }
+        if ($verified_via === null && Pas_2FA_Backup_Codes::verify_and_consume($user_id, $code)) {
             // کد بازیابی معتبر بود — verify_and_consume خودش آن را باطل کرده
             $verified_via = 'backup_code';
         }
 
         if ($verified_via !== null) {
             delete_transient($key);
-            wp_set_auth_cookie((int) $data['user_id']);
-            do_action('wp_login', get_userdata((int) $data['user_id'])->user_login ?? '', get_userdata((int) $data['user_id']));
+            wp_set_auth_cookie($user_id, !empty($data['rememberme']));
+            $user_obj = get_userdata($user_id);
+            do_action('wp_login', $user_obj ? $user_obj->user_login : '', $user_obj);
 
             if ($verified_via === 'backup_code') {
                 // یادآوری برای دفعه‌ی بعد: اگر کد بازیابی مصرف شد و کم مانده،
                 // بعد از ورود به داشبورد یک نوتیس نشان بده تا کدهای جدید بسازد.
-                $remaining = Pas_2FA_Backup_Codes::remaining_count((int) $data['user_id']);
+                $remaining = Pas_2FA_Backup_Codes::remaining_count($user_id);
                 if ($remaining <= 2) {
-                    set_transient('pas_2fa_low_codes_notice_' . (int) $data['user_id'], $remaining, DAY_IN_SECONDS);
+                    set_transient('pas_2fa_low_codes_notice_' . $user_id, $remaining, DAY_IN_SECONDS);
                 }
             }
 
-            wp_safe_redirect(admin_url());
+            $redirect_to = !empty($data['redirect_to'])
+                ? wp_validate_redirect((string) $data['redirect_to'], admin_url())
+                : admin_url();
+            wp_safe_redirect($redirect_to);
             exit;
         }
 

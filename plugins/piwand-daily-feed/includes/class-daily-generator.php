@@ -134,59 +134,68 @@ class PWDF_Daily_Generator {
             return [ 'success' => false, 'error' => $err ];
         }
 
-        $s   = PWDF_Settings::get();
-        $mix = ! empty( $s['auto_generate_mix'] ) ? array_values( (array) $s['auto_generate_mix'] ) : [ 'quote' ];
-
-        // به‌نوبت بر اساس روز سال (نه تصادفی) تا الگوی قابل پیش‌بینی و متعادل باشد
-        $day_index = (int) wp_date( 'z' );
-        $type      = $mix[ $day_index % count( $mix ) ];
-        $batch_id  = wp_date( 'Y-m-d' ) . '-' . wp_generate_password( 5, false ); // شناسه یکتای این دسته
-
-        $created = [];
-        $errors  = [];
-
-        for ( $i = 0; $i < self::BATCH_SIZE; $i++ ) {
-            $result = ( $type === 'book' )
-                ? self::generate_book( $s )
-                : self::generate_quote( self::QUOTE_THEMES[ $i % count( self::QUOTE_THEMES ) ] );
-
-            if ( empty( $result['success'] ) ) {
-                $errors[] = $result['error'] ?? 'خطای نامشخص از سرویس هوش مصنوعی.';
-                continue;
-            }
-
-            $post_id = wp_insert_post( [
-                'post_type'    => 'pwdf_card',
-                'post_status'  => 'draft', // ⚠️ عمداً ثابت — نباید از تنظیمات/ورودی خوانده شود
-                'post_title'   => wp_strip_all_tags( '(گزینه ' . ( $i + 1 ) . ' از ' . self::BATCH_SIZE . ') ' . $result['title'] ),
-                'post_content' => wp_kses_post( $result['content'] ),
-            ], true );
-
-            if ( is_wp_error( $post_id ) ) {
-                $errors[] = $post_id->get_error_message();
-                continue;
-            }
-
-            update_post_meta( $post_id, '_pwdf_type', $type );
-            update_post_meta( $post_id, '_pwdf_color', PWDF_Settings::get( 'colors' )[ $type ] ?? '' );
-            if ( ! empty( $result['author_tag'] ) ) {
-                update_post_meta( $post_id, '_pwdf_author_tag', sanitize_text_field( $result['author_tag'] ) );
-            }
-            update_post_meta( $post_id, '_pwdf_generated_by_ai', '1' );
-            update_post_meta( $post_id, '_pwdf_ai_batch', $batch_id ); // برای گروه‌بندی ۵تایی هر روز
-
-            $created[] = $post_id;
+        if ( get_transient( 'pwdf_generating_lock' ) ) {
+            return [ 'success' => false, 'error' => 'یک فرآیند تولید خودکار هم‌اکنون در حال اجرا است. لطفاً چند لحظه بعد دوباره تلاش کنید.' ];
         }
+        set_transient( 'pwdf_generating_lock', 1, 5 * MINUTE_IN_SECONDS );
 
-        if ( empty( $created ) ) {
-            $err = 'هیچ‌کدام از ۵ گزینه ساخته نشد: ' . implode( ' | ', array_unique( $errors ) );
-            self::notify_admin_error( $err );
-            return [ 'success' => false, 'error' => $err ];
+        try {
+            $s   = PWDF_Settings::get();
+            $mix = ! empty( $s['auto_generate_mix'] ) ? array_values( (array) $s['auto_generate_mix'] ) : [ 'quote' ];
+
+            // به‌نوبت بر اساس روز سال (نه تصادفی) تا الگوی قابل پیش‌بینی و متعادل باشد
+            $day_index = (int) wp_date( 'z' );
+            $type      = $mix[ $day_index % count( $mix ) ];
+            $batch_id  = wp_date( 'Y-m-d' ) . '-' . wp_generate_password( 5, false ); // شناسه یکتای این دسته
+
+            $created = [];
+            $errors  = [];
+
+            for ( $i = 0; $i < self::BATCH_SIZE; $i++ ) {
+                $result = ( $type === 'book' )
+                    ? self::generate_book( $s )
+                    : self::generate_quote( self::QUOTE_THEMES[ $i % count( self::QUOTE_THEMES ) ] );
+
+                if ( empty( $result['success'] ) ) {
+                    $errors[] = $result['error'] ?? 'خطای نامشخص از سرویس هوش مصنوعی.';
+                    continue;
+                }
+
+                $post_id = wp_insert_post( [
+                    'post_type'    => 'pwdf_card',
+                    'post_status'  => 'draft', // ⚠️ عمداً ثابت — نباید از تنظیمات/ورودی خوانده شود
+                    'post_title'   => sanitize_text_field( wp_strip_all_tags( '(گزینه ' . ( $i + 1 ) . ' از ' . self::BATCH_SIZE . ') ' . $result['title'] ) ),
+                    'post_content' => wp_kses_post( $result['content'] ),
+                ], true );
+
+                if ( is_wp_error( $post_id ) ) {
+                    $errors[] = $post_id->get_error_message();
+                    continue;
+                }
+
+                update_post_meta( $post_id, '_pwdf_type', $type );
+                update_post_meta( $post_id, '_pwdf_color', PWDF_Settings::get( 'colors' )[ $type ] ?? '' );
+                if ( ! empty( $result['author_tag'] ) ) {
+                    update_post_meta( $post_id, '_pwdf_author_tag', sanitize_text_field( $result['author_tag'] ) );
+                }
+                update_post_meta( $post_id, '_pwdf_generated_by_ai', '1' );
+                update_post_meta( $post_id, '_pwdf_ai_batch', $batch_id ); // برای گروه‌بندی ۵تایی هر روز
+
+                $created[] = $post_id;
+            }
+
+            if ( empty( $created ) ) {
+                $err = 'هیچ‌کدام از ۵ گزینه ساخته نشد: ' . implode( ' | ', array_unique( $errors ) );
+                self::notify_admin_error( $err );
+                return [ 'success' => false, 'error' => $err ];
+            }
+
+            self::notify_admin_batch_ready( $created, $type, $errors );
+
+            return [ 'success' => true, 'post_ids' => $created, 'partial_errors' => $errors ];
+        } finally {
+            delete_transient( 'pwdf_generating_lock' );
         }
-
-        self::notify_admin_batch_ready( $created, $type, $errors );
-
-        return [ 'success' => true, 'post_ids' => $created, 'partial_errors' => $errors ];
     }
 
     // ─────────────────────────────────────────────────────────────

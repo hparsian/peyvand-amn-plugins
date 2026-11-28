@@ -217,17 +217,37 @@ class ACO_Live_Analyzer {
                 scoreEl.className = scoreClass;
             }
 
+            function safeHref(url) {
+                if (typeof url !== 'string') return '#';
+                const trimmed = url.trim();
+                if (/^(https?:\/\/|\/)/i.test(trimmed)) return trimmed;
+                return '#';
+            }
+
             function renderChecklist(checks) {
-                let html = '';
+                checklistEl.textContent = '';
+                if (!checks || !checks.length) {
+                    const emptyLi = document.createElement('li');
+                    emptyLi.className = 'aco-live-check-neutral';
+                    emptyLi.textContent = 'داده‌ای برای نمایش نیست.';
+                    checklistEl.appendChild(emptyLi);
+                    return;
+                }
                 checks.forEach(function(c) {
                     let cls = 'aco-live-check-neutral', icon = '– ';
                     if (c.pass === true)  { cls = 'aco-live-check-pass'; icon = '✓ '; }
                     if (c.pass === false) { cls = 'aco-live-check-fail'; icon = '✗ '; }
-                    html += '<li class="' + cls + '">' + icon + c.label;
-                    if (c.detail) html += ' <span class="detail"> — ' + c.detail + '</span>';
-                    html += '</li>';
+                    const li = document.createElement('li');
+                    li.className = cls;
+                    li.appendChild(document.createTextNode(icon + (c.label || '')));
+                    if (c.detail) {
+                        const span = document.createElement('span');
+                        span.className = 'detail';
+                        span.textContent = ' — ' + c.detail;
+                        li.appendChild(span);
+                    }
+                    checklistEl.appendChild(li);
                 });
-                checklistEl.innerHTML = html || '<li class="aco-live-check-neutral">داده‌ای برای نمایش نیست.</li>';
             }
 
             function renderClusters(clusters) {
@@ -236,9 +256,13 @@ class ACO_Live_Analyzer {
                     clustersBox.style.display = 'none';
                     return;
                 }
-                clustersEl.innerHTML = clusters.map(function(phrase) {
-                    return '<span class="aco-live-cluster-chip">' + phrase + '</span>';
-                }).join('');
+                clustersEl.textContent = '';
+                clusters.forEach(function(phrase) {
+                    const chip = document.createElement('span');
+                    chip.className = 'aco-live-cluster-chip';
+                    chip.textContent = String(phrase || '');
+                    clustersEl.appendChild(chip);
+                });
                 clustersBox.style.display = 'block';
             }
 
@@ -258,17 +282,33 @@ class ACO_Live_Analyzer {
                     linksBox.style.display = 'none';
                     return;
                 }
-                linksEl.innerHTML = links.map(function(link) {
-                    return '<li><a href="' + link.url + '" target="_blank">' + link.title + '</a></li>';
-                }).join('');
+                linksEl.textContent = '';
+                links.forEach(function(link) {
+                    const li = document.createElement('li');
+                    const a  = document.createElement('a');
+                    a.setAttribute('href', safeHref(link && link.url));
+                    a.setAttribute('target', '_blank');
+                    a.setAttribute('rel', 'noopener noreferrer');
+                    a.textContent = String((link && link.title) || '');
+                    li.appendChild(a);
+                    linksEl.appendChild(li);
+                });
                 linksBox.style.display = 'block';
+            }
+
+            function renderStatusItem(className, text) {
+                checklistEl.textContent = '';
+                const li = document.createElement('li');
+                li.className = className;
+                li.textContent = text;
+                checklistEl.appendChild(li);
             }
 
             function runAnalysis() {
                 const fields = getEditorFields();
                 const keyword = kwInput ? kwInput.value : '';
 
-                checklistEl.innerHTML = '<li class="aco-live-check-neutral">' + acoLiveAnalyzer.i18n.evaluating + '</li>';
+                renderStatusItem('aco-live-check-neutral', acoLiveAnalyzer.i18n.evaluating);
 
                 const formData = new FormData();
                 formData.append('action', 'aco_seo_live_audit');
@@ -283,7 +323,7 @@ class ACO_Live_Analyzer {
                     .then(r => r.json())
                     .then(json => {
                         if (!json.success) {
-                            checklistEl.innerHTML = '<li class="aco-live-error">' + (json.data && json.data.message ? json.data.message : acoLiveAnalyzer.i18n.error) + '</li>';
+                            renderStatusItem('aco-live-error', (json.data && json.data.message) ? String(json.data.message) : acoLiveAnalyzer.i18n.error);
                             return;
                         }
                         renderScore(json.data.score);
@@ -293,7 +333,7 @@ class ACO_Live_Analyzer {
                         renderInternalLinks(json.data.internal_links || []);
                     })
                     .catch(() => {
-                        checklistEl.innerHTML = '<li class="aco-live-error">' + acoLiveAnalyzer.i18n.error + '</li>';
+                        renderStatusItem('aco-live-error', acoLiveAnalyzer.i18n.error);
                     });
             }
 

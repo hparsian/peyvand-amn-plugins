@@ -585,7 +585,7 @@ final class OTP_Auth
             $otp_code = wp_rand(10000, 99999);
         }
 
-        $site_name = get_bloginfo('name');
+        $site_name = trim((string) preg_replace('/[\r\n]+/', ' ', wp_strip_all_tags((string) get_bloginfo('name'))));
         $subject   = 'کد ورود شما به پنل ' . $site_name;
         $body      = "کد تایید ورود شما: {$otp_code}\n\nاین کد تا ۵ دقیقه معتبر است. اگر درخواست ورود نداده‌اید، این پیام را نادیده بگیرید.";
 

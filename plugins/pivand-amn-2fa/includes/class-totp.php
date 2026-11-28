@@ -32,21 +32,32 @@ final class Pas_2FA_Totp
     /** @param int $window تعداد بازه‌ی ۳۰ثانیه‌ای قبل/بعد که به‌خاطر اختلاف ساعت گوشی قبول می‌شود */
     public static function verify(string $secret, string $code, int $window = 1): bool
     {
+        return self::verify_with_step($secret, $code, $window) !== null;
+    }
+
+    /** تایید کد و بازگرداندن شماره‌ی گام زمانی مطابق برای جلوگیری از replay */
+    public static function verify_with_step(string $secret, string $code, int $window = 1): ?int
+    {
         $code = preg_replace('/\D+/', '', $code) ?? '';
         if (strlen($code) !== self::DIGITS) {
-            return false;
+            return null;
         }
 
         $key       = self::base32_decode($secret);
+        if ($key === '') {
+            return null;
+        }
+
         $timestamp = (int) floor(time() / self::PERIOD);
 
         for ($i = -$window; $i <= $window; $i++) {
-            if (hash_equals(self::code_at($key, $timestamp + $i), $code)) {
-                return true;
+            $step = $timestamp + $i;
+            if (hash_equals(self::code_at($key, $step), $code)) {
+                return $step;
             }
         }
 
-        return false;
+        return null;
     }
 
     private static function code_at(string $key, int $counter): string

@@ -39,6 +39,7 @@ class PWDF_Settings {
                 'image'    => '#7EC8A4',
                 'exercise' => '#E8956D',
                 'question' => '#C4A0A0',
+                'book'     => '#B5854E',
             ],
             // فونت
             'font_family'        => 'Vazirmatn',
@@ -85,16 +86,16 @@ class PWDF_Settings {
 
         $out['display_mode']    = in_array( $raw['display_mode'] ?? '', ['slider','feed','grid','masonry'], true )
                                    ? $raw['display_mode'] : $d['display_mode'];
-        $out['card_count']      = max( 1, absint( $raw['card_count'] ?? $d['card_count'] ) );
+        $out['card_count']      = max( 1, min( 50, absint( $raw['card_count'] ?? $d['card_count'] ) ) );
         $out['order']           = in_array( $raw['order'] ?? '', ['newest','oldest','random'], true )
                                    ? $raw['order'] : $d['order'];
         $out['show_days']       = in_array( $raw['show_days'] ?? '', ['all','today','week','custom'], true )
                                    ? $raw['show_days'] : $d['show_days'];
-        $out['custom_days']     = absint( $raw['custom_days'] ?? $d['custom_days'] );
+        $out['custom_days']     = max( 1, min( 365, absint( $raw['custom_days'] ?? $d['custom_days'] ) ) );
         $out['animation']       = in_array( $raw['animation'] ?? '', ['fade','slide','scale','none'], true )
                                    ? $raw['animation'] : $d['animation'];
         $out['autoplay']        = ! empty( $raw['autoplay'] );
-        $out['autoplay_speed']  = absint( $raw['autoplay_speed'] ?? $d['autoplay_speed'] );
+        $out['autoplay_speed']  = max( 1000, min( 10000, absint( $raw['autoplay_speed'] ?? $d['autoplay_speed'] ) ) );
         $out['card_radius']     = min( 32, absint( $raw['card_radius'] ?? $d['card_radius'] ) );
         $out['card_shadow']     = ! empty( $raw['card_shadow'] );
         $out['show_date']       = ! empty( $raw['show_date'] );

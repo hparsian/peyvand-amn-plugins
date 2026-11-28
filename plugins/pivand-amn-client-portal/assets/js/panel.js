@@ -1248,37 +1248,74 @@
         var topic = wrap.getAttribute('data-topic');
         var tempId = null;
 
+        var formMsg = document.createElement('p');
+        formMsg.className = 'zdp-quiz-msg';
+        formMsg.setAttribute('role', 'alert');
+        formMsg.hidden = true;
+        form.appendChild(formMsg);
+
+        function showInlineError(el, msg) {
+            if (!el) return;
+            el.textContent = msg || 'خطایی رخ داد.';
+            el.hidden = false;
+        }
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
+            formMsg.hidden = true;
             var data = new FormData(form);
             var payload = { source: source, topic: topic };
             data.forEach(function (value, key) { payload[key] = value; });
 
             post('zdp_quiz_submit_answers', payload).then(function (res) {
-                if (!res.success) {
-                    alert(res.data.message || 'خطایی رخ داد، دوباره تلاش کنید.');
+                if (!res || !res.success) {
+                    showInlineError(formMsg, (res && res.data && res.data.message) ? res.data.message : 'خطایی رخ داد، دوباره تلاش کنید.');
                     return;
                 }
 
                 form.hidden = true;
                 tempId = res.data.temp_id;
                 partialBox.hidden = false;
-                partialBox.innerHTML =
-                    '<h3>' + res.data.band_label + '</h3>' +
-                    '<p>برای دریافت تحلیل کامل و راهکارهای اختصاصی، شماره همراه خود را وارد کنید:</p>' +
-                    '<input type="text" id="zdp-quiz-phone" placeholder="09xxxxxxxxx یا +xxxxxxxxxxx (00 هم قابل قبول است)">' +
-                    '<button id="zdp-quiz-phone-submit">دریافت تحلیل کامل</button>';
+                partialBox.textContent = '';
 
-                document.getElementById('zdp-quiz-phone-submit').addEventListener('click', function () {
-                    var phone = document.getElementById('zdp-quiz-phone').value.trim();
+                var heading = document.createElement('h3');
+                heading.textContent = (res.data && res.data.band_label) ? String(res.data.band_label) : '';
+
+                var promptP = document.createElement('p');
+                promptP.textContent = 'برای دریافت تحلیل کامل و راهکارهای اختصاصی، شماره همراه خود را وارد کنید:';
+
+                var phoneInput = document.createElement('input');
+                phoneInput.type = 'text';
+                phoneInput.id = 'zdp-quiz-phone';
+                phoneInput.placeholder = '09xxxxxxxxx یا +xxxxxxxxxxx (00 هم قابل قبول است)';
+
+                var submitBtn = document.createElement('button');
+                submitBtn.type = 'button';
+                submitBtn.id = 'zdp-quiz-phone-submit';
+                submitBtn.textContent = 'دریافت تحلیل کامل';
+
+                var partialMsg = document.createElement('p');
+                partialMsg.className = 'zdp-quiz-msg';
+                partialMsg.setAttribute('role', 'alert');
+                partialMsg.hidden = true;
+
+                partialBox.appendChild(heading);
+                partialBox.appendChild(promptP);
+                partialBox.appendChild(phoneInput);
+                partialBox.appendChild(submitBtn);
+                partialBox.appendChild(partialMsg);
+
+                submitBtn.addEventListener('click', function () {
+                    partialMsg.hidden = true;
+                    var phone = toEnglishDigits(phoneInput.value).trim();
                     if (!isValidMobileInput(phone)) {
-                        alert('شماره موبایل معتبر وارد کنید.');
+                        showInlineError(partialMsg, 'شماره موبایل معتبر وارد کنید.');
                         return;
                     }
 
                     post('zdp_quiz_submit_phone', { temp_id: tempId, phone: phone }).then(function (res2) {
-                        if (!res2.success) {
-                            alert(res2.data.message || 'خطایی رخ داد.');
+                        if (!res2 || !res2.success) {
+                            showInlineError(partialMsg, (res2 && res2.data && res2.data.message) ? res2.data.message : 'خطایی رخ داد.');
                             return;
                         }
                         partialBox.hidden = true;

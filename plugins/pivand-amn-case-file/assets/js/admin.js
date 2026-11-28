@@ -40,7 +40,8 @@
                 body.append('nonce', PasCfClientLookup.nonce);
                 body.append('phone', phone);
 
-                fetch(ajaxurl, { method: 'POST', body: body, credentials: 'same-origin' })
+                var ajaxEndpoint = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+                fetch(ajaxEndpoint, { method: 'POST', body: body, credentials: 'same-origin' })
                     .then(function (r) { return r.json(); })
                     .then(function (res) {
                         if (res && res.success && res.data.name && nameEl.value.trim() === '') {

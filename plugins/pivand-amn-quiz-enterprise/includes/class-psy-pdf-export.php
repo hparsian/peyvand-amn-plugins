@@ -117,12 +117,12 @@ class Psy_Quiz_PDF_Export {
         if ( empty( $safe_name ) ) {
             $safe_name = 'client-' . $attempt->invitation_id;
         }
-        $filename = sprintf(
+        $filename = preg_replace( '/[^A-Za-z0-9._-]/', '-', sprintf(
             'report-%s-%s-%s.pdf',
             $safe_name,
-            $attempt->quiz_id,
+            sanitize_key( (string) $attempt->quiz_id ),
             str_replace( '/', '-', $jalali )
-        );
+        ) );
 
         while ( ob_get_level() ) ob_end_clean();
         header( 'Content-Type: application/pdf' );

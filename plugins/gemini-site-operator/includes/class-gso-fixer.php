@@ -275,10 +275,13 @@ class GSO_Fixer {
 
 		$state = GSO_Snapshot::collect_state( (string) $issue->object_type, (int) $issue->object_id, $handler );
 		if ( 'clear_debug_log' === $handler ) {
-			$log = trailingslashit( WP_CONTENT_DIR ) . 'debug.log';
-			if ( file_exists( $log ) && is_readable( $log ) ) {
-				$size                = (int) @filesize( $log );
-				$fp                  = @fopen( $log, 'r' );
+			$log         = trailingslashit( WP_CONTENT_DIR ) . 'debug.log';
+			$content_dir = realpath( WP_CONTENT_DIR );
+			$log_real    = realpath( $log );
+			if ( file_exists( $log ) && ! is_link( $log ) && false !== $content_dir && false !== $log_real
+				&& 0 === strpos( $log_real, trailingslashit( $content_dir ) ) && is_readable( $log_real ) ) {
+				$size = (int) @filesize( $log_real );
+				$fp   = @fopen( $log_real, 'r' );
 				if ( $fp ) {
 					$read = max( 0, $size - 20000 );
 					fseek( $fp, $read );
@@ -846,10 +849,18 @@ class GSO_Fixer {
 		if ( ! file_exists( $log ) ) {
 			return new WP_Error( 'gso_noop', 'فایل debug.log وجود ندارد.' );
 		}
-		if ( ! is_writable( $log ) ) {
+		if ( is_link( $log ) ) {
+			return new WP_Error( 'gso_permission', 'فایل debug.log نامعتبر است (symlink مجاز نیست).' );
+		}
+		$content_dir = realpath( WP_CONTENT_DIR );
+		$log_real    = realpath( $log );
+		if ( false === $content_dir || false === $log_real || 0 !== strpos( $log_real, trailingslashit( $content_dir ) ) ) {
+			return new WP_Error( 'gso_permission', 'مسیر فایل debug.log خارج از محدوده مجاز است.' );
+		}
+		if ( ! is_writable( $log_real ) ) {
 			return new WP_Error( 'gso_permission', 'فایل debug.log قابل نوشتن نیست.' );
 		}
-		$result = file_put_contents( $log, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$result = file_put_contents( $log_real, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		return false === $result ? new WP_Error( 'gso_write', 'خالی‌کردن فایل لاگ ناموفق بود.' ) : true;
 	}
 

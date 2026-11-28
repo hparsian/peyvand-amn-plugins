@@ -370,8 +370,14 @@
 			.addClass(tone ? 'is-' + tone : '');
 	}
 
+	function findUpdateFormBySlug(slug) {
+		return $('[data-pas-update-form][data-slug]').filter(function () {
+			return String($(this).attr('data-slug') || '') === slug;
+		});
+	}
+
 	function updateOnePlugin(slug) {
-		var $form = $('[data-pas-update-form][data-slug="' + slug + '"]');
+		var $form = findUpdateFormBySlug(slug);
 		var deferred = $.Deferred();
 
 		post('pas_dashboard_update_plugin', { slug: slug }, 'updates_run')
@@ -454,7 +460,7 @@
 			index++;
 
 			if (isAll) {
-				setUpdateState($('[data-pas-update-form][data-slug="' + slug + '"]'), cfg.i18n.updating, 'busy');
+				setUpdateState(findUpdateFormBySlug(slug), cfg.i18n.updating, 'busy');
 			}
 
 			updateOnePlugin(slug).then(function (result) {

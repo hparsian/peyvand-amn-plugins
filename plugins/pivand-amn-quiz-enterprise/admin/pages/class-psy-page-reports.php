@@ -47,7 +47,7 @@ class Psy_Page_Reports {
             echo '<div class="wrap psy-admin psy-report-wrap" dir="rtl">';
             echo '<h1>📊 گزارش — ' . esc_html($attempt->client_name) . '</h1>';
             echo '<p class="psy-report-meta">آزمون: <strong>' . esc_html($test ? $test->get_name() : $attempt->quiz_id) . '</strong> | تاریخ: <strong>' . esc_html($jalali) . '</strong></p>';
-            echo '<p><a href="' . admin_url('admin.php?page=psy-quiz-reports') . '" class="button">← بازگشت</a> ';
+            echo '<p><a href="' . esc_url( admin_url('admin.php?page=psy-quiz-reports') ) . '" class="button">← بازگشت</a> ';
             echo '<button class="button" onclick="window.print()">🖨️ چاپ گزارش</button> ';
             // BUG-07: بررسی وجود $test قبل از نمایش لینک PDF
             if ( $test && get_option( 'psy_quiz_pdf_available' ) === '1' ) {

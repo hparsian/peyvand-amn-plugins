@@ -314,7 +314,7 @@ trait GSO_Admin_Pages {
 								<div class="gso-desc"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $issue->description ), 30 ) ); ?></div>
 								<?php $edit = GSO_Issues::edit_link( (string) $issue->object_type, (int) $issue->object_id ); ?>
 								<?php if ( $edit ) : ?>
-									<a href="<?php echo esc_url( $edit ); ?>" target="_blank" rel="noopener">ویرایش مورد ↗</a>
+									<a href="<?php echo esc_url( $edit ); ?>" target="_blank" rel="noopener noreferrer">ویرایش مورد ↗</a>
 								<?php endif; ?>
 							</td>
 							<td><?php echo esc_html( GSO_Issues::issue_label( (string) $issue->issue_type ) ); ?></td>
@@ -528,7 +528,7 @@ trait GSO_Admin_Pages {
 						<h3>پیشنهادها</h3>
 						<ul class="gso-link-list">
 							<?php foreach ( $links['links'] as $link ) : ?>
-								<li><a href="<?php echo esc_url( $link['url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $link['anchor'] ); ?></a> — <?php echo esc_html( $link['reason'] ); ?></li>
+								<li><a href="<?php echo esc_url( $link['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $link['anchor'] ); ?></a> — <?php echo esc_html( $link['reason'] ); ?></li>
 							<?php endforeach; ?>
 						</ul>
 						<textarea class="widefat gso-code" rows="4" readonly onclick="this.select()"><?php echo esc_textarea( $links['html'] ); ?></textarea>

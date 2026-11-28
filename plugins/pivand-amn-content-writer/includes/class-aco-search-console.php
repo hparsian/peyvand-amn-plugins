@@ -96,7 +96,7 @@ class ACO_Search_Console {
 
         $jwt = $signing_input . '.' . self::base64url_encode( $signature );
 
-        $response = wp_remote_post( self::TOKEN_URL, [
+        $response = wp_safe_remote_post( self::TOKEN_URL, [
             'timeout' => 30,
             'body'    => [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -133,7 +133,7 @@ class ACO_Search_Console {
 
         $url = self::API_BASE . rawurlencode( $site ) . '/searchAnalytics/query';
 
-        $response = wp_remote_post( $url, [
+        $response = wp_safe_remote_post( $url, [
             'timeout' => 30,
             'headers' => [
                 'Content-Type'  => 'application/json',

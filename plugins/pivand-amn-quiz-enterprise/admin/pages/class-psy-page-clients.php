@@ -377,18 +377,18 @@ class Psy_Page_Clients {
         $query_args = array_merge( $where_args, [ $per_page, $offset ] );
         $records = $wpdb->get_results( $wpdb->prepare( $data_sql, ...$query_args ) );
 
-        // آمار کلی (بدون فیلتر، با یک کوئری aggregate)
-        // باگ #A4: پارامتر متغیر ندارد — phpcs:ignore برای سکوت linter
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        $stats = $wpdb->get_row(
+        $now_utc = gmdate( 'Y-m-d H:i:s' );
+        $stats   = $wpdb->get_row( $wpdb->prepare(
             "SELECT
                 COUNT(*) AS total,
                 SUM(status = 'completed') AS done,
                 SUM(status = 'revoked') AS revoked,
-                SUM(status IN ('unused','processing') AND (expires_at IS NULL OR expires_at > NOW())) AS pending,
-                SUM(status = 'unused' AND expires_at IS NOT NULL AND expires_at <= NOW()) AS expired
-             FROM {$wpdb->prefix}psy_invitations"
-        );
+                SUM(status IN ('unused','processing') AND (expires_at IS NULL OR expires_at > %s)) AS pending,
+                SUM(status = 'unused' AND expires_at IS NOT NULL AND expires_at <= %s) AS expired
+             FROM {$wpdb->prefix}psy_invitations",
+            $now_utc,
+            $now_utc
+        ) );
 
         $total_pages = $total_count > 0 ? ceil( $total_count / $per_page ) : 1;
         $tests = \PsychAssessments\Core\Registry::all();
@@ -398,7 +398,7 @@ class Psy_Page_Clients {
         ?>
         <div class="wrap psy-admin" dir="rtl">
             <h1 class="wp-heading-inline">📋 مدیریت مراجعین</h1>
-            <a href="<?php echo admin_url('admin.php?page=psy-quiz-new'); ?>" class="page-title-action">+ مراجع جدید</a>
+            <a href="<?php echo esc_url( admin_url('admin.php?page=psy-quiz-new') ); ?>" class="page-title-action">+ مراجع جدید</a>
             <hr class="wp-header-end">
 
             <?php if ( $done_action === 'revoke' ): ?>
@@ -449,7 +449,7 @@ class Psy_Page_Clients {
                         'paged'         => 1,
                     ] ), admin_url('admin.php') );
                 ?>
-                <a href="<?php echo esc_url($url); ?>" class="button <?php echo $active; ?>"><?php echo esc_html($label); ?></a>
+                <a href="<?php echo esc_url($url); ?>" class="button <?php echo esc_attr($active); ?>"><?php echo esc_html($label); ?></a>
                 <?php endforeach; ?>
 
                 <form method="get" class="psy-search-form">
@@ -490,9 +490,9 @@ class Psy_Page_Clients {
                         <?php if ( $search !== '' ): ?>
                         هیچ مراجعی مطابق «<?php echo esc_html($search); ?>» یافت نشد. <a href="<?php echo esc_url( add_query_arg( array_filter( [ 'page' => 'psy-quiz', 'filter_status' => $filter_status ?: null ] ), admin_url('admin.php') ) ); ?>">پاک کردن جستجو ←</a>
                         <?php elseif ( $filter_status ): ?>
-                        هیچ مراجعی با این وضعیت یافت نشد. <a href="<?php echo admin_url('admin.php?page=psy-quiz'); ?>">نمایش همه ←</a>
+                        هیچ مراجعی با این وضعیت یافت نشد. <a href="<?php echo esc_url( admin_url('admin.php?page=psy-quiz') ); ?>">نمایش همه ←</a>
                         <?php else: ?>
-                        هنوز مراجعی ثبت نشده. <a href="<?php echo admin_url('admin.php?page=psy-quiz-new'); ?>">اولین مراجع را اضافه کنید ←</a>
+                        هنوز مراجعی ثبت نشده. <a href="<?php echo esc_url( admin_url('admin.php?page=psy-quiz-new') ); ?>">اولین مراجع را اضافه کنید ←</a>
                         <?php endif; ?>
                     </td></tr>
                 <?php endif; ?>
@@ -507,7 +507,7 @@ class Psy_Page_Clients {
                     $is_revoked    = $row->status === 'revoked';
                     $is_expired    = ! $is_done && ! $is_processing && ! $is_revoked
                                      && ! empty( $row->expires_at )
-                                     && strtotime( $row->expires_at ) < time();
+                                     && strtotime( $row->expires_at . ' UTC' ) < time();
                     $is_pending    = $row->status === 'unused' && ! $is_expired;
 
                     // nonce های عملیات
@@ -571,7 +571,7 @@ class Psy_Page_Clients {
                             <?php if ( $is_pending ): ?>
                             <input type="text" readonly value="<?php echo esc_url($link); ?>" id="lnk-<?php echo absint($row->id); ?>" class="psy-link-input">
                             <button class="button button-secondary psy-copy-btn" data-id="<?php echo absint($row->id); ?>">📋 کپی</button>
-                            <a href="<?php echo esc_url($w_url); ?>" target="_blank" class="button psy-wa-btn">💬 واتساپ</a>
+                            <a href="<?php echo esc_url($w_url); ?>" target="_blank" rel="noopener noreferrer" class="button psy-wa-btn">💬 واتساپ</a>
                             <a href="<?php echo esc_url($force_notify_url); ?>"
                                class="button psy-btn-notify"
                                title="پیامک/ایمیل «آزمون آماده است» را همین حالا دوباره برای این مراجع بفرست — حتی اگر امروز قبلاً یک‌بار برایش ارسال شده باشد (محدودیت روزانه را برای همین یک مورد نادیده می‌گیرد). برای وقتی که مراجع می‌گوید پیامک نگرفته یا اسمش اشتباه ضبط شده و باید دوباره اطلاع‌رسانی شود."
@@ -664,11 +664,11 @@ class Psy_Page_Clients {
                 </div>
                 <?php endforeach; ?>
                 <div class="psy-link-row">
-                    <a href="<?php echo esc_url($result['whatsapp']); ?>" target="_blank" class="button psy-wa-btn-big">💬 ارسال همه با واتساپ</a>
+                    <a href="<?php echo esc_url($result['whatsapp']); ?>" target="_blank" rel="noopener noreferrer" class="button psy-wa-btn-big">💬 ارسال همه با واتساپ</a>
                 </div>
                 <hr>
-                <p><a href="<?php echo admin_url('admin.php?page=psy-quiz'); ?>" class="button">← بازگشت به لیست مراجعین</a>
-                <a href="<?php echo admin_url('admin.php?page=psy-quiz-new'); ?>" class="button button-primary">+ مراجع بعدی</a></p>
+                <p><a href="<?php echo esc_url( admin_url('admin.php?page=psy-quiz') ); ?>" class="button">← بازگشت به لیست مراجعین</a>
+                <a href="<?php echo esc_url( admin_url('admin.php?page=psy-quiz-new') ); ?>" class="button button-primary">+ مراجع بعدی</a></p>
             </div>
             <?php endif; ?>
 

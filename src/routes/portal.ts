@@ -4,10 +4,13 @@ import { formatJalali, parseJalaliInputToIso, toPersianDigits, todayIso, todayJa
 
 export const portalRouter = Router();
 
+const PORTAL_TABS = ['appointments', 'assessments', 'messages', 'intake', 'survey'] as const;
+
 let portalLoggedIn = true;
 
 portalRouter.get('/', (req: Request, res: Response) => {
-  const activeTab = typeof req.query.tab === 'string' ? req.query.tab : 'appointments';
+  const rawTab = typeof req.query.tab === 'string' ? req.query.tab : 'appointments';
+  const activeTab = (PORTAL_TABS as readonly string[]).includes(rawTab) ? rawTab : 'appointments';
   const clientPhone = '09121234567';
   const clientBookings = store.bookings.filter((b) => b.mobile === clientPhone);
   const clientInvites = store.invitations.filter((i) => i.client_phone === clientPhone);
@@ -46,9 +49,16 @@ portalRouter.get('/logout', (_req: Request, res: Response) => {
 });
 
 portalRouter.post('/book', (req: Request, res: Response) => {
+  if (!portalLoggedIn) {
+    return res.redirect('/portal');
+  }
   const jalaliDate = String(req.body.booking_date_jalali || '');
-  const time = String(req.body.booking_time || '16:30');
-  const sessionType = String(req.body.session_type || 'individual');
+  const timeRaw = String(req.body.booking_time || '16:30').trim();
+  const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(timeRaw) ? timeRaw : '16:30';
+  const sessionTypeRaw = String(req.body.session_type || 'individual');
+  const sessionType = Object.prototype.hasOwnProperty.call(SESSION_TYPES, sessionTypeRaw)
+    ? sessionTypeRaw
+    : 'individual';
   const isoDate = parseJalaliInputToIso(jalaliDate) ?? todayIso();
 
   store.createBooking({
@@ -59,18 +69,24 @@ portalRouter.post('/book', (req: Request, res: Response) => {
     session_type: sessionType,
     booking_source: 'portal',
   });
-  res.redirect('/portal?tab=appointments');
+  return res.redirect('/portal?tab=appointments');
 });
 
 portalRouter.post('/message', (req: Request, res: Response) => {
-  const body = String(req.body.body || '').trim();
+  if (!portalLoggedIn) {
+    return res.redirect('/portal');
+  }
+  const body = String(req.body.body || '').trim().slice(0, 2000);
   if (body) {
     store.addPortalMessage(body);
   }
-  res.redirect('/portal?tab=messages');
+  return res.redirect('/portal?tab=messages');
 });
 
 portalRouter.post('/survey', (_req: Request, res: Response) => {
+  if (!portalLoggedIn) {
+    return res.redirect('/portal');
+  }
   store.portalSurveyDone = true;
-  res.redirect('/portal?tab=survey');
+  return res.redirect('/portal?tab=survey');
 });

@@ -395,7 +395,7 @@ class ACO_AI_Router {
             'temperature' => self::TEMPERATURE,
         ] );
 
-        $response = wp_remote_post( self::OPENROUTER_URL, [
+        $response = wp_safe_remote_post( self::OPENROUTER_URL, [
             'timeout'     => $timeout,
             'redirection' => 3,
             'headers'     => [
@@ -431,7 +431,7 @@ class ACO_AI_Router {
 
         $body = wp_json_encode( $body_arr );
 
-        $response = wp_remote_post( self::DEEPSEEK_URL, [
+        $response = wp_safe_remote_post( self::DEEPSEEK_URL, [
             'timeout'     => $timeout,
             'redirection' => 3,
             'headers'     => [
@@ -456,7 +456,7 @@ class ACO_AI_Router {
             'temperature' => self::TEMPERATURE,
         ] );
 
-        $response = wp_remote_post( self::OPENAI_URL, [
+        $response = wp_safe_remote_post( self::OPENAI_URL, [
             'timeout'     => $timeout,
             'redirection' => 3,
             'headers'     => [
@@ -513,12 +513,15 @@ class ACO_AI_Router {
             $body_arr['systemInstruction'] = [ 'parts' => [ [ 'text' => $system_prompt ] ] ];
         }
 
-        $url = self::GEMINI_URL . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $this->api_key );
+        $url = self::GEMINI_URL . rawurlencode( $model ) . ':generateContent';
 
-        $response = wp_remote_post( $url, [
+        $response = wp_safe_remote_post( $url, [
             'timeout'     => $timeout,
             'redirection' => 3,
-            'headers'     => [ 'Content-Type' => 'application/json' ],
+            'headers'     => [
+                'Content-Type'   => 'application/json',
+                'x-goog-api-key' => $this->api_key,
+            ],
             'body'        => wp_json_encode( $body_arr ),
         ] );
 
@@ -548,7 +551,7 @@ class ACO_AI_Router {
             'messages'    => $anthro_messages,
         ] );
 
-        $response = wp_remote_post( self::ANTHROPIC_URL, [
+        $response = wp_safe_remote_post( self::ANTHROPIC_URL, [
             'timeout'     => $timeout,
             'redirection' => 3,
             'headers'     => [

@@ -42,7 +42,7 @@ final class Zarinpal
             return ['success' => false, 'message' => 'درگاه پرداخت هنوز پیکربندی نشده است.'];
         }
 
-        $response = wp_remote_post($this->is_sandbox() ? self::SANDBOX_REQUEST_URL : self::REQUEST_URL, [
+        $response = wp_safe_remote_post($this->is_sandbox() ? self::SANDBOX_REQUEST_URL : self::REQUEST_URL, [
             'timeout' => 15,
             'headers' => ['Content-Type' => 'application/json'],
             'body'    => wp_json_encode([
@@ -58,6 +58,10 @@ final class Zarinpal
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        if (!is_array($body)) {
+            return ['success' => false, 'message' => 'پاسخ نامعتبر از درگاه پرداخت دریافت شد.'];
+        }
+
         $code = $body['data']['code'] ?? null;
 
         if ($code !== 100 || empty($body['data']['authority'])) {
@@ -66,12 +70,15 @@ final class Zarinpal
             return ['success' => false, 'message' => $error_message];
         }
 
-        $authority = $body['data']['authority'];
+        $authority = (string) $body['data']['authority'];
+        if (!preg_match('/^[A-Za-z0-9_-]{10,128}$/', $authority)) {
+            return ['success' => false, 'message' => 'شناسه تراکنش درگاه معتبر نیست.'];
+        }
 
         return [
             'success'     => true,
             'authority'   => $authority,
-            'gateway_url' => ($this->is_sandbox() ? self::SANDBOX_GATEWAY_URL : self::GATEWAY_URL) . $authority,
+            'gateway_url' => ($this->is_sandbox() ? self::SANDBOX_GATEWAY_URL : self::GATEWAY_URL) . rawurlencode($authority),
         ];
     }
 
@@ -82,17 +89,16 @@ final class Zarinpal
     {
         $merchant_id = $this->merchant_id();
 
-        // همان چکِ دفاعی‌ای که request_payment() از قبل دارد. در مسیر عادی
-        // بی‌خطر بود (verify فقط بعد از یک request موفق صدا زده می‌شود که
-        // خودش merchant_id را تضمین می‌کند)، ولی برای یکدستی و برای اینکه
-        // این متد به‌تنهایی هم در برابر تنظیمات پاک‌شده/جابه‌جا از میانه‌ی
-        // مسیر (مثلاً ادمین Merchant ID را بین request و verify خالی کند)
-        // درست رفتار کند، همان early-return اینجا هم اضافه شد.
         if (empty($merchant_id)) {
             return ['success' => false, 'message' => 'درگاه پرداخت هنوز پیکربندی نشده است.'];
         }
 
-        $response = wp_remote_post($this->is_sandbox() ? self::SANDBOX_VERIFY_URL : self::VERIFY_URL, [
+        $authority = trim($authority);
+        if (!preg_match('/^[A-Za-z0-9_-]{10,128}$/', $authority)) {
+            return ['success' => false, 'message' => 'شناسه تراکنش نامعتبر است.'];
+        }
+
+        $response = wp_safe_remote_post($this->is_sandbox() ? self::SANDBOX_VERIFY_URL : self::VERIFY_URL, [
             'timeout' => 15,
             'headers' => ['Content-Type' => 'application/json'],
             'body'    => wp_json_encode([
@@ -107,6 +113,10 @@ final class Zarinpal
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
+        if (!is_array($body)) {
+            return ['success' => false, 'message' => 'پاسخ نامعتبر از درگاه پرداخت دریافت شد.'];
+        }
+
         $code = $body['data']['code'] ?? null;
 
         // کد ۱۰۰: تایید موفق. کد ۱۰۱: تراکنش قبلاً تایید شده (idempotent — نباید خطا حساب شود).
