@@ -1,12 +1,8 @@
 /* ============================================================
    پیوند امن — کیت رابط کاربری · پوسته‌ها (shell.css)
-   فقط برای صفحاتی که کل صفحه مالِ ماست (ورود، پنل مراجع) یا ناحیه‌های
-   اختصاصی داخل پیشخوان (.pui-shell / .pui-admin). هیچ قاعده‌ای روی
-   html/body به‌جز پوستهٔ تمام‌صفحه (.pui-page) نوشته نمی‌شود.
    ============================================================ */
 
 @layer pui.base {
-    /* پوستهٔ تمام‌صفحه: صفحهٔ ورود و پنل مراجع */
     html.pui-page,
     html.pui-page body {
         margin: 0;
@@ -33,21 +29,20 @@
         display: none;
         padding: clamp(2rem, 5vw, 4rem);
         background:
-            radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--pui-accent) 38%, transparent), transparent 55%),
-            radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--pui-sand) 45%, transparent), transparent 60%),
-            var(--pui-brown);
-        color: var(--pui-cream);
+            radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--pui-accent) 28%, transparent), transparent 55%),
+            radial-gradient(circle at 86% 82%, color-mix(in srgb, var(--pui-sand) 24%, transparent), transparent 58%),
+            var(--pui-primary);
+        color: var(--pui-on-primary);
         overflow: hidden;
     }
 
     .pui-auth__brand::after {
         content: "";
         position: absolute;
-        inset: auto -12% -22% -12%;
-        block-size: 55%;
+        inset: auto -14% -24% -14%;
+        block-size: 52%;
         border-radius: 50% 50% 0 0;
-        background: color-mix(in srgb, var(--pui-cream) 8%, transparent);
-        filter: blur(1px);
+        background: color-mix(in srgb, var(--pui-cream) 7%, transparent);
     }
 
     .pui-auth__brand-inner {
@@ -67,19 +62,18 @@
         block-size: 46px;
         align-items: center;
         justify-content: center;
-        border-radius: 14px;
+        border-radius: 12px;
         background: color-mix(in srgb, var(--pui-cream) 14%, transparent);
-        border: 1px solid color-mix(in srgb, var(--pui-cream) 28%, transparent);
+        border: 1px solid color-mix(in srgb, var(--pui-cream) 26%, transparent);
         color: var(--pui-cream);
     }
 
     .pui-auth__headline { font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.5; color: var(--pui-cream); font-weight: 700; }
-    .pui-auth__lead { margin-block-start: var(--pui-s3); color: color-mix(in srgb, var(--pui-cream) 78%, transparent); font-size: var(--pui-fs-md); }
+    .pui-auth__lead { margin-block-start: var(--pui-s3); color: color-mix(in srgb, var(--pui-cream) 82%, transparent); font-size: var(--pui-fs-md); }
 
     .pui-auth__points { display: grid; gap: var(--pui-s3); margin: 0; padding: 0; list-style: none; }
-    .pui-auth__point { display: flex; align-items: center; gap: var(--pui-s3); font-size: var(--pui-fs-sm); color: color-mix(in srgb, var(--pui-cream) 85%, transparent); }
-
-    .pui-auth__point svg { color: var(--pui-gold); }
+    .pui-auth__point { display: flex; align-items: center; gap: var(--pui-s3); font-size: var(--pui-fs-sm); color: color-mix(in srgb, var(--pui-cream) 88%, transparent); }
+    .pui-auth__point svg { color: var(--pui-accent); }
 
     .pui-auth__main {
         display: grid;
@@ -91,14 +85,14 @@
     .pui-auth__card {
         inline-size: min(100%, 440px);
         background: var(--pui-surface);
-        border: 1px solid var(--pui-border-soft);
+        border: 1px solid var(--pui-border);
         border-radius: var(--pui-r-xl);
-        box-shadow: var(--pui-shadow-lg);
-        padding: clamp(1.25rem, 3vw, 2rem);
+        box-shadow: var(--pui-shadow);
+        padding: clamp(1.5rem, 3vw, 2.25rem);
     }
 
     .pui-auth__mobile-brand { display: flex; align-items: center; gap: var(--pui-s2); margin-block-end: var(--pui-s5); font-weight: 700; }
-    .pui-auth__mobile-brand .pui-auth__mark { background: var(--pui-accent-soft); border-color: color-mix(in srgb, var(--pui-accent) 45%, transparent); color: var(--pui-text); inline-size: 40px; block-size: 40px; }
+    .pui-auth__mobile-brand .pui-auth__mark { background: var(--pui-accent-soft); border-color: color-mix(in srgb, var(--pui-accent-line) 38%, transparent); color: var(--pui-primary); inline-size: 40px; block-size: 40px; }
 
     .pui-auth__title { font-size: var(--pui-fs-xl); }
     .pui-auth__sub { margin-block: var(--pui-s2) var(--pui-s5); color: var(--pui-text-muted); font-size: var(--pui-fs-sm); }
@@ -134,7 +128,7 @@
         justify-content: space-between;
         gap: var(--pui-s4);
         padding: var(--pui-s3) var(--pui-s4);
-        background: color-mix(in srgb, var(--pui-surface) 88%, transparent);
+        background: var(--pui-glass);
         backdrop-filter: saturate(140%) blur(10px);
         border-block-end: 1px solid var(--pui-border-soft);
     }
@@ -198,7 +192,7 @@
     }
 
     .pui-app__navlink[aria-current="page"],
-    .pui-app__navlink[aria-selected="true"] { color: var(--pui-text); background: var(--pui-accent-soft); font-weight: 600; }
+    .pui-app__navlink[aria-selected="true"] { color: var(--pui-primary); background: var(--pui-accent-soft); font-weight: 600; }
 
     .pui-app__footer { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--pui-s3); padding: var(--pui-s5) 0 var(--pui-s6); font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
 
@@ -280,14 +274,12 @@
         .pui-calendar__day { min-block-size: 84px; }
     }
 
-    /* نمودار میله‌ای سبک (پیش‌نمایش؛ نسخهٔ نهایی ApexCharts است) */
     .pui-bars { display: flex; align-items: flex-end; gap: var(--pui-s2); block-size: 150px; padding-block-start: var(--pui-s2); }
     .pui-bars__col { flex: 1; display: grid; align-content: end; gap: 4px; justify-items: center; }
-    .pui-bars__bar { inline-size: 100%; border-radius: 6px 6px 2px 2px; background: var(--pui-accent); min-block-size: 4px; }
+    .pui-bars__bar { inline-size: 100%; border-radius: 6px 6px 2px 2px; background: var(--pui-accent-line); min-block-size: 4px; }
     .pui-bars__bar--muted { background: var(--pui-sand); }
     .pui-bars__label { font-size: 10px; color: var(--pui-text-soft); }
 
-    /* نوار پایین صفحهٔ پیش‌نمایش */
     .pui-kit-bar {
         display: flex;
         flex-wrap: wrap;
@@ -300,10 +292,7 @@
     }
 }
 
-/* ── پیشخوان: پرکردن ناحیهٔ محتوا با زمینهٔ کیت (فقط صفحه‌ای که کلاس را دارد) ── */
-body.pui-admin-page #wpbody-content {
-    padding-block-end: 0;
-}
+body.pui-admin-page #wpbody-content { padding-block-end: 0; }
 
 body.pui-admin-page .pui-shell.pui-admin {
     margin: -10px -20px 0;
@@ -318,7 +307,6 @@ body.pui-admin-page .pui-shell.pui-admin {
         margin: 0;
         padding: 16px 12px 44px;
     }
-
     body.pui-admin-page #wpbody-content {
         padding-inline: 0;
     }

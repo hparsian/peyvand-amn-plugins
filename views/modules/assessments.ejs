@@ -5,11 +5,11 @@
     <div class="pas-grid">
       <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(r.total) %> از <%= h.persianNum(r.max_score) %></span><span class="pas-stat-label">نمرهٔ کل</span></div>
       <div class="pas-stat"><span class="pas-stat-value"><%= r.severity %></span><span class="pas-stat-label">شدت بالینی</span></div>
-      <div class="pas-stat"><span class="pas-stat-value"><%= h.jalaliDateTime(r.completed_at) %></span><span class="pas-stat-label">تاریخ تکمیل</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.jalaliDateTime(r.completed_at) %></span><span class="pas-stat-label">تاریخ تکمیل</span></div>
     </div>
-    <p style="margin-top:16px"><strong>تفسیر بالینی:</strong> <%= r.interpretation %></p>
+    <p class="pas-card-gap"><strong>تفسیر بالینی:</strong> <%= r.interpretation %></p>
     <% if (r.subscales && r.subscales.length) { %>
-      <div class="pas-table-wrap" style="margin-top:14px">
+      <div class="pas-table-wrap pas-card-gap">
         <table class="pas-table">
           <thead><tr><th>خرده‌مقیاس</th><th>نمره</th><th>سهم</th></tr></thead>
           <tbody>
@@ -17,11 +17,11 @@
               const pct = Math.max(2, Math.round((sub.score / Math.max(1, sub.max)) * 100));
             %>
               <tr>
-                <td><%= sub.name %></td>
-                <td class="pui-num"><%= h.persianNum(sub.score) %> / <%= h.persianNum(sub.max) %></td>
-                <td>
+                <td data-label="خرده‌مقیاس"><%= sub.name %></td>
+                <td data-label="نمره" class="pui-num"><%= h.persianNum(sub.score) %> / <%= h.persianNum(sub.max) %></td>
+                <td data-label="سهم">
                   <span class="pas-meter"><span class="pas-meter-fill" style="--pas-w:<%= pct %>%"></span></span>
-                  <span class="pas-muted"><%= h.persianNum(pct) %>٪</span>
+                  <span class="pas-muted pui-num"><%= h.persianNum(pct) %>٪</span>
                 </td>
               </tr>
             <% }); %>
@@ -36,7 +36,7 @@
     <h2 class="pas-card-title">مراجع</h2>
     <div class="pas-grid">
       <div class="pas-stat"><span class="pas-stat-value"><%= inv.client_name %></span><span class="pas-stat-label">نام</span></div>
-      <div class="pas-stat"><span class="pas-stat-value" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span><span class="pas-stat-label">موبایل</span></div>
+      <div class="pas-stat"><span class="pas-stat-value pui-num" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span><span class="pas-stat-label">موبایل</span></div>
       <div class="pas-stat"><span class="pas-stat-value"><%= inv.status === 'completed' ? 'تکمیل‌شده' : inv.status %></span><span class="pas-stat-label">وضعیت دعوت</span></div>
       <div class="pas-stat"><span class="pas-stat-value pui-num"><%= h.persianNum(data.trendScores.length) %></span><span class="pas-stat-label">نتیجهٔ ثبت‌شده</span></div>
     </div>
@@ -53,11 +53,11 @@
           <tbody>
             <% data.trendScores.slice().reverse().forEach(function(sc) { %>
               <tr>
-                <td><%= sc.label %></td>
-                <td class="pui-num"><%= h.persianNum(sc.total) %> / <%= h.persianNum(sc.max_score) %></td>
-                <td><span class="pas-badge"><%= sc.severity %></span></td>
-                <td><%= h.jalaliDateTime(sc.completed_at) %></td>
-                <td><a class="pas-btn pas-btn-sm" href="/dashboard?module=assessments&invitation_id=<%= inv.id %>&attempt_id=<%= sc.attempt_id %>">مشاهدهٔ گزارش</a></td>
+                <td data-label="آزمون"><%= sc.label %></td>
+                <td data-label="نمره" class="pui-num"><%= h.persianNum(sc.total) %> / <%= h.persianNum(sc.max_score) %></td>
+                <td data-label="شدت"><span class="pas-badge"><%= sc.severity %></span></td>
+                <td data-label="تاریخ" class="pui-num"><%= h.jalaliDateTime(sc.completed_at) %></td>
+                <td data-label="گزارش"><a class="pas-btn pas-btn-sm" href="/dashboard?module=assessments&invitation_id=<%= inv.id %>&attempt_id=<%= sc.attempt_id %>">مشاهدهٔ گزارش</a></td>
               </tr>
             <% }); %>
           </tbody>
@@ -69,10 +69,10 @@
   <% if (data.newInviteLink) { %>
     <section class="pas-card">
       <h2 class="pas-card-title">لینک دعوت تازه</h2>
-      <p>دعوت‌نامه برای <strong><%= data.newInviteLink.name %></strong> ساخته شد.</p>
+      <p class="pas-card-lead">دعوت‌نامه برای <strong><%= data.newInviteLink.name %></strong> ساخته شد.</p>
       <div class="pas-invite-link">
         <input class="pas-input" type="text" readonly value="<%= data.newInviteLink.link %>" dir="ltr" aria-label="لینک دعوت" />
-        <button type="button" class="pas-btn" data-pas-copy="<%= data.newInviteLink.link %>">کپی لینک</button>
+        <button type="button" class="pas-btn pas-btn-primary" data-pas-copy="<%= data.newInviteLink.link %>">کپی لینک</button>
       </div>
     </section>
   <% } %>
@@ -116,6 +116,10 @@
     <form method="get" action="/dashboard" class="pas-filter-form">
       <input type="hidden" name="module" value="assessments" />
       <div class="pas-form-row">
+        <label for="pas-invites-filter">فیلتر سریع در جدول</label>
+        <input class="pas-input" type="search" id="pas-invites-filter" data-pui-filter-target="#pvn-invites-tbody" placeholder="نام مراجع، آزمون یا وضعیت..." />
+      </div>
+      <div class="pas-form-row">
         <label for="pas-invite-status">وضعیت</label>
         <select class="pas-select" id="pas-invite-status" name="status">
           <option value="" <%= data.statusFilter === '' ? 'selected' : '' %>>همه</option>
@@ -125,13 +129,16 @@
           <option value="revoked" <%= data.statusFilter === 'revoked' ? 'selected' : '' %>>باطل‌شده</option>
         </select>
       </div>
-      <button class="pas-btn" type="submit">اعمال</button>
+      <div class="pui-row">
+        <span class="pui-live-count" data-pui-filter-count="#pvn-invites-tbody"></span>
+        <button class="pas-btn" type="submit">اعمال</button>
+      </div>
     </form>
 
     <div class="pas-table-wrap">
       <table class="pas-table">
         <thead><tr><th>تاریخ</th><th>مراجع</th><th>آزمون</th><th>وضعیت</th><th>انقضا</th><th>عملیات</th></tr></thead>
-        <tbody>
+        <tbody id="pvn-invites-tbody">
           <% const stMap = {
             unused: { label: 'استفاده‌نشده', cls: 'pas-badge-warn' },
             processing: { label: 'در حال پاسخ', cls: 'pas-badge-warn' },
@@ -142,12 +149,12 @@
             const st = stMap[inv.status] || { label: inv.status, cls: '' };
           %>
             <tr>
-              <td><%= h.jalaliDateTime(inv.created_at) %></td>
-              <td><strong><%= inv.client_name %></strong><br /><span class="pas-muted" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span></td>
-              <td><%= inv.quiz_name %></td>
-              <td><span class="pas-badge <%= st.cls %>"><%= st.label %></span></td>
-              <td><%= inv.expires_at ? h.jalaliDateTime(inv.expires_at) : '—' %></td>
-              <td>
+              <td data-label="تاریخ" class="pui-num"><%= h.jalaliDateTime(inv.created_at) %></td>
+              <td data-label="مراجع"><strong><%= inv.client_name %></strong><br /><span class="pas-muted" dir="ltr"><%= h.maskMobile(inv.client_phone) %></span></td>
+              <td data-label="آزمون"><%= inv.quiz_name %></td>
+              <td data-label="وضعیت"><span class="pas-badge <%= st.cls %>"><%= st.label %></span></td>
+              <td data-label="انقضا" class="pui-num"><%= inv.expires_at ? h.jalaliDateTime(inv.expires_at) : '—' %></td>
+              <td data-label="عملیات">
                 <div class="pas-row-actions">
                   <% if (inv.attempt_id > 0) { %>
                     <a class="pas-btn pas-btn-sm" href="/dashboard?module=assessments&invitation_id=<%= inv.id %>">نتیجه و روند</a>
@@ -171,5 +178,6 @@
         </tbody>
       </table>
     </div>
+    <p class="pas-empty pas-card-gap" data-pui-filter-empty="#pvn-invites-tbody" hidden>دعوت‌نامه‌ای با این فیلتر یافت نشد.</p>
   </section>
 <% } %>

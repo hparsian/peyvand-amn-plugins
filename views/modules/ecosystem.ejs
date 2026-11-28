@@ -1,19 +1,29 @@
 <section class="pas-card">
   <h2 class="pas-card-title">وضعیت ماژول‌های اکوسیستم پیوند امن</h2>
+  <div class="pui-filter-bar">
+    <div class="pui-filter-bar__search">
+      <span class="pui-filter-bar__icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </span>
+      <input class="pui-input" type="search" id="pvn-eco-filter" data-pui-filter-target="#pvn-eco-tbody" placeholder="فیلتر ماژول یا شناسه..." aria-label="فیلتر ماژول‌ها" />
+    </div>
+    <span class="pui-live-count" data-pui-filter-count="#pvn-eco-tbody"></span>
+  </div>
   <div class="pas-table-wrap">
     <table class="pas-table">
       <thead><tr><th>ماژول</th><th>وضعیت</th><th>نسخه</th><th>جداول</th><th>سلامت</th></tr></thead>
-      <tbody>
+      <tbody id="pvn-eco-tbody">
         <% data.plugins.forEach(function(p) { %>
           <tr>
-            <td><strong><%= p.label %></strong><br /><code><%= p.key %></code></td>
-            <td><%= p.active ? 'فعال' : 'حالت پیش‌نمایش' %></td>
-            <td dir="ltr"><%= p.version %></td>
-            <td><%= p.tables %></td>
-            <td><span class="pas-badge <%= p.status === 'ok' ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= p.status === 'ok' ? 'سالم' : 'نیازمند بررسی' %></span></td>
+            <td data-label="ماژول"><strong><%= p.label %></strong><br /><code dir="ltr"><%= p.key %></code></td>
+            <td data-label="وضعیت"><%= p.active ? 'فعال' : 'حالت پیش‌نمایش' %></td>
+            <td data-label="نسخه" class="pui-num" dir="ltr"><%= p.version %></td>
+            <td data-label="جداول" class="pui-num"><%= p.tables %></td>
+            <td data-label="سلامت"><span class="pas-badge <%= p.status === 'ok' ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= p.status === 'ok' ? 'سالم' : 'نیازمند بررسی' %></span></td>
           </tr>
         <% }); %>
       </tbody>
     </table>
   </div>
+  <p class="pas-empty pas-card-gap" data-pui-filter-empty="#pvn-eco-tbody" hidden>ماژولی با این نام یافت نشد.</p>
 </section>

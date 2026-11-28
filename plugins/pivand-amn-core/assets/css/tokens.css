@@ -1,65 +1,57 @@
 /* ============================================================
    پیوند امن — توکن‌های طراحی مشترک اکوسیستم (tokens.css)
-   نسخه: 1.0.0
+   نسخه: 2.0.0 — هم‌تراز با پالت «Calm Intelligence»
 
-   هدف: یک منبع واحد برای رنگ، شعاع گوشه، سایه و فاصله‌گذاری که همه‌ی
-   افزونه‌های رابط‌کاربری اکوسیستم (آزمون‌ها، فرم تماس، پنل مراجعان، ...)
-   به‌جای تعریف پالت مستقل خودشان، از این متغیرها استفاده می‌کنند.
-
-   نحوه‌ی استفاده در هر افزونه:
-   به‌جای مقداردهی مستقیم مثل  --psy-blue: #2b6cb0;
-   بنویسید:                    --psy-blue: var(--pivand-primary, #2b6cb0);
-   این‌طوری اگر توکن‌های مشترک لود شده باشند رنگ یکپارچه می‌شود، و اگر
-   به هر دلیلی (core غیرفعال) لود نشده باشند، مقدار fallback قبلی همچنان
-   کار می‌کند — بدون شکستن ظاهر افزونه‌ی مستقل.
+   همه‌ی افزونه‌های رابط‌کاربری اکوسیستم (آزمون‌ها، فرم تماس، پرونده،
+   پنل مراجعان، پیامک، ایمیل، دو‌مرحله‌ای، نویسنده و...) از همین
+   متغیرهای --pivand-* استفاده می‌کنند و به‌صورت خودکار ظاهر واحد می‌گیرند.
    ============================================================ */
 
 :root {
-    /* رنگ اصلی برند: آبی روشن (طبق درخواست صریح کارفرما — قبلاً تیل بود) */
-    --pivand-primary:       #2563eb;
-    --pivand-primary-dark:  #1d4ed8;
-    --pivand-primary-light: #60a5fa;
-    --pivand-primary-bg:    #eff6ff;
+    /* رنگ اصلی برند: سبز جنگلی عمیق (Calm Intelligence) */
+    --pivand-primary:       #344A42;
+    --pivand-primary-dark:  #26382F;
+    --pivand-primary-light: #8FAE9B;
+    --pivand-primary-bg:    #E4ECE7;
 
-    /* رنگ ثانویه: آبی/بنفش، برای تاکید در آزمون‌ها و لینک‌ها */
-    --pivand-accent:        #2b6cb0;
-    --pivand-accent-bg:     #ebf8ff;
+    /* رنگ ثانویه: مریم‌گلی آرامش‌بخش، برای تاکید و خط رابط */
+    --pivand-accent:        #6E9182;
+    --pivand-accent-bg:     #E7EEE8;
 
     /* رنگ‌های وضعیت (مشترک بین همه‌ی افزونه‌ها) */
-    --pivand-success:       #16a34a;
-    --pivand-warning:       #d97706;
-    --pivand-danger:        #dc2626;
-    --pivand-info:          #6366f1;
+    --pivand-success:       #366346;
+    --pivand-warning:       #855615;
+    --pivand-danger:        #96362A;
+    --pivand-info:          #406172;
 
     /* متن و سطح */
-    --pivand-ink:           #1e293b;
-    --pivand-ink-mid:       #475569;
-    --pivand-ink-soft:      #64748b;
-    --pivand-border:        #e2e8f0;
-    --pivand-border-soft:   #f1f5f9;
-    --pivand-surface:       #f8fafc;
-    --pivand-white:         #ffffff;
+    --pivand-ink:           #292D2A;
+    --pivand-ink-mid:       #5C615D;
+    --pivand-ink-soft:      #737872;
+    --pivand-border:        #DCD5C9;
+    --pivand-border-soft:   #E8E2D8;
+    --pivand-surface:       #F4F1EC;
+    --pivand-white:         #FCFBF8;
 
     /* هندسه */
-    --pivand-radius-lg:     20px;
+    --pivand-radius-lg:     18px;
     --pivand-radius:        14px;
     --pivand-radius-sm:     10px;
 
-    /* سایه */
-    --pivand-shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06);
-    --pivand-shadow:        0 8px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
-    --pivand-shadow-lg:     0 16px 48px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.05);
+    /* سایه (گرم و کنترل‌شده) */
+    --pivand-shadow-sm:     0 1px 2px rgba(41, 45, 42, 0.04);
+    --pivand-shadow:        0 1px 2px rgba(41, 45, 42, 0.04), 0 8px 20px -10px rgba(41, 45, 42, 0.12);
+    --pivand-shadow-lg:     0 2px 6px rgba(41, 45, 42, 0.05), 0 18px 40px -14px rgba(41, 45, 42, 0.18);
 
-    /* نسخه‌ی روشن‌تر آبی، برای لهجه‌های ثانویه/گرادیان (مثل نوار پیشرفت یا
-       تگ‌های کوچک) — قبلاً در چند افزونه به‌صورت مستقل هاردکد شده بود */
-    --pivand-primary-mid:   #93c5fd;
+    /* نسخه‌ی میانی سبز برند */
+    --pivand-primary-mid:   #6E9182;
 
-    /* پس‌زمینه‌های کم‌رنگِ رنگ‌های وضعیت (برای بج/برچسب‌ها) */
-    --pivand-danger-bg:     #fff1f2;
-    --pivand-warning-bg:    #fffbeb;
-    --pivand-success-bg:    #f0fdf4;
+    /* پس‌زمینه‌های ملایم وضعیت */
+    --pivand-danger-bg:     #F7E9E5;
+    --pivand-warning-bg:    #F7EFDF;
+    --pivand-success-bg:    #E6EFE8;
 
-    /* مقیاس فاصله‌گذاری مشترک (8px baseline) */
+    /* مقیاس فاصله‌گذاری مشترک */
     --pivand-space-1:       4px;
     --pivand-space-2:       8px;
     --pivand-space-3:       12px;
@@ -67,42 +59,17 @@
     --pivand-space-5:       24px;
     --pivand-space-6:       32px;
 
-    /* زمان‌بندی انیمیشن/ترنزیشن مشترک — به‌جای مقادیر پراکنده‌ی
-       0.15s/0.18s/0.2s/0.22s در افزونه‌های مختلف */
-    --pivand-transition-fast: 0.15s ease;
-    --pivand-transition:      0.2s ease;
+    /* زمان‌بندی ترنزیشن مشترک */
+    --pivand-transition-fast: 150ms cubic-bezier(.22, .61, .36, 1);
+    --pivand-transition:      200ms cubic-bezier(.22, .61, .36, 1);
 
-    /* فونت (لاتین برای اعداد/کدها، در کنار Vazirmatn فارسی) */
-    --pivand-font-fa:       'Vazirmatn', Tahoma, Arial, sans-serif;
-    --pivand-font-latin:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* تایپوگرافی */
+    --pivand-font-fa:       'Vazirmatn', Tahoma, system-ui, sans-serif;
+    --pivand-font-latin:    'IBM Plex Sans Arabic', 'Vazirmatn', system-ui, sans-serif;
 
-    /* حلقه‌ی فوکوس مشترک (دسترس‌پذیری کیبورد)
-       هر افزونه که برای یک دکمه/تب/لینک سفارشی outline پیش‌فرض را
-       حذف می‌کند، باید به‌جایش یکی از این دو الگو را روی :focus-visible
-       بگذارد:
-         outline: var(--pivand-focus-outline);
-         outline-offset: var(--pivand-focus-offset);
-       یا برای عناصر بدون border (لینک‌های تخت):
-         box-shadow: var(--pivand-focus-shadow);
-    */
-    --pivand-focus-color:   var(--pivand-primary-light, #14b8a6);
+    /* حلقه‌ی فوکوس مشترک */
+    --pivand-focus-color:   #2F6B57;
     --pivand-focus-outline: 2px solid var(--pivand-focus-color);
     --pivand-focus-offset:  2px;
-    --pivand-focus-shadow:  0 0 0 3px rgba(37, 99, 235, 0.35);
+    --pivand-focus-shadow:  0 0 0 3px rgba(47, 107, 87, 0.22);
 }
-
-/* تصمیم محصولی: کل اکوسیستم «پیوند امن» عمداً دارک‌مود ندارد — همه‌ی
-   رابط‌های بالینی/مراجع باید همیشه دقیقاً یک ظاهر روشن و ثابت داشته
-   باشند (خوانایی و یکدستی بصری روی هر دستگاه، مستقل از تنظیمات کاربر).
-
-   قبلاً اینجا یک بلوک @media (prefers-color-scheme: dark) بود که وقتی
-   سیستم‌عامل/مرورگر کاربر روی تاریک بود، این توکن‌ها (ink/white/surface/
-   border/...) را خودکار به رنگ‌های تیره تغییر می‌داد. چون افزونه‌های
-   مصرف‌کننده (مثل پنل مراجعان) رنگ‌های خودشان را از طریق
-   var(--pivand-x, fallback) از همین‌جا می‌خوانند، این override — کاملاً
-   مستقل از هر تلاش local هر افزونه برای «روشن‌ماندن» (مثل
-   color-scheme:light) — باعث می‌شد کل رابط کاربری آن افزونه با روشن
-   بودن دارک‌مود گوشی، سیاه/تاریک شود؛ چون color-scheme فقط رفتار حدسیِ
-   مرورگر را کنترل می‌کند، نه مقدار واقعیِ یک custom property که اینجا
-   صریحاً override شده بود. این بلوک عمداً کامل حذف شد؛ توکن‌ها اکنون
-   همیشه، در هر شرایطی، همان مقادیر روشنِ بالا هستند. */

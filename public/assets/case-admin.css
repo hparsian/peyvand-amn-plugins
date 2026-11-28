@@ -7,17 +7,17 @@
 .pas-cf-wrap {
     /* از این نسخه: از توکن‌های مشترک اکوسیستم (--pivand-*) می‌خواند تا با
        بقیه‌ی داشبوردهای ادمین یکپارچه باشد. */
-    --pcf-teal:        var(--pivand-primary, #0f766e);
-    --pcf-teal-light:  var(--pivand-primary-light, #14b8a6);
-    --pcf-teal-bg:     var(--pivand-primary-bg, #f0fdfa);
-    --pcf-ink:         var(--pivand-ink, #1e293b);
-    --pcf-mid:         var(--pivand-ink-mid, #475569);
-    --pcf-soft:        var(--pivand-ink-soft, #64748b);
-    --pcf-border:      var(--pivand-border, #e2e8f0);
-    --pcf-surface:     var(--pivand-surface, #f8fafc);
-    --pcf-red:         var(--pivand-danger, #dc2626);
-    --pcf-radius:      var(--pivand-radius, 12px);
-    --pcf-shadow:      var(--pivand-shadow, 0 4px 18px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04));
+    --pcf-teal:        var(--pivand-primary, #344A42);
+    --pcf-teal-light:  var(--pivand-primary-light, #6E9182);
+    --pcf-teal-bg:     var(--pivand-primary-bg, #E4ECE7);
+    --pcf-ink:         var(--pivand-ink, #292D2A);
+    --pcf-mid:         var(--pivand-ink-mid, #4A504B);
+    --pcf-soft:        var(--pivand-ink-soft, #5C615D);
+    --pcf-border:      var(--pivand-border, #DCD5C9);
+    --pcf-surface:     var(--pivand-surface, #F8F4EE);
+    --pcf-red:         var(--pivand-danger, #96362A);
+    --pcf-radius:      var(--pivand-radius, 14px);
+    --pcf-shadow:      var(--pivand-shadow, 0 1px 2px rgba(41, 45, 42, .05), 0 8px 20px -10px rgba(41, 45, 42, .12));
     --pcf-transition:  var(--pivand-transition, 0.2s ease);
     font-family: 'Vazirmatn', Tahoma, sans-serif;
 }
@@ -27,18 +27,20 @@
     color: var(--pcf-ink);
 }
 .pas-cf-wrap h1 + a.page-title-action {
-    background: linear-gradient(135deg, var(--pcf-teal-light), var(--pcf-teal));
-    border: none;
-    color: #fff;
-    border-radius: 999px;
+    background: var(--pcf-teal);
+    border: 1px solid var(--pcf-teal);
+    color: #F6F3EC;
+    border-radius: 10px;
     padding: 6px 18px;
-    box-shadow: 0 4px 12px rgba(15,118,110,0.25);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(41, 45, 42, 0.08);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 .pas-cf-wrap h1 + a.page-title-action:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(15,118,110,0.32);
-    color: #fff;
+    background: #26382F;
+    border-color: #26382F;
+    box-shadow: 0 4px 12px rgba(41, 45, 42, 0.16);
+    color: #F6F3EC;
 }
 
 .pas-cf-wrap h2 {
@@ -58,16 +60,19 @@
 }
 .pas-cf-wrap .button {
     border-radius: 8px;
+    white-space: nowrap;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .pas-cf-wrap .button.button-primary {
-    background: linear-gradient(135deg, var(--pcf-teal-light), var(--pcf-teal));
+    background: var(--pcf-teal);
     border-color: var(--pcf-teal);
-    box-shadow: 0 3px 10px rgba(15,118,110,0.25);
+    color: #F6F3EC;
+    box-shadow: 0 1px 2px rgba(41, 45, 42, 0.08);
 }
 .pas-cf-wrap .button.button-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 14px rgba(15,118,110,0.32);
+    background: #26382F;
+    border-color: #26382F;
+    box-shadow: 0 4px 12px rgba(41, 45, 42, 0.16);
 }
 .pas-cf-wrap .button:hover { transform: translateY(-1px); }
 
@@ -118,8 +123,8 @@
 .pas-cf-wrap table.form-table input:focus,
 .pas-cf-wrap table.form-table textarea:focus,
 .pas-cf-wrap table.form-table select:focus {
-    border-color: var(--pcf-teal-light);
-    box-shadow: 0 0 0 3px rgba(20,184,166,0.15);
+    border-color: var(--pcf-teal);
+    box-shadow: 0 0 0 3px rgba(52, 74, 66, 0.16);
     outline: none;
 }
 
@@ -143,7 +148,7 @@
 
 /* ── Cards ────────────────────────────────────────────────── */
 .pas-cf-box {
-    background: #fff;
+    background: var(--pivand-white, #FCFBF8);
     border: 1px solid var(--pcf-border);
     border-radius: var(--pcf-radius);
     padding: 16px 18px;
@@ -152,7 +157,7 @@
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .pas-cf-box:hover {
-    box-shadow: 0 8px 26px rgba(15,23,42,0.09);
+    box-shadow: 0 8px 24px rgba(41, 45, 42, 0.09);
 }
 .pas-cf-box h3 {
     margin-top: 0;
@@ -165,11 +170,7 @@
     gap: 6px;
 }
 .pas-cf-box h3::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--pcf-teal-light);
+    content: none;
 }
 
 .pas-cf-audit {

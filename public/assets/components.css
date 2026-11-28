@@ -1,9 +1,9 @@
 /* ============================================================
    پیوند امن — کیت رابط کاربری · کامپوننت‌ها (components.css)
-   نسخه 1.0.0
+   نسخه 1.2.0 — «Calm Intelligence»
 
-   قواعد سخت این فایل:
-     • همهٔ انتخابگرها با .pui- شروع می‌شوند (هیچ قاعدهٔ سراسری).
+   قواعد:
+     • همهٔ انتخابگرها با .pui- شروع می‌شوند.
      • همهٔ جهت‌ها با CSS Logical Properties نوشته می‌شوند (RTL خودکار).
      • هیچ رنگ هاردکدی جز توکن‌های --pui-* وجود ندارد.
      • هر کامپوننت در light و dark یکسان کار می‌کند.
@@ -34,7 +34,7 @@
 
     .pui-shell :focus-visible,
     .pui-kit :focus-visible {
-        outline: 2px solid var(--pui-accent-line);
+        outline: 2px solid var(--pui-focus);
         outline-offset: 2px;
         border-radius: var(--pui-r-sm);
     }
@@ -56,7 +56,7 @@
     .pui-shell p, .pui-kit p { margin: 0; }
 
     .pui-shell a, .pui-kit a {
-        color: var(--pui-primary);
+        color: var(--pui-link);
         text-decoration-color: var(--pui-accent-line);
         text-underline-offset: 3px;
     }
@@ -69,7 +69,7 @@
         align-items: center;
         justify-content: center;
         gap: var(--pui-s2);
-        min-block-size: 42px;
+        min-block-size: 40px;
         padding-inline: var(--pui-s4);
         padding-block: var(--pui-s2);
         border: 1px solid transparent;
@@ -78,22 +78,22 @@
         color: var(--pui-text);
         font: inherit;
         font-weight: 500;
-        font-size: var(--pui-fs-base);
+        font-size: var(--pui-fs-sm);
+        white-space: nowrap;
         cursor: pointer;
         text-decoration: none;
         transition: background-color var(--pui-dur) var(--pui-ease),
                     border-color var(--pui-dur) var(--pui-ease),
-                    transform var(--pui-dur) var(--pui-ease);
+                    color var(--pui-dur) var(--pui-ease);
         -webkit-tap-highlight-color: transparent;
     }
 
-    .pui-btn:hover { transform: translateY(-1px); }
-    .pui-btn:active { transform: none; }
+    .pui-btn:hover { background: var(--pui-surface-2); }
+    .pui-btn:active { opacity: .92; }
     .pui-btn[disabled],
     .pui-btn[aria-disabled="true"] {
         opacity: .55;
         cursor: not-allowed;
-        transform: none;
     }
 
     .pui-btn--primary {
@@ -101,14 +101,17 @@
         color: var(--pui-on-primary);
         border-color: var(--pui-primary);
     }
-    .pui-btn--primary:hover { background: var(--pui-primary-hover); border-color: var(--pui-primary-hover); }
+    .pui-btn--primary:hover { background: var(--pui-primary-hover); border-color: var(--pui-primary-hover); color: var(--pui-on-primary); }
 
     .pui-btn--ghost {
-        background: transparent;
+        background: var(--pui-surface);
         border-color: var(--pui-border);
         color: var(--pui-text);
     }
-    .pui-btn--ghost:hover { background: var(--pui-surface-2); }
+    .pui-btn--ghost:hover {
+        background: var(--pui-surface-2);
+        border-color: var(--pui-border-strong);
+    }
 
     .pui-btn--quiet {
         background: transparent;
@@ -120,21 +123,26 @@
     .pui-btn--danger {
         background: var(--pui-danger-bg);
         color: var(--pui-danger);
-        border-color: color-mix(in srgb, var(--pui-danger) 30%, transparent);
+        border-color: color-mix(in srgb, var(--pui-danger) 28%, transparent);
     }
     .pui-btn--danger:hover { background: color-mix(in srgb, var(--pui-danger) 14%, var(--pui-surface)); }
 
     .pui-btn--icon {
-        inline-size: 42px;
+        inline-size: 40px;
         padding-inline: 0;
-        min-block-size: 42px;
+        min-block-size: 40px;
     }
 
-    .pui-btn--sm { min-block-size: 34px; font-size: var(--pui-fs-sm); padding-inline: var(--pui-s3); }
-    .pui-btn--lg { min-block-size: 50px; font-size: var(--pui-fs-md); padding-inline: var(--pui-s6); }
+    .pui-btn--sm { min-block-size: 34px; font-size: var(--pui-fs-xs); padding-inline: var(--pui-s3); }
+    .pui-btn--lg { min-block-size: 48px; font-size: var(--pui-fs-md); padding-inline: var(--pui-s6); }
     .pui-btn--block { inline-size: 100%; }
 
-    .pui-btn[aria-busy="true"] { cursor: progress; opacity: .8; }
+    .pui-btn[aria-busy="true"] { cursor: progress; opacity: .78; }
+    .pui-btn[data-copied="true"] {
+        background: var(--pui-success-bg);
+        color: var(--pui-success);
+        border-color: color-mix(in srgb, var(--pui-success) 32%, var(--pui-border-soft));
+    }
 
     /* ── کارت ─────────────────────────────────────────── */
     .pui-card {
@@ -147,7 +155,7 @@
 
     .pui-card__head {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         gap: var(--pui-s4);
         padding: var(--pui-s4) var(--pui-s5);
@@ -165,7 +173,8 @@
         block-size: 36px;
         border-radius: var(--pui-r-md);
         background: var(--pui-accent-soft);
-        color: var(--pui-text);
+        color: var(--pui-primary);
+        flex-shrink: 0;
     }
 
     .pui-card__title { font-size: var(--pui-fs-md); font-weight: 600; }
@@ -183,7 +192,9 @@
         border: 1px solid var(--pui-border-soft);
         border-radius: var(--pui-r-lg);
         box-shadow: var(--pui-shadow-sm);
+        transition: border-color var(--pui-dur) var(--pui-ease);
     }
+    .pui-stat:hover { border-color: var(--pui-border); }
 
     .pui-stat__icon {
         display: inline-flex;
@@ -198,34 +209,35 @@
     }
 
     .pui-stat__label { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); }
-    .pui-stat__value { font-size: var(--pui-fs-xl); font-weight: 700; letter-spacing: -.01em; }
+    .pui-stat__value { font-size: var(--pui-fs-xl); font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
     .pui-stat__meta { font-size: var(--pui-fs-xs); color: var(--pui-text-soft); }
-    .pui-stat--accent { border-color: color-mix(in srgb, var(--pui-accent) 55%, transparent); }
-    .pui-stat--accent .pui-stat__icon { background: var(--pui-accent-soft); color: var(--pui-text); }
+    .pui-stat--accent { border-color: color-mix(in srgb, var(--pui-accent-line) 42%, var(--pui-border-soft)); }
+    .pui-stat--accent .pui-stat__icon { background: var(--pui-accent-soft); color: var(--pui-primary); }
 
     /* ── بج ────────────────────────────────────────────── */
     .pui-badge {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        padding-inline: var(--pui-s2);
-        padding-block: 3px;
-        border-radius: var(--pui-r-full);
+        padding-inline: 9px;
+        padding-block: 2px;
+        border-radius: var(--pui-r-sm);
         border: 1px solid transparent;
         font-size: var(--pui-fs-xs);
-        font-weight: 500;
-        line-height: 1.7;
+        font-weight: 600;
+        line-height: 1.65;
         white-space: nowrap;
+        font-variant-numeric: tabular-nums;
     }
 
-    .pui-badge--neutral { background: var(--pui-surface-3); color: var(--pui-text-muted); }
-    .pui-badge--success { background: var(--pui-success-bg); color: var(--pui-success); }
-    .pui-badge--warning { background: var(--pui-warning-bg); color: var(--pui-warning); }
-    .pui-badge--danger  { background: var(--pui-danger-bg);  color: var(--pui-danger); }
-    .pui-badge--info    { background: var(--pui-info-bg);    color: var(--pui-info); }
-    .pui-badge--accent  { background: var(--pui-accent-soft); color: var(--pui-text); border-color: color-mix(in srgb, var(--pui-accent) 45%, transparent); }
+    .pui-badge--neutral { background: var(--pui-surface-3); color: var(--pui-text-muted); border-color: var(--pui-border-soft); }
+    .pui-badge--success { background: var(--pui-success-bg); color: var(--pui-success); border-color: color-mix(in srgb, var(--pui-success) 24%, transparent); }
+    .pui-badge--warning { background: var(--pui-warning-bg); color: var(--pui-warning); border-color: color-mix(in srgb, var(--pui-warning) 24%, transparent); }
+    .pui-badge--danger  { background: var(--pui-danger-bg);  color: var(--pui-danger);  border-color: color-mix(in srgb, var(--pui-danger) 24%, transparent); }
+    .pui-badge--info    { background: var(--pui-info-bg);    color: var(--pui-info);    border-color: color-mix(in srgb, var(--pui-info) 24%, transparent); }
+    .pui-badge--accent  { background: var(--pui-accent-soft); color: var(--pui-primary); border-color: color-mix(in srgb, var(--pui-accent-line) 36%, transparent); }
 
-    /* ── هشدار ─────────────────────────────────────────── */
+    /* ── هشدار (۱px قاب کامل، بدون نوار کناری ضخیم) ──── */
     .pui-alert {
         display: flex;
         align-items: flex-start;
@@ -233,18 +245,21 @@
         padding: var(--pui-s3) var(--pui-s4);
         border-radius: var(--pui-r-md);
         border: 1px solid var(--pui-border-soft);
-        border-inline-start-width: 4px;
         background: var(--pui-surface);
     }
 
-    .pui-alert__icon { margin-block-start: 2px; }
-    .pui-alert__title { display: block; font-size: var(--pui-fs-base); margin-block-end: 2px; }
+    .pui-alert__icon { margin-block-start: 2px; flex-shrink: 0; }
+    .pui-alert__title { display: block; font-size: var(--pui-fs-base); font-weight: 600; margin-block-end: 2px; }
     .pui-alert__text { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); }
 
-    .pui-alert--info    { background: var(--pui-info-bg);    border-inline-start-color: var(--pui-info); }
-    .pui-alert--success { background: var(--pui-success-bg); border-inline-start-color: var(--pui-success); }
-    .pui-alert--warning { background: var(--pui-warning-bg); border-inline-start-color: var(--pui-warning); }
-    .pui-alert--danger  { background: var(--pui-danger-bg);  border-inline-start-color: var(--pui-danger); }
+    .pui-alert--info    { background: var(--pui-info-bg);    border-color: color-mix(in srgb, var(--pui-info) 28%, var(--pui-border-soft)); color: var(--pui-info); }
+    .pui-alert--success { background: var(--pui-success-bg); border-color: color-mix(in srgb, var(--pui-success) 28%, var(--pui-border-soft)); color: var(--pui-success); }
+    .pui-alert--warning { background: var(--pui-warning-bg); border-color: color-mix(in srgb, var(--pui-warning) 28%, var(--pui-border-soft)); color: var(--pui-warning); }
+    .pui-alert--danger  { background: var(--pui-danger-bg);  border-color: color-mix(in srgb, var(--pui-danger) 28%, var(--pui-border-soft)); color: var(--pui-danger); }
+    .pui-alert--info .pui-alert__text,
+    .pui-alert--success .pui-alert__text,
+    .pui-alert--warning .pui-alert__text,
+    .pui-alert--danger .pui-alert__text { color: var(--pui-text); }
 
     /* ── فرم ───────────────────────────────────────────── */
     .pui-field { display: grid; gap: var(--pui-s1); }
@@ -255,7 +270,7 @@
     .pui-select,
     .pui-textarea {
         inline-size: 100%;
-        min-block-size: 44px;
+        min-block-size: 42px;
         padding-inline: var(--pui-s3);
         padding-block: var(--pui-s2);
         border: 1px solid var(--pui-border);
@@ -277,7 +292,7 @@
     .pui-input:focus, .pui-select:focus, .pui-textarea:focus {
         outline: none;
         border-color: var(--pui-accent-line);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--pui-accent) 35%, transparent);
+        box-shadow: var(--pui-ring);
     }
 
     .pui-field__hint { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
@@ -294,7 +309,100 @@
         color: var(--pui-text);
         cursor: pointer;
     }
-    .pui-check input { inline-size: 18px; block-size: 18px; margin-block-start: 3px; accent-color: var(--pui-accent-line); }
+    .pui-check input { inline-size: 18px; block-size: 18px; margin-block-start: 3px; accent-color: var(--pui-primary); }
+
+    /* ── کلید میانبر و ابزار فیلتر جدول ───────────────── */
+    .pui-kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: 22px;
+        padding: 1px 6px;
+        border-radius: 5px;
+        border: 1px solid var(--pui-border);
+        background: var(--pui-surface-2);
+        color: var(--pui-text-muted);
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.5;
+        direction: ltr;
+    }
+
+    .pui-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+        margin-block-end: var(--pui-s3);
+    }
+
+    .pui-filter-bar__search {
+        position: relative;
+        flex: 1 1 240px;
+        max-inline-size: 380px;
+    }
+
+    .pui-filter-bar__icon {
+        position: absolute;
+        inset-inline-start: 11px;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        color: var(--pui-text-soft);
+        pointer-events: none;
+        display: inline-flex;
+    }
+
+    .pui-filter-bar__search .pui-input {
+        min-block-size: 38px;
+        padding-inline-start: 36px;
+        font-size: var(--pui-fs-sm);
+    }
+
+    .pui-live-count {
+        font-size: var(--pui-fs-xs);
+        color: var(--pui-text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .pui-slot-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-block-start: var(--pui-s1);
+    }
+
+    .pui-slot-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-block-size: 30px;
+        padding: 3px 10px;
+        border: 1px solid var(--pui-border);
+        border-radius: var(--pui-r-sm);
+        background: var(--pui-surface-2);
+        color: var(--pui-text-muted);
+        font: inherit;
+        font-size: var(--pui-fs-xs);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition: border-color var(--pui-dur) var(--pui-ease), background-color var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
+    }
+
+    .pui-slot-pill:hover {
+        border-color: var(--pui-accent-line);
+        color: var(--pui-text);
+        background: var(--pui-surface);
+    }
+
+    .pui-slot-pill.is-active,
+    .pui-slot-pill[aria-pressed="true"] {
+        background: var(--pui-primary);
+        border-color: var(--pui-primary);
+        color: var(--pui-on-primary);
+    }
 
     /* ── جدول ──────────────────────────────────────────── */
     .pui-table-wrap {
@@ -359,28 +467,30 @@
         white-space: nowrap;
         border-start-start-radius: var(--pui-r-sm);
         border-start-end-radius: var(--pui-r-sm);
+        transition: color var(--pui-dur) var(--pui-ease), background-color var(--pui-dur) var(--pui-ease);
     }
 
     .pui-tab:hover { color: var(--pui-text); background: var(--pui-surface-2); }
 
-    .pui-tab[aria-selected="true"] { color: var(--pui-text); }
+    .pui-tab[aria-selected="true"] { color: var(--pui-text); font-weight: 600; }
     .pui-tab[aria-selected="true"]::after {
         content: "";
         position: absolute;
         inset-inline: var(--pui-s3);
         inset-block-end: -1px;
-        block-size: 3px;
+        block-size: 2px;
         border-radius: var(--pui-r-full);
-        background: var(--pui-accent);
+        background: var(--pui-primary);
     }
 
     .pui-tab__badge {
         min-inline-size: 20px;
         padding-inline: 6px;
-        border-radius: var(--pui-r-full);
+        border-radius: var(--pui-r-sm);
         background: var(--pui-surface-3);
         color: var(--pui-text-muted);
         font-size: var(--pui-fs-xs);
+        font-variant-numeric: tabular-nums;
         text-align: center;
     }
 
@@ -409,13 +519,14 @@
         border: 1px solid var(--pui-border);
         font-size: var(--pui-fs-xs);
         font-weight: 600;
+        font-variant-numeric: tabular-nums;
         background: var(--pui-surface);
     }
 
-    .pui-step--current { color: var(--pui-text); }
+    .pui-step--current { color: var(--pui-text); font-weight: 600; }
     .pui-step--current .pui-step__dot { background: var(--pui-primary); color: var(--pui-on-primary); border-color: var(--pui-primary); }
     .pui-step--done { color: var(--pui-text-muted); }
-    .pui-step--done .pui-step__dot { background: var(--pui-accent-soft); border-color: var(--pui-accent-line); color: var(--pui-text); }
+    .pui-step--done .pui-step__dot { background: var(--pui-accent-soft); border-color: var(--pui-accent-line); color: var(--pui-primary); }
 
     /* ── تایم‌لاین ──────────────────────────────────────── */
     .pui-timeline { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--pui-s4); }
@@ -436,11 +547,11 @@
         inline-size: 19px;
         block-size: 19px;
         border-radius: var(--pui-r-full);
-        border: 2px solid var(--pui-accent);
+        border: 2px solid var(--pui-accent-line);
         background: var(--pui-surface);
     }
     .pui-timeline__title { font-size: var(--pui-fs-base); font-weight: 600; }
-    .pui-timeline__meta { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
+    .pui-timeline__meta { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); font-variant-numeric: tabular-nums; }
 
     /* ── خالی‌بودن ─────────────────────────────────────── */
     .pui-empty {
@@ -462,28 +573,17 @@
         justify-content: center;
         border-radius: var(--pui-r-full);
         background: var(--pui-accent-soft);
-        color: var(--pui-text-muted);
+        color: var(--pui-primary);
     }
 
-    .pui-empty__title { font-size: var(--pui-fs-base); }
+    .pui-empty__title { font-size: var(--pui-fs-base); font-weight: 600; }
     .pui-empty__text { font-size: var(--pui-fs-sm); color: var(--pui-text-muted); max-inline-size: 46ch; }
 
     /* ── اسکلتون ───────────────────────────────────────── */
     .pui-skeleton {
         border-radius: var(--pui-r-sm);
-        background: linear-gradient(90deg, var(--pui-surface-3) 25%, var(--pui-surface-2) 37%, var(--pui-surface-3) 63%);
-        background-size: 400% 100%;
-        animation: pui-shimmer 1.4s ease infinite;
+        background: var(--pui-surface-3);
         min-block-size: 12px;
-    }
-
-    @keyframes pui-shimmer {
-        0% { background-position: 100% 50%; }
-        100% { background-position: 0 50%; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .pui-skeleton { animation: none; }
     }
 
     /* ── نوار پیشرفت ───────────────────────────────────── */
@@ -498,7 +598,7 @@
     .pui-progress__bar {
         block-size: 100%;
         border-radius: inherit;
-        background: var(--pui-accent);
+        background: var(--pui-primary);
         transition: inline-size var(--pui-dur-slow) var(--pui-ease);
     }
 
@@ -511,17 +611,17 @@
         block-size: 38px;
         border-radius: var(--pui-r-full);
         background: var(--pui-accent-soft);
-        color: var(--pui-text);
+        color: var(--pui-primary);
         font-weight: 600;
         font-size: var(--pui-fs-sm);
-        border: 1px solid color-mix(in srgb, var(--pui-accent) 40%, transparent);
+        border: 1px solid color-mix(in srgb, var(--pui-accent-line) 36%, transparent);
     }
 
     .pui-avatar--lg { inline-size: 52px; block-size: 52px; font-size: var(--pui-fs-md); }
 
     /* ── مدال (native dialog) ──────────────────────────── */
     .pui-modal {
-        border: 1px solid var(--pui-border-soft);
+        border: 1px solid var(--pui-border);
         border-radius: var(--pui-r-lg);
         padding: 0;
         inline-size: min(92vw, 520px);
@@ -530,10 +630,84 @@
         box-shadow: var(--pui-shadow-lg);
     }
 
-    .pui-modal::backdrop { background: rgba(42, 37, 33, .55); backdrop-filter: blur(2px); }
+    .pui-modal::backdrop { background: var(--pui-scrim); backdrop-filter: blur(3px); }
     .pui-modal__head { display: flex; align-items: center; justify-content: space-between; gap: var(--pui-s3); padding: var(--pui-s4) var(--pui-s5); border-block-end: 1px solid var(--pui-border-soft); }
     .pui-modal__body { padding: var(--pui-s5); }
     .pui-modal__foot { display: flex; justify-content: flex-end; gap: var(--pui-s2); padding: var(--pui-s4) var(--pui-s5); border-block-start: 1px solid var(--pui-border-soft); background: var(--pui-surface-2); }
+
+    /* ── جابه‌جایی سریع ماژول (Command Palette) ────────── */
+    .pui-cmd-dialog {
+        border: 1px solid var(--pui-border);
+        border-radius: var(--pui-r-lg);
+        padding: 0;
+        inline-size: min(92vw, 560px);
+        background: var(--pui-surface);
+        color: var(--pui-text);
+        box-shadow: var(--pui-shadow-lg);
+        margin-block-start: min(12vh, 96px);
+    }
+    .pui-cmd-dialog::backdrop { background: var(--pui-scrim); backdrop-filter: blur(3px); }
+    .pui-cmd__head {
+        display: flex;
+        align-items: center;
+        gap: var(--pui-s2);
+        padding: var(--pui-s3) var(--pui-s4);
+        border-block-end: 1px solid var(--pui-border-soft);
+    }
+    .pui-cmd__input {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        border: 0;
+        background: transparent;
+        color: var(--pui-text);
+        font: inherit;
+        font-size: var(--pui-fs-base);
+        padding-block: 6px;
+        outline: none;
+    }
+    .pui-cmd__input::placeholder { color: var(--pui-text-soft); }
+    .pui-cmd__list {
+        list-style: none;
+        margin: 0;
+        padding: var(--pui-s2);
+        max-block-size: min(56vh, 380px);
+        overflow-y: auto;
+        display: grid;
+        gap: 2px;
+    }
+    .pui-cmd__link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pui-s3);
+        padding: 10px var(--pui-s3);
+        border-radius: var(--pui-r-sm);
+        color: var(--pui-text);
+        text-decoration: none;
+        font-size: var(--pui-fs-sm);
+        transition: background-color var(--pui-dur) var(--pui-ease);
+    }
+    .pui-cmd__link:hover,
+    .pui-cmd__link.is-active,
+    .pui-cmd__link:focus-visible {
+        background: var(--pui-primary-soft);
+        color: var(--pui-primary);
+        outline: none;
+    }
+    .pui-cmd__hint {
+        font-size: var(--pui-fs-xs);
+        color: var(--pui-text-soft);
+    }
+    .pui-cmd__foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--pui-s2) var(--pui-s4);
+        border-block-start: 1px solid var(--pui-border-soft);
+        background: var(--pui-surface-2);
+        font-size: var(--pui-fs-xs);
+        color: var(--pui-text-muted);
+    }
 
     /* ── توست ──────────────────────────────────────────── */
     .pui-toasts {
@@ -549,9 +723,11 @@
     .pui-toast {
         display: flex;
         align-items: center;
-        gap: var(--pui-s2);
+        justify-content: space-between;
+        gap: var(--pui-s3);
         padding: var(--pui-s3) var(--pui-s4);
         border-radius: var(--pui-r-md);
+        border: 1px solid var(--pui-border);
         background: var(--pui-text);
         color: var(--pui-bg);
         box-shadow: var(--pui-shadow-lg);
@@ -566,14 +742,21 @@
         gap: var(--pui-s3);
         padding: var(--pui-s2) var(--pui-s3);
         border-radius: var(--pui-r-md);
+        border: 1px solid transparent;
         color: var(--pui-text-muted);
         text-decoration: none;
         font-size: var(--pui-fs-base);
         min-block-size: 42px;
+        transition: background-color var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
     }
 
     .pui-nav__link:hover { background: var(--pui-surface-2); color: var(--pui-text); }
-    .pui-nav__link[aria-current="page"] { background: var(--pui-accent-soft); color: var(--pui-text); font-weight: 600; box-shadow: inset 3px 0 0 var(--pui-accent); }
+    .pui-nav__link[aria-current="page"] {
+        background: var(--pui-accent-soft);
+        border-color: color-mix(in srgb, var(--pui-accent-line) 38%, transparent);
+        color: var(--pui-primary);
+        font-weight: 600;
+    }
 }
 
 @layer pui.utilities {
@@ -594,7 +777,6 @@
     .pui-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .pui-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 
-    /* عنصری که باید تمام عرض شبکهٔ کارت‌ها را بگیرد (نمونه‌های عریض). */
     .pui-grid__wide { grid-column: 1 / -1; }
     .pui-stack { display: grid; gap: var(--pui-s4); }
     .pui-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pui-s2); }
@@ -608,13 +790,14 @@
         .pui-table--cards thead { display: none; }
         .pui-table--cards tbody tr {
             display: grid;
-            gap: 2px;
+            gap: 4px;
             padding: var(--pui-s3) var(--pui-s4);
             border-block-end: 1px solid var(--pui-border-soft);
         }
         .pui-table--cards tbody td {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             gap: var(--pui-s3);
             padding: 2px 0;
             border: 0;
@@ -630,10 +813,9 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   کامپوننت‌های پایه — فاز ۱۴ گام ۳
+   کامپوننت‌های تعاملی تکمیلی
    ══════════════════════════════════════════════════════════════════════ */
 @layer pui.components {
-    /* ── کلید روشن/خاموش ────────────────────────────────── */
     .pui-switch-field { display: grid; gap: var(--pui-s1); }
 
     .pui-switch {
@@ -732,17 +914,10 @@
         margin: 0;
     }
 
-    .pui-radio-card__body {
-        display: grid;
-        gap: 2px;
-    }
-
+    .pui-radio-card__body { display: grid; gap: 2px; }
     .pui-radio-card__icon { color: var(--pui-text-muted); }
-
     .pui-radio-card__label { font-size: var(--pui-fs-sm); font-weight: 500; }
-
     .pui-radio-card__desc { font-size: var(--pui-fs-xs); color: var(--pui-text-muted); }
-
     .pui-radio-card:hover { border-color: var(--pui-accent-line); }
 
     .pui-radio-card:has(input:checked) {
@@ -750,7 +925,7 @@
         background: var(--pui-accent-soft);
     }
 
-    .pui-radio-card:has(input:checked) .pui-radio-card__icon { color: var(--pui-text); }
+    .pui-radio-card:has(input:checked) .pui-radio-card__icon { color: var(--pui-primary); }
 
     .pui-radio-card:has(input:focus-visible) {
         outline: 2px solid var(--pui-focus);
@@ -784,9 +959,6 @@
         pointer-events: none;
     }
 
-    /* استایل‌های عمومی وردپرس/قالب‌ها با padding فیزیکی (padding-right) روی
-       کنترل‌های فرم، بر لایه‌ها غالب می‌شوند؛ این یک قاعدهٔ آگاهانه
-       با !important است تا آیکون جست‌وجو روی متن نیفتد. */
     .pui-input.pui-toolbar__input {
         padding-inline-start: 36px !important;
         min-inline-size: 0;
@@ -802,7 +974,6 @@
     /* ── اسکلتون (اندازه با کلاس) ───────────────────────── */
     .pui-skeleton-stack { display: grid; gap: var(--pui-s2); }
     .pui-skeleton-stack .pui-skeleton { display: block; }
-
     .pui-skeleton { min-block-size: 14px; }
     .pui-skeleton--sm { block-size: 8px; min-block-size: 8px; }
     .pui-skeleton--lg { block-size: 22px; min-block-size: 22px; }
@@ -814,7 +985,6 @@
 
     /* ── پیشرفت با برچسب ────────────────────────────────── */
     .pui-progress-field { display: grid; gap: var(--pui-s1); }
-
     .pui-progress-field__head {
         display: flex;
         align-items: baseline;
@@ -822,10 +992,8 @@
         gap: var(--pui-s2);
         font-size: var(--pui-fs-sm);
     }
-
     .pui-progress-field__label { color: var(--pui-text); }
-    .pui-progress-field__value { color: var(--pui-text-muted); font-size: var(--pui-fs-xs); }
-
+    .pui-progress-field__value { color: var(--pui-text-muted); font-size: var(--pui-fs-xs); font-variant-numeric: tabular-nums; }
     .pui-progress__bar { transition: inline-size var(--pui-dur-slow) var(--pui-ease); }
     .pui-progress--success .pui-progress__bar { background: var(--pui-success); }
     .pui-progress--warning .pui-progress__bar { background: var(--pui-warning); }
@@ -834,5 +1002,5 @@
     /* ── مدال: اندازه‌ها و عنوان ────────────────────────── */
     .pui-modal--sm { max-inline-size: 380px; }
     .pui-modal--lg { max-inline-size: 720px; }
-    .pui-modal__title { font-size: var(--pui-fs-md); }
+    .pui-modal__title { font-size: var(--pui-fs-md); font-weight: 700; }
 }

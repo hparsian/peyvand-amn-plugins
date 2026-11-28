@@ -7,137 +7,152 @@
    ============================================================ */
 
 .psy-admin {
-    --pivand-primary:        #51483F;
-    --pivand-primary-dark:   #3F3830;
-    --pivand-primary-light:  #C8B48A;
-    --pivand-primary-bg:     #EFE6D3;
-    --pivand-primary-mid:    #D9C9A9;
-    --pivand-ink:            #51483F;
-    --pivand-ink-mid:        #6B5F52;
-    --pivand-ink-soft:       #857A6C;
-    --pivand-border:         #DDD5C8;
-    --pivand-border-soft:    #EFE9DE;
-    --pivand-surface:        #FAF7F1;
-    --pivand-white:          #FFFFFF;
-    --pivand-danger:         #9B3A2E;
-    --pivand-danger-bg:      #F7E7E3;
-    --pivand-warning:        #8A5A18;
-    --pivand-warning-bg:     #F8EEDC;
-    --pivand-success:        #3F6B4F;
-    --pivand-success-bg:     #E8F1EB;
-    --pivand-shadow-sm:      0 1px 2px rgba(81, 72, 63, .08);
-    --pivand-shadow:         0 6px 20px rgba(81, 72, 63, .10), 0 1px 3px rgba(81, 72, 63, .06);
+    --pivand-primary:        #344A42;
+    --pivand-primary-dark:   #26382F;
+    --pivand-primary-light:  #6E9182;
+    --pivand-primary-bg:     #E4ECE7;
+    --pivand-primary-mid:    #D1E0D7;
+    --pivand-ink:            #292D2A;
+    --pivand-ink-mid:        #585F5A;
+    --pivand-ink-soft:       #7D837D;
+    --pivand-border:         #DCD5C9;
+    --pivand-border-soft:    #E8E2D8;
+    --pivand-surface:        #F8F4EE;
+    --pivand-white:          #FCFBF8;
+    --pivand-danger:         #B44332;
+    --pivand-danger-bg:      #FCEEEB;
+    --pivand-warning:        #9A631A;
+    --pivand-warning-bg:     #FCF3E3;
+    --pivand-success:        #366346;
+    --pivand-success-bg:     #E8F2EC;
+    --pivand-shadow-sm:      0 1px 3px rgba(41, 45, 42, .05);
+    --pivand-shadow:         0 8px 24px rgba(41, 45, 42, .08), 0 1px 3px rgba(41, 45, 42, .05);
 
-    --psy-teal:        #51483F;
-    --psy-teal-light:  #C8B48A;
-    --psy-teal-bg:     #EFE6D3;
-    --psy-teal-mid:    #D9C9A9;
-    --psy-rose:        #9B3A2E;
-    --psy-rose-bg:     #F7E7E3;
-    --psy-amber:       #8A5A18;
-    --psy-amber-bg:    #F8EEDC;
-    --psy-text:        #51483F;
-    --psy-text-mid:    #6B5F52;
-    --psy-text-soft:   #857A6C;
-    --psy-border:      #DDD5C8;
-    --psy-surface:     #FAF7F1;
-    --psy-white:       #FFFFFF;
+    --psy-teal:        #344A42;
+    --psy-teal-light:  #6E9182;
+    --psy-teal-bg:     #E4ECE7;
+    --psy-teal-mid:    #D1E0D7;
+    --psy-rose:        #B44332;
+    --psy-rose-bg:     #FCEEEB;
+    --psy-amber:       #9A631A;
+    --psy-amber-bg:    #FCF3E3;
+    --psy-text:        #292D2A;
+    --psy-text-mid:    #585F5A;
+    --psy-text-soft:   #7D837D;
+    --psy-border:      #DCD5C9;
+    --psy-surface:     #F8F4EE;
+    --psy-white:       #FCFBF8;
 }
 
 .psy-admin h1 {
-    color: #51483F !important;
+    color: #292D2A !important;
 }
 
 .psy-admin h1 + a.page-title-action {
-    background: #51483F;
-    color: #F4F0E8 !important;
-    box-shadow: 0 4px 12px rgba(81, 72, 63, .18);
+    background: #344A42;
+    color: #FBF9F5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(52, 74, 66, .16);
+    white-space: nowrap;
 }
 
 .psy-admin h1 + a.page-title-action:hover {
-    background: #3F3830;
-    box-shadow: 0 6px 16px rgba(81, 72, 63, .24);
-    color: #F4F0E8 !important;
+    background: #26382F;
+    box-shadow: 0 4px 12px rgba(52, 74, 66, .22);
+    color: #FBF9F5 !important;
 }
 
-/* تب‌های افقی: آیتم فعال قهوه‌ای، آیتم‌های دیگر روی کرم */
+/* تب‌های افقی: آیتم فعال سبز جنگلی روی زمینه کتان ملایم */
 .psy-admin .psy-pill-nav {
-    background: #EFE9DE;
-    border-radius: 14px;
+    background: #EFEAE2;
+    border: 1px solid #DCD5C9;
+    border-radius: 10px;
+}
+
+.psy-admin .psy-pill-nav a,
+.psy-admin .psy-pill-nav button {
+    border-radius: 8px;
 }
 
 .psy-admin .psy-pill-nav a:hover,
 .psy-admin .psy-pill-nav button:hover {
-    color: #51483F;
-    background: rgba(200, 180, 138, .28);
+    color: #292D2A;
+    background: rgba(52, 74, 66, .08);
 }
 
 .psy-admin .psy-pill-nav a.current,
 .psy-admin .psy-pill-nav button.current,
 .psy-admin .psy-pill-nav a.active,
 .psy-admin .psy-pill-nav button.active {
-    background: #51483F;
-    color: #F4F0E8 !important;
+    background: #344A42;
+    color: #FBF9F5 !important;
     box-shadow: none;
 }
 
-/* کارت‌های آماری: نوار سمت بالا با طلایی برند */
+/* کارت‌های آماری: حاشیه ۱ پیکسل تمیز بدون نوار ضخیم */
 .psy-admin .psy-stat-card {
-    border-top-color: #C8B48A;
+    border: 1px solid #DCD5C9;
+    background: #FCFBF8;
 }
 
 .psy-admin .psy-stat-val {
-    color: #51483F;
+    color: #344A42;
+    font-variant-numeric: tabular-nums;
 }
 
 .psy-admin .psy-table thead th {
-    background: #FAF7F1;
-    color: #6B5F52;
+    background: #F8F4EE;
+    color: #585F5A;
 }
 
 .psy-admin .psy-table tbody tr:hover td {
-    background: #FAF7F1 !important;
+    background: #F8F4EE !important;
 }
 
 .psy-admin .psy-badge-done {
-    background: #E8F1EB;
-    color: #3F6B4F;
-    border-color: rgba(63, 107, 79, .28);
+    background: #E8F2EC;
+    color: #366346;
+    border-color: rgba(54, 99, 70, .28);
 }
 
 .psy-admin .psy-badge-pending {
-    background: #F8EEDC;
-    color: #8A5A18;
-    border-color: rgba(200, 180, 138, .55);
+    background: #FCF3E3;
+    color: #9A631A;
+    border-color: rgba(154, 99, 26, .28);
 }
 
 .psy-admin .psy-badge-revoked {
-    background: #F7E7E3;
-    color: #9B3A2E;
-    border-color: rgba(155, 58, 46, .25);
+    background: #FCEEEB;
+    color: #B44332;
+    border-color: rgba(180, 67, 50, .26);
+}
+
+.psy-admin .button {
+    white-space: nowrap;
 }
 
 .psy-admin .button.button-primary {
-    background: #51483F !important;
-    border-color: #51483F !important;
-    color: #F4F0E8 !important;
+    background: #344A42 !important;
+    border-color: #344A42 !important;
+    color: #FBF9F5 !important;
     box-shadow: none;
 }
 
 .psy-admin .button.button-primary:hover {
-    background: #3F3830 !important;
-    border-color: #3F3830 !important;
+    background: #26382F !important;
+    border-color: #26382F !important;
 }
 
 .psy-admin .psy-form-card {
-    border-color: #DDD5C8;
+    border-color: #DCD5C9;
+    background: #FCFBF8;
 }
 
 .psy-admin .psy-success-box {
-    background: #E8F1EB;
-    border-color: rgba(63, 107, 79, .25);
+    background: #E8F2EC;
+    border: 1px solid rgba(54, 99, 70, .28);
 }
 
 .psy-admin .psy-success-box h2 {
-    color: #3F6B4F;
+    color: #366346;
 }

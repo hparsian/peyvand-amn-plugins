@@ -34,13 +34,14 @@
    CARD — base styles
    ============================================================ */
 .pwdf-card {
-    background: #ffffff;
+    background: var(--pivand-white, #FCFBF8);
+    border: 1px solid var(--pivand-border, #DCD5C9);
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
-    transition: transform 0.28s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.28s ease;
+    transition: transform 0.24s cubic-bezier(.22,.9,.35,1),
+                box-shadow 0.24s ease;
     will-change: transform;
     opacity: 0;           /* JS animates in */
 }
@@ -51,20 +52,14 @@
 
 /* hover lift */
 .pwdf-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 36px rgba(0,0,0,.13), 0 2px 8px rgba(0,0,0,.07) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(41,45,42,.1), 0 2px 6px rgba(41,45,42,.05) !important;
 }
 
-/* Today highlight pulse border */
+/* Today highlight crisp border (static, no continuous pulse) */
 .pwdf-card.pwdf-today {
-    outline: 2.5px solid currentColor;
+    outline: 1.5px solid var(--pwdf-accent, var(--pivand-primary, #344A42));
     outline-offset: 2px;
-    animation: pwdf-today-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes pwdf-today-pulse {
-    0%,100% { outline-color: rgba(91,141,184,.55); }
-    50%      { outline-color: rgba(91,141,184,1);   }
 }
 
 /* ── Accent bar ───────────────────────────────────────── */
@@ -137,9 +132,9 @@
 .pwdf-quote {
     font-size: 15px;
     line-height: 2;
-    color: #444;
-    border-right: 4px solid;           /* color set inline */
-    padding-right: 16px;
+    color: var(--pivand-ink-mid, #585F5A);
+    border-inline-start: 2px solid;     /* subtle 2px editorial quote rule, color set inline */
+    padding-inline-start: 14px;
     font-style: normal;
     margin: 0;
 }
@@ -156,16 +151,17 @@
     display: flex;
     gap: 8px;
     padding: 8px 16px 14px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--pivand-border-soft, #E8E2D8);
 }
 
 .pwdf-btn {
     background: none;
     border: 1.5px solid;
-    border-radius: 20px;
+    border-radius: 8px;
     padding: 5px 14px;
     font-size: 12px;
     font-family: 'Vazirmatn', Tahoma, sans-serif;
+    white-space: nowrap;
     cursor: pointer;
     transition: background 0.18s, color 0.18s;
     font-weight: 600;
@@ -175,24 +171,17 @@
     filter: brightness(0.92);
 }
 .pwdf-btn:focus-visible {
-    outline: var(--pivand-focus-outline, 2px solid #14b8a6);
+    outline: var(--pivand-focus-outline, 2px solid #344A42);
     outline-offset: var(--pivand-focus-offset, 2px);
 }
 
 /*
  * BUG-4 FIX: استفاده از --pwdf-accent CSS variable به جای currentColor
- * currentColor در این context برابر رنگ متن دکمه بود نه رنگ accent —
- * باعث می‌شد background و color هر دو یکسان شوند و متن ناخوانا باشد.
- * --pwdf-accent از PHP inline style روی دکمه set می‌شود.
  */
 .pwdf-save.pwdf-saved {
-    /* --pwdf-accent از inline style هر instance ست می‌شود (رنگ سفارشی
-       ادمین برای همان فید)؛ اگر تنظیم نشده باشد، به‌جای رنگ ثابت قبلی
-       به رنگ برند مشترک اکوسیستم برمی‌گردیم تا با بقیه‌ی افزونه‌ها هماهنگ
-       باشد. */
-    background: var(--pwdf-accent, var(--pivand-accent, #5B8DB8));
-    color: #fff !important;
-    border-color: var(--pwdf-accent, var(--pivand-accent, #5B8DB8));
+    background: var(--pwdf-accent, var(--pivand-primary, #344A42));
+    color: #FBF9F5 !important;
+    border-color: var(--pwdf-accent, var(--pivand-primary, #344A42));
 }
 
 /* ============================================================
@@ -232,15 +221,15 @@
 
 .pwdf-prev,
 .pwdf-next {
-    background: none;
-    border: 2px solid #ddd;
+    background: var(--pivand-white, #FCFBF8);
+    border: 1px solid var(--pivand-border, #DCD5C9);
     border-radius: 50%;
     width: 34px;
     height: 34px;
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    color: #666;
+    color: var(--pivand-ink-mid, #585F5A);
     transition: border-color 0.2s, color 0.2s, background 0.2s;
     display: flex;
     align-items: center;
@@ -248,9 +237,9 @@
 }
 .pwdf-prev:hover,
 .pwdf-next:hover {
-    border-color: #0073aa;
-    color: #0073aa;
-    background: #f0f7ff;
+    border-color: var(--pivand-primary, #344A42);
+    color: var(--pivand-primary, #344A42);
+    background: var(--pivand-primary-bg, #E4ECE7);
 }
 
 .pwdf-dots {
@@ -261,15 +250,15 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #ddd;
+    background: var(--pivand-border, #DCD5C9);
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
     border: none;
     padding: 0;
 }
 .pwdf-dot.active {
-    background: #0073aa;
-    transform: scale(1.35);
+    background: var(--pivand-primary, #344A42);
+    transform: scale(1.3);
 }
 
 /* ============================================================

@@ -11,15 +11,6 @@
   <link rel="stylesheet" href="/assets/calm.css">
   <link rel="stylesheet" href="/assets/dashboard-admin.css">
   <link rel="stylesheet" href="/assets/shell-v2.css">
-  <style>
-    html, body { margin: 0; background: #F4F1EC; }
-    [data-pui-theme="dark"] body { background: var(--pui-bg, #171916); }
-    .pvn-topbar { top: 0 !important; }
-    .pvn-nav { top: 64px !important; height: calc(100vh - 64px) !important; }
-    .pvn-shell { margin: 0 !important; min-height: 100vh; }
-    .pvn-frame { min-height: 100vh; }
-    .pvn-avatar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
-  </style>
   <script>
     (function () {
       try {
@@ -31,7 +22,7 @@
   </script>
 </head>
 <body>
-<div class="pvn-shell pas-dashboard" dir="rtl">
+<div class="pvn-shell pvn-shell--preview pas-dashboard" dir="rtl">
   <a class="pas-skip-link" href="#pas-main">پرش به محتوا</a>
 
   <div class="pvn-frame">
@@ -59,10 +50,26 @@
               <% } %>
             </div>
             <div class="pvn-pagehead__aside">
-              <span class="pvn-pagehead__chip">
-                <%- h.svg(meta.id, 15) %>
-                <%= meta.group || meta.label %>
-              </span>
+              <% if (moduleId === 'overview') { %>
+                <a class="pas-btn pas-btn-primary" href="/dashboard?module=case_files&new=1">پروندهٔ جدید</a>
+                <a class="pas-btn" href="/dashboard?module=appointments">نوبت‌دهی</a>
+              <% } else if (moduleId === 'case_files') { %>
+                <% if (data.isNew || data.selectedCase) { %>
+                  <a class="pas-btn" href="/dashboard?module=case_files">بازگشت به فهرست پرونده‌ها</a>
+                <% } else { %>
+                  <a class="pas-btn pas-btn-primary" href="/dashboard?module=case_files&new=1">پروندهٔ جدید</a>
+                <% } %>
+              <% } else if (moduleId === 'appointments') { %>
+                <a class="pas-btn pas-btn-primary" href="#pas-b-name">ثبت نوبت جدید</a>
+              <% } else if (moduleId === 'assessments') { %>
+                <% if (data.report || data.invitation) { %>
+                  <a class="pas-btn" href="/dashboard?module=assessments">فهرست دعوت‌نامه‌ها</a>
+                <% } else { %>
+                  <a class="pas-btn pas-btn-primary" href="#pas-inv-name">ساخت دعوت‌نامه</a>
+                <% } %>
+              <% } else { %>
+                <a class="pas-btn" href="/dashboard?module=overview">نمای کلی</a>
+              <% } %>
             </div>
           </div>
 
@@ -82,6 +89,21 @@
 
   <div class="pvn-scrim" data-pvn-close-nav aria-hidden="true"></div>
 </div>
+
+<dialog class="pui-cmd-dialog" id="pvn-cmd-dialog" aria-label="پرش سریع به بخش‌های داشبورد">
+  <div class="pui-cmd__head">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    </svg>
+    <input type="search" id="pvn-cmd-input" class="pui-cmd__input" placeholder="جست‌وجوی ماژول یا بخش..." autocomplete="off" />
+    <button type="button" class="pui-btn pui-btn--sm pui-btn--quiet" data-pui-close>Esc</button>
+  </div>
+  <ul class="pui-cmd__list" id="pvn-cmd-list"></ul>
+  <div class="pui-cmd__foot">
+    <span>حرکت با کلیدهای جهت‌دار و باز کردن با Enter</span>
+    <kbd class="pui-kbd">Ctrl K</kbd>
+  </div>
+</dialog>
 
 <script src="/assets/js/ui.js"></script>
 <script src="/assets/js/dashboard.js"></script>

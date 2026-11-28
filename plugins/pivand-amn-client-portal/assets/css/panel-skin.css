@@ -13,23 +13,24 @@
    ============================================================ */
 
 .zdp-panel-shell {
-    --pui-bg: #F4F0E8;
-    --pui-surface: #FFFFFF;
-    --pui-surface-2: #FAF7F1;
-    --pui-surface-3: #F1ECE2;
-    --pui-text: #51483F;
-    --pui-text-soft: #6B5F52;
-    --pui-text-muted: #8A7F72;
-    --pui-border: #D9D1C4;
-    --pui-border-soft: #E8E1D6;
-    --pui-primary: #51483F;
-    --pui-on-primary: #F4F0E8;
-    --pui-accent: #C8B48A;
-    --pui-accent-soft: #F3EAD8;
-    --pui-danger: #9B3A32;
-    --pui-danger-soft: #FBEDEB;
-    --pui-success: #3D6B4F;
-    --pui-success-soft: #ECF4EE;
+    --pui-bg: #F4F1EC;
+    --pui-surface: #FCFBF8;
+    --pui-surface-2: #F8F4EE;
+    --pui-surface-3: #EFEAE2;
+    --pui-text: #292D2A;
+    --pui-text-soft: #4A504B;
+    --pui-text-muted: #5C615D;
+    --pui-border: #DCD5C9;
+    --pui-border-soft: #E8E2D8;
+    --pui-primary: #344A42;
+    --pui-on-primary: #F6F3EC;
+    --pui-accent: #6E9182;
+    --pui-accent-soft: #E4ECE7;
+    --pui-accent-line: #6E9182;
+    --pui-danger: #96362A;
+    --pui-danger-soft: #F7E9E5;
+    --pui-success: #366346;
+    --pui-success-soft: #E6EFE8;
     --pui-fs-xs: .78rem;
     --pui-fs-sm: .875rem;
     --pui-fs-md: 1rem;
@@ -41,38 +42,35 @@
     --pui-s5: 24px;
     --pui-s6: 32px;
     --pui-r-sm: 8px;
-    --pui-r-md: 12px;
-    --pui-r-lg: 16px;
-    --pui-r-xl: 22px;
-    --pui-shadow-sm: 0 1px 2px rgba(81, 72, 63, .08);
-    --pui-shadow-lg: 0 18px 40px -26px rgba(81, 72, 63, .45);
+    --pui-r-md: 10px;
+    --pui-r-lg: 14px;
+    --pui-r-xl: 18px;
+    --pui-shadow-sm: 0 1px 2px rgba(41, 45, 42, .05);
+    --pui-shadow-lg: 0 14px 36px -20px rgba(41, 45, 42, .22);
     --pui-font: Vazirmatn, Tahoma, Arial, sans-serif;
 
-    /* نگاشت متغیرهای قدیمی panel.css به پالت برند. این کار اجازه می‌دهد
-       همهٔ قواعد موجود (گرادیان‌ها، تب فعال، تقویم، نشان‌ها) بدون بازنویسی
-       تک‌تک انتخابگرها هم‌رنگ کیت شوند — فقط در محدودهٔ همین پنل. */
-    --zdp-teal: #6B5F52;
-    --zdp-teal-dark: #51483F;
-    --zdp-teal-light: #8A7A66;
-    --zdp-teal-mid: #5A5147;
-    --zdp-teal-bg: #F7F1E7;
-    --zdp-indigo: #51483F;
-    --zdp-rose: #9B3A32;
-    --zdp-green: #3D6B4F;
-    --zdp-amber: #8A6A2F;
-    --zdp-ink: #51483F;
-    --zdp-mid: #6B5F52;
-    --zdp-soft: #8A7F72;
-    --zdp-border: #D9D1C4;
-    --zdp-border-soft: #E8E1D6;
-    --zdp-surface: #FAF7F1;
-    --zdp-white: #FFFFFF;
+    --zdp-teal: #344A42;
+    --zdp-teal-dark: #26382F;
+    --zdp-teal-light: #6E9182;
+    --zdp-teal-mid: #3F6B4F;
+    --zdp-teal-bg: #E4ECE7;
+    --zdp-indigo: #3A5A6E;
+    --zdp-rose: #96362A;
+    --zdp-green: #366346;
+    --zdp-amber: #855615;
+    --zdp-ink: #292D2A;
+    --zdp-mid: #4A504B;
+    --zdp-soft: #5C615D;
+    --zdp-border: #DCD5C9;
+    --zdp-border-soft: #E8E2D8;
+    --zdp-surface: #F8F4EE;
+    --zdp-white: #FCFBF8;
     --zdp-radius: 14px;
     --zdp-radius-lg: 18px;
     --zdp-radius-sm: 10px;
-    --zdp-shadow: 0 1px 2px rgba(81, 72, 63, .07);
-    --zdp-shadow-sm: 0 1px 2px rgba(81, 72, 63, .07);
-    --zdp-shadow-md: 0 10px 24px -18px rgba(81, 72, 63, .5);
+    --zdp-shadow: 0 1px 2px rgba(41, 45, 42, .05);
+    --zdp-shadow-sm: 0 1px 2px rgba(41, 45, 42, .05);
+    --zdp-shadow-md: 0 10px 24px -18px rgba(41, 45, 42, .22);
 
     font-family: var(--pui-font);
     color: var(--pui-text);
@@ -85,9 +83,9 @@
 
 body.zdp-panel-blank {
     background:
-        radial-gradient(900px 380px at 88% -12%, rgba(200, 180, 138, .26), transparent 62%),
-        radial-gradient(700px 340px at 0% 108%, rgba(184, 173, 160, .22), transparent 60%),
-        var(--pui-bg, #F4F0E8);
+        radial-gradient(900px 380px at 88% -12%, rgba(110, 145, 130, .14), transparent 62%),
+        radial-gradient(700px 340px at 0% 108%, rgba(52, 74, 66, .08), transparent 60%),
+        var(--pui-bg, #F4F1EC);
 }
 
 /* ── نوار بالا ─────────────────────────────────────────────── */
@@ -585,11 +583,10 @@ body.zdp-panel-blank {
 .zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-a { inset-inline-start: 10px; }
 .zdp-panel-shell .zdp-shell-brand-mark .zdp-ring-b { inset-inline-start: 18px; }
 
-/* کادر قوانین رزرو داخل ویجت نوبت‌دهی (panel.css رنگ فیروزه‌ای هاردکد دارد) */
+/* کادر قوانین رزرو داخل ویجت نوبت‌دهی */
 .zdp-panel-shell .zdp-bw-notice {
     background: var(--pui-accent-soft) !important;
-    border: 1px solid rgba(200, 180, 138, .55) !important;
-    border-inline-end: 4px solid var(--pui-accent) !important;
+    border: 1px solid color-mix(in srgb, var(--pui-accent) 42%, transparent) !important;
     border-radius: var(--pui-r-lg);
     color: var(--pui-text) !important;
 }
@@ -600,7 +597,7 @@ body.zdp-panel-blank {
 /* چیپ‌های راهنما/فیلتر تقویم */
 .zdp-panel-shell .zdp-bw-legend-chip,
 .zdp-panel-shell .zdp-bw-qf-btn {
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid var(--pui-border);
     background: var(--pui-surface);
     color: var(--pui-text-soft);
@@ -611,8 +608,8 @@ body.zdp-panel-blank {
 .zdp-panel-shell .zdp-bw-qf-btn[aria-pressed="true"],
 .zdp-panel-shell .zdp-bw-qf-btn:hover {
     background: var(--pui-accent-soft);
-    border-color: rgba(200, 180, 138, .7);
-    color: var(--pui-text);
+    border-color: var(--pui-accent);
+    color: var(--pui-primary);
 }
 
 .zdp-panel-shell .zdp-bw-selected-summary {

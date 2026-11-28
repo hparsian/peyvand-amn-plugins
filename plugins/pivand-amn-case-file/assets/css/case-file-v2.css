@@ -108,6 +108,7 @@
     font-size: .8125rem;
     text-align: start;
     vertical-align: middle;
+    font-variant-numeric: tabular-nums;
 }
 
 .pas-cf-wrap table.widefat tbody tr:last-child td,
@@ -177,6 +178,7 @@
     font-size: .8125rem;
     font-weight: 500;
     line-height: 1.7;
+    white-space: nowrap;
     box-shadow: none;
     text-shadow: none;
     transition: background 180ms cubic-bezier(.22,.61,.36,1), border-color 180ms;
@@ -212,26 +214,25 @@
 .pas-cf-wrap .notice {
     margin-block: 12px;
     padding: 10px 14px;
-    border: 0;
-    border-inline-start: 3px solid var(--cf-accent);
-    border-radius: 4px 10px 10px 4px;
+    border: 1px solid var(--cf-line-strong);
+    border-radius: 10px;
     background: var(--cf-surface-2);
     box-shadow: none;
     font-size: .8125rem;
 }
 
 .pas-cf-wrap .notice-warning {
-    border-inline-start-color: var(--cf-warn);
+    border-color: color-mix(in srgb, var(--cf-warn) 28%, transparent);
     background: var(--cf-warn-bg);
 }
 
 .pas-cf-wrap .notice-error {
-    border-inline-start-color: var(--cf-danger);
+    border-color: color-mix(in srgb, var(--cf-danger) 28%, transparent);
     background: var(--cf-danger-bg);
 }
 
 .pas-cf-wrap .notice-success {
-    border-inline-start-color: var(--cf-good);
+    border-color: color-mix(in srgb, var(--cf-good) 28%, transparent);
     background: var(--cf-good-bg);
 }
 

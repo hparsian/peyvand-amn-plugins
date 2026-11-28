@@ -1,29 +1,26 @@
 /* ── Psy Quiz Admin Styles — v3.4.0 (بازطراحی: هم‌راستا با برند teal/rose اکوسیستم) ── */
 
 :root {
-    /* از این نسخه: رنگ‌ها از توکن‌های مشترک اکوسیستم (--pivand-*) می‌خوانند
-       تا داشبورد ادمین این افزونه با بقیه‌ی داشبوردها (پنل مراجعان، پرونده
-       مراجعین، ...) یکپارچه باشد. */
-    --psy-teal:       var(--pivand-primary, #0f766e);
-    --psy-teal-light: var(--pivand-primary-light, #14b8a6);
-    --psy-teal-bg:    var(--pivand-primary-bg, #f0fdfa);
-    --psy-teal-mid:   var(--pivand-primary-mid, #5eead4);
-    --psy-rose:       var(--pivand-danger, #e11d48);
-    --psy-rose-bg:    var(--pivand-danger-bg, #fff1f2);
-    --psy-amber:      var(--pivand-warning, #c05621);
-    --psy-amber-bg:   var(--pivand-warning-bg, #fffaf0);
-    --psy-text:       var(--pivand-ink, #1e293b);
-    --psy-text-mid:   var(--pivand-ink-mid, #475569);
-    --psy-text-soft:  var(--pivand-ink-soft, #64748b);
-    --psy-border:     var(--pivand-border, #e2e8f0);
-    --psy-surface:    var(--pivand-surface, #f8fafc);
-    --psy-white:      var(--pivand-white, #ffffff);
+    --psy-teal:       var(--pivand-primary, #344A42);
+    --psy-teal-light: var(--pivand-primary-light, #6E9182);
+    --psy-teal-bg:    var(--pivand-primary-bg, #E4ECE7);
+    --psy-teal-mid:   var(--pivand-primary-mid, #D1E0D7);
+    --psy-rose:       var(--pivand-danger, #B44332);
+    --psy-rose-bg:    var(--pivand-danger-bg, #FCEEEB);
+    --psy-amber:      var(--pivand-warning, #9A631A);
+    --psy-amber-bg:   var(--pivand-warning-bg, #FCF3E3);
+    --psy-text:       var(--pivand-ink, #292D2A);
+    --psy-text-mid:   var(--pivand-ink-mid, #585F5A);
+    --psy-text-soft:  var(--pivand-ink-soft, #7D837D);
+    --psy-border:     var(--pivand-border, #DCD5C9);
+    --psy-surface:    var(--pivand-surface, #F8F4EE);
+    --psy-white:      var(--pivand-white, #FCFBF8);
     --psy-radius:     var(--pivand-radius-sm, 10px);
-    --psy-shadow-sm:  var(--pivand-shadow-sm, 0 1px 3px rgba(15,23,42,0.07), 0 1px 2px rgba(15,23,42,0.04));
-    --psy-shadow:     var(--pivand-shadow, 0 4px 16px rgba(15,23,42,0.07));
+    --psy-shadow-sm:  var(--pivand-shadow-sm, 0 1px 3px rgba(41,45,42,0.05));
+    --psy-shadow:     var(--pivand-shadow, 0 6px 20px rgba(41,45,42,0.08));
     --psy-transition: var(--pivand-transition, 0.2s ease);
 
-    /* نام‌های قدیمی برای سازگاری با کد موجود (مثلاً استفاده‌ی مستقیم var(--psy-green)) */
+    /* نام‌های قدیمی برای سازگاری با کد موجود */
     --psy-blue:       var(--psy-teal);
     --psy-blue-lt:    var(--psy-teal-light);
     --psy-blue-bg:    var(--psy-teal-bg);
@@ -35,10 +32,10 @@
 .psy-admin {
     direction: rtl;
     font-family: 'Vazirmatn', Tahoma, sans-serif !important;
-    animation: psy-admin-fade-up 0.4s cubic-bezier(.22,.9,.35,1) both;
+    animation: psy-admin-fade-up 0.35s cubic-bezier(.22,.9,.35,1) both;
 }
 @keyframes psy-admin-fade-up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -54,39 +51,44 @@
     gap: 8px;
 }
 .psy-admin h1 + a.page-title-action {
-    background: linear-gradient(135deg, var(--psy-teal-light), var(--psy-teal));
-    border: none !important;
-    color: #fff !important;
-    border-radius: 999px !important;
-    padding: 6px 18px !important;
-    box-shadow: 0 4px 12px rgba(15,118,110,0.25);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: var(--psy-teal);
+    border: 1px solid var(--psy-teal) !important;
+    color: #FBF9F5 !important;
+    border-radius: 8px !important;
+    padding: 6px 16px !important;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(52,74,66,0.16);
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .psy-admin h1 + a.page-title-action:hover {
+    background: var(--pivand-primary-dark, #26382F);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(15,118,110,0.32);
-    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(52,74,66,0.22);
+    color: #FBF9F5 !important;
 }
 
-/* ── Pill nav / تب‌های افقی (هم‌راستا با subsubsub/tabs بقیه‌ی اکوسیستم) ── */
+/* ── Pill nav / تب‌های افقی ── */
 .psy-pill-nav {
     display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 20px;
-    padding: 5px; background: var(--psy-surface); border-radius: 999px;
-    width: fit-content; max-width: 100%; list-style: none;
+    padding: 4px; background: var(--psy-surface); border: 1px solid var(--psy-border);
+    border-radius: 10px; width: fit-content; max-width: 100%; list-style: none;
 }
 .psy-pill-nav a, .psy-pill-nav button {
-    display: inline-block; padding: 8px 18px; border-radius: 999px;
+    display: inline-block; padding: 8px 16px; border-radius: 8px;
     font-size: 13px; font-weight: 700; color: var(--psy-text-soft);
     text-decoration: none; border: none; background: none; cursor: pointer;
     font-family: inherit; white-space: nowrap;
     transition: background .2s ease, color .2s ease;
 }
-.psy-pill-nav a:hover, .psy-pill-nav button:hover { color: var(--psy-teal); }
+.psy-pill-nav a:hover, .psy-pill-nav button:hover {
+    color: var(--psy-text);
+    background: rgba(52,74,66,0.06);
+}
 .psy-pill-nav a.current, .psy-pill-nav button.current,
 .psy-pill-nav a.active,  .psy-pill-nav button.active {
-    background: linear-gradient(135deg, var(--psy-teal-light), var(--psy-teal));
-    color: #fff !important;
-    box-shadow: 0 4px 12px rgba(15,118,110,.28);
+    background: var(--psy-teal);
+    color: #FBF9F5 !important;
+    box-shadow: none;
 }
 
 /* ── Stats row ───────────────────────────────────────────────────────── */
@@ -101,7 +103,6 @@
     min-width: 130px;
     background: var(--psy-white);
     border: 1px solid var(--psy-border);
-    border-top: 4px solid #ccc;
     border-radius: var(--psy-radius);
     padding: 16px 18px;
     text-align: center;
@@ -116,9 +117,10 @@
     font-size: 30px;
     font-weight: 900;
     line-height: 1.1;
+    font-variant-numeric: tabular-nums;
 }
 .psy-stat-lbl {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--psy-text-soft);
     margin-top: 5px;
     font-weight: 500;
@@ -130,19 +132,23 @@
     text-align: right !important;
     vertical-align: middle !important;
     padding: 10px 14px !important;
+    font-variant-numeric: tabular-nums;
 }
 .psy-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background: var(--psy-surface) !important;
     font-weight: 700 !important;
     font-size: 12px !important;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     color: var(--psy-text-soft) !important;
 }
 .psy-table tbody tr { transition: background 0.15s ease; }
-.psy-table tbody tr:hover td { background: #fafcff !important; }
+.psy-table tbody tr:hover td { background: var(--psy-surface) !important; }
 .psy-admin table.widefat {
     border-radius: var(--psy-radius);
+    border: 1px solid var(--psy-border);
     overflow: hidden;
     box-shadow: var(--psy-shadow-sm);
 }
@@ -153,15 +159,16 @@
     align-items: center;
     gap: 4px;
     padding: 3px 10px;
-    border-radius: 20px;
+    border-radius: 6px;
     font-size: 11px;
     font-weight: 700;
     line-height: 1.6;
+    white-space: nowrap;
 }
-.psy-badge-done    { background: var(--psy-teal-bg);  color: var(--psy-teal);     border: 1px solid var(--psy-teal-mid); }
-.psy-badge-pending { background: var(--psy-amber-bg);  color: var(--psy-amber);    border: 1px solid #fbd38d; }
-.psy-badge-expired { background: var(--psy-surface);   color: var(--psy-text-soft);border: 1px solid var(--psy-border); }
-.psy-badge-revoked { background: var(--psy-rose-bg);   color: var(--psy-rose);     border: 1px solid #fecdd3; }
+.psy-badge-done    { background: var(--pivand-success-bg, #E8F2EC); color: var(--pivand-success, #366346); border: 1px solid rgba(54,99,70,.24); }
+.psy-badge-pending { background: var(--psy-amber-bg); color: var(--psy-amber); border: 1px solid rgba(154,99,26,.24); }
+.psy-badge-expired { background: var(--psy-surface); color: var(--psy-text-soft); border: 1px solid var(--psy-border); }
+.psy-badge-revoked { background: var(--psy-rose-bg); color: var(--psy-rose); border: 1px solid rgba(180,67,50,.24); }
 
 /* ── Actions ─────────────────────────────────────────────────────────── */
 .psy-filter-bar {
@@ -200,7 +207,7 @@
 .psy-wa-btn-big:focus-visible,
 .psy-btn-notify:focus-visible,
 .psy-copy-btn:focus-visible {
-    outline: var(--pivand-focus-outline, 2px solid #14b8a6);
+    outline: var(--pivand-focus-outline, 2px solid #344A42);
     outline-offset: var(--pivand-focus-offset, 2px);
 }
 
@@ -430,12 +437,12 @@
 .psy-text-danger { color: var(--psy-rose) !important; }
 .psy-text-danger-outline { color: var(--psy-rose) !important; border-color: var(--psy-rose) !important; }
 .psy-text-amber  { color: var(--psy-amber) !important; }
-.psy-text-purple { color: #7c3aed !important; }
+.psy-text-purple { color: #5B4D70 !important; }
 .psy-text-bold   { font-weight: 700 !important; }
 .psy-text-center { text-align: center !important; }
 .psy-text-xs     { font-size: 12px !important; }
 
-.psy-badge-purple-solid { background: #7c3aed !important; color: #fff !important; }
+.psy-badge-purple-solid { background: #5B4D70 !important; color: #fff !important; }
 .psy-badge-danger-solid { background: var(--psy-rose) !important; color: #fff !important; }
 
 .psy-mt-6  { margin-top: 6px !important; }
@@ -610,7 +617,7 @@
 .psy-debug-table.is-sm { font-size: 12px; }
 .psy-debug-table.is-md { font-size: 13px; }
 .psy-va-top { vertical-align: top; }
-.psy-va-top-mono { vertical-align: top; font-family: monospace; color: #7c3aed; font-size: 11px; }
+.psy-va-top-mono { vertical-align: top; font-family: monospace; color: #5B4D70; font-size: 11px; }
 .psy-va-top-relaxed { vertical-align: top; color: var(--psy-text); line-height: 1.6; }
 .psy-va-top-center { vertical-align: top; text-align: center; }
 .psy-va-top-soft { vertical-align: top; color: var(--psy-text-soft); white-space: nowrap; }
@@ -686,10 +693,11 @@
 .psy-field-row { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
 
 .psy-card-warn {
-    margin-top: 16px; background: var(--psy-amber-bg); border-right: 4px solid #d69e2e;
+    margin-top: 16px; background: var(--psy-amber-bg);
+    border: 1px solid color-mix(in srgb, var(--psy-amber) 35%, var(--psy-border));
 }
-.psy-card-warn h3 { margin-bottom: 10px; font-size: .95rem; color: #744210; }
-.psy-card-warn p  { font-size: .9rem; color: #744210; line-height: 1.8; }
+.psy-card-warn h3 { margin-bottom: 10px; font-size: .95rem; color: var(--psy-amber); }
+.psy-card-warn p  { font-size: .9rem; color: var(--psy-text-mid); line-height: 1.8; }
 
 /* ── ویجت درگ‌ودراپ «آزمون‌های پرکاربرد» در صفحه‌ی تنظیمات ─────────────── */
 .psy-th-top { vertical-align: top; padding-top: 16px; }
@@ -702,7 +710,7 @@
 
 .psy-popular-list {
     list-style: none; margin: 0; padding: 0; min-height: 60px;
-    border: 2px dashed #c3c4c7; border-radius: 8px; background: var(--psy-surface);
+    border: 1.5px dashed var(--psy-border); border-radius: 8px; background: var(--psy-surface);
 }
 .psy-popular-list:empty::after {
     content: 'هیچ آزمونی انتخاب نشده — از ستون راست اضافه کنید';
@@ -730,25 +738,25 @@
     display: flex; align-items: center; gap: 8px; padding: 8px 12px;
     border-bottom: 1px solid var(--psy-surface); font-size: 13px; cursor: pointer;
 }
-.psy-pool-item.psy-pool-added { opacity: .4; cursor: default; }
+.psy-pool-item.psy-pool-added { opacity: .45; cursor: default; }
 .psy-pool-item-name { flex: 1; }
 .psy-pool-added-label { color: var(--psy-text-soft); font-size: 11px; }
 .psy-pool-add-btn {
-    background: var(--psy-teal) !important; color: #fff !important; border: none !important;
-    border-radius: 6px !important; padding: 3px 10px !important; cursor: pointer; font-size: 12px !important;
+    background: var(--psy-teal) !important; color: #FBF9F5 !important; border: none !important;
+    border-radius: 6px !important; padding: 4px 10px !important; cursor: pointer; font-size: 12px !important; white-space: nowrap;
 }
-.psy-pool-add-btn:hover { background: var(--psy-teal-light) !important; }
+.psy-pool-add-btn:hover { background: var(--pivand-primary-dark, #26382F) !important; }
 
 .sortable-ghost { opacity: .4; background: var(--psy-teal-bg) !important; }
 
 /* ── تُن‌های کیت برای کامپوننت‌های ادمین (فاز ۱۴) ─────────────────────── */
-.psy-tone--success { --psy-c: #276749; --psy-bg: #f0fff4; }
-.psy-tone--warning { --psy-c: #b7791f; --psy-bg: #fffff0; }
-.psy-tone--accent  { --psy-c: #c05621; --psy-bg: #fffaf0; }
-.psy-tone--danger  { --psy-c: #c53030; --psy-bg: #fff5f5; }
-.psy-tone--info    { --psy-c: #2b6cb0; --psy-bg: #ebf8ff; }
-.psy-tone--purple  { --psy-c: #553c9a; --psy-bg: #f3e8ff; }
-.psy-tone--neutral { --psy-c: #718096; --psy-bg: #f7fafc; }
+.psy-tone--success { --psy-c: #366346; --psy-bg: #E8F2EC; }
+.psy-tone--warning { --psy-c: #9A631A; --psy-bg: #FCF3E3; }
+.psy-tone--accent  { --psy-c: #8A5026; --psy-bg: #FAF0E6; }
+.psy-tone--danger  { --psy-c: #B44332; --psy-bg: #FCEEEB; }
+.psy-tone--info    { --psy-c: #3A5A6E; --psy-bg: #EBF1F4; }
+.psy-tone--purple  { --psy-c: #5B4D70; --psy-bg: #EFEBF4; }
+.psy-tone--neutral { --psy-c: #585F5A; --psy-bg: #F8F4EE; }
 
 /* کامپوننت‌های ادمین از این متغیرها تغذیه می‌شوند */
 .psy-tone--success,

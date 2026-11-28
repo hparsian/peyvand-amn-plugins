@@ -6,44 +6,44 @@
  */
 
 .pas-dashboard {
-	/* رنگ و سطح */
-	--pas-bg: #f4f6fb;
-	--pas-bg-soft: #eef1f8;
-	--pas-card: #ffffff;
-	--pas-ink: #16203a;
-	--pas-ink-soft: #3c4866;
-	--pas-muted: #6c7690;
-	--pas-line: #e2e7f1;
-	--pas-line-strong: #cfd7e6;
+	/* رنگ و سطح (Calm Intelligence) */
+	--pas-bg: #F4F1EC;
+	--pas-bg-soft: #EFEAE2;
+	--pas-card: #FCFBF8;
+	--pas-ink: #292D2A;
+	--pas-ink-soft: #4A504B;
+	--pas-muted: #5C615D;
+	--pas-line: #E8E2D8;
+	--pas-line-strong: #DCD5C9;
 
 	/* برند */
-	--pas-primary: #2f6fed;
-	--pas-primary-dark: #1f4fbd;
-	--pas-primary-soft: #e8efff;
-	--pas-primary-ink: #ffffff;
-	--pas-accent: #12a594;
+	--pas-primary: #344A42;
+	--pas-primary-dark: #26382F;
+	--pas-primary-soft: #E4ECE7;
+	--pas-primary-ink: #F6F3EC;
+	--pas-accent: #6E9182;
 
 	/* وضعیت‌ها */
-	--pas-good: #0f7a55;
-	--pas-good-bg: #e4f6ee;
-	--pas-warn: #8a5b00;
-	--pas-warn-bg: #fdf1d6;
-	--pas-danger: #a51c1c;
-	--pas-danger-bg: #fde9e9;
+	--pas-good: #366346;
+	--pas-good-bg: #E6EFE8;
+	--pas-warn: #855615;
+	--pas-warn-bg: #F7EFDF;
+	--pas-danger: #96362A;
+	--pas-danger-bg: #F7E9E5;
 
 	/* شکل و سایه */
-	--pas-radius: 14px;
+	--pas-radius: 16px;
 	--pas-radius-sm: 10px;
-	--pas-shadow-sm: 0 1px 2px rgba(22, 32, 58, 0.05);
-	--pas-shadow: 0 6px 24px rgba(22, 32, 58, 0.07);
-	--pas-shadow-lg: 0 14px 40px rgba(22, 32, 58, 0.12);
-	--pas-ring: 0 0 0 3px rgba(47, 111, 237, 0.28);
+	--pas-shadow-sm: 0 1px 2px rgba(41, 45, 42, 0.04);
+	--pas-shadow: 0 1px 2px rgba(41, 45, 42, 0.04), 0 8px 20px -10px rgba(41, 45, 42, 0.12);
+	--pas-shadow-lg: 0 2px 6px rgba(41, 45, 42, 0.05), 0 18px 40px -14px rgba(41, 45, 42, 0.18);
+	--pas-ring: 0 0 0 3px rgba(47, 107, 87, 0.22);
 
 	margin: 16px 20px 28px;
 	color: var(--pas-ink);
 	font-family: Vazirmatn, Tahoma, "Segoe UI", system-ui, sans-serif;
 	font-size: 14px;
-	line-height: 1.7;
+	line-height: 1.75;
 	direction: rtl;
 }
 
@@ -100,8 +100,8 @@
 	border: 1px solid var(--pas-line);
 	border-radius: var(--pas-radius);
 	background:
-		radial-gradient(1200px 120px at 100% 0%, rgba(47, 111, 237, 0.10), transparent 60%),
-		linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+		radial-gradient(1200px 120px at 100% 0%, rgba(110, 145, 130, 0.12), transparent 60%),
+		linear-gradient(180deg, var(--pas-card) 0%, var(--pas-bg) 100%);
 	box-shadow: var(--pas-shadow);
 	backdrop-filter: saturate(140%) blur(6px);
 }
@@ -120,9 +120,9 @@
 	width: 44px;
 	height: 44px;
 	border-radius: 13px;
-	background: linear-gradient(135deg, var(--pas-primary) 0%, #5b8ef7 100%);
-	color: #fff;
-	box-shadow: 0 6px 14px rgba(47, 111, 237, 0.28);
+	background: linear-gradient(135deg, var(--pas-primary) 0%, var(--pas-primary-dark) 100%);
+	color: var(--pas-primary-ink);
+	box-shadow: 0 4px 12px rgba(52, 74, 66, 0.22);
 	flex: 0 0 auto;
 }
 
@@ -296,10 +296,10 @@
 }
 
 .pas-nav-item.is-active a {
-	background: linear-gradient(135deg, var(--pas-primary) 0%, #4a80f0 100%);
+	background: var(--pas-primary);
 	color: var(--pas-primary-ink);
 	font-weight: 700;
-	box-shadow: 0 6px 16px rgba(47, 111, 237, 0.28);
+	box-shadow: var(--pas-shadow-sm);
 }
 
 .pas-nav-item.is-active .dashicons {
@@ -386,26 +386,21 @@
 
 .pas-stat {
 	position: relative;
-	background: linear-gradient(160deg, #ffffff 0%, var(--pas-bg) 100%);
+	background: var(--pas-card);
 	border: 1px solid var(--pas-line);
 	border-radius: var(--pas-radius);
 	padding: 16px 18px;
 	overflow: hidden;
-	transition: transform 0.18s ease, box-shadow 0.18s ease;
+	transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .pas-stat::after {
-	content: "";
-	position: absolute;
-	inset-inline-start: 0;
-	top: 0;
-	bottom: 0;
-	width: 4px;
-	background: linear-gradient(180deg, var(--pas-primary), #6ea1ff);
+	content: none;
 }
 
 .pas-stat:hover {
-	transform: translateY(-2px);
+	transform: translateY(-1px);
+	border-color: var(--pas-line-strong);
 	box-shadow: var(--pas-shadow);
 }
 
@@ -424,6 +419,185 @@
 	color: var(--pas-muted);
 	font-size: 12px;
 	margin-top: 6px;
+}
+
+/* توضیح شاخص: روی دسکتاپ فقط tooltip، روی صفحهٔ لمسی متن خوانا */
+.pas-stat-hint {
+	display: none;
+	margin-top: 6px;
+	color: var(--pas-muted);
+	font-size: 11.5px;
+	line-height: 1.7;
+}
+
+/* هشت شاخص در دسکتاپ دو ردیف منظم چهارتایی می‌سازند، نه ۶+۲. */
+@media (min-width: 900px) {
+	.pas-kpi-grid {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+/* ── نمودار روند و نوار سهم ─────────────────────────────────────────── */
+
+.pas-chart-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+	margin-bottom: 14px;
+	font-size: 12px;
+	color: var(--pas-muted);
+}
+
+.pas-chart-legend > span {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.pas-chart-dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	background: var(--pas-primary);
+}
+
+.pas-chart-dot-b {
+	background: var(--pas-accent);
+}
+
+.pas-chart-dot-c {
+	background: var(--pas-warn);
+}
+
+.pas-chart-plot {
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+	min-height: 190px;
+	padding: 8px 4px 0;
+	border-bottom: 1px solid var(--pas-line);
+}
+
+.pas-chart-col {
+	display: flex;
+	flex: 1 1 0;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.pas-chart-bars {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 4px;
+	width: 100%;
+	height: 150px;
+}
+
+.pas-chart-bar {
+	display: block;
+	width: 100%;
+	max-width: 16px;
+	height: var(--pas-h, 0%);
+	border-radius: 4px 4px 0 0;
+	background: var(--pas-primary);
+	opacity: 0.9;
+	transition: height 0.25s ease;
+}
+
+.pas-chart-bar-b {
+	background: var(--pas-accent);
+}
+
+.pas-chart-bar-c {
+	background: var(--pas-warn);
+}
+
+.pas-chart-month {
+	font-size: 11.5px;
+	color: var(--pas-muted);
+	white-space: nowrap;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pas-chart-table {
+	margin-top: 14px;
+}
+
+.pas-meter {
+	display: inline-flex;
+	width: 84px;
+	max-width: 100%;
+	height: 8px;
+	border-radius: 999px;
+	background: var(--pas-bg-soft);
+	overflow: hidden;
+	vertical-align: middle;
+}
+
+.pas-meter-fill {
+	display: block;
+	width: var(--pas-w, 0%);
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--pas-primary), var(--pas-accent));
+}
+
+@media (max-width: 600px) {
+	/* شاخص‌ها در موبایل یک‌ستونی می‌شوند تا توضیح هر شاخص جا باز کند. */
+	.pas-kpi-grid {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.pas-kpi-grid .pas-stat {
+		padding: 13px 14px;
+	}
+
+	.pas-stat-hint {
+		display: block;
+	}
+
+	.pas-chart-legend {
+		gap: 6px 12px;
+		font-size: 11.5px;
+		margin-bottom: 10px;
+	}
+
+	.pas-chart-bars {
+		height: 104px;
+		gap: 3px;
+	}
+
+	.pas-chart-plot {
+		gap: 4px;
+		min-height: 0;
+		padding: 6px 0 0;
+	}
+
+	.pas-chart-bar {
+		max-width: 12px;
+	}
+
+	.pas-chart-month {
+		font-size: 10px;
+	}
+}
+
+/* در عرض‌های خیلی کم (۳۲۰ پیکسل) نام ماه‌ها نباید بریده شوند. */
+@media (max-width: 360px) {
+	.pas-chart-plot {
+		gap: 3px;
+	}
+
+	.pas-chart-month {
+		font-size: 9px;
+	}
 }
 
 /* ── جدول ───────────────────────────────────────────────────────────── */
@@ -445,7 +619,7 @@
 
 .pas-table th,
 .pas-table td {
-	text-align: right;
+	text-align: start;
 	padding: 11px 14px;
 	border-bottom: 1px solid var(--pas-line);
 	vertical-align: middle;
@@ -463,7 +637,7 @@
 }
 
 .pas-table tbody tr:nth-child(even) {
-	background: #fbfcff;
+	background: var(--pas-bg);
 }
 
 .pas-table tbody tr:hover {
@@ -497,6 +671,7 @@
 	padding: 8px 15px;
 	font-size: 13px;
 	font-weight: 600;
+	white-space: nowrap;
 	cursor: pointer;
 	text-decoration: none;
 	line-height: 1.5;
@@ -519,15 +694,16 @@
 }
 
 .pas-btn-primary {
-	background: linear-gradient(135deg, var(--pas-primary) 0%, #4a80f0 100%);
+	background: var(--pas-primary);
 	color: var(--pas-primary-ink);
-	border-color: transparent;
-	box-shadow: 0 6px 16px rgba(47, 111, 237, 0.25);
+	border-color: var(--pas-primary);
+	box-shadow: var(--pas-shadow-sm);
 }
 
 .pas-btn-primary:hover {
+	background: var(--pas-primary-dark);
+	border-color: var(--pas-primary-dark);
 	color: var(--pas-primary-ink);
-	filter: brightness(1.04);
 }
 
 .pas-btn-danger {
@@ -620,13 +796,17 @@
 	color: var(--pas-danger);
 }
 
+.pas-badge-muted {
+	background: var(--pas-bg-soft);
+	color: var(--pas-muted);
+}
+
 .pas-notice {
 	position: relative;
 	border-radius: var(--pas-radius-sm);
-	padding: 12px 16px 12px 16px;
+	padding: 12px 16px;
 	margin-bottom: 16px;
-	border: 1px solid var(--pas-line);
-	border-inline-start: 4px solid var(--pas-primary);
+	border: 1px solid var(--pas-line-strong);
 	background: var(--pas-bg);
 	font-size: 13px;
 }
@@ -638,27 +818,24 @@
 .pas-notice-success {
 	background: var(--pas-good-bg);
 	color: var(--pas-good);
-	border-color: rgba(15, 122, 85, 0.18);
-	border-inline-start-color: var(--pas-good);
+	border-color: color-mix(in srgb, var(--pas-good) 24%, transparent);
 }
 
 .pas-notice-warning {
 	background: var(--pas-warn-bg);
 	color: var(--pas-warn);
-	border-color: rgba(138, 91, 0, 0.18);
-	border-inline-start-color: #d9a21b;
+	border-color: color-mix(in srgb, var(--pas-warn) 26%, transparent);
 }
 
 .pas-notice-error {
 	background: var(--pas-danger-bg);
 	color: var(--pas-danger);
-	border-color: rgba(165, 28, 28, 0.18);
-	border-inline-start-color: var(--pas-danger);
+	border-color: color-mix(in srgb, var(--pas-danger) 24%, transparent);
 }
 
 .pas-empty {
 	color: var(--pas-muted);
-	background: linear-gradient(160deg, #ffffff, var(--pas-bg));
+	background: var(--pas-bg);
 	border: 1px dashed var(--pas-line-strong);
 	border-radius: var(--pas-radius);
 	padding: 28px 20px;
@@ -966,4 +1143,174 @@
 		transition: none !important;
 		animation: none !important;
 	}
+}
+
+/* ── فاز ۱: فرم‌های پرونده و مدیریت نوبت ─────────────────────────────── */
+.pas-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px 18px;
+}
+
+.pas-form-row--full {
+	grid-column: 1 / -1;
+}
+
+.pas-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 600;
+}
+
+.pas-readonly {
+	margin: 0;
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.04);
+	font-family: inherit;
+}
+
+.pas-form-section {
+	margin: 18px 0;
+	padding: 12px 14px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+}
+
+.pas-form-section > summary {
+	cursor: pointer;
+	font-weight: 700;
+}
+
+.pas-form-section[open] > summary {
+	margin-bottom: 12px;
+}
+
+.pas-row-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.pas-inline-form {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+	margin: 0;
+}
+
+.pas-btn-sm {
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.pas-select-sm {
+	min-width: 130px;
+	padding: 5px 8px;
+	font-size: 12px;
+}
+
+.pas-row-details {
+	margin-top: 8px;
+}
+
+.pas-row-details > summary {
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--pas-primary);
+}
+
+.pas-row-details .pas-form {
+	margin-top: 8px;
+	padding: 10px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.03);
+}
+
+.pas-actions {
+	margin: 0 0 12px;
+}
+
+@media (max-width: 782px) {
+	.pas-form-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ── فاز ۲: دعوت آزمون و صندوق پیام ──────────────────────────────────── */
+.pas-invite-link {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.pas-invite-link .pas-input {
+	flex: 1 1 320px;
+}
+
+.pas-message-card {
+	margin: 0 0 12px;
+	padding: 12px 14px;
+	border: 1px solid var(--pas-line);
+	border-radius: 12px;
+	background: var(--pas-card);
+}
+
+.pas-message-card.is-unread {
+	border-color: color-mix(in srgb, var(--pas-warn) 38%, transparent);
+	background: color-mix(in srgb, var(--pas-warn-bg) 45%, var(--pas-card));
+}
+
+.pas-message-head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.pas-message-body {
+	line-height: 1.9;
+	white-space: normal;
+	word-break: break-word;
+}
+
+.pas-message-reply {
+	margin-top: 8px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.035);
+	line-height: 1.8;
+}
+
+.pas-message-form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: flex-start;
+	margin-top: 10px;
+}
+
+.pas-message-form .pas-textarea {
+	flex: 1 1 260px;
+}
+
+.pas-report {
+	overflow-x: auto;
+}
+
+.pas-report table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.pas-report th,
+.pas-report td {
+	padding: 6px 8px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	text-align: start;
 }

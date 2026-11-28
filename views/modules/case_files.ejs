@@ -175,14 +175,17 @@
             </div>
           <% } %>
 
-          <hr />
+          <hr class="pui-divider" />
           <form id="pas-note-form" class="pas-note-form">
             <h3 class="pas-note-form-title">افزودن یادداشت جدید</h3>
             <input type="hidden" name="case_id" value="<%= c.id %>" />
             <input type="hidden" name="note_id" value="0" />
             <div class="pas-form-row">
               <label for="pas-session-date">تاریخ جلسه (شمسی)</label>
-              <input class="pas-input" type="text" id="pas-session-date" name="session_date" dir="ltr" inputmode="numeric" placeholder="<%= h.todayJalaliAscii %>" required value="<%= h.todayJalaliAscii %>" data-default="<%= h.todayJalaliAscii %>" />
+              <div class="pas-input-row">
+                <input class="pas-input" type="text" id="pas-session-date" name="session_date" dir="ltr" inputmode="numeric" placeholder="<%= h.todayJalaliAscii %>" required value="<%= h.todayJalaliAscii %>" data-default="<%= h.todayJalaliAscii %>" />
+                <button type="button" class="pas-btn pas-btn-sm" data-pui-fill="#pas-session-date" data-pui-value="<%= h.todayJalaliAscii %>">امروز</button>
+              </div>
               <p class="pas-muted pas-field-hint">مثال: <%= h.todayJalali %> — ارقام فارسی هم پذیرفته می‌شود.</p>
             </div>
             <div class="pas-form-row">
@@ -192,6 +195,10 @@
             <div class="pas-form-row">
               <label for="pas-note-content">متن یادداشت</label>
               <textarea class="pas-textarea" id="pas-note-content" name="content" required></textarea>
+              <div class="pvn-textarea-meta">
+                <span id="pas-note-counter">۰ کلمه · ۰ نویسه</span>
+                <span>ثبت سریع با <kbd class="pui-kbd">Ctrl Enter</kbd></span>
+              </div>
             </div>
             <div class="pas-note-form-actions">
               <button class="pas-btn pas-btn-primary" type="submit">ثبت یادداشت</button>
@@ -216,16 +223,16 @@
                 <% const labels = { fill: 'پر می‌شود', same: 'یکسان', conflict: 'اختلاف با مقدار فعلی' };
                    data.intakeRows.forEach(function(r) { %>
                   <tr>
-                    <td><code><%= r.target %></code></td>
-                    <td><%= r.sensitivity === 'clinical' && r.current !== '—' ? '••••' : r.current %></td>
-                    <td><%= r.sensitivity === 'clinical' ? '••••' : r.value %></td>
-                    <td><span class="pas-badge <%= r.status === 'fill' ? 'pas-badge-good' : (r.status === 'conflict' ? 'pas-badge-warn' : '') %>"><%= labels[r.status] %></span></td>
+                    <td data-label="فیلد"><code><%= r.target %></code></td>
+                    <td data-label="مقدار فعلی"><%= r.sensitivity === 'clinical' && r.current !== '—' ? '••••' : r.current %></td>
+                    <td data-label="مقدار جدید"><%= r.sensitivity === 'clinical' ? '••••' : r.value %></td>
+                    <td data-label="نتیجه"><span class="pas-badge <%= r.status === 'fill' ? 'pas-badge-good' : (r.status === 'conflict' ? 'pas-badge-warn' : '') %>"><%= labels[r.status] %></span></td>
                   </tr>
                 <% }); %>
               </tbody>
             </table>
           </div>
-          <form method="post" action="/api/cases/<%= c.id %>/intake" class="pas-form pas-inline-form">
+          <form method="post" action="/api/cases/<%= c.id %>/intake" class="pas-form pas-inline-form pas-card-gap">
             <label class="pas-check"><input type="checkbox" name="overwrite" value="1" /> مقادیر دارای اختلاف هم بازنویسی شوند</label>
             <button class="pas-btn pas-btn-primary" type="submit">اعمال روی پرونده</button>
           </form>
@@ -240,16 +247,16 @@
           <p class="pas-empty">ابتدا پرونده را ثبت کنید.</p>
         <% } else { %>
           <div class="pas-grid">
-            <div class="pas-stat"><span class="pas-stat-value"><%= c.next_session_date ? h.jalali(c.next_session_date) : '—' %></span><span class="pas-stat-label">جلسهٔ بعدی</span></div>
+            <div class="pas-stat"><span class="pas-stat-value pui-num"><%= c.next_session_date ? h.jalali(c.next_session_date) : '—' %></span><span class="pas-stat-label">جلسهٔ بعدی</span></div>
             <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_consent ? 'دارد' : 'ندارد' %></span><span class="pas-stat-label">رضایت یادآور</span></div>
             <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_channel === 'email' ? 'ایمیل' : 'پیامک' %></span><span class="pas-stat-label">کانال</span></div>
             <div class="pas-stat"><span class="pas-stat-value"><%= c.reminder_consent ? 'آمادهٔ ارسال' : 'نیازمند رضایت' %></span><span class="pas-stat-label">وضعیت</span></div>
           </div>
           <% if (c.reminder_last_sent_at) { %>
-            <p class="pas-muted">آخرین یادآور ارسال‌شده: <%= h.jalaliDateTime(c.reminder_last_sent_at) %></p>
+            <p class="pas-muted pas-card-gap">آخرین یادآور ارسال‌شده: <%= h.jalaliDateTime(c.reminder_last_sent_at) %></p>
           <% } %>
           <% if (c.reminder_consent) { %>
-            <form method="post" action="/api/cases/<%= c.id %>/reminder" class="pas-form pas-inline-form">
+            <form method="post" action="/api/cases/<%= c.id %>/reminder" class="pas-form pas-inline-form pas-card-gap">
               <button class="pas-btn pas-btn-primary" type="submit" data-pas-confirm="یادآور برای مراجع ارسال شود؟">ارسال یادآور</button>
             </form>
           <% } %>
@@ -262,7 +269,18 @@
 <% } else { %>
   <section class="pas-card">
     <h2 class="pas-card-title">پرونده‌های شما</h2>
-    <p class="pas-actions"><a class="pas-btn pas-btn-primary" href="/dashboard?module=case_files&new=1">پروندهٔ جدید</a></p>
+    <div class="pui-filter-bar">
+      <div class="pui-filter-bar__search">
+        <span class="pui-filter-bar__icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </span>
+        <input class="pui-input" type="search" id="pvn-cases-filter" data-pui-filter-target="#pvn-cases-tbody" placeholder="فیلتر بر اساس نام مراجع، وضعیت، درمانگر یا شناسه..." aria-label="فیلتر پرونده‌ها" />
+      </div>
+      <div class="pui-row">
+        <span class="pui-live-count" data-pui-filter-count="#pvn-cases-tbody"></span>
+        <a class="pas-btn pas-btn-primary" href="/dashboard?module=case_files&new=1">پروندهٔ جدید</a>
+      </div>
+    </div>
     <div class="pas-table-wrap">
       <table class="pas-table">
         <thead>
@@ -276,7 +294,7 @@
             <th>عملیات</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="pvn-cases-tbody">
           <% data.cases.forEach(function(c) {
             const tone = c.status.includes('فعال') ? ' pas-badge-good' : (c.status.includes('توقف') ? ' pas-badge-warn' : '');
           %>
@@ -293,5 +311,6 @@
         </tbody>
       </table>
     </div>
+    <p class="pas-empty pas-card-gap" data-pui-filter-empty="#pvn-cases-tbody" hidden>پرونده‌ای با این عبارت فیلتر یافت نشد.</p>
   </section>
 <% } %>

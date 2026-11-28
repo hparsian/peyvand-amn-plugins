@@ -562,3 +562,400 @@
         scroll-behavior: auto;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ۲.۲ — ارتقای کارآمدی و تجربهٔ کاربری پنل مراجع + پشتیبانی حالت تیره
+   ═══════════════════════════════════════════════════════════ */
+
+.zdp-panel-shell .zdp-status::before {
+    content: none;
+}
+
+.zdp-panel-shell .zdp-topbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.zdp-panel-shell .zdp-btn,
+.zdp-panel-shell .zdp-logout,
+.zdp-panel-shell .zdp-tab {
+    white-space: nowrap;
+}
+
+.zdp-panel-shell .zdp-login-wrap {
+    max-inline-size: 460px;
+    margin: clamp(24px, 5vw, 52px) auto;
+}
+
+.zdp-panel-shell .zdp-portal-heading {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-portal-lead {
+    margin: 0 0 18px;
+    font-size: .835rem;
+    color: var(--pvn-muted);
+    line-height: 1.75;
+}
+
+.zdp-panel-shell .zdp-login-field {
+    margin-block-end: 14px;
+}
+
+.zdp-panel-shell .zdp-login-field label {
+    display: block;
+    margin-block-end: 6px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-booking-form {
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) minmax(110px, .7fr) minmax(180px, 1.1fr) auto;
+    gap: 12px;
+    align-items: end;
+    margin-block-end: 16px;
+}
+
+.zdp-panel-shell .zdp-field label {
+    display: block;
+    margin-block-end: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pvn-muted);
+}
+
+.zdp-panel-shell .zdp-field-row-inline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.zdp-panel-shell .zdp-booking-slots-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.zdp-panel-shell .zdp-booking-slots-label {
+    font-size: 11.5px;
+    color: var(--pvn-muted);
+}
+
+/* جدول استاندارد و تمیز در تب نوبت‌ها و آزمون‌ها */
+.zdp-panel-shell .zdp-portal-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--pvn-line);
+    border-radius: 14px;
+    background: var(--zdp-white);
+    margin-block-start: 14px;
+}
+
+.zdp-panel-shell .zdp-portal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .835rem;
+}
+
+.zdp-panel-shell .zdp-portal-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    text-align: start;
+    padding: 11px 14px;
+    background: var(--zdp-teal-bg);
+    color: var(--pvn-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    border-block-end: 1px solid var(--pvn-line);
+    white-space: nowrap;
+}
+
+.zdp-panel-shell .zdp-portal-table tbody td {
+    padding: 12px 14px;
+    border-block-end: 1px solid var(--pvn-line);
+    color: var(--pvn-ink);
+    vertical-align: middle;
+}
+
+.zdp-panel-shell .zdp-portal-table tbody tr:last-child td {
+    border-block-end: 0;
+}
+
+.zdp-panel-shell .zdp-portal-table tbody tr:hover {
+    background: var(--zdp-teal-bg);
+}
+
+/* گفتگو و پیام با درمانگر */
+.zdp-panel-shell .zdp-chat-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-block-end: 18px;
+}
+
+.zdp-panel-shell .zdp-chat-msg {
+    padding: 12px 15px;
+    border-radius: 14px;
+    border: 1px solid var(--pvn-line);
+    background: var(--zdp-teal-bg);
+    max-inline-size: min(88%, 620px);
+}
+
+.zdp-panel-shell .zdp-chat-msg--client {
+    align-self: flex-start;
+    background: var(--zdp-teal-light);
+    border-color: rgba(110, 145, 130, .4);
+    border-start-start-radius: 4px;
+}
+
+.zdp-panel-shell .zdp-chat-msg--therapist {
+    align-self: flex-end;
+    background: var(--zdp-white);
+    border-color: var(--pvn-line);
+    border-start-end-radius: 4px;
+}
+
+.zdp-panel-shell .zdp-chat-msg__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: .78rem;
+    color: var(--pvn-muted);
+    margin-block-end: 4px;
+}
+
+.zdp-panel-shell .zdp-chat-msg__body {
+    margin: 0;
+    font-size: .875rem;
+    line-height: 1.8;
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-chat-form {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.zdp-panel-shell .zdp-chat-form input[type="text"] {
+    flex: 1 1 auto;
+}
+
+/* مقیاس نظرسنجی تعاملی */
+.zdp-panel-shell .zdp-survey-scale {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    margin: 12px 0 16px;
+}
+
+.zdp-panel-shell .zdp-survey-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.zdp-panel-shell .zdp-survey-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    inline-size: 1px;
+    block-size: 1px;
+}
+
+.zdp-panel-shell .zdp-survey-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 12px 8px;
+    border: 1px solid var(--zdp-border);
+    border-radius: 12px;
+    background: var(--zdp-white);
+    color: var(--pvn-muted);
+    text-align: center;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.zdp-panel-shell .zdp-survey-num {
+    font-family: 'IBM Plex Sans Arabic', 'Vazirmatn', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.zdp-panel-shell .zdp-survey-lbl {
+    font-size: 11px;
+}
+
+.zdp-panel-shell .zdp-survey-option:hover .zdp-survey-card {
+    border-color: var(--pvn-accent);
+    color: var(--pvn-ink);
+}
+
+.zdp-panel-shell .zdp-survey-option input:checked + .zdp-survey-card {
+    background: var(--pvn-primary);
+    border-color: var(--pvn-primary);
+    color: #F6F3EC;
+}
+
+.zdp-panel-shell .zdp-survey-option input:focus-visible + .zdp-survey-card {
+    outline: 2px solid var(--pvn-focus);
+    outline-offset: 2px;
+}
+
+.zdp-panel-shell .zdp-empty-note {
+    padding: 20px;
+    border: 1px dashed var(--zdp-border);
+    border-radius: 12px;
+    color: var(--pvn-muted);
+    font-size: .84rem;
+    text-align: center;
+    background: var(--zdp-teal-bg);
+}
+
+@media (max-width: 720px) {
+    .zdp-panel-shell .zdp-booking-form {
+        grid-template-columns: 1fr;
+    }
+
+    .zdp-panel-shell .zdp-survey-scale {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .zdp-panel-shell .zdp-chat-form {
+        flex-direction: column;
+    }
+
+    .zdp-panel-shell .zdp-portal-table-wrap {
+        border: 0;
+        background: transparent;
+    }
+
+    .zdp-panel-shell .zdp-portal-table thead {
+        display: none;
+    }
+
+    .zdp-panel-shell .zdp-portal-table,
+    .zdp-panel-shell .zdp-portal-table tbody,
+    .zdp-panel-shell .zdp-portal-table tr,
+    .zdp-panel-shell .zdp-portal-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .zdp-panel-shell .zdp-portal-table tbody tr {
+        background: var(--zdp-white);
+        border: 1px solid var(--pvn-line);
+        border-radius: 12px;
+        padding: 4px 14px;
+        margin-block-end: 10px;
+    }
+
+    .zdp-panel-shell .zdp-portal-table tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 0;
+        border-block-end: 1px dashed var(--pvn-line);
+    }
+
+    .zdp-panel-shell .zdp-portal-table tbody td:last-child {
+        border-block-end: 0;
+    }
+
+    .zdp-panel-shell .zdp-portal-table tbody td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--pvn-muted);
+    }
+}
+
+/* ── حالت تیره (Dark Mode) با سوییچر دستی کیت رابط کاربری ──── */
+html[data-pui-theme="dark"] body {
+    background: #1B201E;
+    color: #EAE6DF;
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell {
+    --zdp-white: #232927;
+    --zdp-surface: #2B322F;
+    --zdp-border: #38403C;
+    --zdp-border-soft: #2E3632;
+    --zdp-ink: #EAE6DF;
+    --zdp-mid: #C4C7C2;
+    --zdp-soft: #969B94;
+    --zdp-teal: #8FAE9B;
+    --zdp-teal-dark: #A5C1B0;
+    --zdp-teal-light: #2A3832;
+    --zdp-teal-bg: #1F2A26;
+
+    --pui-bg: #1B201E;
+    --pui-surface: #232927;
+    --pui-surface-2: #2B322F;
+    --pui-surface-3: #333B38;
+    --pui-text: #EAE6DF;
+    --pui-text-soft: #C4C7C2;
+    --pui-text-muted: #969B94;
+    --pui-border: #38403C;
+    --pui-border-soft: #2E3632;
+    --pui-primary: #8FAE9B;
+    --pui-on-primary: #171D1B;
+    --pui-accent: #6E9182;
+    --pui-accent-soft: #24312C;
+
+    --pvn-bg: #1B201E;
+    --pvn-ink: #EAE6DF;
+    --pvn-muted: #A9AEA8;
+    --pvn-line: #343C38;
+    --pvn-primary: #8FAE9B;
+    --pvn-accent: #6E9182;
+    --pvn-focus: #8FAE9B;
+
+    color-scheme: dark;
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell input[type="text"],
+[data-pui-theme="dark"] .zdp-panel-shell input[type="tel"],
+[data-pui-theme="dark"] .zdp-panel-shell input[type="email"],
+[data-pui-theme="dark"] .zdp-panel-shell input[type="date"],
+[data-pui-theme="dark"] .zdp-panel-shell input[type="number"],
+[data-pui-theme="dark"] .zdp-panel-shell select,
+[data-pui-theme="dark"] .zdp-panel-shell textarea {
+    background: #1B201E;
+    border-color: #3D4742;
+    color: #EAE6DF;
+    color-scheme: dark;
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell .zdp-stat-card-highlight {
+    background: linear-gradient(135deg, rgba(110, 145, 130, .18), #232927);
+    border-color: #384942;
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell .zdp-btn,
+[data-pui-theme="dark"] .zdp-panel-shell button.zdp-btn,
+[data-pui-theme="dark"] .zdp-panel-shell a.zdp-btn {
+    color: #171D1B;
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell .zdp-chat-msg--client {
+    background: rgba(110, 145, 130, .16);
+    border-color: rgba(143, 174, 155, .28);
+}
+
+[data-pui-theme="dark"] .zdp-panel-shell .zdp-survey-option input:checked + .zdp-survey-card {
+    color: #171D1B;
+}
+

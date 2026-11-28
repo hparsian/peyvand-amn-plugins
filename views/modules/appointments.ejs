@@ -14,8 +14,22 @@
     <div class="pas-form-grid">
       <div class="pas-form-row"><label for="pas-b-name">نام و نام خانوادگی *</label><input class="pas-input" type="text" id="pas-b-name" name="full_name" required /></div>
       <div class="pas-form-row"><label for="pas-b-mobile">موبایل *</label><input class="pas-input" type="text" id="pas-b-mobile" name="mobile" dir="ltr" placeholder="09123456789" required /></div>
-      <div class="pas-form-row"><label for="pas-b-date">تاریخ (شمسی) *</label><input class="pas-input" type="text" id="pas-b-date" name="booking_date_jalali" dir="ltr" inputmode="numeric" value="<%= h.todayJalaliAscii %>" placeholder="<%= h.todayJalaliAscii %>" required /></div>
-      <div class="pas-form-row"><label for="pas-b-time">ساعت *</label><input class="pas-input" type="text" id="pas-b-time" name="booking_time" dir="ltr" value="10:00" placeholder="09:00" required /></div>
+      <div class="pas-form-row">
+        <label for="pas-b-date">تاریخ (شمسی) *</label>
+        <div class="pas-input-row">
+          <input class="pas-input" type="text" id="pas-b-date" name="booking_date_jalali" dir="ltr" inputmode="numeric" value="<%= h.todayJalaliAscii %>" placeholder="<%= h.todayJalaliAscii %>" required />
+          <button type="button" class="pas-btn pas-btn-sm" data-pui-fill="#pas-b-date" data-pui-value="<%= h.todayJalaliAscii %>">امروز</button>
+        </div>
+      </div>
+      <div class="pas-form-row">
+        <label for="pas-b-time">ساعت *</label>
+        <input class="pas-input" type="text" id="pas-b-time" name="booking_time" dir="ltr" value="10:00" placeholder="09:00" required />
+        <div class="pui-slot-pills" aria-label="ساعت‌های پیشنهادی">
+          <% ['09:00', '10:30', '12:00', '14:30', '16:30', '18:00'].forEach(function(slot) { %>
+            <button type="button" class="pui-slot-pill<%= slot === '10:30' ? '' : '' %>" data-pui-fill="#pas-b-time" data-pui-value="<%= slot %>"><%= h.persianNum(slot) %></button>
+          <% }); %>
+        </div>
+      </div>
       <div class="pas-form-row">
         <label for="pas-session_type">نوع جلسه</label>
         <select class="pas-select" id="pas-session_type" name="session_type">
@@ -43,32 +57,35 @@
   <form method="get" action="/dashboard" class="pas-filter-form">
     <input type="hidden" name="module" value="appointments" />
     <div class="pas-form-row">
-      <label for="pas-booking-search">جست‌وجو (نام، موبایل، کد پیگیری)</label>
-      <input class="pas-input" type="search" id="pas-booking-search" name="s" value="<%= data.search %>" />
+      <label for="pas-booking-search">جست‌وجوی سروری (نام، موبایل، کد پیگیری)</label>
+      <input class="pas-input" type="search" id="pas-booking-search" name="s" value="<%= data.search %>" placeholder="برای فیلتر آنی یا جست‌وجو تایپ کنید..." data-pui-filter-target="#pvn-bookings-tbody" />
     </div>
-    <button class="pas-btn" type="submit">جست‌وجو</button>
+    <div class="pui-row">
+      <span class="pui-live-count" data-pui-filter-count="#pvn-bookings-tbody"></span>
+      <button class="pas-btn" type="submit">جست‌وجو</button>
+    </div>
   </form>
 
   <div class="pas-table-wrap">
     <table class="pas-table pas-table-bookings">
       <thead><tr><th>تاریخ</th><th>ساعت</th><th>مراجع</th><th>نوع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-      <tbody>
+      <tbody id="pvn-bookings-tbody">
         <% data.bookings.forEach(function(b) {
           const badgeCls = ['تایید شده', 'فعال', 'انجام شده'].includes(b.status)
             ? 'pas-badge-good'
             : (['لغو شده', 'ناموفق', 'عدم حضور'].includes(b.status) ? 'pas-badge-danger' : 'pas-badge-warn');
         %>
           <tr>
-            <td><%= h.jalali(b.booking_date) %></td>
-            <td dir="ltr"><%= h.persianNum(b.booking_time) %></td>
-            <td>
+            <td data-label="تاریخ" class="pui-num"><%= h.jalali(b.booking_date) %></td>
+            <td data-label="ساعت" class="pui-num" dir="ltr"><%= h.persianNum(b.booking_time) %></td>
+            <td data-label="مراجع">
               <strong><%= b.full_name %></strong><br />
               <span class="pas-muted" dir="ltr"><%= h.maskMobile(b.mobile) %></span><br />
-              <span class="pas-muted">کد: <%= b.ref_id %></span>
+              <span class="pas-muted pui-num">کد: <%= b.ref_id %></span>
             </td>
-            <td><%= b.service_name %></td>
-            <td><span class="pas-badge <%= badgeCls %>"><%= b.status %></span></td>
-            <td>
+            <td data-label="نوع"><%= b.service_name %></td>
+            <td data-label="وضعیت"><span class="pas-badge <%= badgeCls %>"><%= b.status %></span></td>
+            <td data-label="عملیات">
               <div class="pas-row-actions">
                 <form method="post" action="/api/bookings/<%= b.id %>/status" class="pas-inline-form">
                   <select class="pas-select pas-select-sm" name="status" aria-label="وضعیت نوبت">
@@ -100,6 +117,7 @@
       </tbody>
     </table>
   </div>
+  <p class="pas-empty pas-card-gap" data-pui-filter-empty="#pvn-bookings-tbody" hidden>نوبتی با این مشخصات یافت نشد.</p>
 </section>
 
 <section class="pas-card">
@@ -110,10 +128,10 @@
       <tbody>
         <% data.upcomingCases.forEach(function(uc) { %>
           <tr>
-            <td>#<%= h.persianNum(uc.id) %> — <%= uc.full_name %></td>
-            <td><%= h.jalali(uc.next_session_date) %></td>
-            <td class="pui-num"><%= h.persianNum(uc.next_session_number) %></td>
-            <td><a class="pas-btn pas-btn-sm" href="/dashboard?module=case_files&case_id=<%= uc.id %>">پرونده</a></td>
+            <td data-label="پرونده">#<%= h.persianNum(uc.id) %> — <%= uc.full_name %></td>
+            <td data-label="تاریخ" class="pui-num"><%= h.jalali(uc.next_session_date) %></td>
+            <td data-label="شماره جلسه" class="pui-num"><%= h.persianNum(uc.next_session_number) %></td>
+            <td data-label="عملیات"><a class="pas-btn pas-btn-sm" href="/dashboard?module=case_files&case_id=<%= uc.id %>">پرونده</a></td>
           </tr>
         <% }); %>
       </tbody>

@@ -1,17 +1,8 @@
 /**
  * پیوند امن — پوستهٔ داشبورد یکپارچه (shell-v2.css)
- * نسخه ۲.۱.۰ — «اتاق کنترل / میز کار»
- *
- * این فایل بعد از dashboard-admin.css بارگذاری می‌شود و فقط داخل
- * .pvn-shell اثر دارد. کار آن دو چیز است:
- *   ۱) ساخت چیدمان جدید: نوار بالا، ناوبری کناری، ناحیهٔ کاری.
- *   ۲) بازرنگ‌آمیزی کلاس‌های قدیمی .pas-* با توکن‌های برند جدید، بدون
- *      دست‌زدن به ۱۱ ماژول موجود. هیچ قاعدهٔ سراسری روی body/html نیست.
+ * نسخه ۲.۲.۰ — «اتاق کنترل / میز کار» (Calm Intelligence)
  */
 
-/* ── متغیرهای قدیمی، مقادیر جدید ─────────────────────────
-   ماژول‌های موجود از var(--pas-*) استفاده می‌کنند؛ با نگاشت آن‌ها به
-   پالت تازه، همهٔ صفحات بدون تغییر مارک‌آپ هم‌رنگ می‌شوند. */
 .pvn-shell {
     --pas-bg: #F4F1EC;
     --pas-bg-soft: #EFEAE2;
@@ -28,28 +19,22 @@
     --pas-primary-ink: #F6F3EC;
     --pas-accent: #6E9182;
 
-    --pas-good: #3F6B4F;
+    --pas-good: #366346;
     --pas-good-bg: #E6EFE8;
-    --pas-warn: #8A5A18;
+    --pas-warn: #855615;
     --pas-warn-bg: #F7EFDF;
-    --pas-danger: #9B3A2E;
+    --pas-danger: #96362A;
     --pas-danger-bg: #F7E9E5;
 
-    --pas-radius: 18px;
+    --pas-radius: 16px;
     --pas-radius-sm: 10px;
-    --pas-shadow-sm: 0 1px 2px rgba(41, 45, 42, .06);
-    --pas-shadow: 0 1px 2px rgba(41, 45, 42, .05), 0 8px 20px -8px rgba(41, 45, 42, .14);
-    --pas-shadow-lg: 0 2px 4px rgba(41, 45, 42, .05), 0 18px 40px -12px rgba(41, 45, 42, .20);
+    --pas-shadow-sm: 0 1px 2px rgba(41, 45, 42, .04);
+    --pas-shadow: 0 1px 2px rgba(41, 45, 42, .04), 0 8px 20px -10px rgba(41, 45, 42, .12);
+    --pas-shadow-lg: 0 2px 6px rgba(41, 45, 42, .05), 0 18px 40px -14px rgba(41, 45, 42, .18);
     --pas-ring: 0 0 0 3px rgba(47, 107, 87, .22);
 
-    /* ارتفاع نوار مدیریت وردپرس: ۳۲px در دسکتاپ، ۴۶px زیر ۷۸۲px */
     --pvn-adminbar-h: 32px;
 
-    /*
-     * تمام‌عرض‌سازی با مارجین منفی در پیشخوان RTL باعث سرریز افقی
-     * می‌شد (اندازه‌گیری‌شده: 20px روی staging). پس فقط بالا را جبران
-     * می‌کنیم و عرض را دست‌نخورده می‌گذاریم.
-     */
     margin-block-start: -10px;
     margin-inline: 0;
     min-block-size: calc(100vh - 32px);
@@ -57,8 +42,18 @@
     color: var(--pui-text);
     font-family: var(--pui-font);
     font-size: .9375rem;
-    line-height: 1.8;
+    line-height: 1.75;
     overflow-x: clip;
+}
+
+.pvn-shell--preview {
+    --pvn-adminbar-h: 0px;
+    margin: 0;
+    min-block-size: 100vh;
+}
+
+.pvn-shell--preview .pvn-frame {
+    min-block-size: 100vh;
 }
 
 .pvn-shell *,
@@ -109,18 +104,17 @@
     gap: var(--pui-s4);
     min-block-size: var(--pui-topbar-h);
     padding: 10px clamp(16px, 2.4vw, 32px);
-    /* fallback برای مرورگرهای بدون color-mix */
     background: var(--pui-surface);
-    background: color-mix(in srgb, var(--pui-surface) 86%, transparent);
+    background: var(--pui-glass);
     border-block-end: 1px solid var(--pui-border-soft);
-    backdrop-filter: saturate(130%) blur(10px);
+    backdrop-filter: saturate(135%) blur(10px);
 }
 
 .pvn-topbar-start,
 .pvn-topbar-end {
     display: flex;
     align-items: center;
-    gap: var(--pui-s4);
+    gap: var(--pui-s3);
     min-inline-size: 0;
 }
 
@@ -133,25 +127,22 @@
     flex: 0 0 auto;
 }
 
-.pvn-brand:hover {
-    color: var(--pui-text);
-}
+.pvn-brand:hover { color: var(--pui-text); }
 
 .pvn-mark {
     position: relative;
-    inline-size: 30px;
-    block-size: 30px;
-    border-radius: 9px 3px 9px 9px;
+    inline-size: 32px;
+    block-size: 32px;
+    border-radius: 9px 4px 9px 9px;
     background: var(--pui-primary);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
     flex: 0 0 auto;
 }
 
 .pvn-mark::after {
     content: "";
     position: absolute;
-    inset-block-start: 8px;
-    inset-inline-start: 8px;
+    inset-block-start: 9px;
+    inset-inline-start: 9px;
     inline-size: 14px;
     block-size: 14px;
     border: 1.6px solid var(--pui-on-primary);
@@ -174,7 +165,6 @@
 .pvn-brand-text small {
     font-size: 10.5px;
     color: var(--pui-text-soft);
-    letter-spacing: .04em;
 }
 
 .pvn-crumb {
@@ -196,12 +186,36 @@
     color: var(--pui-text);
 }
 
+/* دکمهٔ پرش سریع (Ctrl+K) */
+.pvn-quickjump {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-block-size: 36px;
+    padding: 4px 10px;
+    border: 1px solid var(--pui-border);
+    border-radius: var(--pui-r-sm);
+    background: var(--pui-surface-2);
+    color: var(--pui-text-muted);
+    font: inherit;
+    font-size: var(--pui-fs-xs);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color var(--pui-dur) var(--pui-ease), background-color var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
+}
+
+.pvn-quickjump:hover {
+    background: var(--pui-surface);
+    border-color: var(--pui-accent-line);
+    color: var(--pui-text);
+}
+
 .pvn-date {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     color: var(--pui-text-muted);
-    font-size: var(--pui-fs-sm);
+    font-size: var(--pui-fs-xs);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -211,8 +225,8 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    inline-size: 38px;
-    block-size: 38px;
+    inline-size: 36px;
+    block-size: 36px;
     padding: 0;
     border: 1px solid var(--pui-border-soft);
     border-radius: 10px 4px 10px 10px;
@@ -220,17 +234,16 @@
     color: var(--pui-text-muted);
     text-decoration: none;
     cursor: pointer;
-    transition: background var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
+    transition: background var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
 }
 
 .pvn-icon-btn:hover {
     background: var(--pui-surface-3);
+    border-color: var(--pui-border);
     color: var(--pui-primary);
 }
 
-.pvn-bell {
-    position: relative;
-}
+.pvn-bell { position: relative; }
 
 .pvn-bell__count {
     position: absolute;
@@ -254,8 +267,8 @@
 .pvn-user {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 4px 10px 4px 4px;
+    gap: 8px;
+    padding: 3px 10px 3px 4px;
     border: 1px solid var(--pui-border-soft);
     border-radius: var(--pui-r-full);
     background: var(--pui-surface-2);
@@ -266,19 +279,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: 30px;
-    block-size: 30px;
+    inline-size: 28px;
+    block-size: 28px;
     border-radius: 50%;
     background: var(--pui-primary);
     color: var(--pui-on-primary);
     font-family: var(--pui-font-display);
     font-weight: 600;
-    font-size: .875rem;
+    font-size: .8125rem;
     flex: 0 0 auto;
 }
 
 .pvn-user__name {
-    font-size: var(--pui-fs-sm);
+    font-size: var(--pui-fs-xs);
+    font-weight: 500;
     color: var(--pui-text);
     white-space: nowrap;
     overflow: hidden;
@@ -287,8 +301,8 @@
 
 .pvn-burger {
     display: none;
-    inline-size: 38px;
-    block-size: 38px;
+    inline-size: 36px;
+    block-size: 36px;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--pui-border-soft);
@@ -306,12 +320,11 @@
     align-self: start;
     display: flex;
     flex-direction: column;
-    gap: var(--pui-s5);
+    gap: var(--pui-s4);
     block-size: calc(100vh - var(--pvn-adminbar-h) - var(--pui-topbar-h));
     padding: var(--pui-s5) var(--pui-s4) var(--pui-s4);
     border-inline-end: 1px solid var(--pui-border-soft);
-    background:
-        linear-gradient(180deg, var(--pui-surface) 0%, var(--pui-bg) 62%);
+    background: linear-gradient(180deg, var(--pui-surface) 0%, var(--pui-bg) 68%);
     overflow-y: auto;
     overscroll-behavior: contain;
 }
@@ -326,7 +339,7 @@
     padding-inline: 10px;
     font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: .09em;
+    letter-spacing: .04em;
     color: var(--pui-text-soft);
 }
 
@@ -335,12 +348,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 10px;
-    border-radius: 10px 3px 10px 10px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 10px 4px 10px 10px;
     color: var(--pui-text-muted);
     font-size: var(--pui-fs-sm);
     text-decoration: none;
-    transition: background var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
+    transition: background var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
 }
 
 .pvn-nav__link:hover {
@@ -353,24 +367,15 @@
     block-size: 18px;
     font-size: 18px;
     color: currentColor;
-    opacity: .82;
+    opacity: .84;
     flex: 0 0 auto;
 }
 
 .pvn-nav__link[aria-current="page"] {
     background: var(--pui-primary-soft);
+    border-color: color-mix(in srgb, var(--pui-accent-line) 36%, transparent);
     color: var(--pui-primary);
     font-weight: 600;
-}
-
-.pvn-nav__link[aria-current="page"]::before {
-    content: "";
-    position: absolute;
-    inset-block: 8px;
-    inset-inline-start: 0;
-    inline-size: 3px;
-    border-radius: var(--pui-r-full);
-    background: var(--pui-primary);
 }
 
 .pvn-nav__link[aria-current="page"] .dashicons {
@@ -381,7 +386,7 @@
     margin-inline-start: auto;
     min-inline-size: 20px;
     padding-inline: 6px;
-    border-radius: var(--pui-r-full);
+    border-radius: var(--pui-r-sm);
     background: var(--pui-danger);
     color: #fff;
     font-size: 10px;
@@ -416,9 +421,7 @@
 .pvn-status__dot--ok { background: var(--pui-success); }
 .pvn-status__dot--bad { background: var(--pui-danger); }
 
-.pvn-scrim {
-    display: none;
-}
+.pvn-scrim { display: none; }
 
 /* ── ناحیهٔ کاری ─────────────────────────────────────────── */
 
@@ -426,7 +429,7 @@
     min-inline-size: 0;
     padding: clamp(18px, 2.2vw, 30px) clamp(16px, 2.4vw, 34px) var(--pui-s9);
     background:
-        radial-gradient(900px 220px at 88% -6%, rgba(143, 174, 155, .16), transparent 70%),
+        radial-gradient(900px 220px at 88% -6%, rgba(143, 174, 155, .14), transparent 70%),
         var(--pui-bg);
 }
 
@@ -437,12 +440,14 @@
 
 .pvn-pagehead {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: var(--pui-s4);
     flex-wrap: wrap;
     margin-block-end: var(--pui-s5);
 }
+
+.pvn-pagehead__text { min-inline-size: 0; }
 
 .pvn-pagehead__title {
     margin: 0;
@@ -460,10 +465,17 @@
     color: var(--pui-text-muted);
 }
 
+.pvn-pagehead__aside {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 /* ── بازرنگ‌آمیزی کلاس‌های قدیمی ────────────────────────── */
 
 .pvn-shell .pas-card {
-    padding: 22px 24px;
+    padding: 20px 24px;
     margin-block-end: var(--pui-s4);
     background: var(--pui-surface);
     border: 1px solid var(--pui-border-soft);
@@ -476,11 +488,23 @@
 
 .pvn-shell .pas-card-title {
     margin: 0 0 var(--pui-s3);
+    padding-block-end: 10px;
+    border-block-end: 1px solid var(--pui-border-soft);
     font-family: var(--pui-font-display);
     font-weight: 600;
-    font-size: 1.0625rem;
+    font-size: 1.05rem;
     line-height: 1.4;
     color: var(--pui-text);
+}
+
+.pvn-shell .pas-card-lead {
+    margin: 0 0 var(--pui-s3);
+    font-size: var(--pui-fs-sm);
+    color: var(--pui-text-muted);
+}
+
+.pvn-shell .pas-card-gap {
+    margin-block-start: var(--pui-s4);
 }
 
 .pvn-shell .pas-grid {
@@ -489,29 +513,34 @@
     gap: var(--pui-s4) var(--pui-s6);
 }
 
-/* بازنشانی کامل کارت آماری قدیمی: از کارت به ستون ساده با خط راهنما. */
+/* کارت آماری آرام: ستون بدون باکس با خط جداکنندهٔ ۱px */
 .pvn-shell .pas-stat {
     position: static;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 0 0 0 0;
-    padding-inline-start: 14px;
+    padding: 2px 0;
+    padding-inline-start: 16px;
     background: none;
     border: 0;
-    border-inline-start: 2px solid var(--pui-accent-line);
+    border-inline-start: 1px solid var(--pui-border);
     border-radius: 0;
     box-shadow: none;
     overflow: visible;
     transform: none;
 }
 
+.pvn-shell .pas-stat:first-child {
+    border-inline-start: 0;
+    padding-inline-start: 0;
+}
+
 .pvn-shell .pas-stat-value {
     font-family: var(--pui-font-display);
-    font-weight: 600;
-    font-size: 1.625rem;
-    line-height: 1.2;
-    color: var(--pui-text);
+    font-weight: 700;
+    font-size: 1.55rem;
+    line-height: 1.25;
+    color: var(--pui-primary);
     font-variant-numeric: tabular-nums;
 }
 
@@ -522,7 +551,9 @@
 
 .pvn-shell .pas-table-wrap {
     overflow-x: auto;
-    border-radius: var(--pui-r-sm);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-surface);
 }
 
 .pvn-shell .pas-table {
@@ -533,7 +564,7 @@
 
 .pvn-shell .pas-table th,
 .pvn-shell .pas-table td {
-    padding: 11px 12px;
+    padding: 11px 14px;
     text-align: start;
     border: 0;
     border-block-end: 1px solid var(--pui-border-soft);
@@ -541,11 +572,13 @@
 }
 
 .pvn-shell .pas-table thead th {
-    background: transparent;
-    font-size: 11px;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background: var(--pui-surface-2);
+    font-size: 11.5px;
     font-weight: 600;
-    letter-spacing: .05em;
-    color: var(--pui-text-soft);
+    color: var(--pui-text-muted);
     border-block-end: 1px solid var(--pui-border);
     white-space: nowrap;
 }
@@ -567,27 +600,32 @@
     align-items: center;
     gap: 5px;
     padding: 2px 9px;
-    border-radius: var(--pui-r-xs) var(--pui-r-full) var(--pui-r-full) var(--pui-r-full);
-    background: var(--pui-surface-3);
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-sm);
+    background: var(--pui-surface-2);
     color: var(--pui-text-muted);
     font-size: 11.5px;
-    font-weight: 500;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
 .pvn-shell .pas-badge-good {
     background: var(--pui-success-bg);
     color: var(--pui-success);
+    border-color: color-mix(in srgb, var(--pui-success) 24%, transparent);
 }
 
 .pvn-shell .pas-badge-warn {
     background: var(--pui-warning-bg);
     color: var(--pui-warning);
+    border-color: color-mix(in srgb, var(--pui-warning) 24%, transparent);
 }
 
 .pvn-shell .pas-badge-danger {
     background: var(--pui-danger-bg);
     color: var(--pui-danger);
+    border-color: color-mix(in srgb, var(--pui-danger) 24%, transparent);
 }
 
 .pvn-shell .pas-btn {
@@ -597,28 +635,23 @@
     gap: 6px;
     min-block-size: 36px;
     padding: 6px 14px;
-    border: 1px solid var(--pui-border-strong);
+    border: 1px solid var(--pui-border);
     border-radius: 10px 4px 10px 10px;
     background: var(--pui-surface);
     color: var(--pui-text);
     font-family: inherit;
     font-size: var(--pui-fs-sm);
     font-weight: 500;
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
-    transition: background var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease),
-        transform var(--pui-dur) var(--pui-ease);
+    transition: background var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease), color var(--pui-dur) var(--pui-ease);
 }
 
 .pvn-shell .pas-btn:hover {
     background: var(--pui-surface-2);
-    border-color: var(--pui-text-soft);
-    color: var(--pui-text);
-    transform: translateY(-1px);
-}
-
-.pvn-shell .pas-btn:active {
-    transform: translateY(0);
+    border-color: var(--pui-border-strong);
+    color: var(--pui-primary);
 }
 
 .pvn-shell .pas-btn-primary {
@@ -634,29 +667,43 @@
 }
 
 .pvn-shell .pas-btn-danger {
-    background: transparent;
-    border-color: var(--pui-danger);
+    background: var(--pui-danger-bg);
+    border-color: color-mix(in srgb, var(--pui-danger) 28%, transparent);
     color: var(--pui-danger);
 }
 
+.pvn-shell .pas-btn-danger:hover {
+    background: color-mix(in srgb, var(--pui-danger) 14%, var(--pui-surface));
+    border-color: var(--pui-danger);
+}
+
+/* اعلان با قاب ۱px کامل */
 .pvn-shell .pas-notice {
     margin-block-end: var(--pui-s4);
     padding: 12px 16px;
-    border: 0;
-    border-inline-start: 3px solid var(--pui-info);
-    border-radius: 4px 10px 10px 4px;
+    border: 1px solid color-mix(in srgb, var(--pui-info) 26%, var(--pui-border-soft));
+    border-radius: var(--pui-r-md);
     background: var(--pui-info-bg);
     color: var(--pui-text);
     font-size: var(--pui-fs-sm);
 }
 
-.pvn-shell .pas-notice p {
-    margin: 0;
+.pvn-shell .pas-notice p { margin: 0; }
+
+.pvn-shell .pas-notice-success {
+    border-color: color-mix(in srgb, var(--pui-success) 28%, var(--pui-border-soft));
+    background: var(--pui-success-bg);
 }
 
-.pvn-shell .pas-notice-success { border-inline-start-color: var(--pui-success); background: var(--pui-success-bg); }
-.pvn-shell .pas-notice-warning { border-inline-start-color: var(--pui-warning); background: var(--pui-warning-bg); }
-.pvn-shell .pas-notice-error   { border-inline-start-color: var(--pui-danger);  background: var(--pui-danger-bg); }
+.pvn-shell .pas-notice-warning {
+    border-color: color-mix(in srgb, var(--pui-warning) 28%, var(--pui-border-soft));
+    background: var(--pui-warning-bg);
+}
+
+.pvn-shell .pas-notice-error {
+    border-color: color-mix(in srgb, var(--pui-danger) 28%, var(--pui-border-soft));
+    background: var(--pui-danger-bg);
+}
 
 .pvn-shell .pas-empty {
     margin: 0;
@@ -666,6 +713,7 @@
     background: var(--pui-surface-2);
     color: var(--pui-text-muted);
     font-size: var(--pui-fs-sm);
+    text-align: center;
 }
 
 .pvn-shell .pas-list {
@@ -673,7 +721,7 @@
     padding: 0;
     list-style: none;
     display: grid;
-    gap: 8px;
+    gap: 10px;
     font-size: var(--pui-fs-sm);
     color: var(--pui-text-muted);
 }
@@ -682,14 +730,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding-block-end: 8px;
+    gap: 12px;
+    padding-block-end: 10px;
     border-block-end: 1px solid var(--pui-border-soft);
 }
 
 .pvn-shell .pas-list li:last-child {
     padding-block-end: 0;
     border-block-end: 0;
+}
+
+.pvn-shell .pas-list-sub {
+    margin: 4px 0 0;
+    font-size: var(--pui-fs-xs);
+    color: var(--pui-text-soft);
 }
 
 .pvn-shell .pas-pagination {
@@ -739,21 +793,59 @@
     color: var(--pui-text);
     font-family: inherit;
     font-size: var(--pui-fs-sm);
+    transition: border-color var(--pui-dur) var(--pui-ease), box-shadow var(--pui-dur) var(--pui-ease);
+}
+
+.pvn-shell .pas-input:hover,
+.pvn-shell .pas-select:hover,
+.pvn-shell .pas-textarea:hover {
+    border-color: var(--pui-accent-line);
 }
 
 .pvn-shell .pas-input:focus,
 .pvn-shell .pas-select:focus,
 .pvn-shell .pas-textarea:focus {
-    outline: 2px solid var(--pui-focus);
-    outline-offset: 1px;
-    border-color: var(--pui-focus);
+    outline: none;
+    border-color: var(--pui-accent-line);
+    box-shadow: var(--pui-ring);
 }
 
 .pvn-shell .pas-filter-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    align-items: flex-end;
+    gap: 10px;
     margin-block-end: var(--pui-s4);
+    padding: 12px 14px;
+    border: 1px solid var(--pui-border-soft);
+    border-radius: var(--pui-r-md);
+    background: var(--pui-surface-2);
+}
+
+.pvn-shell .pas-filter-form .pas-form-row {
+    margin-bottom: 0;
+    flex: 1 1 220px;
+}
+
+.pvn-shell .pas-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pvn-shell .pas-input-row .pas-input {
+    flex: 1 1 auto;
+}
+
+.pvn-textarea-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-block-start: 6px;
+    font-size: var(--pui-fs-xs);
+    color: var(--pui-text-muted);
+    font-variant-numeric: tabular-nums;
 }
 
 /* ── صفحه‌بندی ویژهٔ داشبورد (شبکهٔ نامتقارن) ────────────── */
@@ -777,16 +869,16 @@
     display: flex;
     flex-direction: column;
     gap: var(--pui-s4);
-    padding: 26px 26px 22px;
+    padding: 24px 26px 22px;
     border: 1px solid var(--pui-border-soft);
     border-start-start-radius: var(--pui-r-corner);
-    border-start-end-radius: 24px;
-    border-end-start-radius: 24px;
-    border-end-end-radius: 24px;
+    border-start-end-radius: 22px;
+    border-end-start-radius: 22px;
+    border-end-end-radius: 22px;
     background:
-        radial-gradient(420px 160px at 92% -20%, rgba(143, 174, 155, .22), transparent 70%),
+        radial-gradient(420px 160px at 92% -20%, rgba(143, 174, 155, .18), transparent 70%),
         var(--pui-surface);
-    box-shadow: var(--pui-shadow);
+    box-shadow: var(--pui-shadow-sm);
 }
 
 .pvn-focus__figure {
@@ -829,7 +921,7 @@
     display: flex;
     align-items: baseline;
     gap: 10px;
-    padding: 8px 6px;
+    padding: 8px 8px;
     border-radius: 8px;
     text-decoration: none;
     color: var(--pui-text);
@@ -902,22 +994,15 @@
 
 /* ── کلید حالت رنگ ──────────────────────────────────────── */
 
-.pvn-theme-toggle__sun {
-    display: none;
-}
-
-[data-pui-theme="dark"] .pvn-theme-toggle__sun {
-    display: block;
-}
-
-[data-pui-theme="dark"] .pvn-theme-toggle__moon {
-    display: none;
-}
+.pvn-theme-toggle__sun { display: none; }
+[data-pui-theme="dark"] .pvn-theme-toggle__sun { display: block; }
+[data-pui-theme="dark"] .pvn-theme-toggle__moon { display: none; }
 
 /* ── تب‌های پرونده ──────────────────────────────────────── */
 
 .pvn-case-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 2px;
     margin-block-end: var(--pui-s4);
     border-block-end: 1px solid var(--pui-border-soft);
@@ -936,9 +1021,7 @@
     transition: color var(--pui-dur) var(--pui-ease), border-color var(--pui-dur) var(--pui-ease);
 }
 
-.pvn-case-tab:hover {
-    color: var(--pui-text);
-}
+.pvn-case-tab:hover { color: var(--pui-text); }
 
 .pvn-case-tab.is-active {
     color: var(--pui-primary);
@@ -946,9 +1029,7 @@
     font-weight: 600;
 }
 
-.pvn-cpanel[hidden] {
-    display: none;
-}
+.pvn-cpanel[hidden] { display: none; }
 
 /* ── ویرایش یادداشت ─────────────────────────────────────── */
 
@@ -965,9 +1046,7 @@
     gap: var(--pui-s2);
 }
 
-.pas-note-actions {
-    margin-block: var(--pui-s3) 0;
-}
+.pas-note-actions { margin-block: var(--pui-s3) 0; }
 
 .pas-note-form.is-editing {
     padding: var(--pui-s4);
@@ -980,101 +1059,84 @@
     color: var(--pui-primary);
 }
 
-
-
-/* ── حالت تاریک ───────────────────────────────────────────
-   توکن‌های --pui-* با [data-pui-theme="dark"] خودشان عوض می‌شوند؛ این
-   بلوک فقط نگاشت --pas-* را برای ماژول‌های قدیمی به‌روز می‌کند. */
+/* ── حالت تاریک ─────────────────────────────────────────── */
 
 [data-pui-theme="dark"] .pvn-shell {
-    --pas-bg: #171B18;
-    --pas-bg-soft: #1E231F;
-    --pas-card: #1E231F;
+    --pas-bg: #151916;
+    --pas-bg-soft: #1D221E;
+    --pas-card: #1D221E;
     --pas-ink: #F1EDE5;
     --pas-ink-soft: #D6DBD4;
-    --pas-muted: #B9C0B8;
-    --pas-line: #2E352F;
-    --pas-line-strong: #3A423B;
+    --pas-muted: #BCC4BB;
+    --pas-line: #2D352E;
+    --pas-line-strong: #39423A;
 
     --pas-primary: #A9C7B6;
     --pas-primary-dark: #C0D8C9;
-    --pas-primary-soft: #26332B;
-    --pas-primary-ink: #171B18;
+    --pas-primary-soft: #243229;
+    --pas-primary-ink: #151916;
     --pas-accent: #8FAE9B;
 
     --pas-good: #86C6A2;
-    --pas-good-bg: #24322A;
+    --pas-good-bg: #213127;
     --pas-warn: #E2B36B;
     --pas-warn-bg: #332B20;
     --pas-danger: #E79A8C;
-    --pas-danger-bg: #33221F;
+    --pas-danger-bg: #34221F;
 
-    --pas-shadow-sm: 0 1px 2px rgba(0, 0, 0, .40);
-    --pas-shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 24px -10px rgba(0, 0, 0, .55);
+    --pas-shadow-sm: 0 1px 2px rgba(0, 0, 0, .34);
+    --pas-shadow: 0 1px 2px rgba(0, 0, 0, .32), 0 10px 24px -10px rgba(0, 0, 0, .52);
     --pas-shadow-lg: 0 2px 4px rgba(0, 0, 0, .35), 0 22px 46px -14px rgba(0, 0, 0, .65);
     --pas-ring: 0 0 0 3px rgba(169, 199, 182, .26);
 }
 
 [data-pui-theme="dark"] .pvn-shell .pvn-main {
     background:
-        radial-gradient(900px 220px at 88% -6%, rgba(143, 174, 155, .10), transparent 70%),
+        radial-gradient(900px 220px at 88% -6%, rgba(143, 174, 155, .09), transparent 70%),
         var(--pui-bg);
 }
 
 [data-pui-theme="dark"] .pvn-shell .pvn-focus {
     background:
-        radial-gradient(420px 160px at 92% -20%, rgba(143, 174, 155, .14), transparent 70%),
+        radial-gradient(420px 160px at 92% -20%, rgba(143, 174, 155, .12), transparent 70%),
         var(--pui-surface);
 }
 
 [data-pui-theme="dark"] .pvn-shell .pvn-mark,
 [data-pui-theme="dark"] .pvn-shell .pvn-avatar {
     background: #A9C7B6;
-    color: #171B18;
+    color: #151916;
 }
 
-[data-pui-theme="dark"] .pvn-shell .pvn-mark::after {
-    border-color: rgba(23, 27, 24, .75);
+[data-pui-theme="dark"] .pvn-shell .pvn-mark::after { border-color: rgba(21, 25, 22, .75); }
+[data-pui-theme="dark"] .pvn-shell .pas-skip-link { color: #151916; }
+
+[data-pui-theme="dark"] .pvn-shell .pas-note,
+[data-pui-theme="dark"] .pvn-shell .pas-note-body,
+[data-pui-theme="dark"] .pvn-shell .pas-message-card,
+[data-pui-theme="dark"] .pvn-shell .pas-form-section,
+[data-pui-theme="dark"] .pvn-shell .pas-readonly {
+    background: var(--pui-surface-2);
+    border-color: var(--pui-border-soft);
 }
 
-[data-pui-theme="dark"] .pvn-shell .pas-skip-link {
-    color: #171B18;
-}
-
-/*
- * در پیشخوان، پس‌زمینهٔ خود وردپرس بیرون از پوسته می‌ماند و در حالت
- * تاریک یک حاشیهٔ روشن دور داشبورد می‌ساخت. با :has فقط روی صفحه‌هایی
- * اثر می‌گذارد که پوسته را دارند؛ بقیهٔ پیشخوان دست‌نخورده می‌ماند.
- */
 html[data-pui-theme="dark"] body:has(.pvn-shell) #wpcontent,
 html[data-pui-theme="dark"] body:has(.pvn-shell) #wpbody-content,
 html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter {
-    background: #171B18;
+    background: #151916;
 }
 
 html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter,
 html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
-    color: #B9C0B8;
+    color: #BCC4BB;
 }
 
-/* ── حالت کنسول مدیر ──────────────────────────────────────
-   همان پوسته، تراکم بیشتر: مدیر به‌جای کار روزمره، ناظر سیستم است. */
+/* ── حالت کنسول مدیر ────────────────────────────────────── */
 
-.pvn-shell--console .pvn-main-inner {
-    max-inline-size: 1440px;
-}
-
-.pvn-shell--console .pas-card {
-    padding: 18px 20px;
-}
-
-.pvn-shell--console .pvn-nav__label {
-    letter-spacing: .12em;
-}
-
-.pvn-shell--console .pvn-deck {
-    gap: 12px;
-}
+.pvn-shell--console .pvn-main-inner { max-inline-size: 1440px; }
+.pvn-shell--console .pas-card { padding: 18px 20px; }
+.pvn-shell--console .pvn-nav__label { letter-spacing: .08em; }
+.pvn-shell--console .pvn-deck { gap: 12px; }
 
 /* ── پابرگ ──────────────────────────────────────────────── */
 
@@ -1086,35 +1148,24 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
     font-size: 11.5px;
 }
 
-.pvn-shell .pas-footer p {
-    margin: 0;
-}
+.pvn-shell .pas-footer p { margin: 0; }
 
 /* ── واکنش‌گرایی ────────────────────────────────────────── */
 
 @media (max-width: 980px) {
     .pvn-span-8,
-    .pvn-span-4 {
-        grid-column: span 12;
-    }
+    .pvn-span-4 { grid-column: span 12; }
 }
 
 @media (max-width: 920px) {
     .pvn-span-7,
     .pvn-span-5,
-    .pvn-span-6 {
-        grid-column: span 12;
-    }
+    .pvn-span-6 { grid-column: span 12; }
 }
 
 @media (max-width: 860px) {
-    .pvn-body {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .pvn-burger {
-        display: inline-flex;
-    }
+    .pvn-body { grid-template-columns: minmax(0, 1fr); }
+    .pvn-burger { display: inline-flex; }
 
     .pvn-nav {
         position: fixed;
@@ -1131,10 +1182,7 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
         transition: transform var(--pui-dur-slow) var(--pui-ease), visibility var(--pui-dur-slow);
     }
 
-    .pvn-nav.is-open {
-        transform: translateX(0);
-        visibility: visible;
-    }
+    .pvn-nav.is-open { transform: translateX(0); visibility: visible; }
 
     .pvn-scrim {
         display: block;
@@ -1147,57 +1195,39 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
         transition: opacity var(--pui-dur-slow) var(--pui-ease);
     }
 
-    .pvn-nav-open .pvn-scrim {
-        opacity: 1;
-        pointer-events: auto;
-    }
+    .pvn-nav-open .pvn-scrim { opacity: 1; pointer-events: auto; }
 
     .pvn-date,
-    .pvn-crumb {
-        display: none;
-    }
+    .pvn-crumb,
+    .pvn-user__name { display: none; }
 
-    .pvn-user__name {
-        display: none;
-    }
+    .pvn-quickjump__text { display: none; }
 }
 
 @media (max-width: 782px) {
-    /* نوار مدیریت وردپرس در این عرض ۴۶px است؛ چسبیدن نوار بالا به ۳۲px
-       باعث می‌شد زیر نوار مدیریت پنهان شود. */
     body.pas-dashboard-page,
-    .pvn-shell {
-        --pvn-adminbar-h: 46px;
-    }
+    .pvn-shell { --pvn-adminbar-h: 46px; }
 }
 
 @media (max-width: 600px) {
-    .pvn-main {
-        padding-inline: 14px;
-    }
+    .pvn-main { padding-inline: 14px; }
+    .pvn-shell { margin-inline: 0; }
+    .pvn-span-4, .pvn-span-5, .pvn-span-6, .pvn-span-7, .pvn-span-8 { grid-column: span 12; }
+    .pvn-shell .pas-card { padding: 16px; }
+    .pvn-breadcrumb { font-size: 11px; }
+    .pvn-pagehead__aside { inline-size: 100%; }
+    .pvn-update-state { display: block; margin-inline-start: 0; }
 
-    /*
-     * هر نوع مارجین منفی روی #wpcontent در این عرض 10px سرریز افقی
-     * می‌ساخت (اندازه‌گیری‌شده روی staging در 375px)؛ پس در موبایل
-     * پوسته بدون جبران می‌نشیند و همان پدینگ خود وردپرس را می‌پذیرد.
-     */
-    .pvn-shell {
-        margin-inline: 0;
+    .pvn-shell .pas-stat {
+        border-inline-start: 0;
+        padding-inline-start: 0;
+        padding-block: 8px;
+        border-block-end: 1px solid var(--pui-border-soft);
     }
+    .pvn-shell .pas-stat:last-child { border-block-end: 0; }
 
-    .pvn-span-4,
-    .pvn-span-5,
-    .pvn-span-6,
-    .pvn-span-7,
-    .pvn-span-8 {
-        grid-column: span 12;
-    }
+    .pvn-shell .pas-table-wrap { border: 0; background: transparent; }
 
-    .pvn-shell .pas-card {
-        padding: 18px 16px;
-    }
-
-    /* جدول → کارت */
     .pvn-shell .pas-table thead {
         position: absolute;
         inline-size: 1px;
@@ -1225,8 +1255,9 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
     .pvn-shell .pas-table td {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         gap: 12px;
-        padding: 5px 0;
+        padding: 6px 0;
         border: 0;
         text-align: end;
     }
@@ -1249,24 +1280,12 @@ html[data-pui-theme="dark"] body:has(.pvn-shell) #wpfooter p {
     }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   ۲.۱۱ — چیدمان «یک ناحیهٔ اسکرول»
-   ═══════════════════════════════════════════════════════════
-   پیش از این، متغیر --pvn-adminbar-h فقط روی .pvn-shell تعریف شده بود
-   (نه روی #wpbody-content)، پس calc(100dvh - var(--pvn-adminbar-h)) نامعتبر
-   می‌شد و با overflow: hidden روی body و #wpbody-content اسکرول کل داشبورد
-   قفل می‌شد. اکنون متغیر روی body تعریف می‌شود و قفل اسکرول فقط در دسکتاپ
-   (>= 861px) با زنجیرهٔ کامل min-block-size: 0 اعمال می‌گردد تا در موبایل
-   اسکرول طبیعی صفحه هم از کار نیفتد. */
+/* ── چیدمان یک ناحیهٔ اسکرول ────────────────────────────── */
 
-body.pas-dashboard-page {
-    --pvn-adminbar-h: 32px;
-}
+body.pas-dashboard-page { --pvn-adminbar-h: 32px; }
 
 @media (min-width: 861px) {
-    body.pas-dashboard-page {
-        overflow: hidden;
-    }
+    body.pas-dashboard-page { overflow: hidden; }
 
     body.pas-dashboard-page #wpbody-content {
         display: flex;
@@ -1287,9 +1306,7 @@ body.pas-dashboard-page {
         margin-inline: clamp(16px, 2.4vw, 32px);
     }
 
-    body.pas-dashboard-page #wpfooter {
-        display: none;
-    }
+    body.pas-dashboard-page #wpfooter { display: none; }
 
     .pvn-shell {
         display: flex;
@@ -1323,7 +1340,6 @@ body.pas-dashboard-page {
         scrollbar-width: thin;
     }
 
-    /* ناوبری داخل قاب می‌ماند و فقط خودش در صورت نیاز اسکرول می‌شود. */
     .pvn-nav {
         position: relative;
         inset-block-start: auto;
@@ -1360,16 +1376,12 @@ body.pas-dashboard-page {
     margin: 0;
     padding: 9px 11px;
     border: 1px solid var(--pui-border-soft);
-    border-radius: 4px 14px 14px 14px;
+    border-radius: 4px 12px 12px 12px;
     background: var(--pui-surface);
     box-shadow: var(--pui-shadow-sm);
 }
 
-.pvn-nav__now-icon {
-    display: inline-flex;
-    color: var(--pui-primary);
-    flex: 0 0 auto;
-}
+.pvn-nav__now-icon { display: inline-flex; color: var(--pui-primary); flex: 0 0 auto; }
 
 .pvn-nav__now-text {
     display: flex;
@@ -1378,33 +1390,11 @@ body.pas-dashboard-page {
     line-height: 1.35;
 }
 
-.pvn-nav__now-text small {
-    font-size: 10px;
-    color: var(--pui-text-soft);
-}
+.pvn-nav__now-text small { font-size: 10px; color: var(--pui-text-soft); }
+.pvn-nav__now-text b { font-size: .8125rem; font-weight: 600; color: var(--pui-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pvn-nav__group.is-current .pvn-nav__label { color: var(--pui-primary); }
 
-.pvn-nav__now-text b {
-    font-size: .8125rem;
-    font-weight: 600;
-    color: var(--pui-text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.pvn-nav__group.is-current .pvn-nav__label {
-    color: var(--pui-primary);
-}
-
-/* ── سرصفحهٔ صفحه: مسیر + نشان گروه ─────────────────── */
-
-.pvn-pagehead {
-    align-items: center;
-}
-
-.pvn-pagehead__text {
-    min-inline-size: 0;
-}
+/* ── مسیر صفحه ──────────────────────────────────────────── */
 
 .pvn-breadcrumb {
     display: flex;
@@ -1416,65 +1406,16 @@ body.pas-dashboard-page {
     font-size: 11.5px;
 }
 
-.pvn-breadcrumb a {
-    color: inherit;
-    text-decoration: none;
-}
+.pvn-breadcrumb a { color: inherit; text-decoration: none; }
+.pvn-breadcrumb a:hover { color: var(--pui-primary); text-decoration: underline; }
+.pvn-breadcrumb b { color: var(--pui-text); font-weight: 600; }
 
-.pvn-breadcrumb a:hover {
-    color: var(--pui-primary);
-    text-decoration: underline;
-}
+/* ── جدول به‌روزرسانی‌ها ───────────────────────────────── */
 
-.pvn-breadcrumb b {
-    color: var(--pui-text);
-    font-weight: 600;
-}
-
-.pvn-pagehead__aside {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.pvn-pagehead__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 12px;
-    border: 1px solid var(--pui-border-soft);
-    border-radius: var(--pui-r-full);
-    background: var(--pui-surface);
-    color: var(--pui-text-muted);
-    font-size: 11.5px;
-    white-space: nowrap;
-}
-
-/* ── جدول به‌روزرسانی‌ها: ستون زمان ─────────────────── */
-
-.pvn-shell .pvn-updates-table td {
-    vertical-align: middle;
-}
-
-.pvn-shell .pvn-updated {
-    display: inline-block;
-    color: var(--pui-text);
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-
-.pvn-shell .pvn-update-checked {
-    margin-block-start: 2px;
-}
-
-.pvn-update-state {
-    display: inline-block;
-    margin-inline-start: 8px;
-    color: var(--pui-text-muted);
-    font-size: 11px;
-}
-
+.pvn-shell .pvn-updates-table td { vertical-align: middle; }
+.pvn-shell .pvn-updated { display: inline-block; color: var(--pui-text); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pvn-shell .pvn-update-checked { margin-block-start: 2px; }
+.pvn-update-state { display: inline-block; margin-inline-start: 8px; color: var(--pui-text-muted); font-size: 11px; }
 .pvn-update-state.is-busy { color: var(--pui-primary); }
 .pvn-update-state.is-ok { color: var(--pui-success); }
 .pvn-update-state.is-error { color: var(--pui-danger); }
@@ -1484,19 +1425,4 @@ body.pas-dashboard-page {
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-}
-
-@media (max-width: 600px) {
-    .pvn-breadcrumb {
-        font-size: 11px;
-    }
-
-    .pvn-pagehead__aside {
-        display: none;
-    }
-
-    .pvn-update-state {
-        display: block;
-        margin-inline-start: 0;
-    }
 }

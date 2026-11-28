@@ -8,12 +8,12 @@
         <li>
           <div>
             <strong><%= n.title %></strong>
-            <p class="pas-muted" style="margin:4px 0 0"><%= n.body %> — <%= h.jalaliDateTime(n.created_at) %></p>
+            <p class="pas-list-sub pui-num"><%= n.body %> — <%= h.jalaliDateTime(n.created_at) %></p>
           </div>
           <div class="pas-row-actions">
             <a class="pas-btn pas-btn-sm" href="<%= n.module_link %>">مشاهده</a>
             <% if (!n.read) { %>
-              <button type="button" class="pas-btn pas-btn-sm" data-pas-read-notification="<%= n.id %>">خوانده شد</button>
+              <button type="button" class="pas-btn pas-btn-sm pas-btn-primary" data-pas-read-notification="<%= n.id %>">خوانده شد</button>
             <% } else { %>
               <span class="pas-badge">خوانده‌شده</span>
             <% } %>

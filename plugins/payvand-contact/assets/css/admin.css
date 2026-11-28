@@ -7,10 +7,11 @@
 
 .payvand-admin {
     font-family: 'Vazirmatn', Tahoma, sans-serif;
-    animation: payvand-admin-fade-up 0.4s cubic-bezier(.22,.9,.35,1) both;
+    color: var(--pivand-ink, #292D2A);
+    animation: payvand-admin-fade-up 0.35s cubic-bezier(.22,.9,.35,1) both;
 }
 @keyframes payvand-admin-fade-up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -19,84 +20,96 @@
         transition-duration: 0.01ms !important;
     }
 }
-.payvand-admin h1 { display: flex; align-items: center; gap: 8px; font-weight: 800; }
-.payvand-admin h2 { font-weight: 700; }
+.payvand-admin h1 { display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--pivand-ink, #292D2A); }
+.payvand-admin h2 { font-weight: 700; color: var(--pivand-ink, #292D2A); }
 
 .payvand-admin ul.subsubsub {
     display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 18px !important;
-    padding: 5px; background: #f8fafc; border-radius: 999px; width: fit-content; max-width: 100%;
-    list-style: none;
+    padding: 4px; background: var(--pivand-surface, #F8F4EE); border: 1px solid var(--pivand-border, #DCD5C9);
+    border-radius: 10px; width: fit-content; max-width: 100%; list-style: none;
 }
 .payvand-admin ul.subsubsub li { padding: 0; }
 .payvand-admin ul.subsubsub a {
-    display: inline-block; padding: 8px 16px; border-radius: 999px;
-    font-size: 13px; font-weight: 700; color: #64748b; text-decoration: none;
-    transition: background .2s ease, color .2s ease;
+    display: inline-block; padding: 7px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; color: var(--pivand-ink-soft, #7D837D); text-decoration: none;
+    white-space: nowrap; transition: background .18s ease, color .18s ease;
 }
-.payvand-admin ul.subsubsub a:hover { color: #1a4f70; }
+.payvand-admin ul.subsubsub a:hover { color: var(--pivand-ink, #292D2A); background: rgba(52,74,66,.06); }
 .payvand-admin ul.subsubsub a.current {
-    background: linear-gradient(135deg, #2d6a8f, #1a4f70); color: #fff !important;
-    box-shadow: 0 4px 12px rgba(45,106,143,.28);
+    background: var(--pivand-primary, #344A42); color: #FBF9F5 !important;
+    box-shadow: none;
 }
 
 .payvand-admin table.wp-list-table,
 .payvand-admin table.widefat {
-    border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;
-    box-shadow: 0 4px 18px rgba(15,23,42,0.05); border-spacing: 0;
+    background: var(--pivand-white, #FCFBF8);
+    border: 1px solid var(--pivand-border, #DCD5C9); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(41,45,42,0.04); border-spacing: 0;
 }
 .payvand-admin table.wp-list-table thead th,
 .payvand-admin table.widefat thead th {
-    background: #f8fafc; color: #475569; font-size: 12px;
-    text-transform: uppercase; letter-spacing: .03em;
+    position: sticky; top: 0; z-index: 1;
+    background: var(--pivand-surface, #F8F4EE); color: var(--pivand-ink-mid, #585F5A); font-size: 12px;
+    letter-spacing: .02em;
+}
+.payvand-admin table.wp-list-table td,
+.payvand-admin table.widefat td {
+    font-variant-numeric: tabular-nums;
 }
 .payvand-admin table.wp-list-table tbody tr,
 .payvand-admin table.widefat tbody tr { transition: background .15s ease; }
 .payvand-admin table.wp-list-table tbody tr:hover,
-.payvand-admin table.widefat tbody tr:hover { background: #f0fdfa !important; }
+.payvand-admin table.widefat tbody tr:hover { background: var(--pivand-surface, #F8F4EE) !important; }
 
-.payvand-admin table.form-table th { font-weight: 700; color: #334155; }
+.payvand-admin table.form-table th { font-weight: 700; color: var(--pivand-ink-mid, #585F5A); }
 .payvand-admin table.form-table input[type="text"],
 .payvand-admin table.form-table input[type="email"],
 .payvand-admin table.form-table input[type="number"],
 .payvand-admin table.form-table select {
-    border-radius: 8px !important; border: 1.5px solid #cbd5e1 !important;
+    border-radius: 8px !important; border: 1px solid var(--pivand-border, #DCD5C9) !important;
+    background: var(--pivand-white, #FCFBF8); color: var(--pivand-ink, #292D2A);
     transition: border-color .18s ease, box-shadow .18s ease;
 }
 .payvand-admin table.form-table input:focus,
 .payvand-admin table.form-table select:focus {
-    border-color: #2d6a8f !important; box-shadow: 0 0 0 3px rgba(45,106,143,.15); outline: none;
+    border-color: var(--pivand-primary, #344A42) !important; box-shadow: 0 0 0 2px rgba(52,74,66,.16); outline: none;
 }
 
 .payvand-admin .button {
     border-radius: 8px !important;
+    white-space: nowrap;
     transition: transform .15s ease, box-shadow .15s ease;
 }
 .payvand-admin .button:hover { transform: translateY(-1px); }
 .payvand-admin .button-primary {
-    background: linear-gradient(135deg, #2d6a8f, #1a4f70) !important;
-    border-color: #1a4f70 !important;
-    box-shadow: 0 3px 10px rgba(45,106,143,.25);
+    background: var(--pivand-primary, #344A42) !important;
+    border-color: var(--pivand-primary, #344A42) !important;
+    color: #FBF9F5 !important;
+    box-shadow: 0 2px 8px rgba(52,74,66,.18);
 }
 .payvand-admin .button-primary:hover {
-    box-shadow: 0 6px 16px rgba(45,106,143,.32);
+    background: var(--pivand-primary-dark, #26382F) !important;
+    border-color: var(--pivand-primary-dark, #26382F) !important;
+    box-shadow: 0 4px 12px rgba(52,74,66,.24);
 }
 
-.payvand-admin .notice { border-radius: 10px; box-shadow: 0 2px 10px rgba(15,23,42,.05); }
+.payvand-admin .notice { border-radius: 10px; box-shadow: 0 2px 8px rgba(41,45,42,.04); }
 
-/* بج‌ها و تگ‌های وضعیت پیام (از دو <style> جدا در صفحه‌ی پیام‌ها) */
+/* بج‌ها و تگ‌های وضعیت پیام */
 .payvand-admin .payvand-badge-new {
-    background: linear-gradient(135deg,#fb7185,#e11d48); color: #fff; border-radius: 999px;
-    padding: 3px 12px; font-size: 12.5px; font-weight: 700; box-shadow: 0 3px 8px rgba(225,29,72,.28);
+    background: var(--pivand-danger-bg, #FCEEEB); color: var(--pivand-danger, #B44332);
+    border: 1px solid rgba(180,67,50,.28); border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;
 }
 .payvand-admin .payvand-tag {
-    background: var(--pivand-primary-bg, #f0fdfa); color: var(--pivand-primary, #0f766e); padding: 3px 10px; border-radius: 999px;
-    font-size: 12px; font-weight: 600; border: 1px solid #ccfbf1;
+    background: var(--pivand-primary-bg, #E4ECE7); color: var(--pivand-primary, #344A42); padding: 3px 10px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; border: 1px solid var(--pivand-primary-mid, #D1E0D7); white-space: nowrap;
 }
 
-/* عناصر تعاملی جدول پیام‌ها که قبلاً style="" اینلاین داشتند */
-.payvand-admin .payvand-status-select { font-family: Tahoma; font-size: 12px; }
-.payvand-admin .payvand-date-cell { direction: ltr; white-space: nowrap; }
-.payvand-admin .payvand-delete-link { color: #dc2626; }
+/* عناصر تعاملی جدول پیام‌ها */
+.payvand-admin .payvand-status-select { font-family: inherit; font-size: 12px; }
+.payvand-admin .payvand-date-cell { direction: ltr; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.payvand-admin .payvand-delete-link { color: var(--pivand-danger, #B44332); }
 
 @media (max-width: 782px) {
     .payvand-admin table.wp-list-table,
@@ -104,5 +117,5 @@
     .payvand-admin table.widefat {
         display: block; overflow-x: auto; white-space: nowrap;
     }
-    .payvand-admin ul.subsubsub { border-radius: 12px; }
+    .payvand-admin ul.subsubsub { border-radius: 10px; }
 }

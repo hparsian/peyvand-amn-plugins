@@ -6,9 +6,9 @@
       <tbody>
         <% data.checks.forEach(function(ch) { %>
           <tr>
-            <td><%= ch.label %></td>
-            <td><span class="pas-badge <%= ch.ok ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= ch.ok ? 'سالم' : 'نیازمند بررسی' %></span></td>
-            <td><code><%= ch.detail %></code></td>
+            <td data-label="بررسی"><%= ch.label %></td>
+            <td data-label="وضعیت"><span class="pas-badge <%= ch.ok ? 'pas-badge-good' : 'pas-badge-warn' %>"><%= ch.ok ? 'سالم' : 'نیازمند بررسی' %></span></td>
+            <td data-label="جزئیات"><code><%= ch.detail %></code></td>
           </tr>
         <% }); %>
       </tbody>

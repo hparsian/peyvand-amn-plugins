@@ -6,12 +6,13 @@
   <title>پیوند امن — پنل مراجع</title>
   <link rel="stylesheet" href="/assets/fonts/vazirmatn/vazirmatn.css">
   <link rel="stylesheet" href="/assets/fonts/plex-arabic/plex-arabic.css">
+  <link rel="stylesheet" href="/assets/tokens.css">
+  <link rel="stylesheet" href="/assets/components.css">
   <link rel="stylesheet" href="/assets/panel.css">
   <link rel="stylesheet" href="/assets/panel-skin.css">
   <link rel="stylesheet" href="/assets/panel-v2.css">
-  <style>html,body{margin:0;background:#F4F1EC;}</style>
 </head>
-<body>
+<body class="zdp-panel-blank">
 <div class="zdp-panel zdp-panel-shell" dir="rtl">
   <header class="zdp-shell-topbar">
     <div class="zdp-shell-brand">
@@ -21,37 +22,40 @@
       </span>
       <span class="zdp-shell-brand-name">پیوند امن</span>
     </div>
-    <div class="zdp-shell-user">
-      <a href="/dashboard" class="zdp-logout" style="margin-inline-end:8px">داشبورد درمانگر</a>
+    <div class="zdp-topbar-actions">
+      <button type="button" class="pui-theme-toggle" data-pui-theme-toggle aria-label="تغییر تم روشن یا تیره">حالت تیره</button>
+      <a href="/dashboard" class="zdp-logout">داشبورد درمانگر</a>
       <% if (loggedIn) { %>
-        <span class="zdp-shell-user-avatar" aria-hidden="true">م</span>
-        <span class="zdp-shell-user-info">
-          <strong class="zdp-shell-user-name"><%= clientName %></strong>
-          <span class="zdp-shell-user-mobile" dir="ltr"><%= clientMobile %></span>
-        </span>
-        <a href="/portal/logout" class="zdp-logout">
-          <span class="zdp-shell-logout-label">خروج</span>
-        </a>
+        <div class="zdp-shell-user">
+          <span class="zdp-shell-user-avatar" aria-hidden="true">م</span>
+          <span class="zdp-shell-user-info">
+            <strong class="zdp-shell-user-name"><%= clientName %></strong>
+            <span class="zdp-shell-user-mobile" dir="ltr"><%= clientMobile %></span>
+          </span>
+          <a href="/portal/logout" class="zdp-logout">
+            <span class="zdp-shell-logout-label">خروج</span>
+          </a>
+        </div>
       <% } %>
     </div>
   </header>
 
   <% if (!loggedIn) { %>
-    <div class="zdp-shell-main" style="max-width:460px;margin:40px auto">
+    <div class="zdp-shell-main zdp-login-wrap">
       <section class="zdp-tab-panel">
-        <h2 style="margin:0 0 8px;font-size:1.1rem">ورود به پنل مراجع</h2>
-        <p style="margin:0 0 16px;color:#5C615D;font-size:.85rem">نوبت‌ها، آزمون‌ها و پیام‌های شما در یک جای امن و خصوصی.</p>
+        <h2 class="zdp-portal-heading">ورود به پنل مراجع</h2>
+        <p class="zdp-portal-lead">نوبت‌ها، آزمون‌ها و پیام‌های شما در یک جای امن و خصوصی.</p>
         <form method="post" action="/portal/login">
-          <div style="margin-bottom:12px">
-            <label for="zdp-mobile" style="display:block;margin-bottom:6px;font-size:.85rem">شماره موبایل</label>
-            <input id="zdp-mobile" type="text" dir="ltr" value="09121234567" style="width:100%;padding:10px;border:1px solid #DCD5C9;border-radius:10px" />
+          <div class="zdp-login-field">
+            <label for="zdp-mobile">شماره موبایل</label>
+            <input id="zdp-mobile" type="text" dir="ltr" value="09121234567" />
           </div>
           <button type="submit" class="zdp-btn">ورود با کد یک‌بارمصرف</button>
         </form>
       </section>
     </div>
   <% } else { %>
-    <nav class="zdp-tabs" role="tablist">
+    <nav class="zdp-tabs" role="tablist" aria-label="بخش‌های پنل مراجع">
       <a href="/portal?tab=appointments" class="zdp-tab <%= activeTab === 'appointments' ? 'active' : '' %>"><span class="zdp-tab-label">نوبت‌ها</span></a>
       <a href="/portal?tab=assessments" class="zdp-tab <%= activeTab === 'assessments' ? 'active' : '' %>"><span class="zdp-tab-label">آزمون‌ها</span><% if (pendingAssessments > 0) { %><span class="zdp-tab-badge"><%= h.persianNum(pendingAssessments) %></span><% } %></a>
       <a href="/portal?tab=messages" class="zdp-tab <%= activeTab === 'messages' ? 'active' : '' %>"><span class="zdp-tab-label">پیام‌ها</span></a>
@@ -79,101 +83,139 @@
 
       <% if (activeTab === 'appointments') { %>
         <section class="zdp-tab-panel">
-          <h2 style="margin:0 0 10px;font-size:1rem">نوبت‌های شما</h2>
-          <p class="description" style="margin:0 0 16px;color:#5C615D;font-size:.8125rem">برای رزرو وقت جدید از فرم زیر استفاده کنید.</p>
-          <form method="post" action="/portal/book" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px">
-            <div>
-              <label style="display:block;font-size:12px;margin-bottom:4px">تاریخ (شمسی)</label>
-              <input type="text" name="booking_date_jalali" dir="ltr" value="<%= todayJalaliAscii %>" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px" />
+          <h2 class="zdp-portal-heading">نوبت‌های شما</h2>
+          <p class="zdp-portal-lead">برای رزرو وقت جدید تاریخ، ساعت و نوع جلسه را انتخاب کنید.</p>
+          <form method="post" action="/portal/book" class="zdp-booking-form">
+            <div class="zdp-field">
+              <label for="zdp-book-date">تاریخ (شمسی)</label>
+              <div class="zdp-field-row-inline">
+                <input id="zdp-book-date" type="text" name="booking_date_jalali" dir="ltr" value="<%= todayJalaliAscii %>" />
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-date" data-pui-fill-val="<%= todayJalaliAscii %>">امروز</button>
+              </div>
             </div>
-            <div>
-              <label style="display:block;font-size:12px;margin-bottom:4px">ساعت</label>
-              <input type="text" name="booking_time" dir="ltr" value="16:30" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px;width:90px" />
+            <div class="zdp-field">
+              <label for="zdp-book-time">ساعت</label>
+              <input id="zdp-book-time" type="text" name="booking_time" dir="ltr" value="16:30" />
             </div>
-            <div>
-              <label style="display:block;font-size:12px;margin-bottom:4px">نوع جلسه</label>
-              <select name="session_type" style="padding:8px 10px;border:1px solid #DCD5C9;border-radius:8px">
+            <div class="zdp-field">
+              <label for="zdp-book-type">نوع جلسه</label>
+              <select id="zdp-book-type" name="session_type">
                 <% Object.keys(sessionTypes).forEach(function(k) { %>
                   <option value="<%= k %>"><%= sessionTypes[k] %></option>
                 <% }); %>
               </select>
             </div>
-            <button type="submit" class="zdp-btn">رزرو نوبت جدید</button>
+            <div>
+              <button type="submit" class="zdp-btn">رزرو نوبت جدید</button>
+            </div>
+            <div class="zdp-booking-slots-row">
+              <span class="zdp-booking-slots-label">ساعت‌های پرکاربرد:</span>
+              <div class="pui-slot-pills">
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-time" data-pui-fill-val="10:00">۱۰:۰۰</button>
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-time" data-pui-fill-val="11:30">۱۱:۳۰</button>
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-time" data-pui-fill-val="14:00">۱۴:۰۰</button>
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-time" data-pui-fill-val="16:30">۱۶:۳۰</button>
+                <button type="button" class="pui-slot-pill" data-pui-fill="#zdp-book-time" data-pui-fill-val="18:00">۱۸:۰۰</button>
+              </div>
+            </div>
           </form>
 
-          <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:.8125rem">
-            <thead>
-              <tr style="color:#7A7F79;font-size:11px">
-                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">تاریخ</th>
-                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">خدمت</th>
-                <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">وضعیت</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% bookings.forEach(function(b) { %>
-                <tr>
-                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= h.jalali(b.booking_date) %> — <%= h.persianNum(b.booking_time) %></td>
-                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= b.service_name %></td>
-                  <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><span class="zdp-status <%= b.status === 'لغو شده' ? 'zdp-status-cancelled' : '' %>"><%= b.status %></span></td>
-                </tr>
-              <% }); %>
-            </tbody>
-          </table>
-        </section>
-      <% } else if (activeTab === 'assessments') { %>
-        <section class="zdp-tab-panel">
-          <h2 style="margin:0 0 12px;font-size:1rem">آزمون‌های شما</h2>
-          <% if (!invitations.length) { %>
-            <p style="color:#5C615D">آزمونی برای شما ثبت نشده است.</p>
-          <% } else { %>
-            <table style="width:100%;border-collapse:collapse;font-size:.8125rem">
+          <div class="zdp-portal-table-wrap">
+            <table class="zdp-portal-table">
               <thead>
-                <tr style="color:#7A7F79;font-size:11px">
-                  <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">عنوان آزمون</th>
-                  <th style="text-align:start;padding:8px 10px;border-bottom:1px solid #DCD5C9">وضعیت</th>
+                <tr>
+                  <th>تاریخ</th>
+                  <th>خدمت</th>
+                  <th>وضعیت</th>
                 </tr>
               </thead>
               <tbody>
-                <% invitations.forEach(function(inv) { %>
+                <% bookings.forEach(function(b) { %>
                   <tr>
-                    <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><%= inv.quiz_name %></td>
-                    <td style="padding:9px 10px;border-bottom:1px solid #E8E2D8"><span class="zdp-status"><%= inv.status === 'completed' ? 'تکمیل شده' : 'در انتظار پاسخ' %></span></td>
+                    <td data-label="تاریخ" class="pui-num"><%= h.jalali(b.booking_date) %> — <%= h.persianNum(b.booking_time) %></td>
+                    <td data-label="خدمت"><%= b.service_name %></td>
+                    <td data-label="وضعیت"><span class="zdp-status <%= b.status === 'لغو شده' ? 'zdp-status-cancelled' : '' %>"><%= b.status %></span></td>
                   </tr>
                 <% }); %>
               </tbody>
             </table>
+          </div>
+        </section>
+      <% } else if (activeTab === 'assessments') { %>
+        <section class="zdp-tab-panel">
+          <h2 class="zdp-portal-heading">آزمون‌های شما</h2>
+          <% if (!invitations.length) { %>
+            <p class="zdp-empty-note">آزمونی برای شما ثبت نشده است.</p>
+          <% } else { %>
+            <div class="zdp-portal-table-wrap">
+              <table class="zdp-portal-table">
+                <thead>
+                  <tr>
+                    <th>عنوان آزمون</th>
+                    <th>وضعیت</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% invitations.forEach(function(inv) { %>
+                    <tr>
+                      <td data-label="عنوان آزمون"><%= inv.quiz_name %></td>
+                      <td data-label="وضعیت"><span class="zdp-status <%= inv.status === 'completed' ? 'zdp-status-انجام-شده' : 'zdp-status-pending' %>"><%= inv.status === 'completed' ? 'تکمیل شده' : 'در انتظار پاسخ' %></span></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
           <% } %>
         </section>
       <% } else if (activeTab === 'messages') { %>
         <section class="zdp-tab-panel">
-          <h2 style="margin:0 0 12px;font-size:1rem">پیام‌ها با درمانگر</h2>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <h2 class="zdp-portal-heading">پیام‌ها با درمانگر</h2>
+          <div class="zdp-chat-thread">
             <% messages.forEach(function(m) { %>
-              <div style="padding:12px 14px;border-radius:12px;background:<%= m.sender === 'client' ? '#E8EFEA' : '#F6F3EC' %>;border:1px solid #E2DDD2">
-                <strong style="font-size:.82rem"><%= m.sender_name %></strong>
-                <p style="margin:6px 0 0;font-size:.875rem"><%= m.body %></p>
-              </div>
+              <article class="zdp-chat-msg <%= m.sender === 'client' ? 'zdp-chat-msg--client' : 'zdp-chat-msg--therapist' %>">
+                <div class="zdp-chat-msg__head">
+                  <strong><%= m.sender_name %></strong>
+                </div>
+                <p class="zdp-chat-msg__body"><%= m.body %></p>
+              </article>
             <% }); %>
           </div>
-          <form method="post" action="/portal/message" style="display:flex;gap:8px">
-            <input type="text" name="body" placeholder="پیام خود را بنویسید..." required style="flex:1;padding:10px;border:1px solid #DCD5C9;border-radius:10px" />
+          <form method="post" action="/portal/message" class="zdp-chat-form">
+            <input type="text" name="body" placeholder="پیام خود را بنویسید..." required aria-label="متن پیام" />
             <button type="submit" class="zdp-btn">ارسال پیام</button>
           </form>
         </section>
       <% } else if (activeTab === 'intake') { %>
         <section class="zdp-tab-panel">
-          <h2 style="margin:0 0 10px;font-size:1rem">فرم ارزیابی مراجع</h2>
-          <p style="color:#5C615D;font-size:.85rem">اطلاعات پایهٔ شما تکمیل شده و به پروندهٔ بالینی متصل است. برای به‌روزرسانی اهداف درمان می‌توانید در جلسه با درمانگر هماهنگ کنید.</p>
+          <h2 class="zdp-portal-heading">فرم ارزیابی مراجع</h2>
+          <p class="zdp-portal-lead">اطلاعات پایهٔ شما تکمیل شده و به پروندهٔ بالینی متصل است. برای به‌روزرسانی اهداف درمان می‌توانید در جلسه با درمانگر هماهنگ کنید.</p>
         </section>
       <% } else { %>
         <section class="zdp-tab-panel">
-          <h2 style="margin:0 0 10px;font-size:1rem">نظرسنجی کیفیت جلسات</h2>
+          <h2 class="zdp-portal-heading">نظرسنجی کیفیت جلسات</h2>
           <% if (surveyDone) { %>
-            <p class="zdp-status">سپاسگزاریم؛ بازخورد شما ثبت شد.</p>
+            <div class="pui-alert pui-alert--good">سپاسگزاریم؛ بازخورد شما ثبت شد.</div>
           <% } else { %>
             <form method="post" action="/portal/survey">
-              <p style="color:#5C615D;font-size:.85rem">میزان رضایت شما از فرآیند نوبت‌دهی و جلسهٔ مشاوره؟</p>
-              <button type="submit" class="zdp-btn">ثبت بازخورد مثبت</button>
+              <p class="zdp-portal-lead">میزان رضایت شما از فرآیند نوبت‌دهی و جلسهٔ مشاوره؟</p>
+              <div class="zdp-survey-scale" role="radiogroup" aria-label="امتیاز رضایت">
+                <% [
+                  { val: 1, lbl: 'ضعیف' },
+                  { val: 2, lbl: 'متوسط' },
+                  { val: 3, lbl: 'خوب' },
+                  { val: 4, lbl: 'بسیار خوب' },
+                  { val: 5, lbl: 'عالی' }
+                ].forEach(function(opt) { %>
+                  <label class="zdp-survey-option">
+                    <input type="radio" name="rating" value="<%= opt.val %>" <%= opt.val === 5 ? 'checked' : '' %> />
+                    <span class="zdp-survey-card">
+                      <span class="zdp-survey-num"><%= h.persianNum(opt.val) %></span>
+                      <span class="zdp-survey-lbl"><%= opt.lbl %></span>
+                    </span>
+                  </label>
+                <% }); %>
+              </div>
+              <button type="submit" class="zdp-btn">ثبت بازخورد</button>
             </form>
           <% } %>
         </section>
@@ -181,5 +223,7 @@
     </div>
   <% } %>
 </div>
+<script src="/assets/js/ui.js"></script>
 </body>
 </html>
+

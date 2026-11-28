@@ -54,21 +54,139 @@
 
 	$(document).on('click', '[data-pvn-close-nav]', closeNav);
 
+	/* ── پرش سریع ماژول‌ها (Ctrl+K) ───────────────────────── */
+	function ensureCmdPalette() {
+		var dlg = document.getElementById('pvn-cmd-dialog');
+		if (dlg) { return dlg; }
+
+		dlg = document.createElement('dialog');
+		dlg.id = 'pvn-cmd-dialog';
+		dlg.className = 'pui-cmd-dialog';
+		dlg.setAttribute('aria-label', 'پرش سریع به بخش‌های داشبورد');
+		dlg.innerHTML =
+			'<div class="pui-cmd__head">' +
+				'<input type="search" id="pvn-cmd-input" class="pui-cmd__input" placeholder="جست‌وجوی بخش یا ماژول..." autocomplete="off" />' +
+				'<button type="button" class="pui-btn pui-btn--sm pui-btn--quiet" data-pui-close>Esc</button>' +
+			'</div>' +
+			'<ul class="pui-cmd__list" id="pvn-cmd-list"></ul>' +
+			'<div class="pui-cmd__foot"><span>حرکت با ↑ ↓ و انتخاب با Enter</span><kbd class="pui-kbd">Ctrl K</kbd></div>';
+		document.body.appendChild(dlg);
+
+		var input = document.getElementById('pvn-cmd-input');
+		var list  = document.getElementById('pvn-cmd-list');
+		var items = $('.pvn-nav__link').map(function () {
+			var $a = $(this);
+			var grp = $a.closest('.pvn-nav__group').find('.pvn-nav__label').text();
+			return {
+				label: $.trim($a.find('span').first().text() || $a.text()),
+				group: $.trim(grp),
+				href: $a.attr('href'),
+				active: $a.attr('aria-current') === 'page'
+			};
+		}).get();
+
+		function render(q) {
+			var norm = window.PUI && window.PUI.normalizeSearch
+				? window.PUI.normalizeSearch(q)
+				: String(q || '').trim().toLowerCase();
+			var matches = items.filter(function (it) {
+				if (!norm) { return true; }
+				var hay = window.PUI && window.PUI.normalizeSearch
+					? window.PUI.normalizeSearch(it.label + ' ' + it.group)
+					: (it.label + ' ' + it.group).toLowerCase();
+				return hay.indexOf(norm) !== -1;
+			});
+
+			list.innerHTML = '';
+			if (!matches.length) {
+				var empty = document.createElement('li');
+				empty.className = 'pui-muted';
+				empty.style.padding = '12px 14px';
+				empty.textContent = 'بخشی با این نام یافت نشد.';
+				list.appendChild(empty);
+				return;
+			}
+			matches.forEach(function (it, idx) {
+				var li = document.createElement('li');
+				var a  = document.createElement('a');
+				a.className = 'pui-cmd__link' + (idx === 0 ? ' is-active' : '');
+				a.href = it.href;
+				var s1 = document.createElement('span');
+				s1.textContent = it.label;
+				var s2 = document.createElement('span');
+				s2.className = 'pui-cmd__hint';
+				s2.textContent = it.active ? 'بخش فعلی' : it.group;
+				a.appendChild(s1);
+				a.appendChild(s2);
+				li.appendChild(a);
+				list.appendChild(li);
+			});
+		}
+
+		input.addEventListener('input', function () { render(input.value); });
+		input.addEventListener('keydown', function (ev) {
+			var links = Array.prototype.slice.call(list.querySelectorAll('.pui-cmd__link'));
+			if (!links.length) { return; }
+			var cur = links.findIndex(function (el) { return el.classList.contains('is-active'); });
+			if (cur < 0) { cur = 0; }
+			if (ev.key === 'ArrowDown') {
+				ev.preventDefault();
+				links[cur].classList.remove('is-active');
+				var nxt = links[(cur + 1) % links.length];
+				nxt.classList.add('is-active');
+				nxt.scrollIntoView({ block: 'nearest' });
+			} else if (ev.key === 'ArrowUp') {
+				ev.preventDefault();
+				links[cur].classList.remove('is-active');
+				var prv = links[(cur - 1 + links.length) % links.length];
+				prv.classList.add('is-active');
+				prv.scrollIntoView({ block: 'nearest' });
+			} else if (ev.key === 'Enter') {
+				ev.preventDefault();
+				window.location.href = links[cur].href;
+			}
+		});
+
+		render('');
+		dlg._pvnRender = render;
+		return dlg;
+	}
+
+	function openCmdPalette() {
+		var dlg = ensureCmdPalette();
+		var input = document.getElementById('pvn-cmd-input');
+		if (input) { input.value = ''; }
+		if (dlg._pvnRender) { dlg._pvnRender(''); }
+		if (typeof dlg.showModal === 'function' && !dlg.open) {
+			dlg.showModal();
+		}
+		if (input) { window.setTimeout(function () { input.focus(); }, 20); }
+	}
+
+	$(document).on('click', '[data-pvn-cmd-open]', function () {
+		openCmdPalette();
+	});
+
 	$(document).on('keydown', function (event) {
 		if (event.key === 'Escape') {
 			closeNav();
+			return;
+		}
+		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+			event.preventDefault();
+			openCmdPalette();
 		}
 	});
 
-	/* ── حالت رنگ ───────────────────────────────────────────
-	   انتخاب در localStorage ذخیره می‌شود؛ اسکریپت زودهنگام در <head>
-	   attribute را پیش از رندر می‌گذارد تا پرش رنگ نداشته باشیم. */
-	/*
-	 * همان کلید و همان attributes کیت رابط (ui.js). اگر کیت فعال باشد،
-	 * مدیریت کلیک را به [data-pui-theme-toggle] خودش می‌سپاریم تا دو
-	 * هندلر روی یک کلیک همدیگر را خنثی نکنند. اگر کیت نباشد (حالت تنزل)،
-	 * همین کد کار می‌کند.
-	 */
+	/* ارسال سریع یادداشت با Ctrl+Enter */
+	$(document).on('keydown', '#pas-note-content', function (event) {
+		if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+			event.preventDefault();
+			$('#pas-note-form').trigger('submit');
+		}
+	});
+
+	/* ── حالت رنگ ─────────────────────────────────────────── */
 	var THEME_KEY = 'pui-theme';
 
 	function applyTheme(theme) {
@@ -138,7 +256,7 @@
 	});
 
 	$(document).on('keydown', '.pvn-case-tab', function (event) {
-		if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+		if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(event.key) === -1) {
 			return;
 		}
 
@@ -146,10 +264,11 @@
 
 		var $tabs = $('.pvn-case-tab');
 		var index = $tabs.index(this);
-		var next = event.key === 'ArrowLeft' ? index + 1 : index - 1;
-
-		if (next < 0) { next = $tabs.length - 1; }
-		if (next >= $tabs.length) { next = 0; }
+		var next = index;
+		if (event.key === 'ArrowLeft')  { next = (index + 1) % $tabs.length; }
+		if (event.key === 'ArrowRight') { next = (index - 1 + $tabs.length) % $tabs.length; }
+		if (event.key === 'Home')       { next = 0; }
+		if (event.key === 'End')        { next = $tabs.length - 1; }
 
 		activateCaseTab(String($tabs.eq(next).attr('data-pvn-case-tab')), true);
 	});

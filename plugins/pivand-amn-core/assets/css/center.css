@@ -1,37 +1,40 @@
 /**
- * پیوند امن — مرکز مدیریت (فاز ۱۲ / گام ۵)
+ * پیوند امن — مرکز مدیریت (پوستهٔ یکپارچه Calm Intelligence)
  * فقط در صفحهٔ pas-core-center بارگذاری می‌شود. Scope: .pas-center
  */
 
 .pas-center {
-    --pc-brown:      #51483F;
-    --pc-brown-dark: #3F3830;
-    --pc-sand:       #B8ADA0;
-    --pc-cream:      #F4F0E8;
-    --pc-gold:       #C8B48A;
-    --pc-gold-soft:  #EFE6D3;
-    --pc-border:     #DDD5C8;
-    --pc-surface:    #FAF7F1;
-    --pc-muted:      #857A6C;
-    --pc-ok:         #3F6B4F;
-    --pc-ok-bg:      #E8F1EB;
-    --pc-warn:       #8A5A18;
-    --pc-warn-bg:    #F8EEDC;
-    --pc-fail:       #9B3A2E;
-    --pc-fail-bg:    #F7E7E3;
+    --pc-primary:    var(--pivand-primary, #344A42);
+    --pc-primary-dk: var(--pivand-primary-dark, #26382F);
+    --pc-primary-bg: var(--pivand-primary-bg, #E4ECE7);
+    --pc-accent:     var(--pivand-accent, #6E9182);
+    --pc-border:     var(--pivand-border, #DCD5C9);
+    --pc-border-soft: var(--pivand-border-soft, #E8E2D8);
+    --pc-surface:    var(--pivand-white, #FCFBF8);
+    --pc-surface-2:  #F8F4EE;
+    --pc-ink:        var(--pivand-ink, #292D2A);
+    --pc-muted:      var(--pivand-ink-mid, #5C615D);
+    --pc-ok:         var(--pivand-success, #366346);
+    --pc-ok-bg:      var(--pivand-success-bg, #E6EFE8);
+    --pc-warn:       var(--pivand-warning, #855615);
+    --pc-warn-bg:    var(--pivand-warning-bg, #F7EFDF);
+    --pc-fail:       var(--pivand-danger, #96362A);
+    --pc-fail-bg:    var(--pivand-danger-bg, #F7E9E5);
 
-    color: var(--pc-brown);
+    font-family: var(--pivand-font-fa, 'Vazirmatn', Tahoma, sans-serif);
+    color: var(--pc-ink);
 }
 
 .pas-center-lead {
     max-width: 78ch;
     margin-bottom: 18px;
+    color: var(--pc-muted);
 }
 
 /* ── کارت‌های آماری ─────────────────────────────────────────── */
 .pas-center-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 12px;
     margin: 0 0 24px;
 }
@@ -41,14 +44,16 @@
     flex-direction: column;
     gap: 4px;
     padding: 16px 18px;
-    background: #fff;
+    background: var(--pc-surface);
     border: 1px solid var(--pc-border);
     border-radius: 14px;
-    box-shadow: 0 1px 2px rgba(81, 72, 63, .08);
+    box-shadow: var(--pivand-shadow-sm, 0 1px 2px rgba(41, 45, 42, .04));
+    transition: border-color .16s ease;
 }
 
-.pas-center-stat.is-warn { border-color: var(--pc-gold); }
-.pas-center-stat.is-bad  { border-color: var(--pc-fail); }
+.pas-center-stat:hover { border-color: var(--pc-accent); }
+.pas-center-stat.is-warn { border-color: rgba(133, 86, 21, .45); }
+.pas-center-stat.is-bad  { border-color: rgba(150, 54, 42, .45); }
 
 .pas-center-k {
     font-size: 12.5px;
@@ -58,8 +63,9 @@
 .pas-center-v {
     font-size: 26px;
     font-weight: 800;
-    line-height: 1.1;
-    color: var(--pc-brown);
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    color: var(--pc-primary);
 }
 
 .pas-center-stat.is-warn .pas-center-v { color: var(--pc-warn); }
@@ -75,22 +81,22 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 14px;
-    margin: 0 0 12px;
+    margin: 0 0 14px;
 }
 
 .pas-center-card {
-    background: #fff;
+    background: var(--pc-surface);
     border: 1px solid var(--pc-border);
     border-radius: 14px;
-    padding: 14px 16px 6px;
-    box-shadow: 0 1px 2px rgba(81, 72, 63, .08);
+    padding: 16px 18px 8px;
+    box-shadow: var(--pivand-shadow-sm, 0 1px 2px rgba(41, 45, 42, .04));
 }
 
 .pas-center-card h2 {
     margin: 4px 0 8px;
     font-size: 14px;
     font-weight: 700;
-    color: var(--pc-brown);
+    color: var(--pc-primary);
 }
 
 .pas-center-chart {
@@ -99,26 +105,28 @@
 
 /* ── نشان‌ها و پیام‌های خالی ─────────────────────────────────── */
 .pas-center-badge {
-    display: inline-block;
-    padding: 1px 9px;
-    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 8px;
     font-size: 12px;
-    font-weight: 700;
-    background: var(--pc-surface);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: var(--pc-surface-2);
     color: var(--pc-muted);
-    box-shadow: inset 0 0 0 1px var(--pc-border);
+    border: 1px solid var(--pc-border);
     white-space: nowrap;
 }
 
-.pas-center-badge-ok   { background: var(--pc-ok-bg);   color: var(--pc-ok);   box-shadow: inset 0 0 0 1px rgba(63,107,79,.28); }
-.pas-center-badge-warn { background: var(--pc-warn-bg); color: var(--pc-warn); box-shadow: inset 0 0 0 1px rgba(200,180,138,.6); }
-.pas-center-badge-fail { background: var(--pc-fail-bg); color: var(--pc-fail); box-shadow: inset 0 0 0 1px rgba(155,58,46,.25); }
+.pas-center-badge-ok   { background: var(--pc-ok-bg);   color: var(--pc-ok);   border-color: rgba(54, 99, 70, .28); }
+.pas-center-badge-warn { background: var(--pc-warn-bg); color: var(--pc-warn); border-color: rgba(133, 86, 21, .28); }
+.pas-center-badge-fail { background: var(--pc-fail-bg); color: var(--pc-fail); border-color: rgba(150, 54, 42, .28); }
 
 .pas-center-empty {
     padding: 16px;
     border: 1px dashed var(--pc-border);
     border-radius: 12px;
-    background: var(--pc-surface);
+    background: var(--pc-surface-2);
     color: var(--pc-muted);
     font-size: 13px;
 }
@@ -131,25 +139,29 @@
 
 .pas-center .button {
     border-color: var(--pc-border);
-    color: var(--pc-brown);
+    background: var(--pc-surface);
+    color: var(--pc-ink);
     border-radius: 9px;
 }
 
 .pas-center .button:hover,
 .pas-center .button:focus {
-    background: var(--pc-gold-soft);
-    border-color: var(--pc-gold);
-    color: var(--pc-brown-dark);
+    background: var(--pc-primary-bg);
+    border-color: var(--pc-accent);
+    color: var(--pc-primary-dk);
 }
 
 .pas-center table.widefat {
+    background: var(--pc-surface);
     border-color: var(--pc-border);
     border-radius: 12px;
+    overflow: hidden;
 }
 
 .pas-center table.widefat thead th {
-    background: var(--pc-surface);
-    color: #6B5F52;
+    background: var(--pc-surface-2);
+    color: var(--pc-muted);
+    font-weight: 600;
 }
 
 @media (max-width: 782px) {
@@ -162,8 +174,6 @@
         overflow-x: auto;
     }
 
-    /* در عرض کم، سلول‌ها باید بشکنند نه اینکه ستون آخر بیرون کادر بماند
-       (مثل مسیرهای طولانی wp-content/...). */
     .pas-center table.widefat th,
     .pas-center table.widefat td {
         white-space: normal;
@@ -171,7 +181,6 @@
         font-size: 12px;
     }
 
-    /* ستون‌های کم‌اهمیت در موبایل پنهان می‌شوند تا نام و وضعیت جا داشته باشند. */
     .pas-center-plugins thead th:nth-child(3),
     .pas-center-plugins tbody td:nth-child(3),
     .pas-center-plugins thead th:nth-child(4),

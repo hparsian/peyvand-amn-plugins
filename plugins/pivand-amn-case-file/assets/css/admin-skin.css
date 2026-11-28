@@ -8,69 +8,69 @@
    admin.css از این نسخه همه‌جای رنگ را از var(--pivand-*) می‌خواند؛
    کافی است همان متغیرها را در ریشهٔ همین صفحه بازتعریف کنیم. */
 .pas-cf-wrap {
-    --pivand-primary:        #51483F;
-    --pivand-primary-dark:   #3F3830;
-    --pivand-primary-light:  #C8B48A;
-    --pivand-primary-bg:     #EFE6D3;
-    --pivand-primary-mid:    #D9C9A9;
-    --pivand-accent:         #B39B6D;
-    --pivand-accent-bg:      #EFE6D3;
+    --pivand-primary:        #344A42;
+    --pivand-primary-dark:   #26382F;
+    --pivand-primary-light:  #6E9182;
+    --pivand-primary-bg:     #E4ECE7;
+    --pivand-primary-mid:    #8FAE9B;
+    --pivand-accent:         #6E9182;
+    --pivand-accent-bg:      #E4ECE7;
 
-    --pivand-ink:            #51483F;
-    --pivand-ink-mid:        #6B5F52;
-    --pivand-ink-soft:       #857A6C;
-    --pivand-border:         #DDD5C8;
-    --pivand-border-soft:    #EFE9DE;
-    --pivand-surface:        #FAF7F1;
-    --pivand-white:          #FFFFFF;
+    --pivand-ink:            #292D2A;
+    --pivand-ink-mid:        #4A504B;
+    --pivand-ink-soft:       #5C615D;
+    --pivand-border:         #DCD5C9;
+    --pivand-border-soft:    #E8E2D8;
+    --pivand-surface:        #F8F4EE;
+    --pivand-white:          #FCFBF8;
 
-    --pivand-success:        #3F6B4F;
-    --pivand-success-bg:     #E8F1EB;
-    --pivand-warning:        #8A5A18;
-    --pivand-warning-bg:     #F8EEDC;
-    --pivand-danger:         #9B3A2E;
-    --pivand-danger-bg:      #F7E7E3;
-    --pivand-info:           #3E5A75;
-    --pivand-info-bg:        #E7EEF5;
+    --pivand-success:        #366346;
+    --pivand-success-bg:     #E6EFE8;
+    --pivand-warning:        #855615;
+    --pivand-warning-bg:     #F7EFDF;
+    --pivand-danger:         #96362A;
+    --pivand-danger-bg:      #F7E9E5;
+    --pivand-info:           #3A5A6E;
+    --pivand-info-bg:        #EAF0F4;
 
     --pivand-radius-lg:      18px;
     --pivand-radius:         14px;
     --pivand-radius-sm:      10px;
 
-    --pivand-shadow-sm:      0 1px 2px rgba(81, 72, 63, .08);
-    --pivand-shadow:         0 6px 20px rgba(81, 72, 63, .10), 0 1px 3px rgba(81, 72, 63, .06);
-    --pivand-shadow-lg:      0 18px 44px rgba(81, 72, 63, .16), 0 4px 10px rgba(81, 72, 63, .07);
+    --pivand-shadow-sm:      0 1px 2px rgba(41, 45, 42, .05);
+    --pivand-shadow:         0 6px 20px rgba(41, 45, 42, .08), 0 1px 3px rgba(41, 45, 42, .04);
+    --pivand-shadow-lg:      0 18px 44px rgba(41, 45, 42, .14), 0 4px 10px rgba(41, 45, 42, .05);
 
     font-family: Vazirmatn, Tahoma, sans-serif;
     color: var(--pivand-ink);
 }
 
-/* ── سرفصل و دکمهٔ «پرونده‌ی جدید» (گرادیان تیل هاردکد) ─────── */
+/* ── سرفصل و دکمهٔ «پرونده‌ی جدید» ─────────────────────────── */
 .pas-cf-wrap h1 + a.page-title-action {
     background: var(--pivand-primary);
     border: 1px solid var(--pivand-primary);
-    color: #F4F0E8;
-    box-shadow: 0 4px 12px rgba(81, 72, 63, .18);
+    color: #F6F3EC;
+    box-shadow: var(--pivand-shadow-sm);
 }
 
 .pas-cf-wrap h1 + a.page-title-action:hover {
     background: var(--pivand-primary-dark);
-    color: #F4F0E8;
-    box-shadow: 0 6px 16px rgba(81, 72, 63, .24);
+    color: #F6F3EC;
+    box-shadow: var(--pivand-shadow);
 }
 
 .pas-cf-wrap .button.button-primary {
     background: var(--pivand-primary);
     border-color: var(--pivand-primary);
-    color: #F4F0E8;
-    box-shadow: 0 3px 10px rgba(81, 72, 63, .16);
+    color: #F6F3EC;
+    box-shadow: var(--pivand-shadow-sm);
 }
 
 .pas-cf-wrap .button.button-primary:hover,
 .pas-cf-wrap .button.button-primary:focus {
     background: var(--pivand-primary-dark);
     border-color: var(--pivand-primary-dark);
-    color: #F4F0E8;
+    color: #F6F3EC;
 }
 
 .pas-cf-wrap .button:not(.button-primary) {
@@ -103,7 +103,7 @@
 }
 
 .pas-cf-wrap .pas-cf-box h3::before {
-    background: var(--pivand-primary-light);
+    content: none;
 }
 
 /* ── داشبورد درمانگر ───────────────────────────────────────── */
@@ -154,6 +154,7 @@
     font-weight: 800;
     line-height: 1.1;
     color: var(--pivand-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .pas-cf-dash-v small {

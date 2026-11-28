@@ -1,10 +1,7 @@
 /* ============================================================
    پیوند امن — لایهٔ «Calm Intelligence» (calm.css)
-   نسخه ۲.۰.۰
-
-   این فایل فقط *افزودنی* است: روی tokens.css و components.css سوار
-   می‌شود و هیچ کلاس موجودی را بازنویسی نمی‌کند. همهٔ انتخابگرها با
-   پیشوند pui- و بدون قاعدهٔ سراسری روی html/body.
+   نسخه ۲.۱.۰
+   افزودنی روی tokens.css و components.css بدون بازنویسی کلاس‌های پایه.
    ============================================================ */
 
 /* ── تایپوگرافی ─────────────────────────────────────────── */
@@ -14,7 +11,7 @@
     font-family: var(--pui-font-display);
     font-weight: 700;
     font-size: var(--pui-fs-display);
-    line-height: 1.12;
+    line-height: 1.15;
     letter-spacing: -.01em;
     color: var(--pui-text);
     text-wrap: balance;
@@ -34,7 +31,7 @@
     margin: 0;
     font-family: var(--pui-font-display);
     font-weight: 600;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     line-height: 1.35;
     color: var(--pui-text);
 }
@@ -44,8 +41,7 @@
     font-family: var(--pui-font);
     font-size: var(--pui-fs-xs);
     font-weight: 600;
-    letter-spacing: .08em;
-    text-transform: none;
+    letter-spacing: .04em;
     color: var(--pui-text-soft);
 }
 
@@ -53,7 +49,7 @@
     margin: 0;
     max-inline-size: var(--pui-measure);
     font-size: var(--pui-fs-md);
-    line-height: 1.9;
+    line-height: 1.85;
     color: var(--pui-text-muted);
 }
 
@@ -64,7 +60,6 @@
 
 /* ── سطوح ───────────────────────────────────────────────── */
 
-/* گوشهٔ نامتقارن: تنها یک گوشه کوچک، بقیه نرم. */
 .pui-panel {
     position: relative;
     padding: var(--pui-s6);
@@ -82,9 +77,9 @@
 }
 
 .pui-panel--inset {
-    background: var(--pui-surface-3);
-    box-shadow: inset 0 1px 2px rgba(41, 45, 42, .05);
-    border-color: transparent;
+    background: var(--pui-surface-2);
+    border-color: var(--pui-border-soft);
+    box-shadow: none;
 }
 
 .pui-panel--quiet {
@@ -97,23 +92,24 @@
     block-size: 1px;
     border: 0;
     margin: var(--pui-s5) 0;
-    background: linear-gradient(90deg, var(--pui-border-soft), transparent 78%);
+    background: var(--pui-border-soft);
 }
 
-/* ── بج و چیپ ───────────────────────────────────────────── */
+/* ── نشان وضعیت آرام (بدون شکل قرص تزئینی) ─────────────── */
 
 .pui-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 10px;
+    padding: 2px 9px;
     border: 1px solid var(--pui-border-soft);
-    border-radius: var(--pui-r-xs) var(--pui-r-full) var(--pui-r-full) var(--pui-r-full);
+    border-radius: var(--pui-r-sm);
     background: var(--pui-surface-2);
     color: var(--pui-text-muted);
     font-size: var(--pui-fs-xs);
     font-weight: 500;
-    line-height: 1.7;
+    line-height: 1.65;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
@@ -125,10 +121,10 @@
     flex: 0 0 auto;
 }
 
-.pui-chip--good    { color: var(--pui-success); background: var(--pui-success-bg); border-color: transparent; }
-.pui-chip--warn    { color: var(--pui-warning); background: var(--pui-warning-bg); border-color: transparent; }
-.pui-chip--danger  { color: var(--pui-danger);  background: var(--pui-danger-bg);  border-color: transparent; }
-.pui-chip--info    { color: var(--pui-info);    background: var(--pui-info-bg);    border-color: transparent; }
+.pui-chip--good    { color: var(--pui-success); background: var(--pui-success-bg); border-color: color-mix(in srgb, var(--pui-success) 24%, transparent); }
+.pui-chip--warn    { color: var(--pui-warning); background: var(--pui-warning-bg); border-color: color-mix(in srgb, var(--pui-warning) 24%, transparent); }
+.pui-chip--danger  { color: var(--pui-danger);  background: var(--pui-danger-bg);  border-color: color-mix(in srgb, var(--pui-danger) 24%, transparent); }
+.pui-chip--info    { color: var(--pui-info);    background: var(--pui-info-bg);    border-color: color-mix(in srgb, var(--pui-info) 24%, transparent); }
 .pui-chip--neutral { color: var(--pui-text-muted); }
 
 /* ── نوار سنجه ──────────────────────────────────────────── */
@@ -172,13 +168,12 @@
     border-radius: var(--pui-r-sm);
     color: inherit;
     text-decoration: none;
-    transition: background var(--pui-dur) var(--pui-ease), transform var(--pui-dur) var(--pui-ease);
+    transition: background-color var(--pui-dur) var(--pui-ease);
 }
 
 .pui-scan > li > a:hover,
 .pui-scan > li > a:focus-visible {
     background: var(--pui-surface-2);
-    transform: translateX(-2px);
 }
 
 .pui-scan__title {
@@ -238,22 +233,15 @@
 /* ── ورود نرم ───────────────────────────────────────────── */
 
 @keyframes pui-rise {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
 .pui-rise {
     animation: pui-rise var(--pui-dur-slow) var(--pui-ease) both;
-    animation-delay: calc(var(--pui-i, 0) * 40ms);
+    animation-delay: calc(var(--pui-i, 0) * 35ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .pui-rise {
-        animation: none;
-    }
-
-    .pui-scan > li > a:hover,
-    .pui-scan > li > a:focus-visible {
-        transform: none;
-    }
+    .pui-rise { animation: none; }
 }

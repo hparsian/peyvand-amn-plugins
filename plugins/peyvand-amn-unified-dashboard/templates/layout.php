@@ -10,14 +10,29 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// مدیر سایت، چیدمان فشرده‌تر «اتاق کنترل» می‌گیرد؛ درمانگر همان پوسته
-// «میز کار» را می‌بیند. تفاوت فقط در کلاس و تراکم است، نه در مجوز.
 $pas_console = PAS_Dashboard_Security::can_manage();
 $pas_group   = PAS_Dashboard_Module::group_for( $module->id );
 $pas_home    = add_query_arg(
 	array(
 		'page'   => PAS_DASHBOARD_SLUG,
 		'module' => PAS_Dashboard_Permissions::default_module(),
+	),
+	admin_url( 'admin.php' )
+);
+
+$pas_new_case_url = add_query_arg(
+	array(
+		'page'   => PAS_DASHBOARD_SLUG,
+		'module' => 'case_files',
+		'new'    => '1',
+	),
+	admin_url( 'admin.php' )
+);
+
+$pas_cases_url = add_query_arg(
+	array(
+		'page'   => PAS_DASHBOARD_SLUG,
+		'module' => 'case_files',
 	),
 	admin_url( 'admin.php' )
 );
@@ -53,10 +68,12 @@ $pas_home    = add_query_arg(
 						</div>
 
 						<div class="pvn-pagehead__aside">
-							<span class="pvn-pagehead__chip">
-								<?php echo PAS_Dashboard_Module::svg( $module->id, 15 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<?php echo esc_html( $pas_group !== '' ? $pas_group : $module->title ); ?>
-							</span>
+							<?php if ( in_array( $module->id, array( 'overview', 'case_files' ), true ) && PAS_Dashboard_Permissions::can( 'case_files' ) ) : ?>
+								<a class="pas-btn pas-btn-primary" href="<?php echo esc_url( $pas_new_case_url ); ?>"><?php esc_html_e( 'پروندهٔ جدید', 'peyvand-amn-dashboard' ); ?></a>
+							<?php endif; ?>
+							<?php if ( $module->id !== 'case_files' && PAS_Dashboard_Permissions::can( 'case_files' ) ) : ?>
+								<a class="pas-btn" href="<?php echo esc_url( $pas_cases_url ); ?>"><?php esc_html_e( 'پرونده‌های بالینی', 'peyvand-amn-dashboard' ); ?></a>
+							<?php endif; ?>
 						</div>
 					</div>
 
@@ -64,7 +81,6 @@ $pas_home    = add_query_arg(
 
 					<?php
 					$content = $module->render();
-					// خروجی ماژول‌ها در همان فایل با esc_html/esc_url ساخته شده است.
 					echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					?>
 				</div>

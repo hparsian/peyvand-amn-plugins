@@ -66,6 +66,14 @@ $pas_bell  = add_query_arg(
 	<div class="pvn-topbar-end">
 		<span class="pvn-date"><?php echo esc_html( sprintf( /* translators: %s: Jalali date */ __( 'امروز · %s', 'peyvand-amn-dashboard' ), $pas_today ) ); ?></span>
 
+		<button type="button" class="pvn-quickjump" data-pvn-cmd-open title="<?php esc_attr_e( 'پرش سریع بین بخش‌ها (Ctrl+K)', 'peyvand-amn-dashboard' ); ?>">
+			<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+				<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+			</svg>
+			<span class="pvn-quickjump__text"><?php esc_html_e( 'پرش سریع', 'peyvand-amn-dashboard' ); ?></span>
+			<kbd class="pui-kbd">Ctrl K</kbd>
+		</button>
+
 		<button type="button" class="pvn-icon-btn pvn-theme-toggle" data-pui-theme-toggle
 			aria-pressed="<?php echo esc_attr( $pas_is_dark ? 'true' : 'false' ); ?>"
 			data-pui-theme-default="<?php echo esc_attr( $pas_is_dark ? 'dark' : 'light' ); ?>"

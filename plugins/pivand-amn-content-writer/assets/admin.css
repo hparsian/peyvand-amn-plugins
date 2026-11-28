@@ -1,22 +1,20 @@
 /* ACO Content Writer - Admin Styles (بازطراحی: هم‌راستا با برند teal/rose اکوسیستم) */
 
 :root {
-    /* از این نسخه: از توکن‌های مشترک اکوسیستم (--pivand-*) می‌خواند تا با
-       بقیه‌ی داشبوردهای ادمین یکپارچه باشد. */
-    --aco-teal:       var(--pivand-primary, #0f766e);
-    --aco-teal-light: var(--pivand-primary-light, #14b8a6);
-    --aco-teal-bg:    var(--pivand-primary-bg, #f0fdfa);
-    --aco-teal-mid:   var(--pivand-primary-mid, #5eead4);
-    --aco-rose:       var(--pivand-danger, #e11d48);
-    --aco-rose-bg:    var(--pivand-danger-bg, #fff1f2);
-    --aco-amber:      var(--pivand-warning, #d97706);
-    --aco-amber-bg:   var(--pivand-warning-bg, #fffbeb);
-    --aco-text:       var(--pivand-ink, #1e293b);
-    --aco-text-mid:   var(--pivand-ink-mid, #475569);
-    --aco-text-soft:  var(--pivand-ink-soft, #94a3b8);
-    --aco-border:     var(--pivand-border, #e2e8f0);
-    --aco-surface:    var(--pivand-surface, #f8fafc);
-    --aco-white:      var(--pivand-white, #ffffff);
+    --aco-teal:       var(--pivand-primary, #344A42);
+    --aco-teal-light: var(--pivand-primary-light, #6E9182);
+    --aco-teal-bg:    var(--pivand-primary-bg, #E4ECE7);
+    --aco-teal-mid:   var(--pivand-primary-mid, #D1E0D7);
+    --aco-rose:       var(--pivand-danger, #B44332);
+    --aco-rose-bg:    var(--pivand-danger-bg, #FCEEEB);
+    --aco-amber:      var(--pivand-warning, #9A631A);
+    --aco-amber-bg:   var(--pivand-warning-bg, #FCF3E3);
+    --aco-text:       var(--pivand-ink, #292D2A);
+    --aco-text-mid:   var(--pivand-ink-mid, #585F5A);
+    --aco-text-soft:  var(--pivand-ink-soft, #7D837D);
+    --aco-border:     var(--pivand-border, #DCD5C9);
+    --aco-surface:    var(--pivand-surface, #F8F4EE);
+    --aco-white:      var(--pivand-white, #FCFBF8);
     --aco-transition: var(--pivand-transition, 0.2s ease);
 }
 
@@ -146,27 +144,28 @@ label.aco-checked input[type="checkbox"] {
 .aco-btn-generate {
     background: var(--aco-teal) !important;
     border-color: var(--aco-teal) !important;
-    color: #fff !important;
+    color: #FBF9F5 !important;
     padding: 10px 24px !important;
     height: auto !important;
     font-size: 15px !important;
     font-weight: 600 !important;
     border-radius: 8px !important;
+    white-space: nowrap;
     cursor: pointer;
-    transition: background .2s, transform .1s;
+    transition: background .2s, transform .1s, box-shadow .2s;
     font-family: inherit !important;
 }
 .aco-btn-generate:hover {
-    background: #0b5a54 !important;
-    border-color: #0b5a54 !important;
+    background: var(--pivand-primary-dark, #26382F) !important;
+    border-color: var(--pivand-primary-dark, #26382F) !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(15,118,110,.32);
+    box-shadow: 0 4px 12px rgba(52,74,66,.24);
 }
 .aco-btn-generate:active { transform: scale(.98); }
 .aco-btn-generate:focus-visible,
 .aco-result-links .btn-edit:focus-visible,
 .aco-result-links .btn-view:focus-visible {
-    outline: var(--pivand-focus-outline, 2px solid var(--aco-teal, #0f766e));
+    outline: var(--pivand-focus-outline, 2px solid var(--aco-teal, #344A42));
     outline-offset: var(--pivand-focus-offset, 2px);
 }
 .aco-btn-generate:disabled {
@@ -348,8 +347,8 @@ label.aco-checked input[type="checkbox"] {
 
 /* Notice */
 .aco-notice {
-    border-right: 4px solid var(--aco-amber) !important;
-    border-left: none !important;
+    border: 1px solid color-mix(in srgb, var(--aco-amber) 35%, var(--aco-border)) !important;
+    background: var(--aco-amber-bg) !important;
 }
 
 /* Settings message */
@@ -532,11 +531,11 @@ label.aco-checked input[type="checkbox"] {
 
 /* ─── Rewrite Table (v1.9.0) ─── */
 #aco-rw-table .aco-rw-row:hover td {
-    background: var(--aco-teal-bg);
+    background: var(--aco-surface);
     cursor: pointer;
 }
 #aco-rw-table .aco-rw-row:has(.aco-rw-cb:checked) td {
-    background: #ccfbf1;
+    background: var(--aco-teal-bg);
 }
 #aco-rw-table .aco-rw-cb {
     width: 16px;
@@ -660,8 +659,8 @@ label.aco-checked input[type="checkbox"] {
 }
 
 .aco-hidden15 {
-    background:#eff6ff;
-    border:1px solid #bfdbfe;
+    background: var(--aco-teal-bg);
+    border: 1px solid var(--aco-teal-mid);
     border-radius:10px;
     padding:12px 18px;
     margin-bottom:16px;
@@ -672,7 +671,7 @@ label.aco-checked input[type="checkbox"] {
 
 .aco-text16 {
     font-size:13px;
-    color:#1e40af;
+    color: var(--aco-teal);
     font-weight:600;
 }
 
@@ -1382,16 +1381,10 @@ label.aco-checked input[type="checkbox"] {
     margin-bottom:24px;
 }
 
-.aco-u130 {
-    border-top:3px solid #3b82f6;
-}
-
-.aco-u131 {
-    border-top:3px solid #8b5cf6;
-}
-
+.aco-u130,
+.aco-u131,
 .aco-u132 {
-    border-top:3px solid #10b981;
+    border: 1px solid var(--aco-border);
 }
 
 .aco-flex133 {

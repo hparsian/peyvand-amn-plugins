@@ -13,23 +13,23 @@
 
 .zdp-login-stage {
     /* پشتیبان، اگر payvand-amn-ui-kit فعال نباشد */
-    --pui-bg: #F4F0E8;
-    --pui-surface: #FFFFFF;
-    --pui-surface-2: #FAF7F1;
-    --pui-surface-3: #F1ECE2;
-    --pui-text: #51483F;
-    --pui-text-soft: #6B5F52;
-    --pui-text-muted: #8A7F72;
-    --pui-border: #D9D1C4;
-    --pui-border-soft: #E8E1D6;
-    --pui-primary: #51483F;
-    --pui-on-primary: #F4F0E8;
-    --pui-accent: #C8B48A;
-    --pui-accent-soft: #F3EAD8;
-    --pui-danger: #9B3A32;
-    --pui-danger-soft: #FBEDEB;
-    --pui-success: #3D6B4F;
-    --pui-success-soft: #ECF4EE;
+    --pui-bg: #F4F1EC;
+    --pui-surface: #FCFBF8;
+    --pui-surface-2: #F8F4EE;
+    --pui-surface-3: #EFEAE2;
+    --pui-text: #292D2A;
+    --pui-text-soft: #4A504B;
+    --pui-text-muted: #5C615D;
+    --pui-border: #DCD5C9;
+    --pui-border-soft: #E8E2D8;
+    --pui-primary: #344A42;
+    --pui-on-primary: #F6F3EC;
+    --pui-accent: #6E9182;
+    --pui-accent-soft: #E4ECE7;
+    --pui-danger: #96362A;
+    --pui-danger-soft: #F7E9E5;
+    --pui-success: #366346;
+    --pui-success-soft: #E6EFE8;
     --pui-fs-xs: .78rem;
     --pui-fs-sm: .875rem;
     --pui-fs-md: 1rem;
@@ -43,11 +43,11 @@
     --pui-s6: 32px;
     --pui-s7: 40px;
     --pui-r-sm: 8px;
-    --pui-r-md: 12px;
-    --pui-r-lg: 16px;
-    --pui-r-xl: 22px;
-    --pui-shadow-sm: 0 1px 2px rgba(81, 72, 63, .08);
-    --pui-shadow-lg: 0 24px 60px -28px rgba(81, 72, 63, .45);
+    --pui-r-md: 10px;
+    --pui-r-lg: 14px;
+    --pui-r-xl: 18px;
+    --pui-shadow-sm: 0 1px 2px rgba(41, 45, 42, .05);
+    --pui-shadow-lg: 0 20px 48px -24px rgba(41, 45, 42, .25);
     --pui-font: Vazirmatn, Tahoma, Arial, sans-serif;
 
     min-block-size: 100dvh;
@@ -55,8 +55,8 @@
     place-items: center;
     padding: clamp(16px, 4vw, 48px);
     background:
-        radial-gradient(900px 420px at 85% -10%, rgba(200, 180, 138, .30), transparent 62%),
-        radial-gradient(700px 380px at 5% 105%, rgba(184, 173, 160, .28), transparent 60%),
+        radial-gradient(900px 420px at 85% -10%, rgba(110, 145, 130, .18), transparent 62%),
+        radial-gradient(700px 380px at 5% 105%, rgba(52, 74, 66, .10), transparent 60%),
         var(--pui-bg);
     color: var(--pui-text);
     font-family: var(--pui-font);
@@ -85,8 +85,8 @@
     position: relative;
     padding: clamp(24px, 4vw, 44px);
     background:
-        radial-gradient(480px 260px at 110% 110%, rgba(200, 180, 138, .38), transparent 65%),
-        linear-gradient(160deg, #5A5147 0%, #51483F 55%, #443C34 100%);
+        radial-gradient(480px 260px at 110% 110%, rgba(143, 174, 155, .28), transparent 65%),
+        linear-gradient(160deg, #344A42 0%, #26382F 60%, #1F2D26 100%);
     color: var(--pui-bg);
     align-content: center;
     gap: var(--pui-s4);

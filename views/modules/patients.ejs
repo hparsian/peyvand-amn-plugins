@@ -1,15 +1,19 @@
 <% if (data.selectedClient) { const cl = data.selectedClient; %>
   <section class="pas-card">
     <h2 class="pas-card-title">شناسنامه‌ی مراجع</h2>
-    <p><strong>شناسه‌ی یکتا:</strong> <code><%= cl.client_id %></code></p>
+    <p>
+      <strong>شناسه‌ی یکتا:</strong>
+      <code dir="ltr"><%= cl.client_id %></code>
+      <button type="button" class="pas-btn pas-btn-sm" data-pui-copy="<%= cl.client_id %>">کپی شناسه</button>
+    </p>
     <p><strong>نام نمایشی:</strong> <%= cl.display_name %></p>
     <p><strong>وضعیت:</strong>
       <span class="pas-badge <%= cl.status === 'review' ? 'pas-badge-warn' : 'pas-badge-good' %>">
         <%= cl.status === 'review' ? 'نیازمند بررسی' : 'فعال' %>
       </span>
     </p>
-    <p><strong>تعداد تعارض:</strong> <%= h.persianNum(cl.conflict_count) %></p>
-    <p><strong>تعداد منبع:</strong> <%= h.persianNum(cl.sources_count) %></p>
+    <p><strong>تعداد تعارض:</strong> <span class="pui-num"><%= h.persianNum(cl.conflict_count) %></span></p>
+    <p><strong>تعداد منبع:</strong> <span class="pui-num"><%= h.persianNum(cl.sources_count) %></span></p>
     <p class="pas-muted">این داشبورد هیچ فیلد بالینی از رجیستری نمی‌خواند؛ فقط شناسه، نام نمایشی و وضعیت.</p>
   </section>
 
@@ -50,7 +54,7 @@
       <% if (!data.searchResult) { %>
         <p class="pas-empty">مراجعی با این شناسه یافت نشد.</p>
       <% } else { %>
-        <p>شناسه: <code><%= data.searchResult.client_id %></code></p>
+        <p>شناسه: <code dir="ltr"><%= data.searchResult.client_id %></code></p>
         <p>نام نمایشی: <%= data.searchResult.display_name %></p>
         <p><a class="pas-btn" href="/dashboard?module=patients&client_id=<%= encodeURIComponent(data.searchResult.client_id) %>">مشاهده‌ی جزئیات</a></p>
       <% } %>
@@ -59,6 +63,15 @@
 
   <section class="pas-card">
     <h2 class="pas-card-title">آخرین مراجعان ایندکس‌شده</h2>
+    <div class="pui-filter-bar">
+      <div class="pui-filter-bar__search">
+        <span class="pui-filter-bar__icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </span>
+        <input class="pui-input" type="search" id="pvn-clients-filter" data-pui-filter-target="#pvn-clients-tbody" placeholder="فیلتر فوری نام، شناسه یا وضعیت..." aria-label="فیلتر فهرست مراجعان" />
+      </div>
+      <span class="pui-live-count" data-pui-filter-count="#pvn-clients-tbody"></span>
+    </div>
     <div class="pas-table-wrap">
       <table class="pas-table">
         <thead>
@@ -70,14 +83,14 @@
             <th>عملیات</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="pvn-clients-tbody">
           <% data.clients.forEach(function(cl) {
             const idsText = cl.identifiers.map(function(i) {
               return i.type + ': ' + (i.type === 'mobile' ? h.maskMobile(i.value) : i.value);
             }).join(' · ');
           %>
             <tr>
-              <td data-label="شناسه"><code><%= cl.client_id %></code></td>
+              <td data-label="شناسه"><code dir="ltr"><%= cl.client_id %></code></td>
               <td data-label="نام نمایشی"><%= cl.display_name %></td>
               <td data-label="وضعیت">
                 <span class="pas-badge <%= cl.status === 'review' ? 'pas-badge-warn' : 'pas-badge-good' %>">
@@ -91,5 +104,6 @@
         </tbody>
       </table>
     </div>
+    <p class="pas-empty pas-card-gap" data-pui-filter-empty="#pvn-clients-tbody" hidden>مراجعی با این عبارت یافت نشد.</p>
   </section>
 <% } %>
